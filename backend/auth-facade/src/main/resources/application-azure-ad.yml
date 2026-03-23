@@ -1,0 +1,29 @@
+# Azure AD Provider Configuration
+# Activate with: spring.profiles.active=azure-ad
+# Or: AUTH_PROVIDER=azure-ad
+
+auth:
+  facade:
+    provider: azure-ad
+
+    # Azure AD specific role claim paths
+    role-claim-paths:
+      - roles                            # Azure AD App Roles
+      - groups                           # Azure AD Groups (if mapped)
+      - wids                             # Azure AD Directory Roles
+
+    # Azure AD user claim mappings
+    user-claim-mappings:
+      user-id: oid                       # Object ID in Azure AD
+      email: preferred_username          # UPN or email
+      first-name: given_name
+      last-name: family_name
+      tenant-id: tid                     # Azure AD Tenant ID
+      identity-provider: idp             # Identity Provider (for B2B)
+
+    # Provider-specific configuration
+    provider-config:
+      tenant-id: ${AZURE_AD_TENANT_ID:common}
+      client-id: ${AZURE_AD_CLIENT_ID:}
+      client-secret: ${AZURE_AD_CLIENT_SECRET:}
+      scope: openid profile email

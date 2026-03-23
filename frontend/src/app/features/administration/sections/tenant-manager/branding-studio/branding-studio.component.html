@@ -1,0 +1,232 @@
+<div class="branding-studio" data-testid="branding-studio">
+  <!-- Search bar -->
+  <div class="studio-search">
+    <input
+      pInputText
+      class="studio-search-input"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+      placeholder="Search components..."
+      aria-label="Search component catalog"
+      data-testid="studio-search"
+    />
+  </div>
+
+  <div class="studio-body">
+    <!-- LEFT: Catalog Sidebar -->
+    <nav class="studio-sidebar" aria-label="Component catalog">
+      <button
+        type="button"
+        class="catalog-item global-item"
+        [class.active]="isGlobal()"
+        (click)="selectEntry('global')"
+        data-testid="catalog-global"
+      >
+        <i class="pi pi-palette"></i>
+        Global Theme
+      </button>
+
+      @for (group of catalogByCategory(); track group.category) {
+        <div class="catalog-group-header">{{ group.category }}</div>
+        @for (entry of group.entries; track entry.id) {
+          <button
+            type="button"
+            class="catalog-item"
+            [class.active]="isEntrySelected(entry)"
+            [class.has-overrides]="hasOverrides(entry.id)"
+            [class.disabled]="!entry.usedInEmsist"
+            [attr.aria-disabled]="!entry.usedInEmsist"
+            [disabled]="!entry.usedInEmsist"
+            (click)="entry.usedInEmsist && selectEntry(entry)"
+            [attr.data-testid]="'catalog-' + entry.id"
+            [title]="
+              entry.usedInEmsist ? entry.name : entry.name + ' (not used in this application)'
+            "
+          >
+            <i [class]="entry.icon"></i>
+            {{ entry.name }}
+            @if (hasOverrides(entry.id)) {
+              <span class="override-dot" aria-label="Has overrides"></span>
+            }
+            @if (!entry.usedInEmsist) {
+              <span class="disabled-badge" aria-label="Not used">&mdash;</span>
+            }
+          </button>
+        }
+      }
+    </nav>
+
+    <!-- RIGHT: Preview + Settings -->
+    <div class="studio-panel">
+      <div class="policy-status-card" data-testid="branding-policy-status">
+        <div class="policy-status-head">
+          <h3>Brand Enforcement Policy v1</h3>
+          <span>Palette-locked theme controls are active</span>
+        </div>
+        <div class="policy-status-tags">
+          <span class="status-tag active">Custom CSS Disabled</span>
+          <span class="status-tag active">Palette Validation Required</span>
+          @if (validationErrors().length === 0 && validationWarnings().length === 0) {
+            <span class="status-tag ok">No Current Issues</span>
+          } @else {
+            @if (validationErrors().length > 0) {
+              <span class="status-tag error">{{ validationErrors().length }} violation(s)</span>
+            }
+            @if (validationWarnings().length > 0) {
+              <span class="status-tag warn">{{ validationWarnings().length }} warning(s)</span>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="library-status-card" data-testid="branding-library-status">
+        <div class="policy-status-head">
+          <h3>Unified UI Library</h3>
+          <span>Single governed catalog for PrimeNG + custom layout elements</span>
+        </div>
+        <div class="policy-status-tags">
+          <span class="status-tag active">Total {{ libraryStats().total }}</span>
+          <span class="status-tag ok">Used {{ libraryStats().used }}</span>
+          <span class="status-tag active">PrimeNG {{ libraryStats().primeng }}</span>
+          <span class="status-tag active">Custom {{ libraryStats().custom }}</span>
+        </div>
+      </div>
+
+      <div class="state-governance-card" data-testid="branding-component-states">
+        <div class="policy-status-head">
+          <h3>Governed Component States</h3>
+          <span>Single state contract for all admin action buttons.</span>
+        </div>
+        <div class="state-matrix" role="table" aria-label="Governed button state matrix">
+          <div class="state-matrix-head" role="row">
+            <span role="columnheader">State</span>
+            <span role="columnheader">Primary</span>
+            <span role="columnheader">Secondary</span>
+            <span role="columnheader">Destructive</span>
+          </div>
+          @for (row of governedComponentStates; track row.state) {
+            <div class="state-matrix-row" role="row">
+              <span class="state-name" role="cell">{{ row.state }}</span>
+              <span role="cell">{{ row.primary }}</span>
+              <span role="cell">{{ row.secondary }}</span>
+              <span role="cell">{{ row.destructive }}</span>
+            </div>
+          }
+        </div>
+        <div class="state-token-row">
+          @for (item of governedStateTokens; track item.state) {
+            <span class="meta-chip"
+              >{{ item.state }}: <code>{{ item.token }}</code></span
+            >
+          }
+        </div>
+      </div>
+
+      @if (isGlobal()) {
+        <app-global-branding-form
+          [(brandingForm)]="globalBrandingForm"
+          (previewChange)="onPreviewChange()"
+        />
+      } @else {
+        @if (selectedCatalogEntry(); as entry) {
+          <div class="component-panel">
+            <div class="component-header">
+              <div class="component-panel-header">
+                <i [class]="entry.icon + ' component-panel-icon'"></i>
+                <div>
+                  <h3>{{ entry.name }}</h3>
+                  <p class="component-desc">{{ entry.description }}</p>
+                </div>
+              </div>
+              <div class="component-governance" data-testid="component-governance-meta">
+                <span class="meta-chip">{{ getEntrySource(entry) }}</span>
+                <span class="meta-chip">{{ getEntryControlMode(entry) }}</span>
+                <span class="meta-chip">Owner: {{ getEntryOwner(entry) }}</span>
+                <span class="meta-chip">{{ getEntryPolicy(entry) }}</span>
+              </div>
+              <p class="component-implementation">
+                Implementation: <code>{{ getEntryImplementationPath(entry) }}</code>
+              </p>
+            </div>
+
+            <!-- Dynamic preview -->
+            <div class="preview-area" data-testid="preview-area" aria-label="Component preview">
+              @if (previewComponent()) {
+                <ng-container *ngComponentOutlet="previewComponent()" />
+              } @else {
+                <div class="preview-placeholder">
+                  <i class="pi pi-eye-slash"></i>
+                  <p>Preview not available for this component.</p>
+                </div>
+              }
+            </div>
+
+            <!-- Style variant picker -->
+            @if (entry.styleVariants.length > 0) {
+              <div class="variant-section" data-testid="variant-section">
+                <h4 class="section-label">STYLE VARIANTS</h4>
+                <app-style-variant-picker
+                  [variants]="entry.styleVariants"
+                  [selectedId]="getSelectedVariant(entry.id)"
+                  (selectedIdChange)="selectVariant(entry.id, $event)"
+                  [attr.data-testid]="'variant-picker-' + entry.id"
+                />
+              </div>
+            }
+          </div>
+        }
+      }
+
+      @if (validationErrors().length > 0 || validationWarnings().length > 0) {
+        <div class="validation-feedback" data-testid="branding-validation-feedback">
+          @if (validationErrors().length > 0) {
+            <div class="validation-block errors" data-testid="branding-validation-errors">
+              <h4>Policy Violations</h4>
+              <ul>
+                @for (error of validationErrors(); track error) {
+                  <li>{{ error }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (validationWarnings().length > 0) {
+            <div class="validation-block warnings" data-testid="branding-validation-warnings">
+              <h4>Policy Warnings</h4>
+              <ul>
+                @for (warning of validationWarnings(); track warning) {
+                  <li>{{ warning }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Master action bar -->
+      <div class="studio-actions" data-testid="studio-actions">
+        <p-button
+          label="Reset to Default"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="resetToDefault()"
+          data-testid="btn-reset"
+        />
+        @if (savedMessage()) {
+          <span
+            class="save-message"
+            [class.error]="savedMessage().includes('failed')"
+            data-testid="save-message"
+          >
+            {{ savedMessage() }}
+          </span>
+        }
+        <p-button
+          label="Save Branding"
+          (onClick)="saveBranding()"
+          [loading]="isSaving()"
+          data-testid="btn-save"
+        />
+      </div>
+    </div>
+  </div>
+</div>

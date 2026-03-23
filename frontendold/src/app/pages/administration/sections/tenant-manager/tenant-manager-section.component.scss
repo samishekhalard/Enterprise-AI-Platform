@@ -1,0 +1,78 @@
+@use '../../administration.styles' as *;
+:host { display: contents; }
+
+// ============================================================================
+// Licenses Tab — Seat Management Additions
+// ============================================================================
+
+// Additional stat card color variants (extend shared .license-stat-card)
+.license-stat-card {
+  &.stat-teal {
+    background: linear-gradient(135deg, #047481 0%, #035a66 100%);
+  }
+
+  &.stat-green {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  }
+}
+
+// Additional license-type-badge color variants (extend shared .license-type-badge)
+.license-type-badge {
+  &.type-teal::before {
+    background: #047481;
+  }
+
+  &.type-green::before {
+    background: #22c55e;
+  }
+}
+
+// Additional utilization fill color variants (extend shared .utilization-fill)
+.utilization-fill {
+  &.fill-teal {
+    background: linear-gradient(90deg, #047481, #5ee7f7);
+  }
+
+  &.fill-green {
+    background: linear-gradient(90deg, #22c55e, #86efac);
+  }
+}
+
+// Loading state for Licenses tab
+.license-loading-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  color: $gray-500;
+  font-size: 0.875rem;
+}
+
+.loading-spinner-sm {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid $gray-200;
+  border-top-color: $teal;
+  border-radius: 50%;
+  animation: spin-sm 0.7s linear infinite;
+}
+
+@keyframes spin-sm {
+  to { transform: rotate(360deg); }
+}
+
+// Error banner for Licenses tab
+.license-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: rgba($danger, 0.06);
+  border: 1px solid rgba($danger, 0.2);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: $gray-700;
+}

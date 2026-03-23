@@ -1,0 +1,50 @@
+<p-card styleClass="master-auth-card">
+  <section class="master-auth">
+    <h3>Master Authentication</h3>
+    <p class="muted">Global security controls applied across tenant boundaries.</p>
+
+    <p-tabs [value]="tab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="providers">Providers</p-tab>
+        <p-tab value="sso">SSO</p-tab>
+        <p-tab value="mfa">MFA</p-tab>
+        <p-tab value="sessions">Sessions</p-tab>
+        <p-tab value="policies">Policies</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="providers">
+          <app-provider-embedded [tenantId]="tenantId" [tenantName]="tenantName" />
+        </p-tabpanel>
+
+        <p-tabpanel value="sso">
+          <section class="content-card">
+            <h4>Single Sign-On Defaults</h4>
+            <p>Set default redirect flows, assertion handling, and metadata lifecycles.</p>
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="mfa">
+          <section class="content-card">
+            <h4>Multi-Factor Controls</h4>
+            <p>Define mandatory factors, trusted device windows, and recovery methods.</p>
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="sessions">
+          <section class="content-card">
+            <h4>Session Governance</h4>
+            <p>Control idle timeout, absolute timeout, and global session revocation.</p>
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="policies">
+          <section class="content-card">
+            <h4>Policy Engine</h4>
+            <p>Centralized password, token, and brute-force protection policies.</p>
+          </section>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
+</p-card>

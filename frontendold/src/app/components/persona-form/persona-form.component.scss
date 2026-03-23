@@ -1,0 +1,58 @@
+.form-control,
+.form-select {
+  border-color: rgba(180, 144, 52, 0.5);
+
+  &:focus {
+    border-color: #b49034;
+    box-shadow: 0 0 0 0.2rem rgba(180, 144, 52, 0.25);
+  }
+}
+
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+  h6 {
+    font-family: 'SFProDisplay', system-ui, sans-serif;
+  }
+}
+
+.btn-outline-primary {
+  border-color: #b49034;
+  color: #b49034;
+
+  &:hover {
+    background-color: #b49034;
+    border-color: #b49034;
+    color: white;
+  }
+}
+
+.text-primary {
+  color: #b49034 !important;
+}
+
+.border-primary {
+  border-color: rgba(180, 144, 52, 0.3) !important;
+}
+
+.bg-primary {
+  background-color: #b49034 !important;
+}
+
+.text-success {
+  color: #00ACA0 !important;
+}
+
+.border-success {
+  border-color: rgba(0, 172, 160, 0.3) !important;
+}
+
+.border-info {
+  border-color: rgba(0, 172, 160, 0.3) !important;
+}
+
+.text-info {
+  color: #00ACA0 !important;
+}

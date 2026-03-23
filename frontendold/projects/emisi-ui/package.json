@@ -1,0 +1,24 @@
+{
+  "name": "emisi-ui",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@primeuix/styled": "^2.0.3",
+    "@primeuix/themes": "^2.0.3",
+    "primeng": "^21.1.1"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./public-api.d.ts",
+      "default": "./fesm2022/emisi-ui.mjs"
+    },
+    "./styles/emisi-theme.scss": "./styles/emisi-theme.scss",
+    "./styles/_tokens.scss": "./styles/_tokens.scss"
+  },
+  "style": "./styles/emisi-theme.scss",
+  "sideEffects": false
+}

@@ -1,0 +1,19 @@
+# Docker profile - uses container hostnames
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/process_db?sslmode=verify-full}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+
+  flyway:
+    repair-on-mismatch: false
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka}
+
+logging:
+  level:
+    com.ems: INFO

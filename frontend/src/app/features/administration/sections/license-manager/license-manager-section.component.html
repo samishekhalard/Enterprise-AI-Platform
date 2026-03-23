@@ -1,0 +1,308 @@
+<section class="license-manager">
+  <header class="head-row">
+    <div>
+      <h3>License Management</h3>
+      <p class="muted">Manage system entitlements and tenant capacity from license-service.</p>
+    </div>
+
+    <div class="head-actions">
+      <div class="view-toggle" role="radiogroup" aria-label="License view mode">
+        <button
+          type="button"
+          [class.active]="licenseView() === 'grid'"
+          [attr.aria-checked]="licenseView() === 'grid'"
+          role="radio"
+          (click)="licenseView.set('grid')"
+        >
+          <img src="assets/icons/grid.svg" alt="" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          [class.active]="licenseView() === 'table'"
+          [attr.aria-checked]="licenseView() === 'table'"
+          role="radio"
+          (click)="licenseView.set('table')"
+        >
+          <img src="assets/icons/bars.svg" alt="" aria-hidden="true" />
+        </button>
+      </div>
+
+      <button type="button" class="nm-btn ghost" [disabled]="isLoading()" (click)="refresh()">
+        <img src="assets/icons/refresh.svg" alt="" aria-hidden="true" />
+        <span>Refresh</span>
+      </button>
+
+      <button type="button" class="nm-btn primary" (click)="openImportModal()">
+        <img src="assets/icons/upload.svg" alt="" aria-hidden="true" />
+        <span>Import License</span>
+      </button>
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <div class="error-message">
+        <img src="assets/icons/alert-triangle.svg" alt="" aria-hidden="true" />
+        <span>{{ error() }}</span>
+      </div>
+      <div class="error-actions">
+        <button type="button" class="nm-btn compact" (click)="refresh()">Retry</button>
+        <button type="button" class="icon-btn" aria-label="Dismiss error" (click)="clearError()">
+          <img src="assets/icons/times.svg" alt="" aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="stat-grid">
+    @for (card of statCards(); track card.label) {
+      <article class="stat-card">
+        <div class="stat-icon">
+          <img [src]="card.icon" alt="" aria-hidden="true" />
+        </div>
+        <div class="stat-content">
+          <span class="label">{{ card.label }}</span>
+          <strong>{{ card.value }}</strong>
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <section class="loading-state" aria-label="Loading license information">
+      <div class="spinner"></div>
+      <p>Loading license information...</p>
+    </section>
+  } @else if (!hasLicense()) {
+    <section class="empty-state">
+      <img src="assets/icons/briefcase.svg" alt="" aria-hidden="true" />
+      <h4>No Licenses Configured</h4>
+      <p>Add a `.lic` file to activate tenant licensing and entitlement checks.</p>
+      <button type="button" class="nm-btn primary" (click)="openImportModal()">
+        <img src="assets/icons/plus.svg" alt="" aria-hidden="true" />
+        <span>Add First License</span>
+      </button>
+    </section>
+  } @else if (licenseView() === 'grid') {
+    <article class="detail-card">
+      <header class="detail-header">
+        <div>
+          <h4>{{ status()?.product ?? 'License' }}</h4>
+          @if (currentLicense()?.versionRange; as versionRange) {
+            <p>Version {{ versionRange }}</p>
+          }
+        </div>
+        <span class="state-pill" [class]="'state-pill state-' + state().toLowerCase()">
+          {{ stateLabel() }}
+        </span>
+      </header>
+
+      <div class="detail-grid">
+        @if (status()?.licenseId; as licenseId) {
+          <div class="detail-field">
+            <span class="label">License ID</span>
+            <strong class="mono">{{ licenseId }}</strong>
+          </div>
+        }
+
+        @if (status()?.expiresAt; as expiresAt) {
+          <div class="detail-field">
+            <span class="label">Expiry</span>
+            <strong>
+              {{ expiresAt | date: 'mediumDate' }}
+              <span class="days-chip" [class]="daysBadgeClass()">{{ daysText() }}</span>
+            </strong>
+          </div>
+        }
+
+        @if (state() === 'GRACE') {
+          <div class="detail-field">
+            <span class="label">Grace Period</span>
+            <strong>
+              {{ status()?.gracePeriodDays ?? 0 }} days
+              @if (status()?.graceExpiresAt; as graceExpiry) {
+                <span class="muted-inline">(ends {{ graceExpiry | date: 'mediumDate' }})</span>
+              }
+            </strong>
+          </div>
+        }
+
+        <div class="detail-field">
+          <span class="label">Tenants</span>
+          <strong>{{ status()?.activeTenantCount ?? 0 }} / {{ status()?.maxTenants ?? 0 }}</strong>
+        </div>
+
+        @if (status()?.issuer; as issuer) {
+          <div class="detail-field">
+            <span class="label">Issuer</span>
+            <strong>{{ issuer }}</strong>
+          </div>
+        }
+
+        @if (status()?.customerName; as customerName) {
+          <div class="detail-field">
+            <span class="label">Customer</span>
+            <strong>{{ customerName }}</strong>
+          </div>
+        }
+
+        @if (status()?.importedAt; as importedAt) {
+          <div class="detail-field">
+            <span class="label">Imported</span>
+            <strong>{{ importedAt | date: 'medium' }}</strong>
+          </div>
+        }
+      </div>
+
+      @if (features().length > 0) {
+        <section class="features-block">
+          <span class="label">Features</span>
+          <div class="feature-grid">
+            @for (feature of features(); track feature) {
+              <span class="feature-chip" [class.degraded]="isDegraded(feature)">{{ feature }}</span>
+            }
+          </div>
+        </section>
+      } @else {
+        <p class="muted">No feature metadata available.</p>
+      }
+
+      @if (degradedFeatures().length > 0) {
+        <div class="degraded-banner" role="alert">
+          <img src="assets/icons/alert-triangle.svg" alt="" aria-hidden="true" />
+          <span>Some features are degraded while the license is in grace.</span>
+        </div>
+      }
+    </article>
+  } @else {
+    <section class="table-wrap">
+      <table class="license-table" role="table" aria-label="License details">
+        <thead>
+          <tr>
+            <th scope="col">State</th>
+            <th scope="col">Product</th>
+            <th scope="col">Version</th>
+            <th scope="col">Expiry</th>
+            <th scope="col">Grace</th>
+            <th scope="col">Tenants</th>
+            <th scope="col">Features</th>
+            <th scope="col">Imported</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <span class="state-pill" [class]="'state-pill state-' + state().toLowerCase()">{{
+                stateLabel()
+              }}</span>
+            </td>
+            <td>{{ status()?.product ?? '-' }}</td>
+            <td>{{ currentLicense()?.versionRange ?? '-' }}</td>
+            <td>{{ status()?.expiresAt ? (status()!.expiresAt! | date: 'mediumDate') : '-' }}</td>
+            <td>{{ status()?.gracePeriodDays ?? 0 }} days</td>
+            <td>{{ status()?.activeTenantCount ?? 0 }} / {{ status()?.maxTenants ?? 0 }}</td>
+            <td>{{ features().length }}</td>
+            <td>{{ status()?.importedAt ? (status()!.importedAt! | date: 'mediumDate') : '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  }
+</section>
+
+@if (showImportModal()) {
+  <div
+    class="modal-overlay"
+    role="button"
+    tabindex="0"
+    aria-label="Close import license dialog"
+    (click)="$event.target === $event.currentTarget && closeImportModal()"
+    (keydown.enter)="closeImportModal()"
+    (keydown.space)="closeImportModal(); $event.preventDefault()"
+  >
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="import-license-title">
+      <header class="modal-header">
+        <h4 id="import-license-title">Import License File</h4>
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="Close modal"
+          (click)="closeImportModal()"
+        >
+          <img src="assets/icons/times.svg" alt="" aria-hidden="true" />
+        </button>
+      </header>
+
+      <div
+        class="drop-zone"
+        [class.dragging]="isDragging()"
+        [class.has-file]="selectedFile() !== null"
+        role="button"
+        tabindex="0"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+        (keydown.enter)="fileInput.click(); $event.preventDefault()"
+        (keydown.space)="fileInput.click(); $event.preventDefault()"
+      >
+        <input
+          #fileInput
+          class="file-input-hidden"
+          type="file"
+          accept=".lic"
+          (change)="onFileSelected($event)"
+        />
+
+        @if (selectedFile(); as file) {
+          <div class="file-preview">
+            <img src="assets/icons/folder.svg" alt="" aria-hidden="true" />
+            <div>
+              <strong>{{ file.name }}</strong>
+              <span>{{ formatFileSize(file.size) }}</span>
+            </div>
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="Remove selected file"
+              (click)="removeFile($event)"
+            >
+              <img src="assets/icons/times.svg" alt="" aria-hidden="true" />
+            </button>
+          </div>
+        } @else {
+          <div class="drop-zone-empty">
+            <img src="assets/icons/upload.svg" alt="" aria-hidden="true" />
+            <p><strong>Drop your `.lic` file here</strong> or click to browse.</p>
+            <span>Only `.lic` files accepted (max 10 MB)</span>
+          </div>
+        }
+      </div>
+
+      @if (importError()) {
+        <div class="import-error" role="alert">
+          <img src="assets/icons/alert-triangle.svg" alt="" aria-hidden="true" />
+          <span>{{ importError() }}</span>
+        </div>
+      }
+
+      <footer class="modal-footer">
+        <button type="button" class="nm-btn ghost" (click)="closeImportModal()">Cancel</button>
+        <button
+          type="button"
+          class="nm-btn primary"
+          [disabled]="!selectedFile() || isImporting()"
+          (click)="importSelected()"
+        >
+          @if (isImporting()) {
+            <span class="mini-spinner"></span>
+            <span>Importing...</span>
+          } @else {
+            <img src="assets/icons/upload.svg" alt="" aria-hidden="true" />
+            <span>Import License</span>
+          }
+        </button>
+      </footer>
+    </div>
+  </div>
+}

@@ -1,0 +1,264 @@
+@use 'sass:map';
+@use './tokens' as tokens;
+
+:root,
+.emisi-theme {
+  --emisi-primary: #{map.get(tokens.$emisi-colors, primary)};
+  --emisi-primary-dark: #{map.get(tokens.$emisi-colors, primary-dark)};
+  --emisi-primary-light: #{map.get(tokens.$emisi-colors, primary-light)};
+  --emisi-secondary: #{map.get(tokens.$emisi-colors, secondary)};
+
+  --emisi-bg: #{map.get(tokens.$emisi-colors, bg)};
+  --emisi-surface: #{map.get(tokens.$emisi-colors, surface)};
+
+  --emisi-text: #{map.get(tokens.$emisi-colors, text)};
+  --emisi-text-secondary: #{map.get(tokens.$emisi-colors, text-secondary)};
+  --emisi-text-muted: #{map.get(tokens.$emisi-colors, text-muted)};
+  --emisi-border: #{map.get(tokens.$emisi-colors, border)};
+
+  --emisi-success: #{map.get(tokens.$emisi-colors, success)};
+  --emisi-warning: #{map.get(tokens.$emisi-colors, warning)};
+  --emisi-danger: #{map.get(tokens.$emisi-colors, danger)};
+  --emisi-info: #{map.get(tokens.$emisi-colors, info)};
+
+  --emisi-font-sans: #{tokens.$emisi-font-sans};
+  --emisi-font-mono: #{tokens.$emisi-font-mono};
+
+  --emisi-radius-sm: #{map.get(tokens.$emisi-radius, sm)};
+  --emisi-radius-md: #{map.get(tokens.$emisi-radius, md)};
+  --emisi-radius-lg: #{map.get(tokens.$emisi-radius, lg)};
+  --emisi-radius-xl: #{map.get(tokens.$emisi-radius, xl)};
+  --emisi-radius-2xl: #{map.get(tokens.$emisi-radius, '2xl')};
+
+  --emisi-shadow-sm: #{map.get(tokens.$emisi-shadows, sm)};
+  --emisi-shadow-md: #{map.get(tokens.$emisi-shadows, md)};
+  --emisi-shadow-lg: #{map.get(tokens.$emisi-shadows, lg)};
+  --emisi-shadow-glow-primary: #{map.get(tokens.$emisi-shadows, glow-primary)};
+  --emisi-shadow-neu-raised: #{map.get(tokens.$emisi-shadows, neu-raised)};
+  --emisi-shadow-neu-inset: #{map.get(tokens.$emisi-shadows, neu-inset)};
+
+  // Accessibility baseline (WCAG 2.2 A/AA defaults)
+  --emisi-focus-outline-width: 2px;
+  --emisi-focus-outline-offset: 2px;
+  --emisi-focus-ring: 0 0 0 3px rgba(4, 116, 129, 0.35);
+  --emisi-touch-target-min: 44px;
+  --emisi-wcag-level: 'AA';
+
+  // Responsive layout tokens
+  --emisi-layout-gutter: 1rem;
+  --emisi-content-max: 1200px;
+}
+
+.emisi-theme {
+  font-family: var(--emisi-font-sans);
+  color: var(--emisi-text);
+  background: var(--emisi-bg);
+  min-height: 100%;
+}
+
+// ============================================================================
+// Accessibility Utilities
+// ============================================================================
+
+.emisi-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.emisi-theme :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--emisi-focus-outline-width) solid var(--emisi-primary);
+  outline-offset: var(--emisi-focus-outline-offset);
+  box-shadow: var(--emisi-focus-ring);
+}
+
+.emisi-touch-target,
+.emisi-theme :where(button, [role='button'], a, input, select, textarea) {
+  min-height: var(--emisi-touch-target-min);
+}
+
+.emisi-neu-button {
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--emisi-primary), #ffffff 72%);
+  border-radius: var(--emisi-radius-md);
+  min-height: 2.5rem;
+  padding: 0.5rem 0.9rem;
+  font: 600 0.9rem/1 var(--emisi-font-sans);
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--emisi-primary), var(--emisi-primary-dark));
+  box-shadow: var(--emisi-shadow-sm);
+  cursor: pointer;
+}
+
+.emisi-neu-button:hover {
+  box-shadow: var(--emisi-shadow-glow-primary);
+}
+
+.emisi-neu-input {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid var(--emisi-border);
+  border-radius: var(--emisi-radius-md);
+  padding: 0.55rem 0.75rem;
+  color: var(--emisi-text);
+  background: var(--emisi-bg);
+  box-shadow: var(--emisi-shadow-neu-inset);
+}
+
+.emisi-neu-panel {
+  border: 1px solid var(--emisi-border);
+  border-radius: var(--emisi-radius-lg);
+  background: var(--emisi-surface);
+  box-shadow: var(--emisi-shadow-neu-raised);
+}
+
+// Keyboard hint containers (for quick discoverability)
+.emisi-kbd-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--emisi-radius-md);
+  border: 1px solid var(--emisi-border);
+  background: color-mix(in srgb, var(--emisi-bg), #ffffff 38%);
+  color: var(--emisi-text-secondary);
+  font: 500 0.82rem/1.3 var(--emisi-font-sans);
+}
+
+// ============================================================================
+// Responsive Utilities (mobile/tablet/web/foldable)
+// ============================================================================
+
+.emisi-container {
+  width: min(100%, var(--emisi-content-max));
+  margin-inline: auto;
+  padding-inline: var(--emisi-layout-gutter);
+}
+
+.emisi-responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+// Mobile (phones)
+@media (max-width: 599px) {
+  :root,
+  .emisi-theme {
+    --emisi-layout-gutter: 0.75rem;
+    --emisi-content-max: 100%;
+  }
+
+  .emisi-responsive-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+// Tablet (iPad portrait/landscape)
+@media (min-width: 600px) and (max-width: 1023px) {
+  :root,
+  .emisi-theme {
+    --emisi-layout-gutter: 1rem;
+    --emisi-content-max: 900px;
+  }
+
+  .emisi-responsive-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+// Desktop web
+@media (min-width: 1024px) {
+  :root,
+  .emisi-theme {
+    --emisi-layout-gutter: 1.25rem;
+    --emisi-content-max: 1200px;
+  }
+}
+
+// Wide web/2k+
+@media (min-width: 1440px) {
+  :root,
+  .emisi-theme {
+    --emisi-content-max: 1320px;
+  }
+}
+
+// Foldable vertical hinge
+@media (spanning: single-fold-vertical) {
+  .emisi-foldable-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: max(1rem, var(--emisi-layout-gutter));
+  }
+}
+
+// Foldable horizontal hinge
+@media (spanning: single-fold-horizontal) {
+  .emisi-foldable-layout {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: max(1rem, var(--emisi-layout-gutter));
+  }
+}
+
+// ============================================================================
+// User Preference Media Queries
+// ============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  .emisi-theme {
+    --emisi-border: color-mix(in srgb, var(--emisi-text), #ffffff 28%);
+    --emisi-focus-ring: 0 0 0 3px color-mix(in srgb, var(--emisi-primary), #ffffff 20%);
+  }
+}
+
+// Optional AAA mode (apply class or data attribute)
+.emisi-theme.emisi-aaa,
+.emisi-theme[data-contrast='aaa'] {
+  --emisi-wcag-level: 'AAA';
+  --emisi-text: #0d0f12;
+  --emisi-text-secondary: #1a202c;
+  --emisi-text-muted: #2d3748;
+  --emisi-border: #545e6e;
+  --emisi-focus-outline-width: 3px;
+  --emisi-focus-ring: 0 0 0 4px rgba(4, 116, 129, 0.45);
+}
+
+@media (forced-colors: active) {
+  .emisi-theme :where(a, button, input, select, textarea, [tabindex]):focus {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  .emisi-neu-button,
+  .emisi-neu-input,
+  .emisi-neu-panel {
+    forced-color-adjust: auto;
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+    box-shadow: none;
+  }
+}

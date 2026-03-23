@@ -1,0 +1,360 @@
+<section class="embedded-block">
+  <div class="header-row">
+    <div>
+      <h3>Tenant Users</h3>
+      <p class="muted">Users and roles scoped to {{ tenantName }}.</p>
+    </div>
+
+    <div class="head-controls">
+      <input
+        type="search"
+        pInputText
+        class="user-search"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keydown)="onSearchKeydown($event)"
+        placeholder="Search users"
+        aria-label="Search tenant users"
+      />
+      <select
+        class="native-select"
+        [ngModel]="roleFilter()"
+        (ngModelChange)="roleFilter.set($event)"
+      >
+        <option value="">All roles</option>
+        <option value="ADMIN">Admin</option>
+        <option value="SUPER_ADMIN">Super Admin</option>
+        <option value="MANAGER">Manager</option>
+        <option value="USER">User</option>
+        <option value="VIEWER">Viewer</option>
+        <option value="TENANT_ADMIN">Tenant Admin</option>
+        <option value="POWER_USER">Power User</option>
+        <option value="CONTRIBUTOR">Contributor</option>
+      </select>
+      <select
+        class="native-select"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event)"
+      >
+        <option value="">All status</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="contrast"
+        icon="pi pi-filter"
+        [disabled]="loading()"
+        (click)="applyFilters()"
+      >
+        Apply
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        icon="pi pi-times"
+        [disabled]="loading()"
+        (click)="resetFilters()"
+      >
+        Reset
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        icon="pi pi-refresh"
+        [loading]="loading()"
+        [disabled]="loading()"
+        (click)="loadUsers()"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  @if (loading()) {
+    <div class="loading-row">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Loading users...</span>
+    </div>
+  }
+
+  <p-card styleClass="table-card">
+    <p-table [value]="sortedUsers()" [tableStyle]="{ 'min-width': '44rem' }" size="small">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('displayName')">
+              Name <span class="sort-indicator">{{ sortIndicator('displayName') }}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('email')">
+              Email <span class="sort-indicator">{{ sortIndicator('email') }}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('role')">
+              Role <span class="sort-indicator">{{ sortIndicator('role') }}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('status')">
+              Status <span class="sort-indicator">{{ sortIndicator('status') }}</span>
+            </button>
+          </th>
+          <th>
+            <button type="button" class="sort-btn" (click)="toggleSort('lastActive')">
+              Last Active <span class="sort-indicator">{{ sortIndicator('lastActive') }}</span>
+            </button>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.displayName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ displayRole(user) }}</td>
+          <td>
+            <p-tag [value]="statusLabel(user)" [severity]="statusSeverity(statusLabel(user))" />
+          </td>
+          <td>{{ lastActive(user) }}</td>
+          <td>
+            <button
+              type="button"
+              pButton
+              [text]="true"
+              size="small"
+              icon="pi pi-shield"
+              label="Sessions"
+              [attr.aria-label]="'View sessions for ' + user.displayName"
+              data-testid="user-sessions-btn"
+              (click)="openSessions(user); $event.stopPropagation()"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="muted">No users found for the selected filters.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="pagination-row">
+      <div class="pagination-info">
+        {{ totalElements() }} users · Page {{ page() + 1 }} of {{ totalPages() || 1 }}
+      </div>
+
+      <div class="pagination-controls">
+        <label class="size-control">
+          <span>Rows</span>
+          <select
+            class="native-select size-select"
+            [ngModel]="pageSize()"
+            (ngModelChange)="changePageSize($event)"
+          >
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          pButton
+          size="small"
+          severity="secondary"
+          icon="pi pi-chevron-left"
+          [disabled]="loading() || !hasPreviousPage()"
+          (click)="previousPage()"
+        >
+          Previous
+        </button>
+
+        @for (pageNumber of visiblePages(); track pageNumber) {
+          <button
+            type="button"
+            pButton
+            size="small"
+            [severity]="isCurrentPage(pageNumber) ? 'contrast' : 'secondary'"
+            [disabled]="loading()"
+            (click)="goToPage(pageNumber)"
+          >
+            {{ pageNumber }}
+          </button>
+        }
+
+        <button
+          type="button"
+          pButton
+          size="small"
+          severity="secondary"
+          icon="pi pi-chevron-right"
+          [disabled]="loading() || !hasNextPage()"
+          (click)="nextPage()"
+        >
+          Next
+        </button>
+
+        <label class="jump-control">
+          <span>Go to</span>
+          <input
+            pInputText
+            class="jump-input"
+            type="number"
+            min="1"
+            [max]="totalPages() || 1"
+            [ngModel]="jumpPage()"
+            (ngModelChange)="jumpPage.set($event)"
+            (keydown.enter)="jumpToPage()"
+          />
+        </label>
+
+        <button
+          type="button"
+          pButton
+          size="small"
+          severity="secondary"
+          [disabled]="loading()"
+          (click)="jumpToPage()"
+        >
+          Go
+        </button>
+      </div>
+    </div>
+  </p-card>
+</section>
+
+<p-dialog
+  [visible]="showSessions()"
+  (visibleChange)="showSessions.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="sessions-dialog"
+  [style]="{ width: '820px', maxHeight: '90vh' }"
+  (onHide)="closeSessions()"
+  data-testid="sessions-dialog"
+>
+  <ng-template pTemplate="header">
+    <div class="sessions-dialog-header">
+      <span class="sessions-dialog-title">
+        <i class="pi pi-shield" aria-hidden="true"></i>
+        Sessions — {{ selectedUser()?.displayName }}
+      </span>
+      <span class="sessions-dialog-subtitle muted">{{ selectedUser()?.email }}</span>
+    </div>
+  </ng-template>
+
+  @if (sessionsLoading()) {
+    <div class="sessions-loading" aria-busy="true">
+      <p-progressSpinner strokeWidth="4" styleClass="sessions-spinner" />
+    </div>
+  }
+
+  @if (sessionsError()) {
+    <div class="error-banner" role="alert">
+      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+      {{ sessionsError() }}
+    </div>
+  }
+
+  @if (!sessionsLoading() && sessions().length > 0) {
+    <div class="sessions-table-wrap" role="region" aria-label="User sessions">
+      <table class="sessions-table">
+        <thead>
+          <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Device / IP</th>
+            <th scope="col">Login Time</th>
+            <th scope="col">Last Activity</th>
+            <th scope="col">Expires</th>
+            <th scope="col">Flags</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of sessions(); track s.id) {
+            <tr
+              [class.session-current]="s.isCurrent"
+              [attr.aria-label]="'Session ' + s.status + (s.isCurrent ? ', current session' : '')"
+            >
+              <td>
+                <p-tag [value]="s.status" [severity]="sessionSeverity(s.status)" [rounded]="true" />
+                @if (s.isCurrent) {
+                  <span class="current-badge" title="This is the current session"
+                    >This session</span
+                  >
+                }
+              </td>
+              <td>
+                <div class="device-name">{{ s.deviceName ?? 'Unknown device' }}</div>
+                <small class="muted">{{ s.ipAddress ?? '—' }}</small>
+              </td>
+              <td>{{ s.createdAt | date: 'dd MMM y, HH:mm' }}</td>
+              <td>{{ s.lastActivity ? (s.lastActivity | date: 'dd MMM y, HH:mm') : '—' }}</td>
+              <td>{{ s.expiresAt | date: 'dd MMM y, HH:mm' }}</td>
+              <td class="flags-cell">
+                @if (s.isRemembered) {
+                  <p-tag value="Remember Me" severity="info" [rounded]="true" />
+                }
+                @if (s.mfaVerified) {
+                  <p-tag value="MFA" severity="success" [rounded]="true" />
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="sessions-count muted">
+      {{ sessions().length }} session(s) — {{ activeSessionCount() }} active
+    </p>
+  }
+
+  @if (!sessionsLoading() && !sessionsError() && sessions().length === 0) {
+    <div class="empty-sessions" data-testid="sessions-empty">
+      <i class="pi pi-inbox" aria-hidden="true"></i>
+      <p>No sessions found for this user.</p>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      pButton
+      severity="secondary"
+      [text]="true"
+      label="Close"
+      aria-label="Close sessions dialog"
+      data-testid="sessions-close-btn"
+      (click)="closeSessions()"
+    ></button>
+    <button
+      type="button"
+      pButton
+      severity="danger"
+      icon="pi pi-ban"
+      label="Revoke All Sessions"
+      [loading]="revokingAll()"
+      [disabled]="revokingAll() || !hasActiveSessions()"
+      aria-label="Revoke all active sessions for this user"
+      data-testid="revoke-all-btn"
+      (click)="revokeAll()"
+    ></button>
+  </ng-template>
+</p-dialog>

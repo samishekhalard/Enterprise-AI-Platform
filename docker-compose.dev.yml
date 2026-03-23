@@ -1,0 +1,17 @@
+# ==============================================================================
+# EMSIST - Development Environment (Backward-Compatible Wrapper)
+#
+# This file combines the data tier and app tier for convenience.
+# For independent tier lifecycle management, use:
+#   docker compose -f docker-compose.dev-data.yml ...  (data tier)
+#   docker compose -f docker-compose.dev-app.yml ...   (app tier)
+#
+# The tier split (INF-003) ensures that stopping the app tier does NOT
+# destroy data volumes. See docker-compose.dev-data.yml for details.
+#
+# Usage (same as before):
+#   docker compose -f docker-compose.dev.yml --env-file .env.dev up --build -d
+# ==============================================================================
+include:
+  - path: docker-compose.dev-data.yml
+  - path: docker-compose.dev-app.yml

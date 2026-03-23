@@ -1,0 +1,189 @@
+<section class="embedded-block">
+  <div class="header-row">
+    <div>
+      <h3>License Allocation</h3>
+      <p class="muted">Seat allocation and assignments for {{ tenantName }}.</p>
+    </div>
+    <button
+      type="button"
+      pButton
+      size="small"
+      severity="secondary"
+      icon="pi pi-refresh"
+      [loading]="loading()"
+      [disabled]="loading() || assigning()"
+      (click)="loadData()"
+    >
+      Refresh
+    </button>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  @if (info()) {
+    <p-message severity="info">{{ info() }}</p-message>
+  }
+
+  @if (loading()) {
+    <div class="loading-row">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Loading seat allocation...</span>
+    </div>
+  }
+
+  <div class="allocation-sliders">
+    @for (item of availabilityRows(); track item.tier) {
+      <article class="slider-stack">
+        <div class="slider-shell">
+          <div class="track-area">
+            <div class="track-bg"></div>
+            <div class="track-fill" [style.height.%]="item.utilizationPercent"></div>
+            <span class="track-thumb" [style.bottom.%]="item.utilizationPercent"></span>
+          </div>
+          <i class="pi tier-icon" [ngClass]="tierIconClass(item.tier)" aria-hidden="true"></i>
+        </div>
+        <div class="slider-caption">
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.assigned }} / {{ item.maxSeatsLabel }}</span>
+          <small>Available: {{ item.availableLabel }}</small>
+        </div>
+      </article>
+    }
+  </div>
+
+  <p-card styleClass="table-card tier-allocation-card">
+    <h4>Seat Allocation by Tier</h4>
+    <table class="tier-table" role="table" aria-label="Tier seat allocation">
+      <thead>
+        <tr>
+          <th scope="col">Tier</th>
+          <th scope="col">Max</th>
+          <th scope="col">Assigned</th>
+          <th scope="col">Available</th>
+          <th scope="col">Utilization</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of availabilityRows(); track item.tier) {
+          <tr>
+            <td>
+              <p-tag [value]="item.label" severity="contrast" />
+            </td>
+            <td>{{ item.maxSeatsLabel }}</td>
+            <td>{{ item.assigned }}</td>
+            <td>{{ item.availableLabel }}</td>
+            <td>
+              <div class="utilization-bar">
+                <div class="utilization-track">
+                  <div class="utilization-fill" [style.width.%]="item.utilizationPercent"></div>
+                </div>
+                <span>{{ item.utilizationPercent | number: '1.0-0' }}%</span>
+              </div>
+            </td>
+            <td>
+              <button
+                type="button"
+                pButton
+                size="small"
+                severity="secondary"
+                icon="pi pi-pencil"
+                [disabled]="loading() || assigning()"
+                (click)="prepareAssignTier(item.tier)"
+              >
+                Allocate
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </p-card>
+
+  <p-card styleClass="assign-card">
+    <div class="assign-head">
+      <h4>Assign Seat</h4>
+      <p class="muted">Assign a tier to a user UUID within this tenant.</p>
+    </div>
+
+    <div class="assign-controls">
+      <input
+        pInputText
+        type="text"
+        [ngModel]="assignUserId()"
+        (ngModelChange)="assignUserId.set($event)"
+        placeholder="User UUID"
+      />
+
+      <select
+        class="native-select"
+        [ngModel]="assignTier()"
+        (ngModelChange)="assignTier.set($event)"
+      >
+        <option value="TENANT_ADMIN">Tenant Admin</option>
+        <option value="POWER_USER">Power User</option>
+        <option value="CONTRIBUTOR">Contributor</option>
+        <option value="VIEWER">Viewer</option>
+      </select>
+
+      <button
+        type="button"
+        pButton
+        icon="pi pi-plus"
+        [loading]="assigning()"
+        [disabled]="assigning() || loading()"
+        (click)="assignSeat()"
+      >
+        Assign
+      </button>
+    </div>
+  </p-card>
+
+  <p-card styleClass="table-card">
+    <h4>Current Assignments</h4>
+    <p-table [value]="assignments()" [tableStyle]="{ 'min-width': '48rem' }" size="small">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>User ID</th>
+          <th>Tier</th>
+          <th>Assigned At</th>
+          <th>Assigned By</th>
+          <th>Action</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.userId }}</td>
+          <td>
+            <p-tag [value]="tierLabel(row.tier)" severity="contrast" />
+          </td>
+          <td>{{ formatTimestamp(row.assignedAt) }}</td>
+          <td>{{ row.assignedBy || 'n/a' }}</td>
+          <td>
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="danger"
+              icon="pi pi-times"
+              [loading]="isRevoking(row.userId)"
+              [disabled]="isRevoking(row.userId)"
+              (click)="revokeSeat(row)"
+            >
+              Revoke
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="muted">No seat assignments found for this tenant.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>

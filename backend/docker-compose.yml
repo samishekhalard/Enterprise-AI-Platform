@@ -1,0 +1,235 @@
+# ============================================================================
+# EMS Backend - Docker Compose for Local Development
+# Architecture: Polyglot Persistence (PostgreSQL + Neo4j + Valkey)
+# Copy .env.example to .env and customize credentials before running
+# ============================================================================
+
+services:
+  # ==========================================================================
+  # PostgreSQL - Primary Transactional Database
+  # ==========================================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ems-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-master_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/postgres:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Neo4j - Graph Database for Relationships & Knowledge Graphs
+  # ==========================================================================
+  neo4j:
+    image: neo4j:5-community
+    container_name: ems-neo4j
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH:-neo4j/changeme}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "neo4j", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Valkey - AI Cache, Sessions, Embeddings
+  # ==========================================================================
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: ems-valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Keycloak - Identity & Access Management
+  # ==========================================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: ems-keycloak
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Keycloak admin password required}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db?sslmode=verify-full
+      KC_DB_USERNAME: ${KC_DB_USERNAME:-postgres}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:?Keycloak DB password required}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: "xforwarded"
+      KC_HEALTH_ENABLED: "true"
+    command: start-dev --import-realm
+    ports:
+      - "8180:8080"
+    volumes:
+      - ../infrastructure/keycloak/realms:/opt/keycloak/data/import:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3;if timeout 5 grep -q '\"UP\"' <&3; then exit 0; else exit 1; fi"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Kafka - Event Streaming (Optional for local dev)
+  # ==========================================================================
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: ems-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Keycloak Init (one-shot sidecar)
+  # ==========================================================================
+  keycloak-init:
+    build:
+      context: ../infrastructure/keycloak
+      dockerfile: Dockerfile
+    container_name: ems-keycloak-init
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Keycloak admin password required}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-ems-auth-facade-secret}
+      FRONTEND_PUBLIC_URL: ${FRONTEND_PUBLIC_URL:-https://ems.example}
+      API_GATEWAY_PUBLIC_URL: ${API_GATEWAY_PUBLIC_URL:-https://gateway.ems.example}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD:-admin}
+      SUPERADMIN_TEMP_PASSWORD: ${SUPERADMIN_TEMP_PASSWORD:-true}
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - ems-network
+
+  # ==========================================================================
+  # Eureka - Service Discovery
+  # ==========================================================================
+  # eureka:
+  #   build: ./eureka-server
+  #   container_name: ems-eureka
+  #   ports:
+  #     - "8761:8761"
+  #   networks:
+  #     - ems-network
+
+  # ==========================================================================
+  # Java Microservices (uncomment to run in Docker)
+  # ==========================================================================
+
+  # Auth Facade - BFF Authentication Service
+  # auth-facade:
+  #   build:
+  #     context: .
+  #     dockerfile: auth-facade/Dockerfile
+  #   container_name: ems-auth-facade
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: docker
+  #     VALKEY_HOST: valkey
+  #     KEYCLOAK_URL: http://keycloak:8080
+  #     KAFKA_SERVERS: kafka:29092
+  #     EUREKA_URL: http://eureka:8761/eureka
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on:
+  #     keycloak-init:
+  #       condition: service_completed_successfully
+  #     valkey:
+  #       condition: service_healthy
+  #   networks:
+  #     - ems-network
+
+  # Tenant Service - Multi-tenant Management
+  # tenant-service:
+  #   build:
+  #     context: .
+  #     dockerfile: tenant-service/Dockerfile
+  #   container_name: ems-tenant-service
+  #   environment:
+  #     SPRING_PROFILES_ACTIVE: docker
+  #     DATABASE_URL: jdbc:postgresql://postgres:5432/master_db?sslmode=verify-full
+  #     DATABASE_USER: ${POSTGRES_USER:-postgres}
+  #     DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+  #     KAFKA_SERVERS: kafka:29092
+  #     KEYCLOAK_URL: http://keycloak:8080
+  #     EUREKA_URL: http://eureka:8761/eureka
+  #   ports:
+  #     - "8082:8082"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - ems-network
+
+# ==========================================================================
+# Volumes
+# ==========================================================================
+volumes:
+  postgres_data:
+  neo4j_data:
+  neo4j_logs:
+  valkey_data:
+
+# ==========================================================================
+# Networks
+# ==========================================================================
+networks:
+  ems-network:
+    driver: bridge

@@ -1,0 +1,996 @@
+/* =============================================================================
+   Login Page — Neumorphic Design on flat #428177 background
+   Soft extruded/inset shadows, no gradient, no glassmorphism
+   ============================================================================= */
+
+// ─── Design Tokens ───────────────────────────────────────────────────────────
+$nm-bg: #428177;
+$nm-bg-light: #4d9488;
+$nm-bg-dark: #35685f;
+$nm-shadow-light: rgba(93, 168, 155, 0.5);
+$nm-shadow-dark: rgba(33, 65, 59, 0.5);
+$nm-shadow-light-strong: rgba(93, 168, 155, 0.7);
+$nm-shadow-dark-strong: rgba(33, 65, 59, 0.7);
+$nm-text-primary: #edebe0;               // warm cream — softer than pure white
+$nm-text-secondary: rgba(237, 235, 224, 0.75);
+$nm-text-muted: rgba(237, 235, 224, 0.55);
+$nm-accent: #5cc4b4;
+$nm-border: rgba(255, 255, 255, 0.08);
+
+// Glass panel tokens
+$glass-fill: rgba(255, 255, 255, 0.1);
+$glass-border: rgba(255, 255, 255, 0.22);
+$glass-border-top: rgba(255, 255, 255, 0.32);  // slightly brighter top edge
+$glass-blur: 16px;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: $nm-bg;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ─── Arabesque Pattern — Elegant geometric overlay ──────────────────────
+   Islamic 8-pointed star with interlocking lattice. Larger tile (120px),
+   visible but not distracting on the dark teal surface.
+   ────────────────────────────────────────────────────────────────────────── */
+.background-pattern {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.12;
+  pointer-events: none;
+
+  // Arabesque 8-pointed star with lattice (120×120 tile)
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1.2'%3E%3C!-- Outer 8-pointed star --%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3C!-- Inner octagon --%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3C!-- Inner diamond --%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3C!-- Inner square (rotated) --%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3C!-- Corner rosettes (quarter-stars at each tile corner) --%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3C!-- Edge connectors (mid-edge half-diamonds) --%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3C!-- Lattice lines connecting stars --%3E%3Cpath d='M22 10L38 42 M98 10L82 42 M22 110L38 78 M98 110L82 78'/%3E%3Cpath d='M10 22L42 38 M10 98L42 78 M110 22L78 38 M110 98L78 78'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  background-repeat: repeat;
+}
+
+.background-gradient {
+  display: none;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.login-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem 3rem;
+  }
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+}
+
+.header-logo {
+  height: 32px;
+  filter: brightness(0) invert(1);
+
+  @media (min-width: 768px) {
+    height: 36px;
+  }
+}
+
+.tagline {
+  font-size: 0.875rem;
+  color: $nm-text-secondary;
+  font-weight: 400;
+  display: none;
+
+  @media (min-width: 768px) {
+    display: inline;
+  }
+}
+
+.lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: $nm-text-secondary;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.lang-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.lang-menu {
+  position: absolute;
+  top: 100%;
+  right: 2rem;
+  background: $nm-bg;
+  border-radius: 0.75rem;
+  box-shadow:
+    6px 6px 14px $nm-shadow-dark,
+    -6px -6px 14px $nm-shadow-light;
+  overflow: hidden;
+  z-index: 100;
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    font-family: inherit;
+    color: $nm-text-primary;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+}
+
+/* ─── Main Content ───────────────────────────────────────────────────────── */
+.login-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  padding: 2rem 1.5rem 4rem;
+  text-align: center;
+}
+
+.welcome-section {
+  width: 100%;
+  max-width: 460px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-logo-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  &:hover {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+}
+
+.welcome-logo {
+  height: 72px;
+  width: auto;
+  filter: brightness(0) invert(1);
+
+  @media (min-width: 768px) {
+    height: 88px;
+  }
+
+  @media (min-width: 1024px) {
+    height: 100px;
+  }
+}
+
+.welcome-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: $nm-text-primary;
+  margin: 0 0 0.375rem;
+
+  @media (min-width: 768px) {
+    font-size: 1.625rem;
+  }
+}
+
+.welcome-subtitle {
+  font-size: 0.9375rem;
+  color: $nm-text-secondary;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+
+  @media (min-width: 768px) {
+    font-size: 1.0625rem;
+  }
+}
+
+.no-providers-message {
+  text-align: center;
+  padding: 2rem;
+  color: $nm-text-secondary;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  .contact-admin {
+    font-size: 0.875rem;
+    color: $nm-text-muted;
+  }
+}
+
+.form-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.forgot-password-link {
+  font-size: 0.875rem;
+  color: $nm-accent;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #82dece;
+    text-decoration: underline;
+  }
+}
+
+/* ─── Sign In Section ────────────────────────────────────────────────────── */
+.signin-section {
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+  }
+}
+
+/* ─── SSO Buttons — Neumorphic convex ────────────────────────────────────── */
+.sso-btn {
+  width: 100%;
+  padding: 0 2rem;
+  min-height: 60px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: $nm-text-primary;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    5px 5px 12px $nm-shadow-dark,
+    -5px -5px 12px $nm-shadow-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+
+  &:hover:not(:disabled) {
+    box-shadow:
+      7px 7px 16px $nm-shadow-dark-strong,
+      -7px -7px 16px $nm-shadow-light-strong;
+  }
+
+  &:active:not(:disabled) {
+    box-shadow:
+      inset 4px 4px 8px $nm-shadow-dark,
+      inset -4px -4px 8px $nm-shadow-light;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow:
+      2px 2px 6px $nm-shadow-dark,
+      -2px -2px 6px $nm-shadow-light;
+  }
+
+  .provider-logo {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  /* Azure AD / Microsoft */
+  &.sso-btn--azure-ad {
+    color: $nm-text-primary;
+  }
+
+  /* UAE Pass */
+  &.sso-btn--uaepass {
+    background: linear-gradient(135deg, #8a7040 0%, #6e5830 100%);
+    color: #ffffff;
+
+    .uaepass-logo {
+      color: #ffffff;
+    }
+  }
+
+  /* Google */
+  &.sso-btn--google {
+    color: $nm-text-primary;
+  }
+
+  /* Generic OIDC */
+  &.sso-btn--oidc {
+    background: #3a6e96;
+    color: #ffffff;
+
+    .provider-logo {
+      color: #ffffff;
+    }
+  }
+
+  /* SAML */
+  &.sso-btn--saml {
+    background: #4a5690;
+    color: #ffffff;
+
+    .provider-logo {
+      color: #ffffff;
+    }
+  }
+
+  /* Primary provider gets extra emphasis */
+  &.primary {
+    box-shadow:
+      6px 6px 14px $nm-shadow-dark-strong,
+      -6px -6px 14px $nm-shadow-light-strong;
+  }
+}
+
+.microsoft-btn {
+  width: 100%;
+  padding: 0 2rem;
+  min-height: 60px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: $nm-text-primary;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    5px 5px 12px $nm-shadow-dark,
+    -5px -5px 12px $nm-shadow-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  .microsoft-logo {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    box-shadow:
+      7px 7px 16px $nm-shadow-dark-strong,
+      -7px -7px 16px $nm-shadow-light-strong;
+  }
+
+  &:active {
+    box-shadow:
+      inset 4px 4px 8px $nm-shadow-dark,
+      inset -4px -4px 8px $nm-shadow-light;
+  }
+}
+
+.divider-text {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  span {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: $nm-text-muted;
+    text-transform: lowercase;
+  }
+}
+
+.signin-btn {
+  width: 100%;
+  padding: 0 2rem;
+  min-height: 60px;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: $nm-text-primary;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    5px 5px 12px $nm-shadow-dark,
+    -5px -5px 12px $nm-shadow-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  .email-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    box-shadow:
+      7px 7px 16px $nm-shadow-dark-strong,
+      -7px -7px 16px $nm-shadow-light-strong;
+  }
+
+  &:active {
+    box-shadow:
+      inset 4px 4px 8px $nm-shadow-dark,
+      inset -4px -4px 8px $nm-shadow-light;
+  }
+}
+
+.help-text {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: $nm-text-muted;
+
+  a {
+    color: $nm-accent;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: #82dece;
+    }
+  }
+}
+
+.kbd-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  color: $nm-text-muted;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    2px 2px 5px $nm-shadow-dark,
+    -5px -5px 10px $nm-shadow-light;
+  min-height: 44px;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: $nm-accent;
+  }
+
+  &:active, &:focus {
+    box-shadow:
+      inset 2px 2px 5px $nm-shadow-dark,
+      inset -5px -5px 10px $nm-shadow-light;
+  }
+}
+
+/* ─── Login Form Card ────────────────────────────────────────────────────── */
+.login-form-container {
+  width: 100%;
+  max-width: 460px;
+  padding: 0;
+
+  .emisi-surface-card {
+    border-radius: 1.25rem;
+    border: 1.5px solid $glass-border;
+    border-top-color: $glass-border-top;
+    background: $glass-fill;
+    backdrop-filter: blur($glass-blur);
+    -webkit-backdrop-filter: blur($glass-blur);
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 2.5rem 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .emisi-surface-card {
+      padding: 3rem 2.5rem;
+    }
+  }
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.form-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $nm-text-primary;
+  margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 1.25rem;
+  }
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $nm-text-secondary;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ─── Input fields — Neumorphic concave (inset well) ─────────────────────── */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 25px;
+  transition: all 0.2s ease;
+  box-shadow:
+    inset 2px 2px 5px $nm-shadow-dark,
+    inset -5px -5px 10px $nm-shadow-light;
+
+  &.focused {
+    border-color: rgba(92, 196, 180, 0.4);
+    box-shadow:
+      inset 4px 4px 8px $nm-shadow-dark,
+      inset -4px -4px 8px $nm-shadow-light,
+      0 0 0 3px rgba(92, 196, 180, 0.3);
+  }
+
+  &.error {
+    border-color: rgba(237, 235, 224, 0.4);
+    box-shadow:
+      inset 4px 4px 8px $nm-shadow-dark,
+      inset -4px -4px 8px $nm-shadow-light,
+      0 0 0 3px rgba(237, 235, 224, 0.25);
+  }
+
+  // Target all input types inside the wrapper — use !important to beat
+  // browser defaults, PrimeNG Aura global input styles, and user-agent sheets
+  input,
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    flex: 1;
+    padding: 0.875rem 3rem 0.875rem 45px;
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    font-size: 1rem;
+    font-family: inherit;
+    color: $nm-text-primary !important;
+    outline: none !important;
+    width: 100%;
+    // Reset PrimeNG box-shadow and border-radius on inner input
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    &::placeholder {
+      color: $nm-text-muted;
+      opacity: 1;
+    }
+
+    // ── WebKit/Blink autofill override ──────────────────────────────────
+    // Browsers inject !important background on autofill that cannot be
+    // overridden normally. The only workaround is a very long transition
+    // delay on background-color, plus a box-shadow inset trick that
+    // visually paints the $nm-bg color over the autofill background.
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px $nm-bg inset !important;
+      box-shadow: 0 0 0 1000px $nm-bg inset !important;
+      -webkit-text-fill-color: $nm-text-primary !important;
+      caret-color: $nm-text-primary !important;
+      // Delay the browser's autofill background so it never visually appears
+      transition: background-color 600000s 0s, color 600000s 0s;
+    }
+
+    // ── Firefox autofill ────────────────────────────────────────────────
+    &:autofill,
+    &:autofill:hover,
+    &:autofill:focus {
+      background: transparent !important;
+      background-color: transparent !important;
+      -webkit-text-fill-color: $nm-text-primary !important;
+      // Firefox respects filter: none to prevent its own autofill bg
+      filter: none;
+    }
+
+    // ── Focus-visible reset ─────────────────────────────────────────────
+    // Prevent the global styles.scss focus-visible ring from showing on
+    // the inner input (the wrapper handles focus glow instead)
+    &:focus,
+    &:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+      border-color: transparent !important;
+    }
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $nm-text-muted;
+    pointer-events: none;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $nm-text-muted;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $nm-text-primary;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.field-error {
+  display: block;
+  font-size: 0.8125rem;
+  color: $nm-text-primary;
+  margin-top: 0.375rem;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(237, 235, 224, 0.1);
+  color: $nm-text-primary;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border-left: 3px solid rgba(237, 235, 224, 0.5);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  box-shadow:
+    inset 3px 3px 6px $nm-shadow-dark,
+    inset -3px -3px 6px $nm-shadow-light;
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: $nm-text-primary;
+    flex-shrink: 0;
+  }
+}
+
+/* ─── Submit Button — Neumorphic convex, teal accent ─────────────────────── */
+.submit-btn {
+  width: 100%;
+  padding: 0 2rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: $nm-text-primary;
+  background: $nm-bg;
+  border: 1px solid $nm-border;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  box-shadow:
+    4px 4px 10px $nm-shadow-dark,
+    -4px -4px 10px $nm-shadow-light;
+
+  &:hover:not(:disabled) {
+    box-shadow:
+      6px 6px 14px $nm-shadow-dark-strong,
+      -6px -6px 14px $nm-shadow-light-strong;
+  }
+
+  &:focus {
+    color: $nm-accent;
+  }
+
+  &:active:not(:disabled) {
+    box-shadow:
+      inset 2px 2px 5px $nm-shadow-dark,
+      inset -5px -5px 10px $nm-shadow-light;
+  }
+
+  &:disabled {
+    background: $nm-bg;
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow:
+      2px 2px 5px $nm-shadow-dark,
+      -2px -2px 5px $nm-shadow-light;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Back Button — Text-style link (no neumorphic box) ──────────────────── */
+.back-btn {
+  width: auto;
+  margin: 1rem auto 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: $nm-text-muted;
+  background: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: $nm-text-primary;
+  }
+}
+
+/* ─── Divider ────────────────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.divider-line {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ─── Create Account ─────────────────────────────────────────────────────── */
+.create-account-section {
+  text-align: center;
+}
+
+.no-account {
+  font-size: 0.9375rem;
+  color: $nm-text-secondary;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.create-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: $nm-accent;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    .create-icon {
+      box-shadow:
+        7px 7px 16px $nm-shadow-dark-strong,
+        -7px -7px 16px $nm-shadow-light-strong;
+    }
+  }
+
+  span {
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+}
+
+.create-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid $nm-border;
+  background: $nm-bg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow:
+    5px 5px 12px $nm-shadow-dark,
+    -5px -5px 12px $nm-shadow-light;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.login-footer {
+  position: relative;
+  z-index: 10;
+  padding: 1.5rem 2rem;
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: $nm-text-muted;
+  }
+}
+
+/* ─── Keyboard Shortcuts Dialog ──────────────────────────────────────────── */
+:host ::ng-deep .kbd-shortcuts-dialog {
+  .p-dialog {
+    background: $nm-bg;
+    border: 1px solid $nm-border;
+    border-radius: 1.25rem;
+    box-shadow:
+      6px 6px 14px $nm-shadow-dark,
+      -6px -6px 14px $nm-shadow-light;
+  }
+
+  .p-dialog-header {
+    color: $nm-text-primary;
+    font-weight: 600;
+    border-bottom: 1px solid $nm-border;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-dialog-header-close {
+    color: $nm-text-muted;
+
+    &:hover {
+      color: $nm-text-primary;
+    }
+  }
+}
+
+/* ─── Accessibility ──────────────────────────────────────────────────────── */
+@media (prefers-contrast: high) {
+  .login-form-container .emisi-surface-card {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: none !important;
+    border: 2px solid rgba(255, 255, 255, 0.6) !important;
+  }
+
+  .sso-btn,
+  .microsoft-btn,
+  .signin-btn,
+  .submit-btn,
+  .create-icon {
+    box-shadow: none !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .input-wrapper {
+    box-shadow: none !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .kbd-modal-btn {
+    box-shadow: none !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

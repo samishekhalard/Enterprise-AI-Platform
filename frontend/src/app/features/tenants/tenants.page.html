@@ -1,0 +1,83 @@
+<app-page-frame
+  [title]="'Tenant Browser'"
+  [subtitle]="'Live call to /api/tenants through API gateway.'"
+>
+  <div page-actions class="controls">
+    <button type="button" class="app-btn" (click)="load(page())" [disabled]="loading()">
+      Reload
+    </button>
+    <button
+      type="button"
+      class="app-btn"
+      (click)="prevPage()"
+      [disabled]="loading() || page() <= 1"
+    >
+      Prev
+    </button>
+    <button
+      type="button"
+      class="app-btn"
+      (click)="nextPage()"
+      [disabled]="
+        loading() || !response() || response()!.page * response()!.limit >= response()!.total
+      "
+    >
+      Next
+    </button>
+  </div>
+
+  <section page-content>
+    @if (error()) {
+      <section class="app-alert app-alert-error">{{ error() }}</section>
+    }
+
+    @if (loading()) {
+      <p class="muted">Loading tenants...</p>
+    }
+
+    @if (response(); as payload) {
+      <section class="summary">
+        <span
+          >Total: <strong>{{ payload.total }}</strong></span
+        >
+        <span
+          >Page: <strong>{{ payload.page }}</strong></span
+        >
+        <span
+          >Size: <strong>{{ payload.limit }}</strong></span
+        >
+      </section>
+
+      <div class="table-wrap app-panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Tenant ID</th>
+              <th>Tenant UUID</th>
+              <th>Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tenant of payload.tenants; track tenant.id) {
+              <tr>
+                <td>{{ tenant.id }}</td>
+                <td>{{ tenant.uuid || 'n/a' }}</td>
+                <td>{{ tenant.shortName || tenant.fullName || 'n/a' }}</td>
+                <td>{{ tenant.status || 'n/a' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="muted">No tenant rows returned.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <p page-footer>
+    All new modules should preserve this page-frame contract for predictable navigation and spacing.
+  </p>
+</app-page-frame>

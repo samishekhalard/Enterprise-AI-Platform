@@ -1,0 +1,14 @@
+<header class="emisi-section-header" [class.emisi-section-header--compact]="compact">
+  @if (overline) {
+    <span class="emisi-section-header__overline">{{ overline }}</span>
+  }
+  @if (title) {
+    <h2 class="emisi-section-header__title">{{ title }}</h2>
+  }
+  @if (description) {
+    <p class="emisi-section-header__description">{{ description }}</p>
+  }
+  <div class="emisi-section-header__actions">
+    <ng-content select="[emisiSectionActions]" />
+  </div>
+</header>

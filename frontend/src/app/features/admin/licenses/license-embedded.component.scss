@@ -1,0 +1,288 @@
+:host {
+  --nm-bg: #edebe0;
+  --nm-surface: #edebe0;
+  --nm-surface-alt: #edebe0;
+  --nm-shadow-dark: rgba(152, 133, 97, 0.38);
+  --nm-shadow-light: rgba(255, 255, 255, 0.92);
+  --nm-muted: #3d3a3b;
+  --nm-text: #3d3a3b;
+  --nm-accent: #428177;
+}
+
+.embedded-block {
+  display: grid;
+  gap: 0.75rem;
+
+  h3,
+  h4 {
+    margin: 0;
+    color: var(--nm-text);
+  }
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--nm-muted);
+}
+
+.loading-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--nm-muted);
+}
+
+.allocation-sliders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.95rem;
+  padding: 1rem;
+  border-radius: 1.15rem;
+  background: linear-gradient(180deg, #edebe0 0%, #edebe0 100%);
+  border: 0;
+  box-shadow:
+    inset 6px 6px 12px rgba(152, 133, 97, 0.28),
+    inset -6px -6px 12px rgba(255, 255, 255, 0.86);
+}
+
+.slider-stack {
+  width: 118px;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+}
+
+.slider-shell {
+  position: relative;
+  width: 92px;
+  height: 258px;
+  border-radius: 46px;
+  background: #edebe0;
+  box-shadow:
+    12px 12px 22px rgba(152, 133, 97, 0.35),
+    -10px -10px 20px rgba(255, 255, 255, 0.86);
+}
+
+.track-area {
+  position: absolute;
+  top: 24px;
+  bottom: 50px;
+  left: 50%;
+  width: 40px;
+  transform: translateX(-50%);
+}
+
+.track-bg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  border-radius: 999px;
+  background: #edebe0;
+  transform: translateX(-50%);
+}
+
+.track-fill {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6b1f2a 0%, #6b1f2a 100%);
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(107, 31, 42, 0.45);
+}
+
+.track-thumb {
+  position: absolute;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #6b1f2a 0%, #6b1f2a 65%);
+  border: 4px solid #edebe0;
+  transform: translate(-50%, 50%);
+  box-shadow:
+    0 6px 10px rgba(107, 31, 42, 0.35),
+    -2px -2px 6px rgba(255, 255, 255, 0.95);
+}
+
+.tier-icon {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.35rem;
+  color: #6b1f2a;
+}
+
+.slider-caption {
+  text-align: center;
+  display: grid;
+  gap: 0.1rem;
+
+  strong {
+    font-size: 0.78rem;
+    color: #3d3a3b;
+    line-height: 1.1;
+  }
+
+  span {
+    font-size: 0.78rem;
+    color: #161616;
+  }
+
+  small {
+    font-size: 0.72rem;
+    color: var(--nm-muted);
+  }
+}
+
+.assign-card,
+.table-card {
+  border: 0;
+  border-radius: 1rem;
+  background: var(--nm-surface);
+  box-shadow:
+    10px 10px 18px rgba(152, 133, 97, 0.26),
+    -8px -8px 14px rgba(255, 255, 255, 0.86);
+}
+
+:host ::ng-deep .assign-card .p-card-body,
+:host ::ng-deep .table-card .p-card-body {
+  padding: 0.95rem;
+}
+
+.tier-allocation-card {
+  h4 {
+    margin-bottom: 0.55rem;
+  }
+}
+
+.tier-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid #edebe0;
+    font-size: 0.82rem;
+    color: #3d3a3b;
+  }
+
+  th {
+    font-weight: 700;
+    background: #edebe0;
+  }
+}
+
+.utilization-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 140px;
+}
+
+.utilization-track {
+  width: 84px;
+  height: 8px;
+  border-radius: 999px;
+  background: #edebe0;
+  overflow: hidden;
+}
+
+.utilization-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #428177 0%, #428177 100%);
+}
+
+.assign-head {
+  margin-bottom: 0.6rem;
+}
+
+.assign-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 180px auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+:host ::ng-deep .assign-controls .p-inputtext {
+  border: 0;
+  border-radius: 0.8rem;
+  background: var(--nm-surface-alt);
+  box-shadow:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.3),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.85);
+}
+
+.native-select {
+  width: 100%;
+  border: 0;
+  border-radius: 0.8rem;
+  padding: 0.52rem 0.68rem;
+  color: #161616;
+  background: var(--nm-surface-alt);
+  box-shadow:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.3),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.85);
+}
+
+:host ::ng-deep .assign-controls .p-button,
+:host ::ng-deep .header-row .p-button,
+:host ::ng-deep .table-card .p-button {
+  border: 0;
+  border-radius: 0.78rem;
+  box-shadow:
+    6px 6px 12px rgba(152, 133, 97, 0.34),
+    -5px -5px 10px rgba(255, 255, 255, 0.9);
+}
+
+:host ::ng-deep .p-datatable {
+  border-radius: 0.8rem;
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-datatable-table {
+  min-width: 48rem;
+}
+
+:host ::ng-deep .p-datatable-thead > tr > th {
+  background: #edebe0;
+  color: #3d3a3b;
+  border-bottom: 1px solid #edebe0;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td {
+  background: #edebe0;
+  border-bottom: 1px solid #edebe0;
+}
+
+@media (max-width: 760px) {
+  .assign-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .allocation-sliders {
+    justify-content: center;
+  }
+
+  .tier-table {
+    th,
+    td {
+      padding: 0.4rem 0.36rem;
+      font-size: 0.76rem;
+    }
+  }
+}

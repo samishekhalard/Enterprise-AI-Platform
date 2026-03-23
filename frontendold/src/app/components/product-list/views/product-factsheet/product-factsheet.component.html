@@ -1,0 +1,555 @@
+    @if (productService.selectedProduct()) {
+      <!-- Factsheet Header -->
+      <header class="factsheet-header">
+        <div class="header-main">
+          <button class="btn-back"
+                  (click)="productService.setViewMode('list')"
+                  aria-label="Back to products list"
+                  data-testid="btn-back">
+            <img src="assets/icons/arrow-left.svg" alt="" aria-hidden="true">
+          </button>
+
+          <div class="product-logo" [class.has-custom-icon]="productService.selectedProduct()!.icon">
+            @if (productService.selectedProduct()!.icon) {
+              <img [src]="productService.selectedProduct()!.icon" alt="" class="custom-icon">
+            } @else {
+              <img src="assets/icons/box.svg" alt="" aria-hidden="true" class="default-icon">
+            }
+          </div>
+
+          <div class="header-info">
+            <span class="product-category-label">{{ getCategoryName(productService.selectedProduct()!.category) }}</span>
+            <div class="product-title-row">
+              <h1 class="product-title">{{ productService.selectedProduct()!.name || 'Untitled Product' }}</h1>
+              <span class="status-badge"
+                    [class.status-planned]="productService.selectedProduct()!.status === 'planned'"
+                    [class.status-development]="productService.selectedProduct()!.status === 'under_development'"
+                    [class.status-production]="productService.selectedProduct()!.status === 'production'"
+                    [class.status-retired]="productService.selectedProduct()!.status === 'retired'">
+                {{ getStatusLabel(productService.selectedProduct()!.status) }}
+              </span>
+            </div>
+            <div class="uuid-row">
+              <span class="uuid-label">UUID:</span>
+              <span class="uuid-value">{{ productService.selectedProduct()!.id }}</span>
+              <button class="btn-copy" (click)="copyToClipboard(productService.selectedProduct()!.id)" aria-label="Copy UUID" data-testid="btn-copy-uuid">
+                <img src="assets/icons/copy.svg" alt="" aria-hidden="true">
+              </button>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-outline-secondary"
+                    (click)="toggleCurrentStatus()"
+                    data-testid="btn-toggle-status">
+              {{ productService.selectedProduct()!.status === 'production' ? 'Retire' : 'Go Live' }}
+            </button>
+            <button class="btn btn-primary"
+                    (click)="productService.setViewMode('edit')"
+                    data-testid="btn-edit">
+              <img src="assets/icons/edit.svg" alt="" class="btn-icon" aria-hidden="true">
+              Edit
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Tab Navigation -->
+      <nav class="tab-nav" role="tablist" aria-label="Product sections">
+        <button class="tab-item"
+                [class.active]="activeTab() === 'overview'"
+                (click)="setActiveTab('overview')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'overview'"
+                data-testid="tab-overview">
+          <img src="assets/icons/grid.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Overview</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'personas'"
+                (click)="setActiveTab('personas')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'personas'"
+                data-testid="tab-personas">
+          <img src="assets/icons/user-circle.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Personas</span>
+          <span class="tab-count">{{ productService.selectedProduct()!.personas.length }}</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'processes'"
+                (click)="setActiveTab('processes')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'processes'"
+                data-testid="tab-processes">
+          <img src="assets/icons/cog.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Processes</span>
+          <span class="tab-count">0</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'journeys'"
+                (click)="setActiveTab('journeys')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'journeys'"
+                data-testid="tab-journeys">
+          <img src="assets/icons/layers.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Journeys</span>
+          <span class="tab-count">0</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'architecture'"
+                (click)="setActiveTab('architecture')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'architecture'"
+                data-testid="tab-architecture">
+          <img src="assets/icons/building.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Architecture</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'backlog'"
+                (click)="setActiveTab('backlog')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'backlog'"
+                data-testid="tab-backlog">
+          <img src="assets/icons/archive.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">Backlog</span>
+          <span class="tab-count">0</span>
+        </button>
+        <button class="tab-item"
+                [class.active]="activeTab() === 'history'"
+                (click)="setActiveTab('history')"
+                role="tab"
+                [attr.aria-selected]="activeTab() === 'history'"
+                data-testid="tab-history">
+          <img src="assets/icons/clock.svg" alt="" class="tab-icon" aria-hidden="true">
+          <span class="tab-label">History</span>
+          <span class="tab-count">{{ getProductHistoryCount() }}</span>
+        </button>
+      </nav>
+
+      <!-- Tab Content -->
+      <article class="tab-content" role="tabpanel">
+        @if (activeTab() === 'overview') {
+          <!-- Overview Tab Content -->
+          <section class="feature-cards-section">
+          @if (productService.selectedProduct()!.factSheet.keyFeatures.length > 0) {
+            <div class="feature-cards-grid">
+              @for (feature of productService.selectedProduct()!.factSheet.keyFeatures; track feature) {
+                <button class="feature-card" data-testid="feature-card">
+                  <img src="assets/icons/box.svg" alt="" class="feature-icon" aria-hidden="true">
+                  <span class="feature-name">{{ feature }}</span>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="empty-features">
+              <p>No features configured. <button class="btn-link-inline" (click)="productService.setViewMode('edit')">Add features</button></p>
+            </div>
+          }
+        </section>
+
+        <!-- Additional Info -->
+        @if (productService.selectedProduct()!.factSheet.overview) {
+          <section class="info-section">
+            <h2 class="info-heading">Overview</h2>
+            <p class="info-text">{{ productService.selectedProduct()!.factSheet.overview }}</p>
+          </section>
+        }
+
+        @if (productService.selectedProduct()!.factSheet.targetAudience) {
+          <section class="info-section">
+            <h2 class="info-heading">Target Audience</h2>
+            <p class="info-text">{{ productService.selectedProduct()!.factSheet.targetAudience }}</p>
+          </section>
+        }
+
+        @if (productService.selectedProduct()!.factSheet.businessValue) {
+          <section class="info-section">
+            <h2 class="info-heading">Business Value</h2>
+            <p class="info-text">{{ productService.selectedProduct()!.factSheet.businessValue }}</p>
+          </section>
+        }
+
+        @if (productService.selectedProduct()!.factSheet.integrations.length > 0) {
+          <section class="info-section">
+            <h2 class="info-heading">Integrations</h2>
+            <div class="integration-tags">
+              @for (integration of productService.selectedProduct()!.factSheet.integrations; track integration) {
+                <span class="tag">{{ integration }}</span>
+              }
+            </div>
+          </section>
+        }
+        }
+
+        @if (activeTab() === 'personas') {
+          <!-- Personas List View -->
+          @if (personaViewMode() === 'list') {
+            <div class="personas-section">
+              <div class="tab-sub-header">
+                <span class="result-count">{{ productService.selectedProduct()!.personas.length }} personas</span>
+                <button class="btn btn-primary btn-sm" (click)="openPersonaModal()" data-testid="btn-add-persona">
+                  <span class="btn-plus">+</span> Add Persona
+                </button>
+              </div>
+
+              @if (productService.selectedProduct()!.personas.length > 0) {
+                <div class="data-table-container">
+                  <table class="data-table" data-testid="persona-table">
+                    <thead>
+                      <tr>
+                        <th class="col-icon"></th>
+                        <th class="col-code">CODE</th>
+                        <th class="col-name">NAME</th>
+                        <th class="col-type">TYPE</th>
+                        <th class="col-actions">ACTIONS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (persona of productService.selectedProduct()!.personas; track persona.id) {
+                        <tr (click)="viewPersona(persona.id)" class="clickable-row" data-testid="persona-row">
+                          <td class="cell-icon">
+                            <div class="row-icon">
+                              @if (persona.icon) {
+                                <img [src]="persona.icon" alt="" class="custom-icon">
+                              } @else {
+                                <img src="assets/icons/user-circle.svg" alt="" class="default-icon">
+                              }
+                            </div>
+                          </td>
+                          <td class="cell-code">
+                            <span class="code-badge">{{ persona.code || '-' }}</span>
+                          </td>
+                          <td class="cell-name">
+                            <span class="item-name">{{ persona.name || 'Unnamed' }}</span>
+                            @if (persona.description) {
+                              <span class="item-desc">{{ persona.description }}</span>
+                            }
+                          </td>
+                          <td class="cell-type">
+                            <span class="type-badge" [class.type-internal]="persona.type === 'internal'" [class.type-external]="persona.type === 'external'">
+                              {{ persona.type === 'internal' ? 'Internal' : 'External' }}
+                            </span>
+                          </td>
+                          <td class="cell-actions" (click)="$event.stopPropagation()">
+                            <button class="btn-icon-sm" (click)="viewPersona(persona.id)" aria-label="View" data-testid="btn-view-persona">
+                              <img src="assets/icons/eye.svg" alt="">
+                            </button>
+                            <button class="btn-icon-sm btn-icon-danger" (click)="deletePersona(persona.id)" aria-label="Delete" data-testid="btn-delete-persona">
+                              <img src="assets/icons/trash.svg" alt="">
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else {
+                <div class="empty-state-card" data-testid="empty-personas">
+                  <img src="assets/icons/user-circle.svg" alt="" class="empty-icon">
+                  <h4>No Personas Yet</h4>
+                  <p>Add personas to understand your target users better.</p>
+                  <button class="btn btn-primary" (click)="openPersonaModal()" data-testid="btn-add-first-persona">
+                    <span class="btn-plus">+</span> Add First Persona
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Persona Detail View -->
+          @if (personaViewMode() === 'detail' && getSelectedPersona()) {
+            <div class="detail-view">
+              <!-- Persona Header -->
+              <header class="detail-header-section">
+                <div class="detail-header-main">
+                  <button class="btn-back" (click)="backToPersonaList()" aria-label="Back to personas list" data-testid="btn-back-personas">
+                    <img src="assets/icons/arrow-left.svg" alt="" aria-hidden="true">
+                  </button>
+
+                  <div class="detail-logo" [class.has-custom-icon]="getSelectedPersona()!.icon">
+                    @if (getSelectedPersona()!.icon) {
+                      <img [src]="getSelectedPersona()!.icon" alt="" class="custom-icon">
+                    } @else {
+                      <img src="assets/icons/user-circle.svg" alt="" class="default-icon">
+                    }
+                  </div>
+
+                  <div class="detail-info">
+                    <span class="detail-type-label">{{ getSelectedPersona()!.type === 'internal' ? 'Internal' : 'External' }}</span>
+                    <div class="detail-title-row">
+                      <h1 class="detail-title">{{ getSelectedPersona()!.name || 'Unnamed Persona' }}</h1>
+                    </div>
+                    <div class="detail-meta-row">
+                      @if (getSelectedPersona()!.code) {
+                        <span class="detail-code">{{ getSelectedPersona()!.code }}</span>
+                        <span class="meta-separator">&bull;</span>
+                      }
+                      <span class="uuid-label">UUID:</span>
+                      <span class="uuid-value">{{ getSelectedPersona()!.id }}</span>
+                      <button class="btn-copy" (click)="copyToClipboard(getSelectedPersona()!.id)" aria-label="Copy UUID">
+                        <img src="assets/icons/copy.svg" alt="">
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="detail-actions">
+                    <button class="btn btn-primary" (click)="openEditPersonaModal()" data-testid="btn-edit-persona">
+                      <img src="assets/icons/edit.svg" alt="" class="btn-icon" aria-hidden="true">
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </header>
+
+              <!-- Persona Tabs -->
+              <nav class="detail-tabs" role="tablist">
+                <button class="detail-tab"
+                        [class.active]="activePersonaTab() === 'general'"
+                        (click)="activePersonaTab.set('general')"
+                        data-testid="persona-tab-general">
+                  <img src="assets/icons/user.svg" alt="" class="tab-icon">
+                  <span>General</span>
+                </button>
+                <button class="detail-tab"
+                        [class.active]="activePersonaTab() === 'journeys'"
+                        (click)="activePersonaTab.set('journeys')"
+                        data-testid="persona-tab-journeys">
+                  <img src="assets/icons/layers.svg" alt="" class="tab-icon">
+                  <span>Journeys</span>
+                  <span class="tab-count">0</span>
+                </button>
+                <button class="detail-tab"
+                        [class.active]="activePersonaTab() === 'stories'"
+                        (click)="activePersonaTab.set('stories')"
+                        data-testid="persona-tab-stories">
+                  <img src="assets/icons/folder.svg" alt="" class="tab-icon">
+                  <span>Stories</span>
+                  <span class="tab-count">0</span>
+                </button>
+                <button class="detail-tab"
+                        [class.active]="activePersonaTab() === 'history'"
+                        (click)="activePersonaTab.set('history')"
+                        data-testid="persona-tab-history">
+                  <img src="assets/icons/clock.svg" alt="" class="tab-icon">
+                  <span>History</span>
+                  <span class="tab-count">{{ getPersonaHistoryCount() }}</span>
+                </button>
+              </nav>
+
+              <!-- Persona Tab Content -->
+              <div class="detail-content">
+                @if (activePersonaTab() === 'general') {
+                  <div class="info-cards">
+                    <div class="info-card">
+                      <h3 class="info-card-title">Description</h3>
+                      <p class="info-card-text">{{ getSelectedPersona()!.description || 'No description provided.' }}</p>
+                    </div>
+                  </div>
+                }
+
+                @if (activePersonaTab() === 'journeys') {
+                  <div class="tab-placeholder">
+                    <img src="assets/icons/layers.svg" alt="" class="placeholder-icon">
+                    <h3>Journeys</h3>
+                    <p>Customer journeys for this persona will appear here.</p>
+                  </div>
+                }
+
+                @if (activePersonaTab() === 'stories') {
+                  <div class="tab-placeholder">
+                    <img src="assets/icons/folder.svg" alt="" class="placeholder-icon">
+                    <h3>Stories</h3>
+                    <p>User stories for this persona will appear here.</p>
+                  </div>
+                }
+
+                @if (activePersonaTab() === 'history') {
+                  <div class="history-section">
+                    @if (getPersonaHistory().length > 0) {
+                      <div class="history-list">
+                        @for (entry of getPersonaHistory(); track entry.id) {
+                          <div class="history-item">
+                            <div class="history-indicator">
+                              <span class="history-dot"
+                                    [class.dot-created]="entry.action === 'created'"
+                                    [class.dot-updated]="entry.action === 'updated'"
+                                    [class.dot-deleted]="entry.action === 'deleted'"></span>
+                            </div>
+                            <div class="history-content">
+                              <div class="history-header">
+                                <span class="history-action-badge"
+                                      [class.badge-created]="entry.action === 'created'"
+                                      [class.badge-updated]="entry.action === 'updated'"
+                                      [class.badge-deleted]="entry.action === 'deleted'">
+                                  {{ entry.action | titlecase }}
+                                </span>
+                              </div>
+                              <p class="history-description">{{ entry.description }}</p>
+                              <span class="history-timestamp">{{ formatAuditTimestamp(entry.timestamp) }}</span>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div class="empty-state-card">
+                        <img src="assets/icons/clock.svg" alt="" class="empty-icon">
+                        <h4>No History Yet</h4>
+                        <p>Changes to this persona will be tracked here.</p>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Add/Edit Persona Modal -->
+          @if (isPersonaModalOpen()) {
+            <div class="modal-overlay" (click)="closePersonaModal()">
+              <div class="modal-container" (click)="$event.stopPropagation()">
+                <header class="modal-header">
+                  <h2 class="modal-title">{{ editingPersonaId() ? 'Edit Persona' : 'Add Persona' }}</h2>
+                  <button class="btn-close" (click)="closePersonaModal()" aria-label="Close">
+                    <img src="assets/icons/times.svg" alt="">
+                  </button>
+                </header>
+                <div class="modal-body">
+                  <!-- Icon -->
+                  <div class="form-group">
+                    <label class="form-label">Icon</label>
+                    <div class="icon-picker">
+                      <div class="icon-display icon-display-sm icon-display-light" (click)="personaIconInput.click()">
+                        @if (personaForm.icon) {
+                          <img [src]="personaForm.icon" alt="" class="custom-icon">
+                        } @else {
+                          <img src="assets/icons/user-circle.svg" alt="" class="default-icon">
+                        }
+                        <div class="icon-overlay">
+                          <img src="assets/icons/edit.svg" alt="">
+                        </div>
+                      </div>
+                      <input type="file" #personaIconInput class="file-input" accept="image/*" (change)="onPersonaIconSelected($event)">
+                      @if (personaForm.icon) {
+                        <button type="button" class="btn-reset" (click)="personaForm.icon = ''">Reset</button>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Code (only in edit mode) -->
+                  @if (editingPersonaId()) {
+                    <div class="form-group">
+                      <label class="form-label">Code</label>
+                      <input type="text" class="form-control" [(ngModel)]="personaForm.code" placeholder="e.g., PER-001" data-testid="persona-code-input">
+                    </div>
+                  }
+
+                  <!-- Name -->
+                  <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="personaForm.name" placeholder="e.g., Marketing Manager" data-testid="persona-name-input">
+                  </div>
+
+                  <!-- Type -->
+                  <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <select class="form-control" [(ngModel)]="personaForm.type" data-testid="persona-type-select">
+                      <option value="internal">Internal</option>
+                      <option value="external">External</option>
+                    </select>
+                  </div>
+
+                  <!-- Description -->
+                  <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" rows="3" [(ngModel)]="personaForm.description" placeholder="Brief description..." data-testid="persona-description-input"></textarea>
+                  </div>
+                </div>
+                <footer class="modal-footer">
+                  <button class="btn btn-link" (click)="closePersonaModal()">Cancel</button>
+                  <button class="btn btn-primary" (click)="savePersona()" [disabled]="!personaForm.name.trim()" data-testid="btn-save-persona">
+                    {{ editingPersonaId() ? 'Save Changes' : 'Add Persona' }}
+                  </button>
+                </footer>
+              </div>
+            </div>
+          }
+        }
+
+        @if (activeTab() === 'processes') {
+          <!-- Processes Tab Content -->
+          <div class="tab-placeholder">
+            <img src="assets/icons/cog.svg" alt="" class="placeholder-icon">
+            <h3>Processes</h3>
+            <p>Manage product processes here.</p>
+          </div>
+        }
+
+        @if (activeTab() === 'journeys') {
+          <!-- Journeys Tab Content -->
+          <div class="tab-placeholder">
+            <img src="assets/icons/layers.svg" alt="" class="placeholder-icon">
+            <h3>Journeys</h3>
+            <p>Manage customer journeys here.</p>
+          </div>
+        }
+
+        @if (activeTab() === 'architecture') {
+          <!-- Architecture Tab Content -->
+          <div class="tab-placeholder">
+            <img src="assets/icons/building.svg" alt="" class="placeholder-icon">
+            <h3>Architecture</h3>
+            <p>Manage product architecture here.</p>
+          </div>
+        }
+
+        @if (activeTab() === 'backlog') {
+          <!-- Backlog Tab Content -->
+          <div class="tab-placeholder">
+            <img src="assets/icons/archive.svg" alt="" class="placeholder-icon">
+            <h3>Backlog</h3>
+            <p>Manage product backlog here.</p>
+          </div>
+        }
+
+        @if (activeTab() === 'history') {
+          <!-- History Tab Content -->
+          <div class="history-section">
+            @if (getProductHistory().length > 0) {
+              <div class="history-list">
+                @for (entry of getProductHistory(); track entry.id) {
+                  <div class="history-item">
+                    <div class="history-indicator">
+                      <span class="history-dot"
+                            [class.dot-created]="entry.action === 'created'"
+                            [class.dot-updated]="entry.action === 'updated'"
+                            [class.dot-deleted]="entry.action === 'deleted'"></span>
+                    </div>
+                    <div class="history-content">
+                      <div class="history-header">
+                        <span class="history-action-badge"
+                              [class.badge-created]="entry.action === 'created'"
+                              [class.badge-updated]="entry.action === 'updated'"
+                              [class.badge-deleted]="entry.action === 'deleted'">
+                          {{ entry.action | titlecase }}
+                        </span>
+                        @if (entry.entityType === 'persona') {
+                          <span class="history-entity-badge">Persona</span>
+                        }
+                      </div>
+                      <p class="history-description">{{ entry.description }}</p>
+                      <span class="history-timestamp">{{ formatAuditTimestamp(entry.timestamp) }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state-card">
+                <img src="assets/icons/clock.svg" alt="" class="empty-icon">
+                <h4>No History Yet</h4>
+                <p>Changes to this product will be tracked here.</p>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    }

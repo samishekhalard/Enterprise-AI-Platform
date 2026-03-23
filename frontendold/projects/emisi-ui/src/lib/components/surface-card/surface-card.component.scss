@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.emisi-surface-card {
+  border-radius: var(--emisi-radius-lg, 0.75rem);
+  background: var(--emisi-surface, #ffffff);
+  border: 1px solid var(--emisi-border, #e2e8f0);
+  color: var(--emisi-text, #1a202c);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.emisi-surface-card--sm {
+  padding: 0.75rem;
+}
+
+.emisi-surface-card--md {
+  padding: 1rem;
+}
+
+.emisi-surface-card--lg {
+  padding: 1.5rem;
+}
+
+.emisi-surface-card--flat {
+  box-shadow: none;
+}
+
+.emisi-surface-card--raised {
+  box-shadow: var(--emisi-shadow-md);
+}
+
+.emisi-surface-card--raised:hover {
+  border-color: color-mix(in srgb, var(--emisi-primary), #ffffff 70%);
+  box-shadow: var(--emisi-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.emisi-surface-card--inset {
+  background: var(--emisi-bg, #faf9f5);
+  box-shadow: var(--emisi-shadow-neu-inset);
+}

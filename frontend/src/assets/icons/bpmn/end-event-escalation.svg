@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" fill="none" stroke="#C02520">
+  <circle cx="1024" cy="1024" r="875" stroke-width="140" fill="#FFEBEE"/>
+  <!-- Escalation end: Filled upward-pointing triangle (BPMN 2.0 standard) -->
+  <path fill="#C02520" stroke="none" d="M1024 574L574 1474H1474Z"/>
+</svg>

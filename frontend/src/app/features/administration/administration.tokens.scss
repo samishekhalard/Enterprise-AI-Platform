@@ -1,0 +1,239 @@
+:host {
+  --adm-font-code: 'Courier New', monospace;
+  --adm-font-brand: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --adm-bg: var(--tp-bg, #edebe0);
+  --adm-surface: var(--tp-surface, #edebe0);
+  --adm-surface-alt: #edebe0;
+  --adm-button-face: #edebe0;
+
+  --adm-white: #ffffff;
+  --adm-on-primary: #ffffff;
+  --adm-black-rgb: 22, 22, 22;
+  --adm-primary: var(--tp-primary, #428177);
+  --adm-primary-hover: #054239;
+  --adm-danger: var(--tp-danger, #6b1f2a);
+  --adm-danger-hover: #4a151e;
+  --adm-text-strong: #3d3a3b;
+  --adm-text-muted: #3d3a3b;
+  --adm-text-deep-rgb: 22, 22, 22;
+  --adm-radius-control: 0.72rem;
+  --adm-radius-card: 1rem;
+  --adm-radius-pill: 999px;
+
+  --adm-shadow-light: rgba(255, 255, 255, 0.95);
+  --adm-shadow-dark: rgba(152, 133, 97, 0.32);
+
+  --adm-pattern-opacity: 0.045;
+  --adm-pattern-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23428177' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3Cpath d='M22 10L38 42 M98 10L82 42 M22 110L38 78 M98 110L82 78'/%3E%3Cpath d='M10 22L42 38 M10 98L42 78 M110 22L78 38 M110 98L78 78'/%3E%3C/g%3E%3C/svg%3E");
+
+  --adm-island-shadow: 6px 6px 14px var(--adm-shadow-dark), -6px -6px 14px var(--adm-shadow-light);
+  --adm-divider-soft: 1px solid rgba(var(--adm-black-rgb), 0.09);
+  --adm-action-shadow-default: 0 4px 10px rgba(var(--adm-black-rgb), 0.24);
+  --adm-action-shadow-hover: 0 7px 16px rgba(var(--adm-black-rgb), 0.3);
+  --adm-action-shadow-pressed: inset 0 2px 6px rgba(var(--adm-black-rgb), 0.22);
+  --adm-action-primary-bg: var(--adm-primary);
+  --adm-action-primary-bg-hover: var(--adm-primary-hover);
+  --adm-action-primary-text: #ffffff;
+  --adm-action-primary-border: 1px solid rgba(5, 66, 57, 0.6);
+  --adm-action-secondary-bg: rgba(237, 235, 224, 0.86);
+  --adm-action-secondary-text: var(--adm-text-strong);
+  --adm-action-secondary-border: 1px solid rgba(var(--adm-black-rgb), 0.2);
+  --adm-action-danger-bg: rgba(237, 235, 224, 0.92);
+  --adm-action-danger-text: var(--adm-danger);
+  --adm-action-danger-border: 1px solid rgba(107, 31, 42, 0.46);
+  --adm-dialog-shadow:
+    16px 16px 30px rgba(var(--adm-black-rgb), 0.26), -8px -8px 16px rgba(255, 255, 255, 0.42);
+
+  --adm-button-bezel-gradient: linear-gradient(145deg, #428177, #054239);
+  --adm-button-face-gradient: linear-gradient(145deg, #edebe0, #edebe0);
+  --adm-button-face-border: 2px solid #428177;
+
+  --adm-button-shadow-before:
+    6px 6px 14px rgba(var(--adm-black-rgb), 0.38), -4px -4px 10px rgba(255, 255, 255, 0.55);
+  --adm-button-shadow-before-hover:
+    8px 8px 18px rgba(var(--adm-black-rgb), 0.45), -5px -5px 12px rgba(255, 255, 255, 0.62);
+  --adm-button-shadow-before-active:
+    3px 3px 8px rgba(var(--adm-black-rgb), 0.3), -2px -2px 6px rgba(255, 255, 255, 0.4);
+  --adm-button-shadow-after:
+    inset 1px 1px 3px rgba(255, 255, 255, 0.35), inset -2px -2px 5px rgba(var(--adm-black-rgb), 0.2);
+  --adm-button-shadow-after-hover:
+    inset 1px 1px 3px rgba(255, 255, 255, 0.4), inset -2px -2px 5px rgba(var(--adm-black-rgb), 0.24);
+  --adm-button-shadow-after-active:
+    inset 3px 3px 6px rgba(var(--adm-black-rgb), 0.24), inset -1px -1px 3px rgba(255, 255, 255, 0.3);
+
+  --adm-dock-glass-bg: rgba(237, 235, 224, 0.72);
+  --adm-dock-glass-border: 1px solid rgba(66, 129, 119, 0.32);
+  --adm-dock-item-border: 1px solid rgba(66, 129, 119, 0.28);
+  --adm-dock-card-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.14), inset 0 0 4px rgba(255, 255, 255, 0.2),
+    0 6px 10px rgba(var(--adm-text-deep-rgb), 0.26);
+  --adm-dock-item-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.2), inset 0 0 4px rgba(255, 255, 255, 0.28),
+    0 6px 12px rgba(var(--adm-text-deep-rgb), 0.24);
+  --adm-dock-item-shadow-active:
+    inset 0 0 16px rgba(255, 255, 255, 0.24), inset 0 0 4px rgba(255, 255, 255, 0.34),
+    0 8px 14px rgba(var(--adm-text-deep-rgb), 0.3), 0 0 0 2px rgba(66, 129, 119, 0.25);
+
+  --adm-help-dialog-shadow:
+    8px 8px 18px var(--adm-shadow-dark), -8px -8px 18px var(--adm-shadow-light);
+  --adm-help-close-shadow:
+    3px 3px 6px var(--adm-shadow-dark), -3px -3px 6px var(--adm-shadow-light);
+  --adm-help-close-shadow-active:
+    inset 2px 2px 5px var(--adm-shadow-dark), inset -2px -2px 5px var(--adm-shadow-light);
+  --adm-help-kbd-shadow:
+    inset 2px 2px 4px var(--adm-shadow-dark), inset -2px -2px 4px var(--adm-shadow-light);
+
+  --adm-backdrop: rgba(var(--adm-text-deep-rgb), 0.4);
+  --adm-backdrop-mobile: rgba(var(--adm-text-deep-rgb), 0.35);
+  --adm-drawer-shadow: 4px 0 20px rgba(var(--adm-text-deep-rgb), 0.18);
+  --adm-mobile-link-hover-bg: rgba(var(--adm-black-rgb), 0.04);
+  --adm-mobile-link-active-bg: rgba(66, 129, 119, 0.08);
+  --adm-mobile-footer-border: 1px solid rgba(var(--adm-black-rgb), 0.06);
+
+  --tm-bg: var(--tp-bg, #edebe0);
+  --tm-surface: var(--tp-surface, #edebe0);
+  --tm-surface-alt: #edebe0;
+  --tm-shadow-dark: rgba(152, 133, 97, 0.38);
+  --tm-shadow-light: rgba(255, 255, 255, 0.88);
+  --tm-accent: var(--tp-primary, #428177);
+  --tm-accent-rgb: 66, 129, 119;
+  --tm-accent-soft: rgba(66, 129, 119, 0.17);
+  --tm-text: #3d3a3b;
+  --tm-muted: #3d3a3b;
+
+  --tm-shadow-card: 12px 12px 24px var(--tm-shadow-dark), -10px -10px 20px var(--tm-shadow-light);
+  --tm-shadow-search-inset:
+    inset 5px 5px 10px rgba(152, 133, 97, 0.35), inset -5px -5px 10px rgba(255, 255, 255, 0.82);
+  --tm-shadow-item: 7px 7px 14px rgba(152, 133, 97, 0.35), -6px -6px 12px rgba(255, 255, 255, 0.9);
+  --tm-shadow-item-active:
+    inset 4px 4px 9px rgba(152, 133, 97, 0.34), inset -4px -4px 8px rgba(255, 255, 255, 0.88);
+  --tm-shadow-tablist:
+    inset 4px 4px 9px rgba(152, 133, 97, 0.36), inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+  --tm-shadow-tab-active:
+    4px 4px 8px rgba(152, 133, 97, 0.32), -4px -4px 8px rgba(255, 255, 255, 0.9);
+  --tm-shadow-overview-inset:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.25), inset -4px -4px 8px rgba(255, 255, 255, 0.82);
+  --tm-shadow-license-inset:
+    inset 4px 4px 9px rgba(152, 133, 97, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.88);
+  --tm-info-bg: rgba(66, 129, 119, 0.13);
+  --tm-info-text: #054239;
+  --tm-shadow-pill: 4px 4px 8px rgba(152, 133, 97, 0.32), -4px -4px 8px rgba(255, 255, 255, 0.88);
+  --tm-preset-neumorph-bg: #edebe0;
+  --tm-preset-aqua-bg: #428177;
+  --tm-preset-sand-bg: #b9a779;
+  --tm-preset-slate-bg: #3d3a3b;
+  --tm-preset-neumorph-text: #428177;
+  --tm-preset-aqua-text: #ffffff;
+  --tm-preset-sand-text: #3d3a3b;
+  --tm-preset-slate-text: #ffffff;
+  --tm-shadow-input-inset:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+  --tm-overlay-bg: rgba(22, 22, 22, 0.24);
+  --tm-shadow-modal:
+    16px 16px 30px rgba(152, 133, 97, 0.38), -12px -12px 24px rgba(255, 255, 255, 0.9);
+  --tm-shadow-close: 4px 4px 8px rgba(152, 133, 97, 0.3), -4px -4px 8px rgba(255, 255, 255, 0.88);
+  --tm-shadow-panel-inset:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.24), inset -4px -4px 8px rgba(255, 255, 255, 0.82);
+  --tm-color-white: #ffffff;
+  --tm-brand-primary-default: var(--tp-primary, #428177);
+  --tm-brand-secondary-default: var(--tp-primary-light, #b9a779);
+  --tm-brand-surface-default: var(--tp-surface, #edebe0);
+  --tm-brand-text-default: var(--tp-text, #3d3a3b);
+  --tm-brand-text-soft: rgba(61, 58, 59, 0.72);
+  --tm-shadow-logo: 4px 4px 8px rgba(152, 133, 97, 0.35), -3px -3px 7px rgba(255, 255, 255, 0.9);
+  --tm-shadow-btn-primary: var(--adm-action-shadow-default);
+  --tm-shadow-btn-ghost: var(--adm-action-shadow-pressed);
+  --tm-shadow-btn-control: var(--adm-action-shadow-default);
+  --tm-shadow-btn-control-hover: var(--adm-action-shadow-hover);
+  --tm-shadow-btn-control-press: var(--adm-action-shadow-pressed);
+  --tm-shadow-hover-lift: 0 8px 24px rgba(var(--adm-black-rgb), 0.15);
+  --tm-shadow-hover-press: inset 2px 2px 6px rgba(var(--adm-black-rgb), 0.15);
+  --tm-shadow-hover-glow: 0 0 16px rgba(var(--tm-accent-rgb), 0.5);
+  --tm-bg-hover-highlight: rgba(var(--tm-accent-rgb), 0.08);
+
+  --bs-font-code: var(--adm-font-code);
+
+  --bs-color-text: var(--tm-text);
+  --bs-color-muted: var(--tm-muted);
+  --bs-color-accent: var(--tm-accent);
+  --bs-color-accent-rgb: var(--tm-accent-rgb);
+  --bs-color-surface: var(--tm-surface);
+  --bs-color-surface-alt: #edebe0;
+
+  --bs-color-shadow-dark-rgb: 152, 133, 97;
+  --bs-color-shadow-light-rgb: 255, 255, 255;
+
+  --bs-color-success-rgb: 66, 129, 119;
+  --bs-color-success-strong: #054239;
+  --bs-color-success-text: #054239;
+
+  --bs-color-warning-rgb: 185, 167, 121;
+  --bs-color-warning-strong: #3d3a3b;
+
+  --bs-color-danger-rgb: 107, 31, 42;
+  --bs-color-danger-strong: #4a151e;
+  --bs-color-error-text: #6b1f2a;
+
+  --bs-color-preset-neumorph-bg: #edebe0;
+  --bs-color-preset-aqua-bg: #428177;
+  --bs-color-preset-sand-bg: #b9a779;
+  --bs-color-preset-slate-bg: #3d3a3b;
+  --bs-color-preset-aqua-text: #ffffff;
+  --bs-color-preset-sand-text: #3d3a3b;
+  --bs-color-preset-slate-text: #ffffff;
+
+  --bs-border-divider: 1px solid rgba(var(--bs-color-shadow-dark-rgb), 0.18);
+  --bs-border-soft: 1px solid rgba(var(--bs-color-shadow-dark-rgb), 0.22);
+  --bs-border-strong: 1px solid rgba(var(--bs-color-shadow-dark-rgb), 0.28);
+  --bs-border-accent-soft: 1px solid rgba(var(--bs-color-accent-rgb), 0.24);
+  --bs-border-accent: 1px solid rgba(var(--bs-color-accent-rgb), 0.32);
+  --bs-border-accent-hover: 1px solid rgba(var(--bs-color-accent-rgb), 0.42);
+  --bs-border-warning: 1px solid rgba(var(--bs-color-warning-rgb), 0.45);
+  --bs-border-danger: 1px solid rgba(var(--bs-color-danger-rgb), 0.3);
+  --bs-border-swatch: 1px solid rgba(var(--adm-black-rgb), 0.12);
+  --bs-border-swatch-strong: 1px solid rgba(var(--adm-black-rgb), 0.14);
+
+  --bs-bg-accent-soft: rgba(var(--bs-color-accent-rgb), 0.12);
+  --bs-bg-warning-soft: rgba(var(--bs-color-warning-rgb), 0.18);
+  --bs-bg-danger-soft: rgba(var(--bs-color-danger-rgb), 0.08);
+  --bs-bg-danger-soft-strong: rgba(var(--bs-color-danger-rgb), 0.12);
+
+  --bs-bg-card-gradient: linear-gradient(
+    155deg,
+    rgba(237, 235, 224, 0.78),
+    rgba(var(--bs-color-shadow-light-rgb), 0.9)
+  );
+  --bs-bg-palette-gradient: linear-gradient(
+    145deg,
+    rgba(237, 235, 224, 0.72),
+    rgba(var(--bs-color-shadow-light-rgb), 0.88)
+  );
+  --bs-bg-card-base: rgba(var(--bs-color-shadow-light-rgb), 0.75);
+  --bs-bg-card-strong: rgba(var(--bs-color-shadow-light-rgb), 0.72);
+  --bs-bg-panel-soft: rgba(237, 235, 224, 0.56);
+  --bs-bg-scrollbar-thumb: rgba(var(--bs-color-shadow-dark-rgb), 0.25);
+
+  --bs-shadow-preset-pill:
+    4px 4px 8px rgba(var(--bs-color-shadow-dark-rgb), 0.32),
+    -4px -4px 8px rgba(var(--bs-color-shadow-light-rgb), 0.88);
+
+  --bs-shadow-search-inset:
+    inset 5px 5px 10px rgba(var(--bs-color-shadow-dark-rgb), 0.35),
+    inset -5px -5px 10px rgba(var(--bs-color-shadow-light-rgb), 0.82);
+  --bs-shadow-catalog-active:
+    inset 3px 3px 7px rgba(var(--bs-color-shadow-dark-rgb), 0.28),
+    inset -3px -3px 6px rgba(var(--bs-color-shadow-light-rgb), 0.88);
+  --bs-shadow-panel:
+    6px 6px 14px rgba(var(--bs-color-shadow-dark-rgb), 0.16),
+    -4px -4px 10px rgba(var(--bs-color-shadow-light-rgb), 0.7);
+  --bs-shadow-preview-inset:
+    inset 5px 5px 12px rgba(var(--bs-color-shadow-dark-rgb), 0.26),
+    inset -5px -5px 10px rgba(var(--bs-color-shadow-light-rgb), 0.84);
+  --bs-shadow-input-inset:
+    inset 4px 4px 8px rgba(var(--bs-color-shadow-dark-rgb), 0.3),
+    inset -4px -4px 8px rgba(var(--bs-color-shadow-light-rgb), 0.86);
+  --bs-shadow-palette-field:
+    inset 3px 3px 7px rgba(var(--bs-color-shadow-dark-rgb), 0.2),
+    inset -3px -3px 7px rgba(var(--bs-color-shadow-light-rgb), 0.75);
+}

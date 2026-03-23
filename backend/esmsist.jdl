@@ -1,0 +1,474 @@
+/**
+ * ESMSIST - Enterprise Service Management System
+ * JDL Entity Relationship Diagram
+ *
+ * Open this file in VS Code with JHipster IDE extension to view ERD:
+ * - Press Cmd+Shift+P → "JHipster: Open ERD"
+ * - Or right-click file → "Open JDL ERD"
+ */
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum TenantType {
+    MASTER, DOMINANT, REGULAR
+}
+
+enum TenantTier {
+    FREE, STANDARD, PROFESSIONAL, ENTERPRISE
+}
+
+enum TenantStatus {
+    ACTIVE, LOCKED, SUSPENDED, PENDING
+}
+
+enum UserStatus {
+    ACTIVE, INACTIVE, LOCKED, PENDING
+}
+
+enum LicenseStatus {
+    ACTIVE, EXPIRED, SUSPENDED, CANCELLED
+}
+
+enum SSLStatus {
+    PENDING, PROVISIONING, ACTIVE, EXPIRED, FAILED
+}
+
+enum VerificationMethod {
+    DNS_TXT, DNS_CNAME, HTTP_FILE, EMAIL
+}
+
+enum NotificationType {
+    EMAIL, PUSH, IN_APP, SMS
+}
+
+enum NotificationCategory {
+    SYSTEM, MARKETING, TRANSACTIONAL, ALERT
+}
+
+enum NotificationStatus {
+    PENDING, SENT, DELIVERED, FAILED, READ
+}
+
+enum Priority {
+    LOW, NORMAL, HIGH, URGENT
+}
+
+enum Severity {
+    DEBUG, INFO, WARN, ERROR, CRITICAL
+}
+
+enum LlmProvider {
+    OPENAI, ANTHROPIC, GEMINI, OLLAMA
+}
+
+enum AgentStatus {
+    ACTIVE, INACTIVE, DELETED
+}
+
+enum DeviceTrustLevel {
+    UNTRUSTED, BASIC, TRUSTED, MANAGED
+}
+
+enum DeviceStatus {
+    ACTIVE, INACTIVE, BLOCKED, REVOKED
+}
+
+// =============================================================================
+// TENANT SERVICE ENTITIES (master_db)
+// =============================================================================
+
+entity Tenant {
+    id String required maxlength(50)
+    uuid UUID required unique
+    fullName String required maxlength(255)
+    shortName String required maxlength(100)
+    slug String required unique maxlength(100)
+    description TextBlob
+    logoUrl String maxlength(500)
+    tenantType TenantType required
+    tier TenantTier required
+    status TenantStatus required
+    keycloakRealm String maxlength(100)
+    isProtected Boolean required
+    createdAt Instant required
+    updatedAt Instant required
+    createdBy String maxlength(50)
+}
+
+entity TenantDomain {
+    id String required maxlength(50)
+    domain String required unique maxlength(255)
+    isPrimary Boolean required
+    isVerified Boolean required
+    verificationToken String
+    verificationMethod VerificationMethod
+    sslStatus SSLStatus
+    sslCertificateId String maxlength(100)
+    sslExpiresAt Instant
+    verifiedAt Instant
+    createdAt Instant required
+}
+
+entity TenantAuthProvider {
+    id String required maxlength(50)
+    type String required maxlength(20)
+    name String required maxlength(100)
+    isEnabled Boolean required
+    config TextBlob
+    createdAt Instant required
+}
+
+entity TenantBranding {
+    id UUID required
+    primaryColor String maxlength(7)
+    secondaryColor String maxlength(7)
+    accentColor String maxlength(7)
+    logoUrl String maxlength(500)
+    faviconUrl String maxlength(500)
+    loginBackgroundUrl String maxlength(500)
+    customCss TextBlob
+}
+
+entity TenantSessionConfig {
+    id UUID required
+    sessionTimeout Integer
+    idleTimeout Integer
+    maxConcurrentSessions Integer
+    rememberMeDuration Integer
+    enforceSessionBinding Boolean
+}
+
+entity TenantMFAConfig {
+    id UUID required
+    mfaRequired Boolean
+    allowedMethods TextBlob
+    gracePeriodDays Integer
+    rememberDeviceDays Integer
+}
+
+// =============================================================================
+// USER SERVICE ENTITIES (master_db)
+// =============================================================================
+
+entity UserProfile {
+    id UUID required
+    keycloakId UUID required unique
+    tenantId String required maxlength(50)
+    email String required
+    emailVerified Boolean
+    firstName String maxlength(100)
+    lastName String maxlength(100)
+    displayName String
+    jobTitle String maxlength(100)
+    department String maxlength(100)
+    phone String maxlength(50)
+    mobile String maxlength(50)
+    officeLocation String
+    employeeId String maxlength(50)
+    employeeType String maxlength(50)
+    managerId UUID
+    avatarUrl String maxlength(500)
+    timezone String maxlength(50)
+    locale String maxlength(10)
+    mfaEnabled Boolean
+    passwordLastChanged Instant
+    passwordExpiresAt Instant
+    accountLocked Boolean
+    lockoutEnd Instant
+    failedLoginAttempts Integer
+    lastLoginAt Instant
+    lastLoginIp String maxlength(45)
+    status UserStatus required
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+entity UserDevice {
+    id UUID required
+    deviceId String required maxlength(100)
+    deviceName String maxlength(100)
+    deviceType String maxlength(50)
+    platform String maxlength(50)
+    browser String maxlength(100)
+    browserVersion String maxlength(50)
+    os String maxlength(50)
+    osVersion String maxlength(50)
+    trustLevel DeviceTrustLevel
+    status DeviceStatus required
+    lastUsedAt Instant
+    lastIpAddress String maxlength(45)
+    registeredAt Instant required
+}
+
+entity UserSession {
+    id UUID required
+    sessionToken String required unique
+    userId UUID required
+    tenantId String required maxlength(50)
+    deviceId UUID
+    ipAddress String maxlength(45)
+    userAgent String maxlength(500)
+    isActive Boolean required
+    createdAt Instant required
+    expiresAt Instant required
+    lastActivityAt Instant
+}
+
+// =============================================================================
+// LICENSE SERVICE ENTITIES (master_db)
+// =============================================================================
+
+entity LicenseProduct {
+    id UUID required
+    code String required unique maxlength(50)
+    name String required maxlength(100)
+    description TextBlob
+    isActive Boolean required
+    createdAt Instant required
+}
+
+entity LicenseFeature {
+    id UUID required
+    code String required maxlength(50)
+    name String required maxlength(100)
+    description TextBlob
+    isEnabled Boolean required
+}
+
+entity TenantLicense {
+    id UUID required
+    tenantId String required maxlength(50)
+    totalSeats Integer required
+    assignedSeats Integer required
+    validFrom LocalDate required
+    validUntil LocalDate required
+    billingCycle String maxlength(20)
+    autoRenew Boolean required
+    status LicenseStatus required
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+entity UserLicenseAssignment {
+    id UUID required
+    userId UUID required
+    assignedAt Instant required
+    assignedBy UUID
+    revokedAt Instant
+    revokedBy UUID
+}
+
+// =============================================================================
+// AI SERVICE ENTITIES (tenant_db)
+// =============================================================================
+
+entity AgentCategory {
+    id UUID required
+    tenantId String required maxlength(50)
+    name String required maxlength(100)
+    description TextBlob
+    icon String maxlength(50)
+    sortOrder Integer
+    createdAt Instant required
+}
+
+entity Agent {
+    id UUID required
+    tenantId String required maxlength(50)
+    ownerId UUID required
+    name String required maxlength(100)
+    description TextBlob
+    avatarUrl String maxlength(500)
+    systemPrompt TextBlob required
+    greetingMessage TextBlob
+    provider LlmProvider required
+    model String required maxlength(50)
+    ragEnabled Boolean
+    isPublic Boolean
+    isSystem Boolean
+    status AgentStatus required
+    usageCount Long
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+entity Conversation {
+    id UUID required
+    tenantId String required maxlength(50)
+    userId UUID required
+    title String maxlength(255)
+    isArchived Boolean
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+entity Message {
+    id UUID required
+    role String required maxlength(20)
+    content TextBlob required
+    tokenCount Integer
+    model String maxlength(50)
+    createdAt Instant required
+}
+
+entity KnowledgeSource {
+    id UUID required
+    tenantId String required maxlength(50)
+    name String required maxlength(255)
+    sourceType String required maxlength(50)
+    sourceUrl String maxlength(500)
+    status String maxlength(20)
+    chunkCount Integer
+    lastSyncAt Instant
+    createdAt Instant required
+}
+
+entity KnowledgeChunk {
+    id UUID required
+    content TextBlob required
+    embedding TextBlob
+    metadata TextBlob
+    createdAt Instant required
+}
+
+// =============================================================================
+// NOTIFICATION SERVICE ENTITIES (master_db)
+// =============================================================================
+
+entity Notification {
+    id UUID required
+    tenantId String required maxlength(50)
+    userId UUID required
+    type String required maxlength(20)
+    category String required maxlength(50)
+    subject String required
+    body TextBlob required
+    bodyHtml TextBlob
+    templateId UUID
+    status String required maxlength(20)
+    recipientAddress String
+    sentAt Instant
+    deliveredAt Instant
+    readAt Instant
+    failedAt Instant
+    failureReason String
+    retryCount Integer
+    maxRetries Integer
+    priority String maxlength(10)
+    scheduledAt Instant
+    actionUrl String maxlength(500)
+    actionLabel String maxlength(100)
+    correlationId String maxlength(100)
+    createdAt Instant required
+    updatedAt Instant required
+    expiresAt Instant
+}
+
+entity NotificationTemplate {
+    id UUID required
+    tenantId String required maxlength(50)
+    code String required maxlength(100)
+    name String required maxlength(255)
+    type String required maxlength(20)
+    subject String
+    bodyTemplate TextBlob required
+    bodyHtmlTemplate TextBlob
+    isActive Boolean required
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+entity NotificationPreference {
+    id UUID required
+    userId UUID required
+    tenantId String required maxlength(50)
+    category String required maxlength(50)
+    emailEnabled Boolean
+    pushEnabled Boolean
+    inAppEnabled Boolean
+    smsEnabled Boolean
+    createdAt Instant required
+    updatedAt Instant required
+}
+
+// =============================================================================
+// AUDIT SERVICE ENTITIES (audit_db)
+// =============================================================================
+
+entity AuditEvent {
+    id UUID required
+    tenantId String required maxlength(50)
+    userId UUID
+    username String maxlength(255)
+    sessionId String maxlength(100)
+    eventType String required maxlength(50)
+    eventCategory String maxlength(50)
+    severity String maxlength(20)
+    message TextBlob
+    resourceType String maxlength(100)
+    resourceId String maxlength(255)
+    resourceName String maxlength(255)
+    action String maxlength(20)
+    outcome String maxlength(20)
+    failureReason TextBlob
+    ipAddress String maxlength(45)
+    userAgent String maxlength(500)
+    requestId String maxlength(100)
+    correlationId String maxlength(100)
+    serviceName String maxlength(100)
+    serviceVersion String maxlength(50)
+    timestamp Instant required
+    expiresAt Instant
+}
+
+// =============================================================================
+// RELATIONSHIPS
+// =============================================================================
+
+// Tenant relationships
+relationship OneToMany {
+    Tenant{domains} to TenantDomain{tenant required}
+    Tenant{authProviders} to TenantAuthProvider{tenant required}
+}
+
+relationship OneToOne {
+    Tenant{branding} to TenantBranding{tenant required}
+    Tenant{sessionConfig} to TenantSessionConfig{tenant required}
+    Tenant{mfaConfig} to TenantMFAConfig{tenant required}
+}
+
+// User relationships
+relationship OneToMany {
+    UserProfile{devices} to UserDevice{user required}
+}
+
+// License relationships
+relationship OneToMany {
+    LicenseProduct{features} to LicenseFeature{product required}
+    LicenseProduct{tenantLicenses} to TenantLicense{product required}
+    TenantLicense{assignments} to UserLicenseAssignment{tenantLicense required}
+}
+
+// AI Service relationships
+relationship OneToMany {
+    AgentCategory{agents} to Agent{category}
+    Agent{conversations} to Conversation{agent}
+    Agent{knowledgeSources} to KnowledgeSource{agent required}
+    Conversation{messages} to Message{conversation required}
+    KnowledgeSource{chunks} to KnowledgeChunk{source required}
+}
+
+// =============================================================================
+// OPTIONS
+// =============================================================================
+
+// Pagination for all entities
+paginate * with pagination
+
+// DTOs for all entities
+dto * with mapstruct
+
+// Service layer for all entities
+service * with serviceImpl

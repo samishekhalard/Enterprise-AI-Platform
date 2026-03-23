@@ -1,0 +1,12 @@
+<app-page-frame
+  [title]="'Session Expired'"
+  [subtitle]="'Your session ended due to inactivity. Sign in again to continue.'"
+>
+  <section page-content>
+    <section class="app-panel error-panel">
+      <a routerLink="/auth/login" class="app-btn app-btn-primary">Sign In</a>
+    </section>
+  </section>
+
+  <p page-footer>Authentication state page migrated from legacy frontend.</p>
+</app-page-frame>

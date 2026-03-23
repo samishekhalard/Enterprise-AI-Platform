@@ -1,0 +1,405 @@
+openapi: 3.1.0
+info:
+  title: Audit Service API
+  description: API for audit logging, querying, and export
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8087
+    description: Development server
+
+tags:
+  - name: Audit Events
+    description: Audit event management
+  - name: Export
+    description: Audit data export
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/audit:
+    get:
+      tags: [Audit Events]
+      summary: Query audit events
+      operationId: queryAuditEvents
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: resourceType
+          in: query
+          schema:
+            type: string
+        - name: resourceId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [SUCCESS, FAILURE, ERROR]
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: ipAddress
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated audit events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventPage'
+
+    post:
+      tags: [Audit Events]
+      summary: Create audit event
+      description: Internal API for services to log audit events
+      operationId: createAuditEvent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAuditEventRequest'
+      responses:
+        '201':
+          description: Audit event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEvent'
+
+  /api/v1/audit/{eventId}:
+    get:
+      tags: [Audit Events]
+      summary: Get audit event by ID
+      operationId: getAuditEvent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Audit event details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEvent'
+        '404':
+          description: Event not found
+
+  /api/v1/audit/actions:
+    get:
+      tags: [Audit Events]
+      summary: List available audit actions
+      operationId: getAuditActions
+      responses:
+        '200':
+          description: List of audit action types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/v1/audit/resource-types:
+    get:
+      tags: [Audit Events]
+      summary: List available resource types
+      operationId: getResourceTypes
+      responses:
+        '200':
+          description: List of resource types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/v1/audit/export:
+    post:
+      tags: [Export]
+      summary: Export audit events
+      operationId: exportAuditEvents
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '200':
+          description: Export file
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+            text/csv:
+              schema:
+                type: string
+        '202':
+          description: Export queued (for large exports)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportJob'
+
+  /api/v1/audit/statistics:
+    get:
+      tags: [Audit Events]
+      summary: Get audit statistics
+      operationId: getAuditStatistics
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Audit statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditStatistics'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        userId:
+          type: string
+        userEmail:
+          type: string
+        action:
+          type: string
+          description: "Action type (e.g., USER_LOGIN, TENANT_CREATE)"
+        resourceType:
+          type: string
+          description: "Resource type (e.g., USER, TENANT, PRODUCT)"
+        resourceId:
+          type: string
+        resourceName:
+          type: string
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESS, FAILURE, ERROR]
+        errorMessage:
+          type: string
+        oldValues:
+          type: object
+          description: Previous state (for updates)
+        newValues:
+          type: object
+          description: New state (for creates/updates)
+        metadata:
+          type: object
+          description: Additional context
+        timestamp:
+          type: string
+          format: date-time
+
+    CreateAuditEventRequest:
+      type: object
+      required: [action, resourceType]
+      properties:
+        userId:
+          type: string
+        userEmail:
+          type: string
+        action:
+          type: string
+        resourceType:
+          type: string
+        resourceId:
+          type: string
+        resourceName:
+          type: string
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESS, FAILURE, ERROR]
+          default: SUCCESS
+        errorMessage:
+          type: string
+        oldValues:
+          type: object
+        newValues:
+          type: object
+        metadata:
+          type: object
+
+    AuditEventPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEvent'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    ExportRequest:
+      type: object
+      properties:
+        format:
+          type: string
+          enum: [JSON, CSV]
+          default: JSON
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        filters:
+          type: object
+          properties:
+            userId:
+              type: string
+            action:
+              type: string
+            resourceType:
+              type: string
+            status:
+              type: string
+
+    ExportJob:
+      type: object
+      properties:
+        jobId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED]
+        downloadUrl:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    AuditStatistics:
+      type: object
+      properties:
+        totalEvents:
+          type: integer
+        successCount:
+          type: integer
+        failureCount:
+          type: integer
+        uniqueUsers:
+          type: integer
+        topActions:
+          type: array
+          items:
+            type: object
+            properties:
+              action:
+                type: string
+              count:
+                type: integer
+        topResources:
+          type: array
+          items:
+            type: object
+            properties:
+              resourceType:
+                type: string
+              count:
+                type: integer
+        eventsByDay:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              count:
+                type: integer

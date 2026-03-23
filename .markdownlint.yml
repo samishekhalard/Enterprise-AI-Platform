@@ -1,0 +1,8 @@
+default: true
+
+# Documentation uses large tables, long architecture lines, and repeated
+# section headings across arc42 levels; these are intentional.
+MD013: false
+MD024: false
+MD032: false
+MD040: false

@@ -1,0 +1,28 @@
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Build output
+target/
+build/
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp

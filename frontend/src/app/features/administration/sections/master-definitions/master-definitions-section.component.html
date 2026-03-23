@@ -1,0 +1,1053 @@
+<section class="definitions-manager">
+  <!-- ── Error banner ─────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <div class="error-message">
+        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+        <span>{{ error() }}</span>
+      </div>
+      <div class="error-actions">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          size="small"
+          label="Retry"
+          icon="pi pi-refresh"
+          aria-label="Retry loading object types"
+          data-testid="definitions-retry-btn"
+          (click)="loadObjectTypes()"
+        ></button>
+        <button
+          type="button"
+          pButton
+          [text]="true"
+          severity="secondary"
+          icon="pi pi-times"
+          aria-label="Dismiss error"
+          data-testid="definitions-dismiss-error-btn"
+          (click)="error.set(null)"
+        ></button>
+      </div>
+    </div>
+  }
+
+  <div class="split-grid">
+    <!-- ── Left panel: object type list ───────────────────────────────────── -->
+    <div class="list-panel">
+      <div class="list-card">
+        <!-- Toolbar -->
+        <div class="list-head">
+          <h3>Object Types</h3>
+          <div class="head-actions">
+            <div class="view-toggle" role="radiogroup" aria-label="Object type view mode">
+              <button
+                type="button"
+                [class.active]="viewMode() === 'list'"
+                [attr.aria-checked]="viewMode() === 'list'"
+                role="radio"
+                aria-label="Table view"
+                data-testid="definitions-view-list-btn"
+                (click)="setViewMode('list')"
+              >
+                <i class="pi pi-list" aria-hidden="true"></i>
+              </button>
+              <button
+                type="button"
+                [class.active]="viewMode() === 'card'"
+                [attr.aria-checked]="viewMode() === 'card'"
+                role="radio"
+                aria-label="Card view"
+                data-testid="definitions-view-card-btn"
+                (click)="setViewMode('card')"
+              >
+                <i class="pi pi-th-large" aria-hidden="true"></i>
+              </button>
+            </div>
+            <button
+              type="button"
+              pButton
+              severity="primary"
+              icon="pi pi-plus"
+              label="New Type"
+              aria-label="Create new object type"
+              data-testid="definitions-new-type-btn"
+              (click)="openWizard()"
+            ></button>
+          </div>
+        </div>
+
+        <!-- Search + filter row -->
+        <div class="filter-row">
+          <span class="search-wrap">
+            <i class="pi pi-search search-icon" aria-hidden="true"></i>
+            <input
+              type="search"
+              pInputText
+              class="type-search"
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+              placeholder="Search types..."
+              aria-label="Search object types"
+              data-testid="definitions-search-input"
+            />
+          </span>
+          <p-select
+            [options]="statusOptions"
+            [ngModel]="statusFilter()"
+            (ngModelChange)="statusFilter.set($event)"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="status-dropdown"
+            aria-label="Filter by status"
+            data-testid="definitions-status-filter"
+            appendTo="body"
+          />
+        </div>
+
+        <!-- Loading state -->
+        @if (loading()) {
+          <div class="skeleton-list" aria-busy="true" aria-label="Loading object types">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <div class="skeleton-row">
+                <p-skeleton shape="circle" width="32px" height="32px" />
+                <div class="skeleton-text">
+                  <p-skeleton width="60%" height="14px" />
+                  <p-skeleton width="40%" height="12px" />
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (viewMode() === 'list') {
+          <!-- Table / list view -->
+          @if (filteredTypes().length > 0) {
+            <ul class="type-items" role="listbox" aria-label="Object types list">
+              @for (ot of filteredTypes(); track ot.id) {
+                <li
+                  class="type-item"
+                  [class.selected]="selectedObjectType()?.id === ot.id"
+                  role="option"
+                  [attr.aria-selected]="selectedObjectType()?.id === ot.id"
+                  tabindex="0"
+                  data-testid="definitions-type-item"
+                  (click)="selectObjectType(ot)"
+                  (keydown.enter)="selectObjectType(ot)"
+                  (keydown.space)="selectObjectType(ot); $event.preventDefault()"
+                >
+                  <div class="type-row">
+                    <span
+                      class="icon-circle"
+                      [style.background-color]="ot.iconColor"
+                      aria-hidden="true"
+                    >
+                      <i class="pi pi-{{ ot.iconName }}" aria-hidden="true"></i>
+                    </span>
+                    <div class="type-info">
+                      <strong>{{ ot.name }}</strong>
+                      <span class="type-key">{{ ot.typeKey }}</span>
+                    </div>
+                    <p-tag
+                      [value]="getStatusLabel(ot.status)"
+                      [severity]="getStatusSeverity(ot.status)"
+                      [rounded]="true"
+                    />
+                    <p-tag
+                      [value]="getStateLabel(ot.state)"
+                      [severity]="getStateSeverity(ot.state)"
+                      [rounded]="true"
+                      data-testid="definitions-state-badge"
+                    />
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      icon="pi pi-copy"
+                      class="action-btn"
+                      aria-label="Duplicate object type {{ ot.name }}"
+                      data-testid="definitions-duplicate-btn"
+                      pTooltip="Duplicate"
+                      (click)="duplicateItem(ot, $event)"
+                    ></button>
+                    @if (ot.state === 'customized') {
+                      <button
+                        type="button"
+                        pButton
+                        [text]="true"
+                        severity="warn"
+                        icon="pi pi-undo"
+                        class="action-btn"
+                        aria-label="Restore object type {{ ot.name }} to default"
+                        data-testid="definitions-restore-btn"
+                        pTooltip="Restore to Default"
+                        (click)="restoreToDefault(ot, $event)"
+                      ></button>
+                    }
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="danger"
+                      icon="pi pi-trash"
+                      class="delete-btn"
+                      [disabled]="(ot.instanceCount ?? 0) > 0 || ot.state === 'default'"
+                      aria-label="Delete object type {{ ot.name }}"
+                      data-testid="definitions-delete-btn"
+                      pTooltip="{{
+                        (ot.instanceCount ?? 0) > 0
+                          ? 'Cannot delete: has active instances'
+                          : ot.state === 'default'
+                            ? 'Cannot delete default types'
+                            : 'Delete'
+                      }}"
+                      (click)="confirmDelete(ot, $event)"
+                    ></button>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="empty-list" data-testid="definitions-empty-state">
+              <i class="pi pi-inbox empty-icon" aria-hidden="true"></i>
+              <p>No object types match your criteria.</p>
+            </div>
+          }
+        } @else {
+          <!-- Card grid view -->
+          @if (filteredTypes().length > 0) {
+            <div class="card-grid" data-testid="definitions-card-grid">
+              @for (ot of filteredTypes(); track ot.id) {
+                <article
+                  class="type-card"
+                  [class.selected]="selectedObjectType()?.id === ot.id"
+                  tabindex="0"
+                  data-testid="definitions-type-card"
+                  (click)="selectObjectType(ot)"
+                  (keydown.enter)="selectObjectType(ot)"
+                  (keydown.space)="selectObjectType(ot); $event.preventDefault()"
+                >
+                  <div class="card-head">
+                    <span
+                      class="icon-circle"
+                      [style.background-color]="ot.iconColor"
+                      aria-hidden="true"
+                    >
+                      <i class="pi pi-{{ ot.iconName }}" aria-hidden="true"></i>
+                    </span>
+                    <p-tag
+                      [value]="getStatusLabel(ot.status)"
+                      [severity]="getStatusSeverity(ot.status)"
+                      [rounded]="true"
+                    />
+                  </div>
+                  <strong class="card-name">{{ ot.name }}</strong>
+                  <div class="card-meta">
+                    <span class="badge-count" pTooltip="Attributes">
+                      <i class="pi pi-list" aria-hidden="true"></i>
+                      {{ ot.attributes?.length ?? 0 }}
+                    </span>
+                    <span class="badge-count" pTooltip="Connections">
+                      <i class="pi pi-share-alt" aria-hidden="true"></i>
+                      {{ ot.connections?.length ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="card-actions">
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      icon="pi pi-copy"
+                      size="small"
+                      aria-label="Duplicate object type {{ ot.name }}"
+                      data-testid="definitions-card-duplicate-btn"
+                      pTooltip="Duplicate"
+                      (click)="duplicateItem(ot, $event)"
+                    ></button>
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="danger"
+                      icon="pi pi-trash"
+                      size="small"
+                      class="card-delete-btn"
+                      [disabled]="(ot.instanceCount ?? 0) > 0 || ot.state === 'default'"
+                      aria-label="Delete object type {{ ot.name }}"
+                      data-testid="definitions-card-delete-btn"
+                      pTooltip="Delete"
+                      (click)="confirmDelete(ot, $event)"
+                    ></button>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="empty-list" data-testid="definitions-empty-state">
+              <i class="pi pi-inbox empty-icon" aria-hidden="true"></i>
+              <p>No object types match your criteria.</p>
+            </div>
+          }
+        }
+
+        <!-- Record count -->
+        @if (!loading() && filteredTypes().length > 0) {
+          <p class="record-count muted">
+            Showing {{ filteredTypes().length }} of {{ totalRecords() }} object types
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- ── Right panel: detail ────────────────────────────────────────────── -->
+    <div class="detail-panel">
+      @if (selectedObjectType(); as ot) {
+        <div class="detail-card" data-testid="definitions-detail-panel">
+          @if (!detailEditMode()) {
+            <!-- ── View mode ── -->
+            <header class="detail-header">
+              <div class="detail-title-row">
+                <span
+                  class="icon-circle icon-circle-lg"
+                  [style.background-color]="ot.iconColor"
+                  aria-hidden="true"
+                >
+                  <i class="pi pi-{{ ot.iconName }}" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <h3>{{ ot.name }}</h3>
+                  <code class="type-key-code">{{ ot.typeKey }}</code>
+                </div>
+              </div>
+              <div class="detail-header-actions">
+                <p-tag
+                  [value]="getStatusLabel(ot.status)"
+                  [severity]="getStatusSeverity(ot.status)"
+                  [rounded]="true"
+                />
+                <p-tag
+                  [value]="getStateLabel(ot.state)"
+                  [severity]="getStateSeverity(ot.state)"
+                  [rounded]="true"
+                />
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  icon="pi pi-pencil"
+                  label="Edit"
+                  size="small"
+                  aria-label="Edit object type"
+                  data-testid="definitions-edit-btn"
+                  (click)="enterEditMode(ot)"
+                ></button>
+              </div>
+            </header>
+
+            @if (ot.description) {
+              <p class="detail-description">{{ ot.description }}</p>
+            }
+
+            <div class="detail-meta-grid">
+              <div class="meta-field">
+                <span class="label">Code</span>
+                <strong>{{ ot.code }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">State</span>
+                <strong>{{ getStateLabel(ot.state) }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">Attributes</span>
+                <strong>{{ ot.attributes?.length ?? 0 }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">Connections</span>
+                <strong>{{ ot.connections?.length ?? 0 }}</strong>
+              </div>
+              @if (ot.createdAt) {
+                <div class="meta-field">
+                  <span class="label">Created</span>
+                  <strong>{{ ot.createdAt | date: 'mediumDate' }}</strong>
+                </div>
+              }
+              @if (ot.updatedAt) {
+                <div class="meta-field">
+                  <span class="label">Updated</span>
+                  <strong>{{ ot.updatedAt | date: 'mediumDate' }}</strong>
+                </div>
+              }
+            </div>
+
+            <!-- Attributes sub-section -->
+            @if (ot.attributes && ot.attributes.length > 0) {
+              <section class="attributes-section">
+                <h4>Attributes</h4>
+                <div class="attributes-list">
+                  @for (attr of ot.attributes; track attr.attributeTypeId) {
+                    <div class="attribute-row">
+                      <strong>{{ attr.name }}</strong>
+                      <p-tag [value]="attr.dataType" severity="secondary" [rounded]="true" />
+                      @if (attr.isRequired) {
+                        <p-tag value="Required" severity="warn" [rounded]="true" />
+                      }
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Connections sub-section -->
+            @if (ot.connections && ot.connections.length > 0) {
+              <section class="connections-section">
+                <h4>Connections</h4>
+                <div class="connections-list">
+                  @for (conn of ot.connections; track $index) {
+                    <div class="connection-row">
+                      <strong>{{ conn.activeName }}</strong>
+                      <span class="muted">to {{ conn.targetTypeName }}</span>
+                      <p-tag [value]="conn.cardinality" severity="info" [rounded]="true" />
+                    </div>
+                  }
+                </div>
+              </section>
+            }
+          } @else {
+            <!-- ── Edit mode ── -->
+            <header class="detail-header">
+              <h3>Edit Object Type</h3>
+              <code class="type-key-code muted">{{ ot.typeKey }}</code>
+            </header>
+
+            <div class="edit-form" data-testid="definitions-edit-form">
+              <div class="wizard-field">
+                <label for="edit-name">Name <span class="required">*</span></label>
+                <input
+                  id="edit-name"
+                  type="text"
+                  pInputText
+                  class="wizard-input"
+                  [ngModel]="editName()"
+                  (ngModelChange)="editName.set($event)"
+                  placeholder="Object type name"
+                  maxlength="100"
+                  aria-label="Name"
+                  data-testid="edit-name-input"
+                />
+              </div>
+
+              <div class="wizard-field">
+                <label for="edit-desc">Description</label>
+                <textarea
+                  id="edit-desc"
+                  pInputText
+                  class="wizard-textarea"
+                  rows="3"
+                  [ngModel]="editDescription()"
+                  (ngModelChange)="editDescription.set($event)"
+                  placeholder="Description"
+                  maxlength="500"
+                  aria-label="Description"
+                  data-testid="edit-description-input"
+                ></textarea>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Status</label>
+                <div class="status-buttons" role="radiogroup" aria-label="Status">
+                  @for (opt of statusOptions | slice: 1; track opt.value) {
+                    <button
+                      type="button"
+                      class="status-btn"
+                      [class.selected]="editStatus() === opt.value"
+                      (click)="editStatus.set($any(opt.value))"
+                      [attr.aria-pressed]="editStatus() === opt.value"
+                    >
+                      {{ opt.label }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Icon</label>
+                <div class="icon-grid" role="listbox" aria-label="Choose an icon">
+                  @for (icon of iconOptions; track icon) {
+                    <button
+                      type="button"
+                      class="icon-grid-item"
+                      [class.selected]="editIconName() === icon"
+                      (click)="editIconName.set(icon)"
+                      [attr.aria-label]="icon"
+                      role="option"
+                      [attr.aria-selected]="editIconName() === icon"
+                    >
+                      <i class="pi pi-{{ icon }}" aria-hidden="true"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Icon Color</label>
+                <div class="color-picker-row">
+                  <div
+                    class="icon-preview-box"
+                    [style.background-color]="editIconColor()"
+                    aria-hidden="true"
+                  >
+                    <i class="pi pi-{{ editIconName() }}"></i>
+                  </div>
+                  <div class="color-swatches" role="listbox" aria-label="Choose a color">
+                    @for (color of colorSwatches; track $index) {
+                      <button
+                        type="button"
+                        class="color-swatch"
+                        [class.selected]="editIconColor() === color"
+                        [style.background-color]="color"
+                        (click)="editIconColor.set(color)"
+                        [attr.aria-label]="'Color ' + color"
+                        role="option"
+                        [attr.aria-selected]="editIconColor() === color"
+                      ></button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  [text]="true"
+                  label="Cancel"
+                  aria-label="Cancel editing"
+                  data-testid="edit-cancel-btn"
+                  (click)="cancelEditMode()"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  severity="primary"
+                  label="Save"
+                  icon="pi pi-check"
+                  [disabled]="!editName().trim() || editSaving()"
+                  [loading]="editSaving()"
+                  aria-label="Save changes"
+                  data-testid="edit-save-btn"
+                  (click)="saveEdit()"
+                ></button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-detail-card" data-testid="definitions-empty-detail">
+          <i class="pi pi-arrow-left empty-icon" aria-hidden="true"></i>
+          <h4>Select an Object Type</h4>
+          <p class="muted">
+            Choose an object type from the list to view its details, attributes, and connections.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── Delete Confirmation Dialog ────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showDeleteConfirm()"
+  (visibleChange)="showDeleteConfirm.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px' }"
+  header="Delete Object Type"
+  aria-label="Delete confirmation"
+  data-testid="definitions-delete-confirm-dialog"
+  (onHide)="cancelDelete()"
+>
+  <p>
+    Delete <strong>{{ pendingDeleteItem()?.name }}</strong
+    >? This action cannot be undone.
+  </p>
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        data-testid="definitions-delete-cancel-btn"
+        (click)="cancelDelete()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        pButton
+        severity="danger"
+        icon="pi pi-trash"
+        data-testid="definitions-delete-confirm-btn"
+        (click)="executeDelete()"
+      >
+        Delete
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Create Wizard Dialog ─────────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showWizard()"
+  (visibleChange)="showWizard.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="wizard-dialog"
+  [style]="{ width: '640px', maxHeight: '90vh' }"
+  aria-label="Create new object type wizard"
+  data-testid="definitions-wizard-dialog"
+  (onHide)="closeWizard()"
+>
+  <ng-template pTemplate="header">
+    <div class="wizard-dialog-header">
+      <span class="wizard-dialog-title">Create New Object Type</span>
+      <span class="wizard-dialog-subtitle">Define a new object type for your repository</span>
+    </div>
+  </ng-template>
+
+  <!-- Step indicators -->
+  <div class="wizard-steps">
+    @for (
+      step of ['Basic Info', 'Connections', 'Attributes', 'Status'];
+      track step;
+      let i = $index
+    ) {
+      <div
+        class="wizard-step"
+        [class.active]="wizardStep() === i"
+        [class.completed]="wizardStep() > i"
+      >
+        <span class="step-number">{{ i + 1 }}</span>
+        <span class="step-label">{{ step }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── Step 0: Basic Info ────────────────────────────────────────────── -->
+  @if (wizardStep() === 0) {
+    <div class="wizard-body" data-testid="wizard-step-basic">
+      <!-- Code (readonly, auto-assigned) -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Code</label>
+        <div class="readonly-input-wrap">
+          <input
+            type="text"
+            pInputText
+            class="wizard-input readonly-input"
+            value="OBJ_XXX"
+            [attr.readonly]="true"
+            aria-label="Object type code (auto-assigned)"
+            aria-readonly="true"
+          />
+          <i class="pi pi-lock readonly-lock" aria-hidden="true"></i>
+        </div>
+        <small class="field-hint">
+          <i class="pi pi-info-circle" aria-hidden="true"></i>
+          Code will be automatically assigned
+        </small>
+      </div>
+
+      <!-- Name (required, char count) -->
+      <div class="wizard-field">
+        <label for="wiz-name">Name <span class="required">*</span></label>
+        <input
+          id="wiz-name"
+          type="text"
+          pInputText
+          class="wizard-input"
+          [ngModel]="wizardName()"
+          (ngModelChange)="wizardName.set($event)"
+          placeholder="Enter object type name..."
+          maxlength="100"
+          aria-label="Object type name (required)"
+          data-testid="wizard-name-input"
+        />
+        <small class="char-count">{{ wizardName().length }}/100 characters</small>
+      </div>
+
+      <!-- Icon grid -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Icon</label>
+        <div
+          class="icon-grid"
+          role="listbox"
+          aria-label="Choose an icon"
+          data-testid="wizard-icon-grid"
+        >
+          @for (icon of iconOptions; track icon) {
+            <button
+              type="button"
+              class="icon-grid-item"
+              [class.selected]="wizardIconName() === icon"
+              (click)="wizardIconName.set(icon)"
+              [attr.aria-label]="icon"
+              [attr.title]="icon"
+              role="option"
+              [attr.aria-selected]="wizardIconName() === icon"
+            >
+              <i class="pi pi-{{ icon }}" aria-hidden="true"></i>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Icon color swatches -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Icon Color</label>
+        <div class="color-picker-row">
+          <div
+            class="icon-preview-box"
+            [style.background-color]="wizardIconColor()"
+            aria-hidden="true"
+          >
+            <i class="pi pi-{{ wizardIconName() }}"></i>
+          </div>
+          <div class="color-swatches" role="listbox" aria-label="Choose a color">
+            @for (color of colorSwatches; track $index) {
+              <button
+                type="button"
+                class="color-swatch"
+                [class.selected]="wizardIconColor() === color"
+                [style.background-color]="color"
+                (click)="wizardIconColor.set(color)"
+                [attr.aria-label]="'Color ' + color"
+                [attr.title]="color"
+                role="option"
+                [attr.aria-selected]="wizardIconColor() === color"
+              ></button>
+            }
+            <label class="custom-color-label" title="Custom color">
+              <i class="pi pi-palette" aria-hidden="true"></i>
+              Custom
+              <input
+                type="color"
+                class="hidden-color-input"
+                [ngModel]="wizardIconColor()"
+                (ngModelChange)="wizardIconColor.set($event)"
+                aria-label="Custom color picker"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description (textarea, char count) -->
+      <div class="wizard-field">
+        <label for="wiz-desc">Description</label>
+        <textarea
+          id="wiz-desc"
+          pInputText
+          class="wizard-textarea"
+          rows="3"
+          [ngModel]="wizardDescription()"
+          (ngModelChange)="wizardDescription.set($event)"
+          placeholder="Describe the purpose of this object type..."
+          maxlength="500"
+          aria-label="Object type description"
+          data-testid="wizard-description-input"
+        ></textarea>
+        <small class="char-count">{{ wizardDescription().length }}/500 characters</small>
+      </div>
+    </div>
+  }
+
+  <!-- ── Step 1: Connections ───────────────────────────────────────────── -->
+  @if (wizardStep() === 1) {
+    <div class="wizard-body" data-testid="wizard-step-connections">
+      @if (wizardConnections().length > 0) {
+        <div class="connection-list">
+          @for (conn of wizardConnections(); track $index; let i = $index) {
+            <div class="connection-item">
+              <i class="pi pi-arrow-right-arrow-left conn-icon" aria-hidden="true"></i>
+              <div class="conn-info">
+                <strong>{{ conn.activeName }}</strong>
+                <span class="muted">→ {{ conn.targetTypeName }} · {{ conn.cardinality }}</span>
+              </div>
+              <button
+                type="button"
+                pButton
+                [text]="true"
+                severity="danger"
+                icon="pi pi-times"
+                size="small"
+                (click)="removeConnection(i)"
+                aria-label="Remove connection"
+              ></button>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-step-hint">
+          No connections added yet. Use the form below to connect this type to another.
+        </p>
+      }
+
+      <div class="add-form">
+        <h5 class="add-form-title">Add Connection</h5>
+
+        <div class="wizard-field">
+          <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+          <label>Target Object Type</label>
+          <p-select
+            [options]="objectTypes()"
+            [ngModel]="draftTargetTypeId()"
+            (ngModelChange)="draftTargetTypeId.set($event)"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select target type..."
+            styleClass="w-full"
+            aria-label="Target object type"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="wizard-field">
+            <label for="draft-active">Active Name</label>
+            <input
+              id="draft-active"
+              type="text"
+              pInputText
+              class="wizard-input"
+              [ngModel]="draftActiveName()"
+              (ngModelChange)="draftActiveName.set($event)"
+              placeholder="e.g. manages"
+              aria-label="Active relationship name"
+            />
+          </div>
+          <div class="wizard-field">
+            <label for="draft-passive">Passive Name</label>
+            <input
+              id="draft-passive"
+              type="text"
+              pInputText
+              class="wizard-input"
+              [ngModel]="draftPassiveName()"
+              (ngModelChange)="draftPassiveName.set($event)"
+              placeholder="e.g. managed by"
+              aria-label="Passive relationship name"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="wizard-field">
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label>Cardinality</label>
+            <p-select
+              [options]="cardinalityOptions"
+              [ngModel]="draftCardinality()"
+              (ngModelChange)="draftCardinality.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+              aria-label="Connection cardinality"
+            />
+          </div>
+          <div class="wizard-field directed-check">
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label>Directed</label>
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="draftIsDirected()"
+              (ngModelChange)="draftIsDirected.set($event)"
+              aria-label="Is directed connection"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          icon="pi pi-plus"
+          label="Add Connection"
+          aria-label="Add Connection"
+          size="small"
+          [disabled]="!draftTargetTypeId() || !draftActiveName().trim()"
+          (click)="addDraftConnection()"
+          data-testid="wizard-add-connection-btn"
+        ></button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Step 2: Attributes ────────────────────────────────────────────── -->
+  @if (wizardStep() === 2) {
+    <div class="wizard-body" data-testid="wizard-step-attributes">
+      @if (availableAttributeTypes().length > 0) {
+        <p class="step-hint">Select the attributes that apply to this object type.</p>
+        <div class="attribute-pick-list">
+          @for (attr of availableAttributeTypes(); track attr.id) {
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label class="attribute-pick-item" [class.selected]="isAttributeSelected(attr.id)">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="isAttributeSelected(attr.id)"
+                (ngModelChange)="toggleAttributeId(attr.id)"
+              />
+              <div class="attr-info">
+                <strong>{{ attr.name }}</strong>
+                <span class="attr-meta">
+                  <code>{{ attr.attributeKey }}</code>
+                  <span class="muted">· {{ attr.dataType }}</span>
+                </span>
+              </div>
+            </label>
+          }
+        </div>
+      } @else {
+        <div class="empty-step-hint">
+          <i class="pi pi-info-circle" aria-hidden="true"></i>
+          No attribute types available. You can add attributes after creating this object type.
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Step 3: Status ────────────────────────────────────────────────── -->
+  @if (wizardStep() === 3) {
+    <div class="wizard-body" data-testid="wizard-step-status">
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Initial Status</label>
+        <div class="status-buttons" role="radiogroup" aria-label="Choose initial status">
+          @for (opt of statusOptions | slice: 1; track opt.value) {
+            <button
+              type="button"
+              class="status-btn"
+              [class.selected]="wizardStatus() === opt.value"
+              (click)="wizardStatus.set($any(opt.value))"
+              [attr.aria-pressed]="wizardStatus() === opt.value"
+            >
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Review summary -->
+      <div class="review-summary">
+        <h4>Review</h4>
+        <div class="review-grid">
+          <div class="review-field">
+            <span class="label">Name</span>
+            <strong>{{ wizardName() || '(empty)' }}</strong>
+          </div>
+          <div class="review-field">
+            <span class="label">Icon</span>
+            <span class="review-icon-preview">
+              <span
+                class="icon-circle icon-circle-sm"
+                [style.background-color]="wizardIconColor()"
+                aria-hidden="true"
+              >
+                <i class="pi pi-{{ wizardIconName() }}"></i>
+              </span>
+              <code>{{ wizardIconName() }}</code>
+            </span>
+          </div>
+          <div class="review-field">
+            <span class="label">Status</span>
+            <p-tag
+              [value]="getStatusLabel(wizardStatus())"
+              [severity]="getStatusSeverity(wizardStatus())"
+              [rounded]="true"
+            />
+          </div>
+          <div class="review-field">
+            <span class="label">Connections</span>
+            <strong>{{ wizardConnections().length }}</strong>
+          </div>
+          <div class="review-field">
+            <span class="label">Attributes</span>
+            <strong>{{ wizardAttributeIds().size }}</strong>
+          </div>
+          @if (wizardDescription()) {
+            <div class="review-field review-field-full">
+              <span class="label">Description</span>
+              <span>{{ wizardDescription() }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      @if (wizardStep() > 0) {
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [text]="true"
+          label="Back"
+          icon="pi pi-arrow-left"
+          aria-label="Go to previous step"
+          data-testid="wizard-back-btn"
+          (click)="prevStep()"
+        ></button>
+      }
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        label="Cancel"
+        aria-label="Cancel creating object type"
+        data-testid="wizard-cancel-btn"
+        (click)="closeWizard()"
+      ></button>
+      @if (wizardStep() < 3) {
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          label="Next"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [disabled]="wizardStep() === 0 && !wizardName().trim()"
+          aria-label="Go to next step"
+          data-testid="wizard-next-btn"
+          (click)="nextStep()"
+        ></button>
+      } @else {
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          label="Create"
+          icon="pi pi-check"
+          [disabled]="!wizardName().trim() || wizardSaving()"
+          [loading]="wizardSaving()"
+          aria-label="Create object type"
+          data-testid="wizard-create-btn"
+          (click)="saveObjectType()"
+        ></button>
+      }
+    </div>
+  </ng-template>
+</p-dialog>

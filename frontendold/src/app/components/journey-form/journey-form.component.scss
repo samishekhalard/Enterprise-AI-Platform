@@ -1,0 +1,64 @@
+.text-accent {
+  color: #00ACA0 !important;
+}
+
+.border-accent {
+  border-color: rgba(0, 172, 160, 0.3) !important;
+}
+
+.bg-accent-light {
+  background-color: rgba(0, 172, 160, 0.1) !important;
+}
+
+.btn-outline-accent {
+  border-color: #00ACA0;
+  color: #00ACA0;
+
+  &:hover {
+    background-color: #00ACA0;
+    border-color: #00ACA0;
+    color: white;
+  }
+}
+
+.btn-accent {
+  background-color: #00ACA0;
+  border-color: #00ACA0;
+  color: white;
+
+  &:hover {
+    background-color: #009890;
+    border-color: #009890;
+  }
+}
+
+.btn-primary {
+  background-color: #b49034;
+  border-color: #b49034;
+}
+
+.form-control,
+.form-select {
+  border-color: rgba(180, 144, 52, 0.5);
+
+  &:focus {
+    border-color: #b49034;
+    box-shadow: 0 0 0 0.2rem rgba(180, 144, 52, 0.25);
+  }
+}
+
+.card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.alert-primary {
+  background-color: rgba(180, 144, 52, 0.1);
+  border-color: rgba(180, 144, 52, 0.3);
+  color: #b49034;
+}
+
+.form-range {
+  &::-webkit-slider-thumb {
+    background: #b49034;
+  }
+}

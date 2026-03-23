@@ -1,0 +1,418 @@
+<section class="embedded-block">
+  <div class="header-row">
+    <div>
+      <h3>Identity Providers</h3>
+      <p class="muted">Authentication providers configured for {{ tenantName }}.</p>
+    </div>
+    <div class="head-controls">
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="contrast"
+        icon="pi pi-plus"
+        [disabled]="loading() || formSubmitting()"
+        (click)="openCreate()"
+      >
+        Add Provider
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        icon="pi pi-refresh"
+        [loading]="loading()"
+        [disabled]="loading() || formSubmitting()"
+        (click)="loadProviders()"
+      >
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  @if (formError()) {
+    <p-message severity="warn">{{ formError() }}</p-message>
+  }
+
+  @if (testResult(); as test) {
+    <p-message [severity]="test.success ? 'success' : 'error'">
+      {{ test.message || test.error || 'Test completed.' }}
+    </p-message>
+  }
+
+  @if (mode() !== 'list') {
+    <p-card styleClass="form-card">
+      <div class="form-head">
+        <h4>{{ isEditMode() ? 'Edit Provider' : 'Create Provider' }}</h4>
+        @if (loadingDetails()) {
+          <small class="muted">Loading provider details...</small>
+        }
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Provider Name</span>
+          <input
+            pInputText
+            type="text"
+            [ngModel]="form().providerName"
+            (ngModelChange)="updateForm('providerName', $event)"
+            [disabled]="isEditMode()"
+            placeholder="KEYCLOAK / AUTH0 / CUSTOM"
+          />
+        </label>
+
+        <label class="field">
+          <span>Display Name</span>
+          <input
+            pInputText
+            type="text"
+            [ngModel]="form().displayName"
+            (ngModelChange)="updateForm('displayName', $event)"
+            placeholder="Corporate SSO"
+          />
+        </label>
+
+        <label class="field">
+          <span>Protocol</span>
+          <select
+            class="native-select"
+            [ngModel]="form().protocol"
+            (ngModelChange)="updateForm('protocol', $event)"
+            [disabled]="isEditMode()"
+          >
+            <option value="OIDC">OIDC</option>
+            <option value="SAML">SAML</option>
+            <option value="LDAP">LDAP</option>
+            <option value="OAUTH2">OAUTH2</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Priority</span>
+          <input
+            pInputText
+            type="number"
+            [ngModel]="form().priority"
+            (ngModelChange)="updateForm('priority', +$event)"
+            min="1"
+          />
+        </label>
+      </div>
+
+      <div class="form-check">
+        <label>
+          <input
+            type="checkbox"
+            [ngModel]="form().enabled"
+            (ngModelChange)="updateForm('enabled', !!$event)"
+          />
+          Enabled
+        </label>
+      </div>
+
+      @if (protocolFieldsVisible(form().protocol).oidc) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Discovery URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().discoveryUrl"
+              (ngModelChange)="updateForm('discoveryUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client ID</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().clientId"
+              (ngModelChange)="updateForm('clientId', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client Secret</span>
+            <input
+              pInputText
+              type="password"
+              [ngModel]="form().clientSecret"
+              (ngModelChange)="updateForm('clientSecret', $event)"
+              placeholder="Leave empty to keep current secret"
+            />
+          </label>
+          <label class="field">
+            <span>Scopes (comma separated)</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().scopesCsv"
+              (ngModelChange)="updateForm('scopesCsv', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).saml) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Metadata URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().metadataUrl"
+              (ngModelChange)="updateForm('metadataUrl', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).ldap) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Server URL</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().serverUrl"
+              (ngModelChange)="updateForm('serverUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Port</span>
+            <input
+              pInputText
+              type="number"
+              [ngModel]="form().port"
+              (ngModelChange)="updateForm('port', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Bind DN</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().bindDn"
+              (ngModelChange)="updateForm('bindDn', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Bind Password</span>
+            <input
+              pInputText
+              type="password"
+              [ngModel]="form().bindPassword"
+              (ngModelChange)="updateForm('bindPassword', $event)"
+              placeholder="Leave empty to keep current password"
+            />
+          </label>
+          <label class="field">
+            <span>User Search Base</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().userSearchBase"
+              (ngModelChange)="updateForm('userSearchBase', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>User Search Filter</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().userSearchFilter"
+              (ngModelChange)="updateForm('userSearchFilter', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).oauth2) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Authorization URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().authorizationUrl"
+              (ngModelChange)="updateForm('authorizationUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Token URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().tokenUrl"
+              (ngModelChange)="updateForm('tokenUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>User Info URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().userInfoUrl"
+              (ngModelChange)="updateForm('userInfoUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client ID</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().clientId"
+              (ngModelChange)="updateForm('clientId', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client Secret</span>
+            <input
+              pInputText
+              type="password"
+              [ngModel]="form().clientSecret"
+              (ngModelChange)="updateForm('clientSecret', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      <div class="form-grid protocol-grid">
+        <label class="field">
+          <span>IdP Hint</span>
+          <input
+            pInputText
+            type="text"
+            [ngModel]="form().idpHint"
+            (ngModelChange)="updateForm('idpHint', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>JWKS URL</span>
+          <input
+            pInputText
+            type="url"
+            [ngModel]="form().jwksUrl"
+            (ngModelChange)="updateForm('jwksUrl', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Issuer URL</span>
+          <input
+            pInputText
+            type="url"
+            [ngModel]="form().issuerUrl"
+            (ngModelChange)="updateForm('issuerUrl', $event)"
+          />
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [disabled]="formSubmitting()"
+          (click)="cancelForm()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          pButton
+          [loading]="formSubmitting()"
+          [disabled]="formSubmitting() || loadingDetails()"
+          (click)="submitForm()"
+        >
+          {{ isEditMode() ? 'Save Changes' : 'Create Provider' }}
+        </button>
+      </div>
+    </p-card>
+  }
+
+  @if (loading()) {
+    <div class="loading-row">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Loading authentication providers...</span>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="provider-grid">
+      @for (provider of providers(); track provider.id) {
+        <p-card styleClass="provider-card">
+          <div class="card-head">
+            <h4>{{ provider.displayName }}</h4>
+            <p-tag [value]="provider.status" [severity]="statusSeverity(provider.status)" />
+          </div>
+
+          <p>{{ providerDescription(provider) }}</p>
+
+          <div class="meta">
+            <p-tag [value]="'Type: ' + provider.providerType.toUpperCase()" severity="secondary" />
+            <p-tag [value]="'Protocol: ' + provider.protocol.toUpperCase()" severity="contrast" />
+          </div>
+
+          <div class="actions">
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="secondary"
+              icon="pi pi-pencil"
+              [disabled]="formSubmitting()"
+              (click)="openEdit(provider)"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="info"
+              icon="pi pi-power-off"
+              [loading]="isActionBusy(provider.id, 'toggle')"
+              [disabled]="isActionBusy(provider.id, 'toggle') || formSubmitting()"
+              (click)="toggleEnabled(provider)"
+            >
+              {{ provider.enabled ? 'Disable' : 'Enable' }}
+            </button>
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="help"
+              icon="pi pi-check-circle"
+              [loading]="isActionBusy(provider.id, 'test')"
+              [disabled]="isActionBusy(provider.id, 'test') || formSubmitting()"
+              (click)="testProvider(provider)"
+            >
+              Test
+            </button>
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="danger"
+              icon="pi pi-trash"
+              [loading]="isActionBusy(provider.id, 'delete')"
+              [disabled]="isActionBusy(provider.id, 'delete') || formSubmitting()"
+              (click)="deleteProvider(provider)"
+            >
+              Delete
+            </button>
+          </div>
+        </p-card>
+      } @empty {
+        <p-card styleClass="provider-card empty-card">
+          <p>No identity providers configured for this tenant.</p>
+        </p-card>
+      }
+    </div>
+  }
+</section>

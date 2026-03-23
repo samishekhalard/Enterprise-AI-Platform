@@ -1,0 +1,17 @@
+# ==============================================================================
+# EMSIST - Staging Environment (Backward-Compatible Wrapper)
+#
+# This file combines the data tier and app tier for convenience.
+# For independent tier lifecycle management, use:
+#   docker compose -f docker-compose.staging-data.yml ...  (data tier)
+#   docker compose -f docker-compose.staging-app.yml ...   (app tier)
+#
+# The tier split (INF-003) ensures that stopping the app tier does NOT
+# destroy data volumes. See docker-compose.staging-data.yml for details.
+#
+# Usage (same as before):
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging up --build -d
+# ==============================================================================
+include:
+  - path: docker-compose.staging-data.yml
+  - path: docker-compose.staging-app.yml

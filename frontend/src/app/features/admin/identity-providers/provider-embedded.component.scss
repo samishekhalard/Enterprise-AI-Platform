@@ -1,0 +1,128 @@
+.embedded-block {
+  display: grid;
+  gap: 0.75rem;
+
+  h3 {
+    margin: 0;
+  }
+
+  .muted {
+    margin: 0.35rem 0 0;
+    color: #3d3a3b;
+  }
+}
+
+.header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.head-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.form-card {
+  border: 1px solid #b9a779;
+}
+
+.form-head h4 {
+  margin: 0 0 0.65rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.65rem;
+}
+
+.protocol-grid {
+  margin-top: 0.65rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+
+  span {
+    font-size: 0.8rem;
+    color: #3d3a3b;
+  }
+}
+
+.native-select {
+  width: 100%;
+  border: 1px solid #b9a779;
+  border-radius: 6px;
+  padding: 0.52rem 0.6rem;
+  color: #161616;
+  background: #fff;
+}
+
+.form-check {
+  margin-top: 0.7rem;
+  color: #3d3a3b;
+}
+
+.form-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.loading-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3d3a3b;
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+.provider-card {
+  border: 1px solid #b9a779;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    color: #3d3a3b;
+  }
+}
+
+.empty-card p {
+  margin: 0;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meta {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.actions {
+  margin-top: 0.85rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}

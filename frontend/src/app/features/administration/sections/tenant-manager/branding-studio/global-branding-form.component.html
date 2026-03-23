@@ -1,0 +1,285 @@
+<div class="global-form" data-testid="global-branding-form">
+  <h3>Global Theme</h3>
+  <p class="muted">Configure the base theme applied to all components.</p>
+
+  <div class="brand-preset-row">
+    <button
+      type="button"
+      class="brand-preset neumorph"
+      data-testid="preset-neumorph"
+      (click)="applyBrandPreset('neumorph')"
+    >
+      Forest + Wheat
+    </button>
+    <button
+      type="button"
+      class="brand-preset aqua"
+      data-testid="preset-aqua"
+      (click)="applyBrandPreset('aqua')"
+    >
+      Forest Deep
+    </button>
+    <button
+      type="button"
+      class="brand-preset sand"
+      data-testid="preset-sand"
+      (click)="applyBrandPreset('sand')"
+    >
+      Golden Wheat
+    </button>
+    <button
+      type="button"
+      class="brand-preset slate"
+      data-testid="preset-slate"
+      (click)="applyBrandPreset('slate')"
+    >
+      Charcoal
+    </button>
+  </div>
+
+  <div class="policy-palette-card" data-testid="branding-policy-palette">
+    <div class="policy-palette-head">
+      <strong>Approved Brand Palette</strong>
+      <span>Selection is restricted to approved swatches.</span>
+    </div>
+    <div class="policy-palette-groups">
+      @for (group of policyPaletteGroups; track group.label) {
+        <div class="policy-group">
+          <span class="policy-group-label">{{ group.label }}</span>
+          <div class="policy-swatch-row">
+            @for (swatch of group.options; track swatch.value) {
+              <div class="policy-swatch">
+                <span class="policy-swatch-chip" [style.background-color]="swatch.value"></span>
+                <code>{{ swatch.value }}</code>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="form-section-label">Colors</div>
+
+  <div class="palette-grid">
+    @for (field of colorFieldConfigs; track field.key) {
+      <div class="field palette-field" [attr.data-testid]="field.testId">
+        <span>{{ field.label }}</span>
+        <div
+          class="palette-options"
+          role="radiogroup"
+          [attr.aria-label]="field.label + ' color options'"
+        >
+          @for (option of field.options; track option.value) {
+            <button
+              type="button"
+              class="palette-option"
+              [class.selected]="isPaletteColorSelected(field.key, option.value)"
+              [attr.aria-checked]="isPaletteColorSelected(field.key, option.value)"
+              role="radio"
+              (click)="selectPaletteColor(field.key, option.value)"
+            >
+              <span class="palette-chip" [style.background-color]="option.value"></span>
+              <span class="palette-meta">
+                <strong>{{ option.label }}</strong>
+                <code>{{ option.value }}</code>
+              </span>
+            </button>
+          }
+        </div>
+        <div class="selected-color">
+          Selected: <code>{{ brandingForm()[field.key] }}</code>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="form-section-label">Assets</div>
+
+  <div class="form-grid">
+    <label class="field">
+      <span>Logo URL</span>
+      <input
+        pInputText
+        [ngModel]="brandingForm().logoUrl"
+        (ngModelChange)="updateField('logoUrl', $event)"
+        placeholder="https://example.com/logo.svg"
+        data-testid="branding-logo-url"
+      />
+    </label>
+
+    <label class="field">
+      <span>Favicon URL</span>
+      <input
+        pInputText
+        [ngModel]="brandingForm().faviconUrl"
+        (ngModelChange)="updateField('faviconUrl', $event)"
+        placeholder="https://example.com/favicon.ico"
+        data-testid="branding-favicon-url"
+      />
+    </label>
+
+    <label class="field">
+      <span>Login Background URL</span>
+      <input
+        pInputText
+        [ngModel]="brandingForm().loginBackgroundUrl"
+        (ngModelChange)="updateField('loginBackgroundUrl', $event)"
+        placeholder="https://example.com/bg.jpg"
+        data-testid="branding-login-bg-url"
+      />
+    </label>
+
+    <label class="field">
+      <span>Font Family</span>
+      <input
+        pInputText
+        [ngModel]="brandingForm().fontFamily"
+        (ngModelChange)="updateField('fontFamily', $event)"
+        data-testid="branding-font-family"
+      />
+    </label>
+  </div>
+
+  <div class="form-section-label">Neumorphic Controls</div>
+
+  <div class="form-grid">
+    <label class="field">
+      <span>Corner Radius ({{ brandingForm().cornerRadius }}px)</span>
+      <input
+        type="range"
+        min="0"
+        max="40"
+        [ngModel]="brandingForm().cornerRadius"
+        (ngModelChange)="updateField('cornerRadius', +$event)"
+        data-testid="branding-corner-radius"
+      />
+    </label>
+
+    <label class="field">
+      <span>Button Depth ({{ brandingForm().buttonDepth }}px)</span>
+      <input
+        type="range"
+        min="0"
+        max="30"
+        [ngModel]="brandingForm().buttonDepth"
+        (ngModelChange)="updateField('buttonDepth', +$event)"
+        data-testid="branding-button-depth"
+      />
+    </label>
+
+    <label class="field">
+      <span>Shadow Intensity ({{ brandingForm().shadowIntensity }}%)</span>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        [ngModel]="brandingForm().shadowIntensity"
+        (ngModelChange)="updateField('shadowIntensity', +$event)"
+        data-testid="branding-shadow-intensity"
+      />
+    </label>
+  </div>
+
+  <div class="form-toggles">
+    <label>
+      <input
+        type="checkbox"
+        [ngModel]="brandingForm().softShadows"
+        (ngModelChange)="updateField('softShadows', $event)"
+        data-testid="branding-soft-shadows"
+      />
+      Soft Shadows
+    </label>
+    <label>
+      <input
+        type="checkbox"
+        [ngModel]="brandingForm().compactNav"
+        (ngModelChange)="updateField('compactNav', $event)"
+        data-testid="branding-compact-nav"
+      />
+      Compact Navigation
+    </label>
+  </div>
+
+  <div class="form-section-label">Hover Behaviour</div>
+
+  <div class="form-grid">
+    <div class="hover-field">
+      <span class="hover-label">Button Hover</span>
+      <p-selectbutton
+        [options]="buttonHoverOptions"
+        [ngModel]="brandingForm().hoverButton"
+        (ngModelChange)="updateField('hoverButton', $event)"
+        optionLabel="label"
+        optionValue="value"
+        aria-label="Button hover behaviour"
+        data-testid="branding-hover-button"
+      />
+    </div>
+
+    <div class="hover-field">
+      <span class="hover-label">Card Hover</span>
+      <p-selectbutton
+        [options]="cardHoverOptions"
+        [ngModel]="brandingForm().hoverCard"
+        (ngModelChange)="updateField('hoverCard', $event)"
+        optionLabel="label"
+        optionValue="value"
+        aria-label="Card hover behaviour"
+        data-testid="branding-hover-card"
+      />
+    </div>
+
+    <div class="hover-field">
+      <span class="hover-label">Input Hover</span>
+      <p-selectbutton
+        [options]="inputHoverOptions"
+        [ngModel]="brandingForm().hoverInput"
+        (ngModelChange)="updateField('hoverInput', $event)"
+        optionLabel="label"
+        optionValue="value"
+        aria-label="Input hover behaviour"
+        data-testid="branding-hover-input"
+      />
+    </div>
+
+    <div class="hover-field">
+      <span class="hover-label">Nav Hover</span>
+      <p-selectbutton
+        [options]="navHoverOptions"
+        [ngModel]="brandingForm().hoverNav"
+        (ngModelChange)="updateField('hoverNav', $event)"
+        optionLabel="label"
+        optionValue="value"
+        aria-label="Navigation hover behaviour"
+        data-testid="branding-hover-nav"
+      />
+    </div>
+
+    <div class="hover-field">
+      <span class="hover-label">Table Row Hover</span>
+      <p-selectbutton
+        [options]="tableRowHoverOptions"
+        [ngModel]="brandingForm().hoverTableRow"
+        (ngModelChange)="updateField('hoverTableRow', $event)"
+        optionLabel="label"
+        optionValue="value"
+        aria-label="Table row hover behaviour"
+        data-testid="branding-hover-table-row"
+      />
+    </div>
+  </div>
+
+  <label class="field custom-css-field">
+    <span>Custom CSS (Policy Disabled)</span>
+    <textarea
+      rows="4"
+      [ngModel]="brandingForm().customCss"
+      readonly
+      disabled
+      placeholder="Custom CSS is disabled by branding policy v1."
+      data-testid="branding-custom-css"
+    ></textarea>
+  </label>
+</div>

@@ -1,0 +1,612 @@
+// ============================================
+// Page Layout Component Styles
+// Containerized Layout System
+// ============================================
+
+// Design Tokens
+$teal-dark: #035a66;
+$teal: #047481;
+$teal-light: #5ee7f7;
+
+$gray-50: #f7fafc;
+$gray-100: #edf2f7;
+$gray-200: #e2e8f0;
+$gray-300: #cbd5e0;
+$gray-400: #545e6e;
+$gray-500: #454e5c;
+$gray-600: #2d3748;
+$gray-700: #1a202c;
+
+$white: #ffffff;
+$background: #faf9f5;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06);
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-2k: 1920px;
+
+// ============================================
+// HOST STYLES
+// ============================================
+
+:host {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ============================================
+// PAGE LAYOUT CONTAINER
+// ============================================
+
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// ============================================
+// BREADCRUMB CONTAINER
+// ============================================
+
+.breadcrumb-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  background: transparent;
+  border-bottom: 1px solid var(--nm-border);
+  min-height: 48px;
+  flex-shrink: 0;
+
+  @media (min-width: $breakpoint-lg) {
+    padding: 12px 32px;
+    min-height: 56px;
+  }
+
+  @media (min-width: $breakpoint-2k) {
+    padding: 16px 40px;
+  }
+}
+
+.breadcrumb-nav {
+  flex: 1;
+  min-width: 0;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  color: $gray-500;
+
+  &:not(:last-child)::after {
+    content: '/';
+    margin: 0 8px;
+    color: $gray-300;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: $gray-500;
+    text-decoration: none;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: $teal;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $teal;
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  }
+
+  &.active {
+    color: $gray-700;
+    font-weight: 500;
+  }
+}
+
+.breadcrumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+  }
+}
+
+.page-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-700;
+  white-space: nowrap;
+
+  @media (max-width: $breakpoint-md) {
+    display: none;
+  }
+}
+
+.breadcrumb-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+// ============================================
+// CONTENT AREA
+// ============================================
+
+.content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  &.has-sidebar {
+    // Sidebar is present
+  }
+}
+
+// ============================================
+// DOCKER CONTAINER (SIDEBAR)
+// ============================================
+
+.docker-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--nm-bg);
+  border-right: 1px solid var(--nm-border);
+  box-shadow:
+    var(--nm-shadow-lg) var(--nm-shadow-lg) var(--nm-blur-lg) var(--nm-shadow-dark),
+    calc(-1 * var(--nm-shadow-lg)) calc(-1 * var(--nm-shadow-lg)) var(--nm-blur-lg) var(--nm-shadow-light);
+  overflow: hidden;
+  transition: width 0.2s ease, min-width 0.2s ease;
+  flex-shrink: 0;
+
+  // Width variants
+  &.sidebar-narrow {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  &.sidebar-normal {
+    width: 260px;
+    min-width: 260px;
+  }
+
+  &.sidebar-wide {
+    width: 320px;
+    min-width: 320px;
+  }
+
+  // Collapsed state
+  &.collapsed {
+    width: 64px;
+    min-width: 64px;
+
+    .docker-title,
+    .nav-label,
+    .nav-badge,
+    .docker-content:not(.collapsed-content) {
+      display: none;
+    }
+
+    .docker-header {
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .docker-nav-item {
+      justify-content: center;
+      padding: 12px;
+    }
+  }
+
+  // Mobile: hidden by default
+  @media (max-width: $breakpoint-md) {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+}
+
+.docker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--nm-border);
+  flex-shrink: 0;
+}
+
+.docker-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-700;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.docker-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: $radius-sm;
+  color: $gray-500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: $gray-700;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $teal;
+    outline-offset: 2px;
+  }
+}
+
+.docker-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.docker-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: $radius-sm;
+  color: $gray-600;
+  text-decoration: none;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+
+  .nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      opacity: 0.5;
+      transition: opacity 0.15s ease;
+    }
+  }
+
+  .nav-label {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-badge {
+    padding: 2px 8px;
+    background: var(--nm-bg);
+    border: 1px solid var(--nm-border);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $gray-600;
+  }
+
+  &:hover {
+    background: var(--nm-bg);
+    color: $gray-700;
+    box-shadow:
+      var(--nm-shadow-sm) var(--nm-shadow-sm) var(--nm-blur-sm) var(--nm-shadow-dark),
+      calc(-1 * var(--nm-shadow-sm)) calc(-1 * var(--nm-shadow-sm)) var(--nm-blur-sm) var(--nm-shadow-light);
+
+    .nav-icon img {
+      opacity: 0.8;
+    }
+  }
+
+  &.active {
+    background: var(--nm-bg);
+    color: $teal;
+    box-shadow:
+      inset var(--nm-shadow-sm) var(--nm-shadow-sm) var(--nm-blur-sm) var(--nm-shadow-dark),
+      inset calc(-1 * var(--nm-shadow-sm)) calc(-1 * var(--nm-shadow-sm)) var(--nm-blur-sm) var(--nm-shadow-light);
+    border-left: 3px solid var(--nm-accent, #047481);
+
+    .nav-icon img {
+      opacity: 1;
+      filter: invert(30%) sepia(90%) saturate(500%) hue-rotate(145deg);
+    }
+
+    .nav-badge {
+      background: rgba($teal, 0.15);
+      color: $teal;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $teal;
+    outline-offset: -2px;
+  }
+}
+
+.docker-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+
+  &.collapsed-content {
+    padding: 8px;
+  }
+}
+
+// ============================================
+// MAIN CONTAINER
+// ============================================
+
+.main-container {
+  flex: 1;
+  overflow-y: auto;
+  min-width: 0;
+
+  // Padding variants
+  &.padding-none {
+    padding: 0;
+  }
+
+  &.padding-small {
+    padding: 16px;
+
+    @media (min-width: $breakpoint-lg) {
+      padding: 20px;
+    }
+  }
+
+  &.padding-normal {
+    padding: 24px;
+
+    @media (min-width: $breakpoint-lg) {
+      padding: 32px;
+    }
+
+    @media (min-width: $breakpoint-2k) {
+      padding: 40px;
+    }
+  }
+
+  &.padding-large {
+    padding: 32px;
+
+    @media (min-width: $breakpoint-lg) {
+      padding: 48px;
+    }
+
+    @media (min-width: $breakpoint-2k) {
+      padding: 64px;
+    }
+  }
+
+  // Background variants
+  &.bg-default {
+    background: transparent;
+  }
+
+  &.bg-white {
+    background: $white;
+  }
+
+  &.bg-transparent {
+    background: transparent;
+  }
+}
+
+// ============================================
+// STATE CONTAINERS
+// ============================================
+
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 300px;
+  padding: 40px;
+  text-align: center;
+}
+
+.state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.state-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-700;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.state-message {
+  margin: 0;
+  font-size: 14px;
+  color: $gray-500;
+  max-width: 400px;
+}
+
+// Loading State
+.loading-state {
+  .spinner {
+    svg {
+      width: 40px;
+      height: 40px;
+      color: $teal;
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Error State
+.error-state {
+  .error-icon {
+    background: #fef2f2;
+
+    svg {
+      color: #dc2626;
+    }
+  }
+
+  .state-title {
+    color: #dc2626;
+  }
+
+  .btn {
+    margin-top: 8px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  .empty-icon {
+    background: $gray-100;
+
+    svg {
+      color: $gray-400;
+    }
+  }
+}
+
+// ============================================
+// CONTENT SECTION (for use within main)
+// ============================================
+
+// Projected-content utility styles (.content-section/.section-title/.section-description)
+// are defined globally in src/styles.scss using app-page-layout scoped selectors.
+
+// ============================================
+// BUTTON STYLES (for state containers)
+// ============================================
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: $radius-sm;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:focus-visible {
+    outline: 2px solid $teal;
+    outline-offset: 2px;
+  }
+}
+
+.btn-primary {
+  background: $teal;
+  border-color: $teal;
+  color: $white;
+
+  &:hover {
+    background: $teal-dark;
+    border-color: $teal-dark;
+  }
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border-color: $teal;
+  color: $teal;
+
+  &:hover {
+    background: $teal;
+    color: $white;
+  }
+}

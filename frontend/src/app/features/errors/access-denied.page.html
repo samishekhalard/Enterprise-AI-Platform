@@ -1,0 +1,16 @@
+<app-page-frame
+  [title]="'Access Denied'"
+  [subtitle]="'You do not have permission to access this resource.'"
+>
+  <section page-content>
+    <section class="app-panel error-panel">
+      <p>If you need access, please contact your administrator.</p>
+      <div class="actions">
+        <button type="button" class="app-btn" (click)="goBack()">Go Back</button>
+        <a routerLink="/administration" class="app-btn">Go to Administration</a>
+      </div>
+    </section>
+  </section>
+
+  <p page-footer>Authorization failure page migrated from legacy frontend.</p>
+</app-page-frame>

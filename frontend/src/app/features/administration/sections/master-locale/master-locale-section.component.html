@@ -1,0 +1,62 @@
+<p-card styleClass="master-locale-card">
+  <section class="master-locale">
+    <h3>Master Locale</h3>
+    <p class="muted">Platform-wide localization defaults and formatting behavior.</p>
+
+    <p-tabs [value]="tab()" (valueChange)="onTabChange($event)">
+      <p-tablist>
+        <p-tab value="languages">Languages</p-tab>
+        <p-tab value="regions">Regions</p-tab>
+        <p-tab value="formats">Formats</p-tab>
+        <p-tab value="translations">Translations</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="languages">
+          <section class="content-card">
+            <label for="default-language">Default Language</label>
+            <p-select
+              inputId="default-language"
+              [options]="languageOptions"
+              optionLabel="label"
+              optionValue="value"
+              [(ngModel)]="defaultLanguage"
+            />
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="regions">
+          <section class="content-card">
+            <label for="default-region">Default Region</label>
+            <p-select
+              inputId="default-region"
+              [options]="regionOptions"
+              optionLabel="label"
+              optionValue="value"
+              [(ngModel)]="defaultRegion"
+            />
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="formats">
+          <section class="content-card format-grid">
+            <label for="date-format">Date Format</label>
+            <input id="date-format" type="text" pInputText [(ngModel)]="dateFormat" />
+
+            <label for="default-timezone">Timezone</label>
+            <input id="default-timezone" type="text" pInputText [(ngModel)]="timezone" />
+          </section>
+        </p-tabpanel>
+
+        <p-tabpanel value="translations">
+          <section class="content-card">
+            <h4>Translation Packs</h4>
+            <p>
+              Translation governance pipeline will be migrated in the next administration iteration.
+            </p>
+          </section>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  </section>
+</p-card>

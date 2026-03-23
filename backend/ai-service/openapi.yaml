@@ -1,0 +1,701 @@
+openapi: 3.1.0
+info:
+  title: AI Service API
+  description: API for AI agents, conversations, and RAG capabilities
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8088
+    description: Development server
+
+tags:
+  - name: Agents
+    description: AI agent management
+  - name: Conversations
+    description: Conversation management
+  - name: Messages
+    description: Message operations
+  - name: Knowledge
+    description: RAG knowledge base management
+  - name: Providers
+    description: AI provider configuration
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/agents:
+    get:
+      tags: [Agents]
+      summary: List AI agents
+      operationId: listAgents
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: List of agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Agent'
+
+    post:
+      tags: [Agents]
+      summary: Create AI agent
+      operationId: createAgent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '201':
+          description: Agent created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+  /api/v1/agents/{agentId}:
+    get:
+      tags: [Agents]
+      summary: Get agent by ID
+      operationId: getAgent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+    put:
+      tags: [Agents]
+      summary: Update agent
+      operationId: updateAgent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '200':
+          description: Agent updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+    delete:
+      tags: [Agents]
+      summary: Delete agent
+      operationId: deleteAgent
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Agent deleted
+
+  /api/v1/conversations:
+    get:
+      tags: [Conversations]
+      summary: List conversations
+      operationId: listConversations
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPage'
+
+    post:
+      tags: [Conversations]
+      summary: Create conversation
+      operationId: createConversation
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversationRequest'
+      responses:
+        '201':
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+
+  /api/v1/conversations/{conversationId}:
+    get:
+      tags: [Conversations]
+      summary: Get conversation by ID
+      operationId: getConversation
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Conversation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+
+    delete:
+      tags: [Conversations]
+      summary: Delete conversation
+      operationId: deleteConversation
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Conversation deleted
+
+  /api/v1/conversations/{conversationId}/messages:
+    get:
+      tags: [Messages]
+      summary: Get conversation messages
+      operationId: getMessages
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+
+    post:
+      tags: [Messages]
+      summary: Send message
+      operationId: sendMessage
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+
+  /api/v1/conversations/{conversationId}/stream:
+    post:
+      tags: [Messages]
+      summary: Send message with streaming response
+      operationId: sendMessageStream
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Streaming AI response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /api/v1/knowledge/sources:
+    get:
+      tags: [Knowledge]
+      summary: List knowledge sources
+      operationId: listKnowledgeSources
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: agentId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of knowledge sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeSource'
+
+    post:
+      tags: [Knowledge]
+      summary: Create knowledge source
+      operationId: createKnowledgeSource
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateKnowledgeSourceRequest'
+      responses:
+        '201':
+          description: Knowledge source created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeSource'
+
+  /api/v1/knowledge/sources/{sourceId}:
+    get:
+      tags: [Knowledge]
+      summary: Get knowledge source by ID
+      operationId: getKnowledgeSource
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Knowledge source details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeSource'
+
+    delete:
+      tags: [Knowledge]
+      summary: Delete knowledge source
+      operationId: deleteKnowledgeSource
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Knowledge source deleted
+
+  /api/v1/knowledge/sources/{sourceId}/reindex:
+    post:
+      tags: [Knowledge]
+      summary: Reindex knowledge source
+      operationId: reindexKnowledgeSource
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: sourceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '202':
+          description: Reindex started
+
+  /api/v1/providers:
+    get:
+      tags: [Providers]
+      summary: List available AI providers
+      operationId: listProviders
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: List of providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AIProvider'
+
+  /api/v1/providers/{providerId}/models:
+    get:
+      tags: [Providers]
+      summary: List models for provider
+      operationId: listProviderModels
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AIModel'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        systemPrompt:
+          type: string
+        provider:
+          type: string
+          enum: [OPENAI, ANTHROPIC, GEMINI, OLLAMA]
+        model:
+          type: string
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+        maxTokens:
+          type: integer
+        knowledgeSourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateAgentRequest:
+      type: object
+      required: [name, provider, model]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        systemPrompt:
+          type: string
+        provider:
+          type: string
+          enum: [OPENAI, ANTHROPIC, GEMINI, OLLAMA]
+        model:
+          type: string
+        temperature:
+          type: number
+          default: 0.7
+        maxTokens:
+          type: integer
+          default: 2048
+        knowledgeSourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        isActive:
+          type: boolean
+          default: true
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        agentId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        messageCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateConversationRequest:
+      type: object
+      required: [agentId]
+      properties:
+        agentId:
+          type: string
+          format: uuid
+        title:
+          type: string
+
+    ConversationPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        conversationId:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [USER, ASSISTANT, SYSTEM]
+        content:
+          type: string
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageSource'
+        tokenCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    MessageSource:
+      type: object
+      properties:
+        sourceId:
+          type: string
+          format: uuid
+        sourceName:
+          type: string
+        chunkContent:
+          type: string
+        similarity:
+          type: number
+
+    SendMessageRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+        useRag:
+          type: boolean
+          default: true
+
+    KnowledgeSource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [FILE, URL, TEXT]
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+        mimeType:
+          type: string
+        url:
+          type: string
+        chunkCount:
+          type: integer
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, READY, FAILED]
+        errorMessage:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        indexedAt:
+          type: string
+          format: date-time
+
+    CreateKnowledgeSourceRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        file:
+          type: string
+          format: binary
+        url:
+          type: string
+        text:
+          type: string
+        agentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    AIProvider:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        isEnabled:
+          type: boolean
+        models:
+          type: array
+          items:
+            type: string
+
+    AIModel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        maxTokens:
+          type: integer
+        supportedFeatures:
+          type: array
+          items:
+            type: string

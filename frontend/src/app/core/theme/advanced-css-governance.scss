@@ -1,0 +1,66 @@
+:root {
+  /* Core interaction/elevation tokens used across shell + administration. */
+  --tp-pattern-opacity: 0.05;
+  --tp-elevation-default: 0 4px 10px rgba(22, 22, 22, 0.24);
+  --tp-elevation-hover: 0 7px 16px rgba(22, 22, 22, 0.3);
+  --tp-elevation-pressed: inset 0 2px 6px rgba(22, 22, 22, 0.22);
+  --tp-touch-target-min-size: 44px;
+
+  /* Orientation-aware shell spacing defaults. */
+  --tp-admin-content-padding-top: 104px;
+  --tp-admin-content-padding-inline: 32px;
+  --tp-admin-content-padding-bottom: 24px;
+}
+
+@media (orientation: portrait) {
+  :root {
+    --tp-admin-content-padding-top: 88px;
+    --tp-admin-content-padding-inline: 12px;
+    --tp-admin-content-padding-bottom: 16px;
+  }
+}
+
+/* Screen-reader only utility (visually hidden but accessible). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Environment-aware visibility helpers. */
+@media screen {
+  .u-print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  .u-no-print {
+    display: none !important;
+  }
+}
+
+/* Interaction capability helpers. */
+@media (hover: hover) and (pointer: fine) {
+  .u-hover-lift:hover {
+    box-shadow: var(--tp-elevation-hover);
+    transform: translateY(-1px);
+  }
+
+  .u-hover-press:hover {
+    box-shadow: var(--tp-elevation-pressed);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .u-hover-lift:hover,
+  .u-hover-press:hover {
+    transform: none;
+  }
+}

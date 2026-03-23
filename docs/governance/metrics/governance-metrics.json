@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Governance Metrics Data",
+  "description": "Tracking data for governance metrics",
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-25",
+
+  "metadata": {
+    "framework": "EMSIST SDLC Agent Governance",
+    "measurementStart": "2026-02-25",
+    "reviewCycle": "monthly"
+  },
+
+  "targets": {
+    "principleCompliance": {
+      "target": 95,
+      "unit": "percent",
+      "comparison": "greaterThanOrEqual"
+    },
+    "violationRate": {
+      "target": 5,
+      "unit": "countPerSprint",
+      "comparison": "lessThan"
+    },
+    "improvementRate": {
+      "target": 50,
+      "unit": "percent",
+      "comparison": "greaterThan"
+    },
+    "governanceHealth": {
+      "target": "green",
+      "thresholds": {
+        "green": 90,
+        "yellow": 70,
+        "orange": 50,
+        "red": 0
+      }
+    }
+  },
+
+  "agents": [
+    "ARCH",
+    "SA",
+    "BA",
+    "DEV",
+    "DBA",
+    "QA",
+    "SEC",
+    "DEVOPS",
+    "DOC"
+  ],
+
+  "sprints": [],
+
+  "sprintTemplate": {
+    "id": "sprint-N",
+    "startDate": "YYYY-MM-DD",
+    "endDate": "YYYY-MM-DD",
+    "compliance": {
+      "ARCH": null,
+      "SA": null,
+      "BA": null,
+      "DEV": null,
+      "DBA": null,
+      "QA": null,
+      "SEC": null,
+      "DEVOPS": null,
+      "DOC": null,
+      "overall": null
+    },
+    "violations": {
+      "ARCH": 0,
+      "SA": 0,
+      "BA": 0,
+      "DEV": 0,
+      "DBA": 0,
+      "QA": 0,
+      "SEC": 0,
+      "DEVOPS": 0,
+      "DOC": 0,
+      "total": 0,
+      "details": []
+    },
+    "improvements": {
+      "submitted": 0,
+      "implemented": 0,
+      "pending": [],
+      "rate": null
+    },
+    "healthScore": {
+      "principleComplianceScore": null,
+      "violationRateScore": null,
+      "improvementRateScore": null,
+      "documentationCurrencyScore": null,
+      "checklistCompletionScore": null,
+      "overall": null,
+      "status": null
+    }
+  },
+
+  "violationTemplate": {
+    "id": "V-NNNN",
+    "date": "YYYY-MM-DD",
+    "agent": "AGENT_NAME",
+    "category": "security|documentation|testing|architecture|process",
+    "severity": "critical|high|medium|low",
+    "description": "Description of the violation",
+    "rootCause": "Why it happened",
+    "resolution": "How it was fixed",
+    "preventionAction": "Changes to prevent recurrence",
+    "status": "open|resolved|wontfix"
+  },
+
+  "improvementTemplate": {
+    "id": "I-NNNN",
+    "date": "YYYY-MM-DD",
+    "agent": "AGENT_NAME",
+    "suggestion": "Description of improvement",
+    "rationale": "Why this improvement is needed",
+    "impact": "Expected benefit",
+    "effort": "low|medium|high",
+    "priority": "low|medium|high",
+    "status": "submitted|reviewing|approved|implemented|rejected",
+    "implementedDate": null,
+    "implementedVersion": null
+  },
+
+  "violations": [],
+
+  "improvements": [],
+
+  "documentationMetrics": {
+    "adrs": {
+      "total": 9,
+      "withImplementationStatus": 0,
+      "upToDate": 0,
+      "stale": 0
+    },
+    "arc42": {
+      "total": 12,
+      "withDiagrams": 0,
+      "upToDate": 0,
+      "stale": 0
+    },
+    "llds": {
+      "total": 0,
+      "upToDate": 0,
+      "stale": 0
+    },
+    "apiSpecs": {
+      "total": 0,
+      "valid": 0,
+      "upToDate": 0
+    }
+  },
+
+  "qualityMetrics": {
+    "codeQuality": {
+      "coverage": null,
+      "technicalDebt": null,
+      "codeSmells": null,
+      "securityHotspots": null,
+      "lastUpdated": null
+    },
+    "testing": {
+      "unitTests": {
+        "count": null,
+        "passRate": null,
+        "executionTime": null
+      },
+      "integrationTests": {
+        "count": null,
+        "passRate": null,
+        "executionTime": null
+      },
+      "e2eTests": {
+        "count": null,
+        "passRate": null,
+        "executionTime": null
+      }
+    }
+  },
+
+  "securityMetrics": {
+    "scans": {
+      "sast": {
+        "frequency": "per-commit",
+        "lastRun": null,
+        "status": null
+      },
+      "dast": {
+        "frequency": "weekly",
+        "lastRun": null,
+        "status": null
+      },
+      "dependency": {
+        "frequency": "daily",
+        "lastRun": null,
+        "status": null
+      },
+      "container": {
+        "frequency": "per-build",
+        "lastRun": null,
+        "status": null
+      }
+    },
+    "vulnerabilities": {
+      "critical": {
+        "open": 0,
+        "resolved30d": 0,
+        "avgResolutionDays": null
+      },
+      "high": {
+        "open": 0,
+        "resolved30d": 0,
+        "avgResolutionDays": null
+      },
+      "medium": {
+        "open": 0,
+        "resolved30d": 0,
+        "avgResolutionDays": null
+      },
+      "low": {
+        "open": 0,
+        "resolved30d": 0,
+        "avgResolutionDays": null
+      }
+    }
+  },
+
+  "agentActivity": {
+    "ARCH": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "SA": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "BA": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "DEV": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "DBA": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "QA": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "SEC": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "DEVOPS": { "tasks": 0, "avgDuration": null, "successRate": null },
+    "DOC": { "tasks": 0, "avgDuration": null, "successRate": null }
+  },
+
+  "reviewSchedule": {
+    "metricsReview": {
+      "frequency": "monthly",
+      "nextReview": null,
+      "owner": "ARCH"
+    },
+    "principlesReview": {
+      "frequency": "quarterly",
+      "nextReview": null,
+      "owner": "ARCH"
+    },
+    "frameworkUpdate": {
+      "frequency": "bi-annually",
+      "nextReview": null,
+      "owner": "ARCH"
+    }
+  }
+}

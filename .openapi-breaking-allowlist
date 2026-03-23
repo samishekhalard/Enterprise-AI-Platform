@@ -1,0 +1,2 @@
+# format: <spec-path>|<expires-YYYY-MM-DD-or-none>|<reason>
+backend/tenant-service/openapi.yaml|2026-06-30|ISSUE-005 approved: remove slug and X-User-ID from tenant create contract

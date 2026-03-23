@@ -1,0 +1,407 @@
+// =============================================================================
+// Neumorphic Design System — Warm Beige Surface
+// =============================================================================
+// Promoted from PoC (nm-admin-demo.page.scss) to production design system.
+// Shadow pairs are tuned for #faf9f5 warm-white surface:
+//   - Light shadow: pure white (visible against cream)
+//   - Dark shadow: warm gray with higher opacity (compensates for bright base)
+//
+// Usage:
+//   CSS custom properties: var(--nm-*) — available globally via :root
+//   SCSS mixins: nm-convex($size), nm-concave($size) — @use this file
+//   Utility classes: .nm-convex-sm, .nm-concave-md, etc.
+// =============================================================================
+
+// ---------------------------------------------------------------------------
+// 1. Design Tokens (CSS Custom Properties)
+// ---------------------------------------------------------------------------
+
+:root {
+  // Surface — system background
+  --nm-bg: #faf9f5;
+  --nm-bg-card: #ffffff;
+
+  // Neumorphic shadow colors (tuned for warm-white)
+  --nm-shadow-light: rgba(255, 255, 255, 1);
+  --nm-shadow-dark: rgba(174, 174, 160, 0.35);
+
+  // Shadow distances (sm / md / lg)
+  --nm-shadow-sm: 3px;
+  --nm-shadow-md: 6px;
+  --nm-shadow-lg: 10px;
+
+  // Blur radii (2× distance)
+  --nm-blur-sm: 6px;
+  --nm-blur-md: 12px;
+  --nm-blur-lg: 20px;
+
+  // Accent (ThinkPlus teal)
+  --nm-accent: #047481;
+  --nm-accent-hover: #035a66;
+  --nm-accent-muted: rgba(4, 116, 129, 0.1);
+
+  // Semantic status colors
+  --nm-green: #22c55e;
+  --nm-orange: #f59e0b;
+  --nm-red: #ef4444;
+  --nm-purple: #7c3aed;
+
+  // Text (WCAG AAA compliant — 7:1+ contrast on #faf9f5)
+  --nm-text-primary: #1e293b;
+  --nm-text-secondary: #454e5c; // 7.01:1 on #faf9f5
+  --nm-text-muted: #94a3b8;    // decorative only — do NOT use for essential info
+  --nm-text-on-accent: #ffffff;
+
+  // Borders
+  --nm-border: rgba(0, 0, 0, 0.06);
+  --nm-border-hover: rgba(0, 0, 0, 0.1);
+
+  // Focus indicators (WCAG AAA)
+  --nm-focus-ring: 0 0 0 3px rgba(4, 116, 129, 0.4);
+  --nm-focus-outline: 2px solid #047481;
+
+  // Radii
+  --nm-radius-sm: 8px;
+  --nm-radius-md: 12px;
+  --nm-radius-lg: 16px;
+  --nm-radius-xl: 20px;
+  --nm-radius-full: 50%;
+
+  // Motion & sizing
+  --nm-transition: 0.2s ease;
+  --nm-touch-min: 44px;
+}
+
+// ---------------------------------------------------------------------------
+// 2. SCSS Mixins
+// ---------------------------------------------------------------------------
+
+/// Convex (raised/extruded) — dual outward shadow
+/// @param {String} $size [md] — sm | md | lg
+@mixin nm-convex($size: md) {
+  $d: var(--nm-shadow-#{$size});
+  $b: var(--nm-blur-#{$size});
+  box-shadow:
+    #{$d} #{$d} #{$b} var(--nm-shadow-dark),
+    calc(-1 * #{$d}) calc(-1 * #{$d}) #{$b} var(--nm-shadow-light);
+}
+
+/// Concave (pressed/inset) — dual inward shadow
+/// @param {String} $size [sm] — sm | md | lg
+@mixin nm-concave($size: sm) {
+  $d: var(--nm-shadow-#{$size});
+  $b: var(--nm-blur-#{$size});
+  box-shadow:
+    inset #{$d} #{$d} #{$b} var(--nm-shadow-dark),
+    inset calc(-1 * #{$d}) calc(-1 * #{$d}) #{$b} var(--nm-shadow-light);
+}
+
+// ---------------------------------------------------------------------------
+// 3. Utility Classes
+// ---------------------------------------------------------------------------
+
+.nm-convex-sm { @include nm-convex(sm); }
+.nm-convex-md { @include nm-convex(md); }
+.nm-convex-lg { @include nm-convex(lg); }
+
+.nm-concave-sm { @include nm-concave(sm); }
+.nm-concave-md { @include nm-concave(md); }
+.nm-concave-lg { @include nm-concave(lg); }
+
+// ---------------------------------------------------------------------------
+// 4. PrimeNG Component Overrides — Neumorphic Treatment
+// ---------------------------------------------------------------------------
+// These are global (unscoped) overrides. The login page's component-scoped
+// styles have higher specificity via Angular's _ngcontent attributes.
+
+// ---- Buttons ----
+.p-button {
+  background: var(--nm-bg);
+  color: var(--nm-text-primary);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-md);
+  @include nm-convex(md);
+  min-height: var(--nm-touch-min);
+  font-weight: 600;
+  transition: all var(--nm-transition);
+
+  &:hover:not(:disabled) {
+    background: var(--nm-bg);
+    color: var(--nm-accent);
+    @include nm-convex(lg);
+  }
+
+  &:active:not(:disabled) {
+    @include nm-concave(sm);
+  }
+
+  &:focus-visible {
+    outline: var(--nm-focus-outline);
+    outline-offset: 2px;
+  }
+
+  // Primary accent variant
+  &.nm-primary {
+    background: var(--nm-accent);
+    color: var(--nm-text-on-accent);
+
+    &:hover:not(:disabled) {
+      background: var(--nm-accent-hover);
+      color: var(--nm-text-on-accent);
+    }
+  }
+}
+
+// ---- Text Inputs ----
+.p-inputtext {
+  background: var(--nm-bg);
+  color: var(--nm-text-primary);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-md);
+  @include nm-concave(sm);
+  min-height: var(--nm-touch-min);
+  transition: all var(--nm-transition);
+
+  &::placeholder {
+    color: var(--nm-text-muted);
+  }
+
+  &:focus {
+    outline: var(--nm-focus-outline);
+    outline-offset: 2px;
+    box-shadow:
+      var(--nm-focus-ring),
+      inset var(--nm-shadow-sm) var(--nm-shadow-sm) var(--nm-blur-sm) var(--nm-shadow-dark),
+      inset calc(-1 * var(--nm-shadow-sm)) calc(-1 * var(--nm-shadow-sm)) var(--nm-blur-sm) var(--nm-shadow-light);
+  }
+}
+
+// ---- Select / Dropdown ----
+.p-select {
+  background: var(--nm-bg);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-md);
+  @include nm-convex(sm);
+  min-height: var(--nm-touch-min);
+  transition: all var(--nm-transition);
+
+  &:focus-visible {
+    outline: var(--nm-focus-outline);
+    outline-offset: 2px;
+  }
+}
+
+.p-select-overlay {
+  background: var(--nm-bg);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-md);
+  @include nm-convex(md);
+}
+
+// ---- DatePicker ----
+.p-datepicker {
+  .p-inputtext {
+    @include nm-concave(sm);
+  }
+}
+
+.p-datepicker-panel {
+  background: var(--nm-bg);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-md);
+  @include nm-convex(md);
+}
+
+// ---- Checkbox ----
+.p-checkbox {
+  .p-checkbox-box {
+    background: var(--nm-bg);
+    border: 1px solid var(--nm-border);
+    border-radius: var(--nm-radius-sm);
+    @include nm-concave(sm);
+    transition: all var(--nm-transition);
+    width: 22px;
+    height: 22px;
+
+    &.p-highlight {
+      background: var(--nm-accent);
+      border-color: var(--nm-accent);
+      @include nm-convex(sm);
+    }
+  }
+}
+
+// ---- Toggle Switch ----
+.p-toggleswitch {
+  .p-toggleswitch-slider {
+    background: var(--nm-bg);
+    border: 1px solid var(--nm-border);
+    @include nm-concave(sm);
+    transition: all var(--nm-transition);
+
+    &::before {
+      background: var(--nm-bg);
+      @include nm-convex(sm);
+    }
+  }
+
+  &.p-toggleswitch-checked .p-toggleswitch-slider {
+    background: var(--nm-accent-muted);
+    border-color: var(--nm-accent);
+
+    &::before {
+      background: var(--nm-accent);
+    }
+  }
+}
+
+// ---- Slider ----
+.p-slider {
+  background: var(--nm-bg);
+  border: 1px solid var(--nm-border);
+  @include nm-concave(sm);
+
+  .p-slider-range {
+    background: var(--nm-accent);
+  }
+
+  .p-slider-handle {
+    background: var(--nm-bg);
+    border: 2px solid var(--nm-accent);
+    @include nm-convex(sm);
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// ---- Progress Bar ----
+.p-progressbar {
+  background: var(--nm-bg);
+  border-radius: 100px;
+  border: 1px solid var(--nm-border);
+  @include nm-concave(sm);
+  height: 8px;
+
+  .p-progressbar-value {
+    background: var(--nm-accent);
+    border-radius: 100px;
+  }
+}
+
+// ---- Card ----
+.p-card {
+  background: var(--nm-bg);
+  border: 1px solid var(--nm-border);
+  border-radius: var(--nm-radius-lg);
+  @include nm-convex(md);
+}
+
+// ---- Tag ----
+.p-tag {
+  border-radius: 100px;
+  font-weight: 600;
+  @include nm-convex(sm);
+}
+
+// ---- Tabs ----
+.p-tabs {
+  .p-tablist {
+    background: var(--nm-bg);
+    border: 1px solid var(--nm-border);
+    border-radius: var(--nm-radius-md);
+    @include nm-concave(sm);
+    padding: 4px;
+  }
+
+  .p-tab {
+    border-radius: var(--nm-radius-sm);
+    transition: all var(--nm-transition);
+
+    &.p-tab-active {
+      background: var(--nm-bg);
+      color: var(--nm-accent);
+      @include nm-convex(sm);
+    }
+  }
+}
+
+// ---- Avatar ----
+.p-avatar {
+  @include nm-convex(sm);
+}
+
+// ---- Tooltip ----
+.p-tooltip {
+  .p-tooltip-text {
+    background: rgba(30, 41, 59, 0.9);
+    border-radius: var(--nm-radius-sm);
+    @include nm-convex(sm);
+    color: var(--nm-text-on-accent);
+    font-size: 0.75rem;
+  }
+}
+
+// ---- Divider ----
+.p-divider {
+  &::before {
+    border-color: var(--nm-border);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 5. Accessibility Media Queries
+// ---------------------------------------------------------------------------
+
+// ---- High Contrast: Remove all shadows, show solid borders ----
+@media (prefers-contrast: high) {
+  :root {
+    --nm-shadow-light: transparent;
+    --nm-shadow-dark: transparent;
+  }
+
+  // All neumorphic elements: solid borders instead of shadows
+  .nm-convex-sm,
+  .nm-convex-md,
+  .nm-convex-lg,
+  .nm-concave-sm,
+  .nm-concave-md,
+  .nm-concave-lg {
+    box-shadow: none !important;
+    border: 2px solid #1e293b !important;
+  }
+
+  // PrimeNG components
+  .p-button,
+  .p-inputtext,
+  .p-select,
+  .p-card,
+  .p-tag,
+  .p-avatar,
+  .p-progressbar,
+  .p-slider,
+  .p-checkbox .p-checkbox-box,
+  .p-toggleswitch .p-toggleswitch-slider,
+  .p-tabs .p-tablist {
+    box-shadow: none !important;
+    border: 2px solid #1e293b !important;
+  }
+}
+
+// ---- Reduced Motion: Disable all transitions ----
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --nm-transition: 0s;
+  }
+
+  .p-button,
+  .p-inputtext,
+  .p-select,
+  .p-card,
+  .p-tag,
+  .p-checkbox .p-checkbox-box,
+  .p-toggleswitch .p-toggleswitch-slider,
+  .p-slider .p-slider-handle,
+  .p-tabs .p-tab {
+    transition: none !important;
+  }
+}

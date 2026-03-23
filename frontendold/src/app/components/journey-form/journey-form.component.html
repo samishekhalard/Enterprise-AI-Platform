@@ -1,0 +1,302 @@
+<!-- Journey Setup -->
+<div class="card mb-3 border-accent">
+  <div class="card-header bg-accent-light border-accent">
+    <h6 class="mb-0 text-accent fw-semibold">① Journey Setup</h6>
+    <small class="text-muted">Journey title, variant type, and stage framework</small>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label small text-uppercase text-muted">Journey Title <span class="text-danger">*</span></label>
+        <input type="text" class="form-control rounded-pill"
+               [ngModel]="service.journey().title"
+               (ngModelChange)="service.updateJourney({ title: $event })"
+               placeholder="e.g. Trade License Renewal - Standard Path">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small text-uppercase text-muted">Variant Type</label>
+        <select class="form-select rounded-pill"
+                [ngModel]="service.journey().variant_type"
+                (ngModelChange)="service.updateJourney({ variant_type: $event })">
+          <option *ngFor="let opt of variantTypes" [value]="opt">{{ opt }}</option>
+        </select>
+      </div>
+      <div class="col-12">
+        <label class="form-label small text-uppercase text-muted">Stage Framework</label>
+        <small class="d-block text-muted mb-2">Select a framework to pre-populate stage names, or choose Custom</small>
+        <div class="row g-2">
+          <div class="col-md-6" *ngFor="let fw of frameworks">
+            <button class="btn w-100 text-start p-3"
+                    [class.btn-outline-accent]="service.journey().framework !== fw.id"
+                    [class.btn-accent]="service.journey().framework === fw.id"
+                    (click)="service.applyFramework(fw.id)">
+              <div class="fw-semibold">{{ fw.label }}</div>
+              <small class="text-muted d-block">
+                {{ fw.stages.length > 0 ? fw.stages.join(' → ') : 'Define your own stages below' }}
+              </small>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Persona Context -->
+<div *ngIf="service.persona().identity.name" class="alert alert-primary mb-3">
+  Building journey for: <strong>{{ service.persona().identity.name }}</strong> · {{ service.persona().identity.occupation }}
+</div>
+
+<!-- Emotion Arc Preview -->
+<div *ngIf="service.journey().stages.length > 0" class="card mb-3">
+  <div class="card-body">
+    <div class="small text-uppercase text-muted mb-3">Emotion Arc Preview</div>
+    <div class="d-flex align-items-end gap-1" style="height: 80px;">
+      <div *ngFor="let stage of service.journey().stages; let i = index"
+           class="flex-fill d-flex flex-column align-items-center">
+        <div *ngIf="stage.emotion.score >= 0"
+             class="w-100 rounded-top"
+             [style.height.px]="Math.abs(stage.emotion.score) * 0.5"
+             [style.background-color]="getEmotionColor(stage.emotion.score)"
+             [style.min-height.px]="stage.emotion.score > 0 ? 4 : 0"></div>
+        <div class="w-100 bg-secondary" style="height: 1px;"></div>
+        <div *ngIf="stage.emotion.score < 0"
+             class="w-100 rounded-bottom"
+             [style.height.px]="Math.abs(stage.emotion.score) * 0.5"
+             [style.background-color]="getEmotionColor(stage.emotion.score)"
+             style="min-height: 4px;"></div>
+        <small class="text-muted mt-1 text-truncate" style="max-width: 70px;">{{ stage.name }}</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stages -->
+<div class="mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="mb-0 fw-semibold">② Journey Stages <span class="text-muted fw-normal">({{ service.journey().stages.length }})</span></h6>
+  </div>
+
+  <div *ngFor="let stage of service.journey().stages; let i = index"
+       class="card mb-3"
+       [style.border-color]="getStageColor(i) + '50'">
+    <div class="card-header d-flex justify-content-between align-items-center"
+         [style.background-color]="getStageColor(i) + '10'">
+      <div class="d-flex align-items-center gap-3">
+        <span class="badge rounded-circle d-flex align-items-center justify-content-center"
+              style="width: 32px; height: 32px;"
+              [style.background-color]="getStageColor(i)">{{ i + 1 }}</span>
+        <input type="text" class="form-control form-control-sm border-0 bg-transparent fw-semibold"
+               style="width: 200px;"
+               [style.color]="getStageColor(i)"
+               [ngModel]="stage.name"
+               (ngModelChange)="service.updateStage(i, { name: $event })"
+               placeholder="Stage name">
+      </div>
+      <button class="btn btn-outline-danger btn-sm" (click)="service.removeStage(i)">Remove</button>
+    </div>
+    <div class="card-body">
+      <!-- Description -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Stage Description</label>
+        <textarea class="form-control" rows="2"
+                  [ngModel]="stage.description"
+                  (ngModelChange)="service.updateStage(i, { description: $event })"
+                  placeholder="What is the persona doing and thinking at this stage?"></textarea>
+      </div>
+
+      <!-- Persona Drivers -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Persona Drivers</label>
+        <small class="d-block text-muted mb-2">Which goals (G) or frustrations (F) are active at this stage?</small>
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let goal of service.persona().behavioral.goals; let gi = index"
+                  type="button" class="btn btn-sm"
+                  [class.btn-primary]="stage.persona_drivers.includes(goal.id)"
+                  [class.btn-outline-secondary]="!stage.persona_drivers.includes(goal.id)"
+                  (click)="togglePersonaDriver(i, goal.id)">
+            {{ goal.id || 'G' + (gi + 1) }}
+          </button>
+          <button *ngFor="let frust of service.persona().behavioral.frustrations; let fi = index"
+                  type="button" class="btn btn-sm"
+                  [class.btn-danger]="stage.persona_drivers.includes(frust.id)"
+                  [class.btn-outline-secondary]="!stage.persona_drivers.includes(frust.id)"
+                  (click)="togglePersonaDriver(i, frust.id)">
+            {{ frust.id || 'F' + (fi + 1) }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Emotion -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Emotion at This Stage</label>
+        <div class="d-flex gap-3 align-items-center">
+          <select class="form-select form-select-sm rounded-pill" style="width: 150px;"
+                  [ngModel]="stage.emotion.label"
+                  (ngModelChange)="service.updateStage(i, { emotion: { label: $event, score: stage.emotion.score } })">
+            <option *ngFor="let opt of emotionOptions" [value]="opt">{{ opt }}</option>
+          </select>
+          <span class="text-muted">−</span>
+          <input type="range" class="form-range" style="width: 150px;"
+                 [min]="-100" [max]="100"
+                 [ngModel]="stage.emotion.score"
+                 (ngModelChange)="service.updateStage(i, { emotion: { label: stage.emotion.label, score: +$event } })">
+          <span class="text-muted">+</span>
+          <span class="fw-semibold" [style.color]="getEmotionColor(stage.emotion.score)">
+            {{ stage.emotion.score > 0 ? '+' : '' }}{{ stage.emotion.score }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Touchpoints -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Touchpoints</label>
+        <div *ngFor="let tp of stage.touchpoints; let ti = index" class="row g-2 mb-2">
+          <div class="col-md-3">
+            <select class="form-select form-select-sm rounded-pill"
+                    [ngModel]="tp.actor"
+                    (ngModelChange)="updateTouchpoint(i, ti, 'actor', $event)">
+              <option *ngFor="let opt of actorOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control form-control-sm rounded-pill"
+                   [ngModel]="tp.action"
+                   (ngModelChange)="updateTouchpoint(i, ti, 'action', $event)"
+                   placeholder="Action performed">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm rounded-pill"
+                    [ngModel]="tp.channel"
+                    (ngModelChange)="updateTouchpoint(i, ti, 'channel', $event)">
+              <option *ngFor="let opt of channelOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-danger btn-sm w-100" (click)="removeTouchpoint(i, ti)">Remove</button>
+          </div>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm w-100"
+                [style.border-color]="getStageColor(i)"
+                [style.color]="getStageColor(i)"
+                (click)="addTouchpoint(i)">+ Add Touchpoint</button>
+      </div>
+
+      <!-- Pain Points -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Pain Points</label>
+        <div *ngFor="let pp of stage.pain_points; let pi = index" class="row g-2 mb-2">
+          <div class="col-md-7">
+            <input type="text" class="form-control form-control-sm rounded-pill"
+                   [ngModel]="pp.text"
+                   (ngModelChange)="updatePainPoint(i, pi, 'text', $event)"
+                   placeholder="Describe the pain point">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select form-select-sm rounded-pill"
+                    [ngModel]="pp.severity"
+                    (ngModelChange)="updatePainPoint(i, pi, 'severity', $event)">
+              <option *ngFor="let opt of severityOptions" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-danger btn-sm w-100" (click)="removePainPoint(i, pi)">Remove</button>
+          </div>
+        </div>
+        <button class="btn btn-outline-danger btn-sm w-100" (click)="addPainPoint(i)">+ Add Pain Point</button>
+      </div>
+
+      <!-- Opportunities -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Opportunities (How Might We)</label>
+        <div *ngFor="let opp of stage.opportunities; let oi = index"
+             class="border rounded p-2 mb-2 bg-success bg-opacity-10">
+          <div class="d-flex gap-2 mb-2">
+            <input type="text" class="form-control form-control-sm rounded-pill flex-grow-1"
+                   [ngModel]="opp.hmw"
+                   (ngModelChange)="updateOpportunity(i, oi, 'hmw', $event)"
+                   placeholder="How might we ...">
+            <button class="btn btn-outline-danger btn-sm" (click)="removeOpportunity(i, oi)">Remove</button>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-4">
+              <small class="text-muted d-block mb-1">IMPACT</small>
+              <select class="form-select form-select-sm rounded-pill"
+                      [ngModel]="opp.impact"
+                      (ngModelChange)="updateOpportunity(i, oi, 'impact', $event)">
+                <option *ngFor="let opt of priorityOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted d-block mb-1">EFFORT</small>
+              <select class="form-select form-select-sm rounded-pill"
+                      [ngModel]="opp.effort"
+                      (ngModelChange)="updateOpportunity(i, oi, 'effort', $event)">
+                <option *ngFor="let opt of priorityOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <small class="text-muted d-block mb-1">BACKLOG TAG</small>
+              <input type="text" class="form-control form-control-sm rounded-pill"
+                     [ngModel]="opp.backlog_tag"
+                     (ngModelChange)="updateOpportunity(i, oi, 'backlog_tag', $event)"
+                     placeholder="e.g. notifications">
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-outline-success btn-sm w-100" (click)="addOpportunity(i)">+ Add Opportunity</button>
+      </div>
+
+      <!-- Integrations -->
+      <div class="mb-3">
+        <label class="form-label small text-uppercase text-muted">Integrations / System Connections</label>
+        <div *ngFor="let int of stage.integrations; let ii = index" class="row g-2 mb-2">
+          <div class="col-md-3">
+            <input type="text" class="form-control form-control-sm rounded-pill"
+                   [ngModel]="int.name"
+                   (ngModelChange)="updateIntegration(i, ii, 'name', $event)"
+                   placeholder="System name">
+          </div>
+          <div class="col-md-2">
+            <select class="form-select form-select-sm rounded-pill"
+                    [ngModel]="int.type"
+                    (ngModelChange)="updateIntegration(i, ii, 'type', $event)">
+              <option *ngFor="let opt of integrationTypes" [value]="opt">{{ opt }}</option>
+            </select>
+          </div>
+          <div class="col-md-5">
+            <input type="text" class="form-control form-control-sm rounded-pill"
+                   [ngModel]="int.desc"
+                   (ngModelChange)="updateIntegration(i, ii, 'desc', $event)"
+                   placeholder="Purpose / data pulled">
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-outline-danger btn-sm w-100" (click)="removeIntegration(i, ii)">Remove</button>
+          </div>
+        </div>
+        <button class="btn btn-outline-info btn-sm w-100" (click)="addIntegration(i)">+ Add Integration</button>
+      </div>
+
+      <!-- EBP -->
+      <div>
+        <label class="form-label small text-uppercase text-muted">Exception Branching Point (EBP)</label>
+        <small class="d-block text-muted mb-2">Optional - mark if this stage has a critical decision point</small>
+        <div *ngIf="stage.ebp !== null" class="border border-warning rounded p-2 bg-warning bg-opacity-10">
+          <div class="d-flex justify-content-between mb-2">
+            <small class="text-warning fw-semibold">⚡ EBP DEFINED</small>
+            <button class="btn btn-link btn-sm text-danger p-0" (click)="removeEbp(i)">Remove EBP</button>
+          </div>
+          <textarea class="form-control form-control-sm"
+                    [ngModel]="stage.ebp"
+                    (ngModelChange)="service.updateStage(i, { ebp: $event })"
+                    placeholder="Describe the branching point and its outcomes..."></textarea>
+        </div>
+        <button *ngIf="stage.ebp === null"
+                class="btn btn-outline-warning btn-sm w-100"
+                (click)="addEbp(i)">+ Add Exception Branching Point</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-outline-accent w-100" (click)="service.addStage()">+ Add Stage</button>
+</div>

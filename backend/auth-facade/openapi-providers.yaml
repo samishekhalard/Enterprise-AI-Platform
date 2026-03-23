@@ -1,0 +1,862 @@
+# OpenAPI 3.1 Specification - Multi-Provider Authentication Extensions
+# This file contains the additional endpoints and schemas for multi-provider auth
+# Merge with the main auth-facade OpenAPI spec
+
+openapi: 3.1.0
+info:
+  title: Auth Facade - Multi-Provider Authentication
+  description: |
+    Extensions to the Auth Facade API for multi-provider authentication.
+    Supports Azure AD, UAE Pass, LDAP/Active Directory, and IBM IAM (SAML).
+  version: 1.1.0
+  contact:
+    name: EMS Platform Team
+
+servers:
+  - url: https://api.ems.example.com
+    description: Production
+  - url: https://api.staging.ems.example.com
+    description: Staging
+
+tags:
+  - name: Authentication
+    description: Public authentication endpoints
+  - name: Provider Configuration
+    description: Admin endpoints for provider management
+
+paths:
+  # ============================================================================
+  # Public Authentication Endpoints
+  # ============================================================================
+
+  /api/v1/auth/{tenantId}/login/initiate:
+    post:
+      tags:
+        - Authentication
+      summary: Initiate login with specific identity provider
+      description: |
+        Initiates the authentication flow for a specific identity provider.
+        Returns a redirect URL for OIDC/SAML/OAuth2 flows, or indicates
+        inline authentication for LDAP.
+      operationId: initiateProviderLogin
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Tenant identifier
+          example: tenant-acme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginInitiateRequest'
+      responses:
+        '200':
+          description: Login initiation successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginInitiateResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Provider not configured for tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/{tenantId}/providers:
+    get:
+      tags:
+        - Authentication
+      summary: List available providers for tenant login page
+      description: |
+        Returns the list of enabled identity providers for a tenant.
+        Used to render the login page with provider buttons.
+      operationId: listAvailableProviders
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Tenant identifier
+      responses:
+        '200':
+          description: Provider list retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderInfo'
+
+  /api/v1/auth/callback/{providerType}:
+    get:
+      tags:
+        - Authentication
+      summary: OAuth/OIDC callback endpoint
+      description: |
+        Handles the callback from OAuth2/OIDC providers after user authentication.
+        Exchanges authorization code for tokens.
+      operationId: handleOAuthCallback
+      parameters:
+        - name: providerType
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [azure-ad, uaepass, keycloak, auth0, okta]
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Authorization code from provider
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          description: CSRF state parameter
+        - name: error
+          in: query
+          schema:
+            type: string
+          description: Error code if authentication failed
+        - name: error_description
+          in: query
+          schema:
+            type: string
+          description: Error description
+      responses:
+        '302':
+          description: Redirect to application with tokens (via cookie or fragment)
+        '400':
+          description: Invalid callback parameters
+
+  /api/v1/auth/saml/acs:
+    post:
+      tags:
+        - Authentication
+      summary: SAML Assertion Consumer Service
+      description: |
+        Handles the SAML Response from SAML identity providers (IBM IAM).
+        Validates the assertion and creates a session.
+      operationId: handleSamlAssertion
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - SAMLResponse
+              properties:
+                SAMLResponse:
+                  type: string
+                  description: Base64-encoded SAML Response
+                RelayState:
+                  type: string
+                  description: Relay state for redirect
+      responses:
+        '302':
+          description: Redirect to application with session
+        '401':
+          description: SAML assertion validation failed
+
+  /api/v1/auth/saml/slo:
+    get:
+      tags:
+        - Authentication
+      summary: SAML Single Logout endpoint
+      description: |
+        Handles Single Logout requests from SAML IdP.
+      operationId: handleSamlLogout
+      parameters:
+        - name: SAMLRequest
+          in: query
+          schema:
+            type: string
+          description: Base64-encoded SAML LogoutRequest
+        - name: SAMLResponse
+          in: query
+          schema:
+            type: string
+          description: Base64-encoded SAML LogoutResponse
+        - name: RelayState
+          in: query
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect after logout
+
+  /api/v1/auth/saml/metadata:
+    get:
+      tags:
+        - Authentication
+      summary: SAML SP Metadata
+      description: |
+        Returns the SAML Service Provider metadata for this tenant.
+        Used by SAML IdPs for configuration.
+      operationId: getSamlMetadata
+      parameters:
+        - name: tenantId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: SAML SP metadata
+          content:
+            application/xml:
+              schema:
+                type: string
+                format: xml
+
+  # ============================================================================
+  # Admin Provider Configuration Endpoints
+  # ============================================================================
+
+  /api/v1/admin/tenants/{tenantId}/providers:
+    get:
+      tags:
+        - Provider Configuration
+      summary: List all providers for tenant
+      operationId: listProviders
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      responses:
+        '200':
+          description: Provider list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Provider Configuration
+      summary: Register new identity provider
+      operationId: registerProvider
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderConfigRequest'
+            examples:
+              azureAd:
+                $ref: '#/components/examples/AzureAdConfigExample'
+              uaePass:
+                $ref: '#/components/examples/UaePassConfigExample'
+              ldap:
+                $ref: '#/components/examples/LdapConfigExample'
+              ibmIam:
+                $ref: '#/components/examples/IbmIamConfigExample'
+      responses:
+        '201':
+          description: Provider registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderConfigResponse'
+        '400':
+          description: Invalid configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: Provider already exists
+
+  /api/v1/admin/tenants/{tenantId}/providers/{providerId}:
+    get:
+      tags:
+        - Provider Configuration
+      summary: Get provider by ID
+      operationId: getProvider
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      responses:
+        '200':
+          description: Provider configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderConfigResponse'
+        '404':
+          description: Provider not found
+
+    put:
+      tags:
+        - Provider Configuration
+      summary: Update provider configuration
+      operationId: updateProvider
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderConfigRequest'
+      responses:
+        '200':
+          description: Provider updated
+        '404':
+          description: Provider not found
+
+    delete:
+      tags:
+        - Provider Configuration
+      summary: Delete provider
+      operationId: deleteProvider
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      responses:
+        '204':
+          description: Provider deleted
+        '404':
+          description: Provider not found
+
+  /api/v1/admin/tenants/{tenantId}/providers/{providerId}/test:
+    post:
+      tags:
+        - Provider Configuration
+      summary: Test provider connection
+      description: |
+        Tests connectivity to the identity provider.
+        - OIDC: Fetches and validates discovery document
+        - SAML: Fetches and validates metadata
+        - LDAP: Attempts bind and user count
+      operationId: testProviderConnection
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      responses:
+        '200':
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestConnectionResponse'
+
+  /api/v1/admin/tenants/{tenantId}/providers/validate:
+    post:
+      tags:
+        - Provider Configuration
+      summary: Validate configuration without saving
+      operationId: validateProviderConfig
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderConfigRequest'
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestConnectionResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    TenantIdPath:
+      name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Tenant identifier
+      example: tenant-acme
+
+    ProviderIdPath:
+      name: providerId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Provider identifier
+      example: azure-ad-primary
+
+  schemas:
+    # ============================================================================
+    # Request/Response Schemas
+    # ============================================================================
+
+    LoginInitiateRequest:
+      type: object
+      required:
+        - providerType
+      properties:
+        providerType:
+          $ref: '#/components/schemas/ProviderType'
+        redirectUri:
+          type: string
+          format: uri
+          description: Where to redirect after authentication
+
+    LoginInitiateResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [redirect, inline]
+          description: Flow type
+        redirectUrl:
+          type: string
+          format: uri
+          description: URL to redirect user to (for redirect flows)
+        state:
+          type: string
+          description: CSRF state parameter
+        message:
+          type: string
+          description: Message for inline flows
+
+    ProviderInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        providerType:
+          $ref: '#/components/schemas/ProviderType'
+        displayName:
+          type: string
+        displayNameAr:
+          type: string
+          description: Arabic display name (for UAE Pass)
+        iconUrl:
+          type: string
+          format: uri
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        primary:
+          type: boolean
+          description: Whether this is the primary provider
+
+    ProviderConfigRequest:
+      type: object
+      required:
+        - providerName
+        - protocol
+      properties:
+        # Common fields
+        providerName:
+          $ref: '#/components/schemas/ProviderType'
+        displayName:
+          type: string
+          maxLength: 100
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        enabled:
+          type: boolean
+          default: true
+        priority:
+          type: integer
+          default: 100
+        trustEmail:
+          type: boolean
+          default: true
+        linkExistingAccounts:
+          type: boolean
+          default: true
+
+        # OIDC/OAuth2 fields
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+          writeOnly: true
+        discoveryUrl:
+          type: string
+          format: uri
+        scopes:
+          type: array
+          items:
+            type: string
+          default: [openid, profile, email]
+
+        # Azure AD specific
+        azureTenantId:
+          type: string
+          description: Azure AD tenant ID or domain
+        enableAppRoles:
+          type: boolean
+        enableGroupClaims:
+          type: boolean
+        allowedDomains:
+          type: array
+          items:
+            type: string
+
+        # UAE Pass specific
+        uaePassEnvironment:
+          type: string
+          enum: [STAGING, PRODUCTION]
+        requiredAuthLevel:
+          type: string
+          enum: [ANONYMOUS, BASIC, VERIFIED]
+        displayNameAr:
+          type: string
+          description: Arabic display name (required for UAE Pass)
+        emiratesIdRequired:
+          type: boolean
+        languagePreference:
+          type: string
+          enum: [ar, en]
+
+        # LDAP fields
+        serverUrl:
+          type: string
+          format: uri
+        port:
+          type: integer
+          minimum: 1
+          maximum: 65535
+        useSsl:
+          type: boolean
+        bindDn:
+          type: string
+        bindPassword:
+          type: string
+          writeOnly: true
+        userSearchBase:
+          type: string
+        userSearchFilter:
+          type: string
+        groupSearchBase:
+          type: string
+        groupSearchFilter:
+          type: string
+        syncEnabled:
+          type: boolean
+        syncIntervalMinutes:
+          type: integer
+          minimum: 15
+
+        # SAML fields
+        metadataUrl:
+          type: string
+          format: uri
+        entityId:
+          type: string
+          format: uri
+        ssoUrl:
+          type: string
+          format: uri
+        sloUrl:
+          type: string
+          format: uri
+        signingCertificate:
+          type: string
+        spPrivateKey:
+          type: string
+          writeOnly: true
+        nameIdFormat:
+          type: string
+          enum: [EMAIL, PERSISTENT, TRANSIENT]
+        signAuthnRequest:
+          type: boolean
+        wantAssertionsSigned:
+          type: boolean
+        wantAssertionsEncrypted:
+          type: boolean
+        enableSlo:
+          type: boolean
+        attributeMappings:
+          type: object
+          additionalProperties:
+            type: string
+
+    ProviderConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        providerName:
+          $ref: '#/components/schemas/ProviderType'
+        providerType:
+          $ref: '#/components/schemas/ProviderType'
+        displayName:
+          type: string
+        displayNameAr:
+          type: string
+        protocol:
+          $ref: '#/components/schemas/Protocol'
+        enabled:
+          type: boolean
+        priority:
+          type: integer
+        trustEmail:
+          type: boolean
+
+        # Masked secrets
+        clientId:
+          type: string
+        clientSecret:
+          type: string
+          description: Masked (e.g., "cl****et")
+
+        # Provider-specific (not all fields shown)
+        azureTenantId:
+          type: string
+        uaePassEnvironment:
+          type: string
+        serverUrl:
+          type: string
+        entityId:
+          type: string
+
+        # Metadata
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastTestedAt:
+          type: string
+          format: date-time
+        testResult:
+          type: string
+          enum: [success, failure, pending]
+
+    TestConnectionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        details:
+          $ref: '#/components/schemas/ConnectionDetails'
+        error:
+          type: string
+
+    ConnectionDetails:
+      type: object
+      properties:
+        discoveryUrl:
+          type: string
+        issuer:
+          type: string
+        supportedScopes:
+          type: array
+          items:
+            type: string
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+        userCount:
+          type: integer
+          description: LDAP only - number of users found
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+              code:
+                type: string
+
+    # ============================================================================
+    # Enums
+    # ============================================================================
+
+    ProviderType:
+      type: string
+      enum:
+        - KEYCLOAK
+        - AUTH0
+        - OKTA
+        - AZURE_AD
+        - UAE_PASS
+        - IBM_IAM
+        - LDAP_GENERIC
+        - SAML_GENERIC
+        - OIDC_GENERIC
+        - GOOGLE
+        - MICROSOFT
+        - GITHUB
+
+    Protocol:
+      type: string
+      enum:
+        - OIDC
+        - OAUTH2
+        - SAML
+        - LDAP
+
+  responses:
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Insufficient permissions (requires ADMIN role)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  examples:
+    AzureAdConfigExample:
+      summary: Azure AD Configuration
+      value:
+        providerName: AZURE_AD
+        displayName: Microsoft 365 SSO
+        protocol: OIDC
+        azureTenantId: contoso.onmicrosoft.com
+        clientId: 12345678-1234-1234-1234-123456789abc
+        clientSecret: your-client-secret
+        enableAppRoles: true
+        enableGroupClaims: true
+        allowedDomains:
+          - contoso.com
+          - fabrikam.com
+        scopes:
+          - openid
+          - profile
+          - email
+          - offline_access
+        enabled: true
+        priority: 1
+
+    UaePassConfigExample:
+      summary: UAE Pass Configuration
+      value:
+        providerName: UAE_PASS
+        displayName: UAE Pass
+        displayNameAr: الهوية الرقمية
+        protocol: OAUTH2
+        clientId: uae-pass-client-id
+        clientSecret: uae-pass-client-secret
+        uaePassEnvironment: PRODUCTION
+        requiredAuthLevel: VERIFIED
+        emiratesIdRequired: true
+        languagePreference: ar
+        enabled: true
+        priority: 1
+
+    LdapConfigExample:
+      summary: LDAP/Active Directory Configuration
+      value:
+        providerName: LDAP_GENERIC
+        displayName: Corporate Active Directory
+        protocol: LDAP
+        serverUrl: ldaps://ad.company.com
+        port: 636
+        useSsl: true
+        bindDn: cn=svc-ems,ou=service,dc=company,dc=com
+        bindPassword: service-account-password
+        userSearchBase: ou=users,dc=company,dc=com
+        userSearchFilter: (sAMAccountName={0})
+        groupSearchBase: ou=groups,dc=company,dc=com
+        groupSearchFilter: (member={0})
+        syncEnabled: true
+        syncIntervalMinutes: 60
+        enabled: true
+        priority: 1
+
+    IbmIamConfigExample:
+      summary: IBM IAM (SAML) Configuration
+      value:
+        providerName: IBM_IAM
+        displayName: IBM Security Verify
+        protocol: SAML
+        metadataUrl: https://ibm-verify.company.com/saml/metadata
+        entityId: https://ems.company.com/saml/sp
+        nameIdFormat: EMAIL
+        signAuthnRequest: true
+        wantAssertionsSigned: true
+        enableSlo: true
+        attributeMappings:
+          email: http://schemas.xmlsoap.org/claims/EmailAddress
+          groups: http://schemas.xmlsoap.org/claims/Group
+        enabled: true
+        priority: 1

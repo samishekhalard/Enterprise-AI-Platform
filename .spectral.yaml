@@ -1,0 +1,57 @@
+extends:
+  - spectral:oas
+
+rules:
+  require-global-security:
+    description: OpenAPI specs must define a global security requirement.
+    message: Add top-level `security` to declare default auth requirements.
+    severity: error
+    given: "$"
+    then:
+      field: security
+      function: truthy
+
+  require-security-schemes:
+    description: OpenAPI specs must define security schemes.
+    message: Add `components.securitySchemes` with at least one auth scheme.
+    severity: error
+    given: "$.components"
+    then:
+      field: securitySchemes
+      function: truthy
+
+  require-bearer-or-oauth2:
+    description: Security schemes must include bearerAuth and/or oauth2ClientCredentials.
+    severity: error
+    given: "$.components.securitySchemes"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          anyOf:
+            - required: [bearerAuth]
+            - required: [oauth2ClientCredentials]
+
+  internal-apis-must-declare-scope:
+    description: Internal APIs must explicitly require internal.service scope.
+    severity: error
+    given: "$.paths[?(@property.match(/^\\/api\\/v1\\/internal\\//))][*]"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          required: [security]
+          properties:
+            security:
+              type: array
+              minItems: 1
+              contains:
+                type: object
+                required: [oauth2ClientCredentials]
+                properties:
+                  oauth2ClientCredentials:
+                    type: array
+                    contains:
+                      const: internal.service

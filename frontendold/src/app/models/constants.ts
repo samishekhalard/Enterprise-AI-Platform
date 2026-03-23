@@ -1,0 +1,10 @@
+export const PRIORITY_OPTIONS = ['high', 'medium', 'low'];
+export const SEVERITY_OPTIONS = ['high', 'medium', 'low'];
+export const TECH_LITERACY_OPTIONS = ['low', 'intermediate', 'high', 'expert'];
+export const DECISION_STYLE_OPTIONS = ['compliance-first', 'risk-averse', 'data-driven', 'intuitive', 'consensus-seeking'];
+export const EMOTION_OPTIONS = ['neutral', 'focused', 'tense', 'frustrated', 'anxious', 'relieved', 'confident', 'overwhelmed'];
+export const ACTOR_OPTIONS = ['User', 'System', 'Agent', 'Manager', 'External Party'];
+export const CHANNEL_OPTIONS = ['Web portal', 'Mobile app', 'Email', 'SMS', 'Phone', 'In-person', 'WhatsApp', 'Internal system', 'API'];
+export const VARIANT_TYPE_OPTIONS = ['happy_path', 'frustrated_path', 'power_user', 'edge_case', 'first_time_user'];
+export const QUOTE_BASIS_OPTIONS = ['direct', 'paraphrased', 'composite'];
+export const INTEGRATION_TYPE_OPTIONS = ['Read', 'Write', 'Read/Write'];

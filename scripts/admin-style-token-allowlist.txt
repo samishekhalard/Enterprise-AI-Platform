@@ -1,0 +1,144 @@
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/administration.page.scss|border: 1px solid rgba(66, 129, 119, 0.28);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/administration.page.scss|color: #ffffff;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--danger: #6b1f2a;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-accent: #428177;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-bg: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-muted: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-shadow-dark: rgba(152, 133, 97, 0.38);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-shadow-light: rgba(255, 255, 255, 0.92);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-surface-alt: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-surface: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--nm-text: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--success: #428177;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|--warning: #988561;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|-10px -10px 20px rgba(255, 255, 255, 0.92);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|-4px -4px 8px rgba(255, 255, 255, 0.9);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|-5px -5px 10px rgba(255, 255, 255, 0.9);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|-6px -6px 12px rgba(255, 255, 255, 0.88);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|12px 12px 24px rgba(61, 58, 59, 0.28),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|4px 4px 8px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|6px 6px 12px rgba(152, 133, 97, 0.34),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|8px 8px 16px rgba(152, 133, 97, 0.32),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: linear-gradient(145deg, #428177, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: linear-gradient(145deg, #edebe0 0%, #edebe0 100%);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(107, 31, 42, 0.08);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(107, 31, 42, 0.12);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(107, 31, 42, 0.15);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(152, 133, 97, 0.1);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(152, 133, 97, 0.12);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(152, 133, 97, 0.14);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(152, 133, 97, 0.15);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(22, 22, 22, 0.45);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(66, 129, 119, 0.12);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|background: rgba(66, 129, 119, 0.14);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border-bottom: 1px solid rgba(152, 133, 97, 0.09);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border-bottom: 1px solid rgba(152, 133, 97, 0.2);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border-top-color: #fff;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border: 1px solid rgba(107, 31, 42, 0.2);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border: 1px solid rgba(152, 133, 97, 0.22);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border: 2px dashed rgba(152, 133, 97, 0.35);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border: 2px solid rgba(255, 255, 255, 0.38);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|border: 3px solid rgba(152, 133, 97, 0.25);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #054239;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #161616;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #6b1f2a;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #988561;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|color: #fff;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.84);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.88);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.22),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.24),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.26),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.35),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|linear-gradient(160deg, #edebe0 0%, #edebe0 100%);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/license-manager/license-manager-section.component.scss|radial-gradient(circle at 10% 0%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 42%),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-accent-soft: rgba(66, 129, 119, 0.17);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-accent: #428177;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-bg: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-muted: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-shadow-dark: rgba(152, 133, 97, 0.38);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-shadow-light: rgba(255, 255, 255, 0.88);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-surface-alt: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-surface: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|--nm-text: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-2px -2px 5px rgba(255, 255, 255, 0.7);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-3px -3px 7px rgba(255, 255, 255, 0.8);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-3px -3px 7px rgba(255, 255, 255, 0.85);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-4px -4px 8px rgba(255, 255, 255, 0.9);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-5px -5px 10px rgba(255, 255, 255, 0.88);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-6px -6px 12px rgba(255, 255, 255, 0.9);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-7px -7px 14px rgba(255, 255, 255, 0.9);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|-8px -8px 16px rgba(255, 255, 255, 0.92);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|10px 10px 20px rgba(152, 133, 97, 0.36),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|3px 3px 6px rgba(152, 133, 97, 0.35),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|4px 4px 8px rgba(152, 133, 97, 0.25),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|4px 4px 8px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|4px 4px 8px rgba(152, 133, 97, 0.32),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|6px 6px 12px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|7px 7px 14px rgba(152, 133, 97, 0.32),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|8px 8px 16px rgba(152, 133, 97, 0.35),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|background: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|background: rgba(107, 31, 42, 0.08);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|background: rgba(152, 133, 97, 0.12);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|background: rgba(22, 22, 22, 0.5);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|border-bottom: 1px solid rgba(22, 22, 22, 0.08);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|border-top: 1px solid rgba(152, 133, 97, 0.18);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|border: 1px solid rgba(107, 31, 42, 0.2);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|box-shadow: 2px 2px 4px rgba(22, 22, 22, 0.15);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|box-shadow: var(--adm-dialog-shadow, 16px 16px 30px rgba(22, 22, 22, 0.26));
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|color: #6b1f2a;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|color: #fff;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -2px -2px 5px rgba(255, 255, 255, 0.1);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -3px -3px 6px rgba(255, 255, 255, 0.82);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -3px -3px 7px rgba(255, 255, 255, 0.85);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.82);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.85);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -4px -4px 8px rgba(255, 255, 255, 0.88);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset -5px -5px 10px rgba(255, 255, 255, 0.82);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 2px 2px 5px rgba(152, 133, 97, 0.18),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 3px 3px 6px rgba(152, 133, 97, 0.18),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 3px 3px 6px rgba(152, 133, 97, 0.2),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 3px 3px 6px rgba(152, 133, 97, 0.22),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 3px 3px 6px rgba(22, 22, 22, 0.12),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 3px 3px 7px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.25),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 8px rgba(152, 133, 97, 0.35),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 9px rgba(152, 133, 97, 0.3),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 9px rgba(152, 133, 97, 0.32),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 4px 4px 9px rgba(152, 133, 97, 0.34),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|inset 5px 5px 10px rgba(152, 133, 97, 0.35),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-locale/master-locale-section.component.scss|background: #edebe0;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-locale/master-locale-section.component.scss|border: 1px solid #b9a779;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/master-locale/master-locale-section.component.scss|color: #3d3a3b;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|-4px -4px 8px var(--nm-shadow-light, rgba(255, 255, 255, 0.8));
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|4px 4px 8px var(--nm-shadow-dark, rgba(152, 133, 97, 0.5)),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|background: #161616;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|background: #ffffff;
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|background: rgba(22, 22, 22, 0.03);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|background: var(--nm-bg, #edebe0);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|background: var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border-bottom: 1px solid rgba(22, 22, 22, 0.08);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border-bottom: 3px solid var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border-color: var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border-top: 1px solid rgba(22, 22, 22, 0.08);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border: 1px solid rgba(22, 22, 22, 0.1);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|border: 2px solid var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|box-shadow: 0 2px 4px rgba(22, 22, 22, 0.12);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|box-shadow: 0 2px 8px rgba(22, 22, 22, 0.1);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|box-shadow: 0 2px 8px rgba(22, 22, 22, 0.25);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|color: var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|color: var(--tp-text, #3d3a3b);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|inset -3px -3px 6px var(--nm-shadow-light, rgba(255, 255, 255, 0.8));
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|inset 3px 3px 6px var(--nm-shadow-dark, rgba(152, 133, 97, 0.5)),
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|outline: 2px solid var(--tp-primary, #428177);
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|rgba(22, 22, 22, 0.05) 4px,
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|rgba(22, 22, 22, 0.05) 8px
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|var(--nm-bg, #edebe0) 4px,
+/Users/mksulty/Claude/EMSIST/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/style-variant-picker.component.scss|var(--nm-bg, #edebe0),

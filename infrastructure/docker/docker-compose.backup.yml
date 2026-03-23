@@ -1,0 +1,127 @@
+# ==============================================================================
+# DEPRECATED: This file is superseded by the backup-cron service now wired
+# directly into docker-compose.dev-data.yml and docker-compose.staging-data.yml.
+#
+# As of 2026-03-04 (ADR-018 Phase 1), the backup-cron service runs automatically
+# as part of the data tier — no opt-in step required.
+#
+# New features vs this file:
+#   - Neo4j + Valkey backup (this file only covered PostgreSQL)
+#   - age encryption support (AGE_PUBLIC_KEY env var)
+#   - Three separate cron schedules (PG: 6h, Neo4j: daily, Valkey: hourly)
+#   - 8 PostgreSQL databases including process_db (this file missed it)
+#
+# DO NOT USE this file. It will be removed in a future cleanup.
+# See: docker-compose.dev-data.yml (service: backup-cron)
+# ==============================================================================
+
+services:
+  # ---------- Backup Sidecar (Alpine + cron + pg_dump) ----------
+  backup-sidecar:
+    image: alpine:3.19
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        # Install required packages
+        apk add --no-cache postgresql16-client bash curl jq
+
+        # Create backup directories
+        mkdir -p /backups/postgresql /backups/neo4j /backups/logs
+
+        # Create the backup script
+        cat > /usr/local/bin/run-backup.sh << 'BACKUP_SCRIPT'
+        #!/bin/bash
+        set -euo pipefail
+
+        DATE_DIR="$$(date -u +%Y-%m-%d)"
+        TIMESTAMP="$$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        PG_BACKUP_DIR="/backups/postgresql/$$DATE_DIR"
+        NEO4J_BACKUP_DIR="/backups/neo4j/$$DATE_DIR"
+        LOG_FILE="/backups/logs/backup-$$(date -u +%Y-%m-%d).log"
+
+        log() { echo "[$$(date -u +%Y-%m-%dT%H:%M:%SZ)] $$1" | tee -a "$$LOG_FILE"; }
+
+        mkdir -p "$$PG_BACKUP_DIR" "$$NEO4J_BACKUP_DIR"
+
+        log "=== Starting daily backup ==="
+
+        # PostgreSQL databases
+        DATABASES="master_db keycloak_db user_db license_db notification_db audit_db ai_db"
+        PG_SUCCESS=0
+        PG_FAIL=0
+
+        for DB in $$DATABASES; do
+            log "Backing up PostgreSQL: $$DB"
+            if PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump \
+                -h postgres -p 5432 -U "$$POSTGRES_USER" \
+                --format=custom --compress=6 --no-owner --no-privileges \
+                "$$DB" > "$$PG_BACKUP_DIR/$${DB}.dump" 2>>"$$LOG_FILE"; then
+                SIZE=$$(du -sh "$$PG_BACKUP_DIR/$${DB}.dump" | awk '{print $$1}')
+                log "  OK: $$DB ($$SIZE)"
+                PG_SUCCESS=$$((PG_SUCCESS + 1))
+            else
+                log "  FAIL: $$DB"
+                rm -f "$$PG_BACKUP_DIR/$${DB}.dump"
+                PG_FAIL=$$((PG_FAIL + 1))
+            fi
+        done
+
+        # Write manifest
+        cat > "$$PG_BACKUP_DIR/manifest.json" << MANIFEST
+        {
+          "timestamp": "$$TIMESTAMP",
+          "databases_success": $$PG_SUCCESS,
+          "databases_failed": $$PG_FAIL
+        }
+        MANIFEST
+
+        log "PostgreSQL backup complete: $$PG_SUCCESS/7 databases"
+
+        # Cleanup: remove backups older than 30 days
+        log "Cleaning up old backups (>30 days)..."
+        find /backups/postgresql -maxdepth 1 -type d -mtime +30 -exec rm -rf {} + 2>/dev/null || true
+        find /backups/neo4j -maxdepth 1 -type d -mtime +30 -exec rm -rf {} + 2>/dev/null || true
+        find /backups/logs -name "backup-*.log" -mtime +30 -delete 2>/dev/null || true
+
+        log "=== Backup complete ==="
+        BACKUP_SCRIPT
+
+        chmod +x /usr/local/bin/run-backup.sh
+
+        # Create cron job: daily at 02:00 UTC
+        echo "0 2 * * * /usr/local/bin/run-backup.sh" > /etc/crontabs/root
+
+        echo "[backup-sidecar] Cron scheduler started. Backup runs daily at 02:00 UTC."
+        echo "[backup-sidecar] Manual backup: docker compose exec backup-sidecar /usr/local/bin/run-backup.sh"
+
+        # Run initial backup on startup
+        /usr/local/bin/run-backup.sh
+
+        # Start cron daemon in foreground
+        crond -f -d 8
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+    volumes:
+      - backup_data:/backups
+    # Standalone parsing support: this deprecated override file no longer assumes
+    # a local postgres service declaration. Runtime target is the data-tier stack.
+    # This override file does not declare networks; it relies on the base
+    # compose file's default network. When merged with docker-compose.dev.yml
+    # or docker-compose.staging.yml, Docker Compose attaches all services to
+    # the declared networks automatically. If the sidecar cannot resolve
+    # 'postgres', verify the base file's network is correctly defined.
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+# ==============================================================================
+# VOLUMES
+# ==============================================================================
+volumes:
+  backup_data:
+    name: ${COMPOSE_PROJECT_NAME:-ems}_backup_data

@@ -1,0 +1,154 @@
+<div class="mb-4">
+  <h5 class="fw-semibold mb-3">Preview</h5>
+  <div class="btn-group btn-group-sm mb-4">
+    <button type="button" class="btn"
+            [class.btn-primary]="service.previewTab() === 'persona'"
+            [class.btn-outline-secondary]="service.previewTab() !== 'persona'"
+            (click)="service.previewTab.set('persona')">Persona Card</button>
+    <button type="button" class="btn"
+            [class.btn-primary]="service.previewTab() === 'journey'"
+            [class.btn-outline-secondary]="service.previewTab() !== 'journey'"
+            (click)="service.previewTab.set('journey')">Journey Map</button>
+  </div>
+</div>
+
+<!-- Persona Preview -->
+<div *ngIf="service.previewTab() === 'persona'">
+  <div class="card mb-4 border-0" style="background: linear-gradient(135deg, rgba(180,144,52,0.1), rgba(0,172,160,0.1));">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h4 class="fw-bold mb-1">{{ service.persona().identity.name || 'Unnamed Persona' }}</h4>
+          <div class="text-primary fw-medium">{{ service.persona().identity.occupation }}</div>
+          <div class="text-muted fst-italic" *ngIf="service.persona().identity.archetype">
+            "{{ service.persona().identity.archetype }}"
+          </div>
+        </div>
+        <div class="text-end">
+          <small class="text-muted text-uppercase d-block">Confidence</small>
+          <h2 class="mb-0 fw-bold" [style.color]="getScoreColor(service.confidenceScore())">
+            {{ service.confidenceScore() }}%
+          </h2>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span *ngIf="service.persona().identity.location" class="badge bg-secondary">
+          {{ service.persona().identity.location }}
+        </span>
+        <span *ngIf="service.persona().identity.tech_literacy" class="badge" style="background-color: #00ACA0;">
+          {{ service.persona().identity.tech_literacy }} tech
+        </span>
+        <span *ngIf="service.persona().behavioral.behaviors.decision_style" class="badge bg-warning text-dark">
+          {{ service.persona().behavioral.behaviors.decision_style }}
+        </span>
+      </div>
+
+      <div *ngIf="service.persona().behavioral.systems_used.length > 0" class="d-flex flex-wrap gap-2">
+        <span *ngFor="let system of service.persona().behavioral.systems_used"
+              class="badge" style="background-color: #00ACA0;">{{ system }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Goals -->
+  <div *ngIf="service.persona().behavioral.goals.length > 0" class="mb-4">
+    <small class="text-muted text-uppercase fw-medium d-block mb-2">Goals</small>
+    <div *ngFor="let goal of service.persona().behavioral.goals; let i = index"
+         class="d-flex gap-2 align-items-start mb-2 p-2 rounded bg-light"
+         [style.border-left]="'3px solid ' + getPriorityColor(goal.priority)">
+      <span class="badge bg-primary">{{ goal.id || 'G' + (i + 1) }}</span>
+      <span class="flex-grow-1">{{ goal.text || '-' }}</span>
+      <span class="badge" [style.background-color]="getPriorityColor(goal.priority)">{{ goal.priority }}</span>
+    </div>
+  </div>
+
+  <!-- Frustrations -->
+  <div *ngIf="service.persona().behavioral.frustrations.length > 0" class="mb-4">
+    <small class="text-muted text-uppercase fw-medium d-block mb-2">Frustrations</small>
+    <div *ngFor="let frust of service.persona().behavioral.frustrations; let i = index"
+         class="d-flex gap-2 align-items-start mb-2 p-2 rounded"
+         style="background-color: rgba(239,68,68,0.05); border-left: 3px solid #EF4444;">
+      <span class="badge bg-danger">{{ frust.id || 'F' + (i + 1) }}</span>
+      <span class="flex-grow-1">{{ frust.text || '-' }}</span>
+    </div>
+  </div>
+
+  <!-- Quote -->
+  <div *ngIf="service.persona().quotes.length > 0"
+       class="p-3 rounded fst-italic"
+       style="background-color: rgba(0,172,160,0.05); border: 1px solid rgba(0,172,160,0.2);">
+    <span class="text-success fs-4">"</span>
+    <span>{{ service.persona().quotes[0].text }}</span>
+    <span class="text-success fs-4">"</span>
+    <div *ngIf="service.persona().quotes[0].source" class="text-muted small mt-1">
+      - {{ service.persona().quotes[0].source }}
+    </div>
+  </div>
+</div>
+
+<!-- Journey Preview -->
+<div *ngIf="service.previewTab() === 'journey'">
+  <div *ngIf="service.journey().stages.length === 0" class="text-center text-muted py-5 fst-italic">
+    Add stages to see journey preview
+  </div>
+
+  <div *ngIf="service.journey().stages.length > 0">
+    <!-- Journey Header -->
+    <div class="card mb-4 border-0" style="background-color: rgba(0,172,160,0.05);">
+      <div class="card-body">
+        <h5 class="fw-semibold mb-2">{{ service.journey().title || 'Untitled Journey' }}</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge" style="background-color: #00ACA0;">{{ service.journey().variant_type }}</span>
+          <span class="badge bg-primary">{{ service.journey().stages.length }} stages</span>
+          <span class="badge bg-danger">{{ getTotalPainPoints() }} pain points</span>
+          <span class="badge bg-success">{{ getTotalOpportunities() }} opportunities</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage Flow -->
+    <div class="d-flex align-items-center flex-wrap mb-4 gap-1">
+      <ng-container *ngFor="let stage of service.journey().stages; let i = index; let last = last">
+        <span class="badge py-2 px-3"
+              [style.background-color]="getStageColor(i) + '20'"
+              [style.color]="getStageColor(i)"
+              [style.border]="'1px solid ' + getStageColor(i) + '50'">
+          {{ stage.name }}
+        </span>
+        <span *ngIf="!last" class="text-muted mx-1">→</span>
+      </ng-container>
+    </div>
+
+    <!-- Stage Details -->
+    <div *ngFor="let stage of service.journey().stages; let i = index"
+         class="card mb-3"
+         [style.border-color]="getStageColor(i) + '30'"
+         [style.background-color]="getStageColor(i) + '05'">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0 fw-semibold" [style.color]="getStageColor(i)">
+            Stage {{ i + 1 }}: {{ stage.name }}
+          </h6>
+          <span class="small fw-medium" [style.color]="getEmotionColor(stage.emotion.score)">
+            {{ stage.emotion.label }} ({{ stage.emotion.score > 0 ? '+' : '' }}{{ stage.emotion.score }})
+          </span>
+        </div>
+
+        <div *ngIf="stage.touchpoints.length > 0" class="text-muted small mb-1">
+          📍 {{ stage.touchpoints.length }} touchpoint{{ stage.touchpoints.length > 1 ? 's' : '' }}
+        </div>
+
+        <div *ngIf="stage.pain_points.length > 0" class="text-danger small mb-1">
+          ⚠ {{ stage.pain_points.length }} pain point{{ stage.pain_points.length > 1 ? 's' : '' }}:
+          {{ getPainPointsText(stage) }}
+        </div>
+
+        <div *ngIf="stage.opportunities.length > 0" class="text-success small">
+          💡 {{ stage.opportunities.length }} opportunit{{ stage.opportunities.length > 1 ? 'ies' : 'y' }}:
+          {{ getOpportunitiesText(stage) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

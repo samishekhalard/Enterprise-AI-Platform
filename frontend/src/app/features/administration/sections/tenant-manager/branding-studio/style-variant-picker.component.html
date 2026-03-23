@@ -1,0 +1,31 @@
+<div class="variant-grid" role="radiogroup" aria-label="Style variants">
+  @for (variant of variants(); track variant.id) {
+    <div
+      class="variant-card"
+      role="radio"
+      [attr.aria-checked]="selectedId() === variant.id"
+      [class.selected]="selectedId() === variant.id"
+      [attr.data-testid]="'variant-' + variant.id"
+      (click)="selectedId.set(variant.id)"
+      tabindex="0"
+      (keydown.enter)="selectedId.set(variant.id)"
+      (keydown.space)="selectedId.set(variant.id); $event.preventDefault()"
+    >
+      <!-- Visual indicator of the variant style using CSS only -->
+      <div class="variant-visual" [attr.data-variant]="variant.id">
+        <div class="variant-demo-box"></div>
+      </div>
+
+      <div class="variant-info">
+        <span class="variant-name">{{ variant.name }}</span>
+        <span class="variant-desc">{{ variant.description }}</span>
+      </div>
+
+      @if (selectedId() === variant.id) {
+        <div class="variant-check" aria-hidden="true">
+          <i class="pi pi-check-circle"></i>
+        </div>
+      }
+    </div>
+  }
+</div>

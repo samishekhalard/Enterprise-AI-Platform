@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.page-frame {
+  display: grid;
+  gap: 1rem;
+}
+
+.header-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.95rem;
+  background: #edebe0;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    6px 6px 16px rgba(152, 133, 97, 0.25),
+    -6px -6px 16px rgba(255, 255, 255, 0.85);
+}
+
+.header-copy h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--tp-text);
+}
+
+.header-copy p {
+  margin: 0.35rem 0 0;
+  color: var(--tp-text-secondary);
+}
+
+.header-actions-container:empty,
+.footer-container:empty {
+  display: none;
+}
+
+.footer-container {
+  border-top: 1px solid #b9a779;
+  padding-top: 0.75rem;
+  color: var(--tp-text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

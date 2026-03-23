@@ -1,0 +1,47 @@
+@use '../../administration.tokens';
+
+.master-locale-card {
+  border: var(--bs-border-warning);
+}
+
+.master-locale {
+  display: grid;
+  gap: 0.9rem;
+
+  h3 {
+    margin: 0;
+  }
+
+  .muted {
+    margin: 0.35rem 0 0;
+    color: var(--adm-text-muted);
+  }
+}
+
+.content-card {
+  border: var(--bs-border-warning);
+  border-radius: 0.6rem;
+  background: var(--adm-surface);
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+
+  label {
+    font-size: 0.83rem;
+    color: var(--adm-text-strong);
+    font-weight: 600;
+  }
+
+  h4 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+    color: var(--adm-text-strong);
+  }
+}
+
+.format-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}

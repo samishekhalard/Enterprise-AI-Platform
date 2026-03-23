@@ -1,0 +1,177 @@
+<div class="page-layout">
+  <!-- Breadcrumb Container -->
+  @if (showBreadcrumb && breadcrumbs.length > 0) {
+    <div class="breadcrumb-container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+        <ol class="breadcrumb">
+          @for (item of breadcrumbs; track item.label; let last = $last) {
+            <li class="breadcrumb-item" [class.active]="last">
+              @if (!last && item.route) {
+                <a [routerLink]="item.route">
+                  @if (item.icon) {
+                    <span class="breadcrumb-icon">
+                      <img [src]="item.icon" alt="" aria-hidden="true">
+                    </span>
+                  }
+                  {{ item.label }}
+                </a>
+              } @else {
+                <span [attr.aria-current]="last ? 'page' : null">
+                  @if (item.icon) {
+                    <span class="breadcrumb-icon">
+                      <img [src]="item.icon" alt="" aria-hidden="true">
+                    </span>
+                  }
+                  {{ item.label }}
+                </span>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+
+      <!-- Page Title (optional) -->
+      @if (pageTitle) {
+        <h1 class="page-title">{{ pageTitle }}</h1>
+      }
+
+      <!-- Actions Slot -->
+      <div class="breadcrumb-actions">
+        <ng-container *ngTemplateOutlet="actionsTemplate"></ng-container>
+      </div>
+    </div>
+  }
+
+  <!-- Content Area (Sidebar + Main) -->
+  <div class="content-area" [class.has-sidebar]="showSidebar">
+    <!-- Docker Container (Sidebar) -->
+    @if (showSidebar) {
+      <aside
+        class="docker-container"
+        [class.collapsed]="isSidebarCollapsed()"
+        [ngClass]="getSidebarWidthClass()">
+
+        <!-- Sidebar Header -->
+        <div class="docker-header">
+          @if (!isSidebarCollapsed()) {
+            <h3 class="docker-title">{{ sidebarTitle }}</h3>
+          }
+          @if (sidebarCollapsible) {
+            <button
+              class="docker-toggle"
+              (click)="toggleSidebar()"
+              [attr.aria-label]="isSidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+              [attr.aria-expanded]="!isSidebarCollapsed()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                @if (isSidebarCollapsed()) {
+                  <polyline points="9 18 15 12 9 6"/>
+                } @else {
+                  <polyline points="15 18 9 12 15 6"/>
+                }
+              </svg>
+            </button>
+          }
+        </div>
+
+        <!-- Sidebar Navigation Items -->
+        @if (sidebarNavItems.length > 0) {
+          <nav class="docker-nav" aria-label="Sidebar navigation">
+            @for (item of sidebarNavItems; track item.route) {
+              <a
+                class="docker-nav-item"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [attr.title]="isSidebarCollapsed() ? item.label : null">
+                @if (item.icon) {
+                  <span class="nav-icon">
+                    <img [src]="item.icon" alt="" aria-hidden="true">
+                  </span>
+                }
+                @if (!isSidebarCollapsed()) {
+                  <span class="nav-label">{{ item.label }}</span>
+                  @if (item.badge) {
+                    <span class="nav-badge">{{ item.badge }}</span>
+                  }
+                }
+              </a>
+            }
+          </nav>
+        }
+
+        <!-- Custom Sidebar Content -->
+        @if (sidebarContent) {
+          <div class="docker-content" [class.collapsed-content]="isSidebarCollapsed()">
+            <ng-container *ngTemplateOutlet="sidebarContent"></ng-container>
+          </div>
+        }
+      </aside>
+    }
+
+    <!-- Main Container -->
+    <main
+      class="main-container"
+      [ngClass]="[getContentPaddingClass(), getContentBackgroundClass()]">
+
+      <!-- Loading State -->
+      @if (loading) {
+        <div class="state-container loading-state">
+          <div class="spinner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32">
+                <animate attributeName="stroke-dashoffset" dur="1s" repeatCount="indefinite" values="32;0"/>
+              </circle>
+            </svg>
+          </div>
+          <span class="state-message">{{ loadingMessage }}</span>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (!loading && error) {
+        <div class="state-container error-state">
+          <div class="state-icon error-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <h3 class="state-title">Something went wrong</h3>
+          <p class="state-message">{{ error }}</p>
+          <button class="btn btn-outline-primary" (click)="retryAction()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            Try Again
+          </button>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loading && !error && emptyState) {
+        <div class="state-container empty-state">
+          @if (emptyStateTemplate) {
+            <ng-container *ngTemplateOutlet="emptyStateTemplate"></ng-container>
+          } @else {
+            <div class="state-icon empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                <polyline points="13 2 13 9 20 9"/>
+              </svg>
+            </div>
+            <h3 class="state-title">{{ emptyTitle }}</h3>
+            @if (emptyMessage) {
+              <p class="state-message">{{ emptyMessage }}</p>
+            }
+          }
+        </div>
+      }
+
+      <!-- Main Content (via ng-content) -->
+      @if (!loading && !error && !emptyState) {
+        <ng-content></ng-content>
+      }
+    </main>
+  </div>
+</div>

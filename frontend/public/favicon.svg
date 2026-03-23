@@ -1,0 +1,10 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <title>ThinkPLUS favicon</title>
+  <rect width="64" height="64" rx="12" fill="#ffffff" />
+  <rect x="14" y="10" width="8" height="44" rx="4" fill="#111111" />
+  <path d="M22 32L42 12H51L31 32L51 52H42L22 32Z" fill="#111111" />
+  <path
+    d="M50 6.5L52.2 11.3L57.5 12L53.6 15.4L54.6 20.6L50 18L45.4 20.6L46.4 15.4L42.5 12L47.8 11.3L50 6.5Z"
+    fill="#428177"
+  />
+</svg>

@@ -1,0 +1,387 @@
+# ==============================================================================
+# EMSIST - Development Environment: DATA TIER
+#
+# Contains ONLY data stores (PostgreSQL, Neo4j, Valkey, Kafka).
+# This file owns all networks and all persistent data volumes.
+#
+# Lifecycle:
+#   Data tier runs independently of the app tier.
+#   `docker compose -f docker-compose.dev-app.yml down` CANNOT remove
+#   these volumes or networks because they are defined here, not there.
+#
+# Usage:
+#   docker compose -f docker-compose.dev-data.yml --env-file .env.dev up -d
+#   docker compose -f docker-compose.dev-data.yml --env-file .env.dev ps
+#   docker compose -f docker-compose.dev-data.yml --env-file .env.dev down
+#
+# WARNING: Never use `down -v` unless you intend to destroy ALL data.
+# ==============================================================================
+
+services:
+  # ---------- PostgreSQL (pgvector) ----------
+  # IMPORTANT: Never use `docker compose down -v` — it destroys all data volumes.
+  # Use `docker compose down` (without -v) to stop services while preserving data.
+  # Back up before upgrades: ./scripts/backup-databases.sh --env dev
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-master_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_change_me}
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+      # Per-service passwords passed to init-db.sh (ADR-020, INF-004, INF-010)
+      SVC_TENANT_PASSWORD: ${SVC_TENANT_PASSWORD}
+      SVC_USER_PASSWORD: ${SVC_USER_PASSWORD}
+      SVC_LICENSE_PASSWORD: ${SVC_LICENSE_PASSWORD}
+      SVC_NOTIFICATION_PASSWORD: ${SVC_NOTIFICATION_PASSWORD}
+      SVC_AUDIT_PASSWORD: ${SVC_AUDIT_PASSWORD}
+      SVC_AI_PASSWORD: ${SVC_AI_PASSWORD}
+      SVC_PROCESS_PASSWORD: ${SVC_PROCESS_PASSWORD}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=replica"
+      - "-c"
+      - "archive_mode=on"
+      - "-c"
+      - "archive_command=/bin/true"
+      - "-c"
+      - "max_wal_senders=3"
+      - "-c"
+      - "wal_keep_size=256MB"
+    ports:
+      - "25432:5432"
+    volumes:
+      - dev_postgres_data:/var/lib/postgresql/data
+      - dev_postgres_backups:/backups
+      - ./infrastructure/docker/init-db.sh:/docker-entrypoint-initdb.d/01-init.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-dev-data
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+
+  # ---------- Neo4j (Community) ----------
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH:-neo4j/dev_neo4j_password}
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+      NEO4J_server_memory_heap_initial__size: 128m
+      NEO4J_server_memory_heap_max__size: 256m
+      NEO4J_server_memory_pagecache_size: 64m
+    ports:
+      - "27474:7474"
+      - "27687:7687"
+    volumes:
+      - dev_neo4j_data:/data
+      - dev_neo4j_logs:/logs
+      - dev_neo4j_backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ems-dev-data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+
+  # ---------- Valkey (Redis-compatible cache) ----------
+  # AOF persistence: reduces RPO from ~15 min (RDB-only) to ~1 sec (AOF replay).
+  # Dual-mode: RDB snapshots for fast restore + AOF for near-zero data loss.
+  valkey:
+    image: valkey/valkey:8-alpine
+    command: >
+      valkey-server
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    ports:
+      - "26379:6379"
+    volumes:
+      - dev_valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ems-dev-data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  # ---------- Kafka (KRaft mode, no Zookeeper) ----------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CLUSTER_ID: TkU3OEVBNTcwNTJENDM2Qk
+    ports:
+      - "29092:9092"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ems-dev-data
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+
+  # ---------- Backup Cron (automated encrypted backups) ----------
+  # Runs three cron jobs: PG every 6h, Neo4j daily 03:00, Valkey hourly.
+  # Backups are age-encrypted if AGE_PUBLIC_KEY is set (optional in dev).
+  # Manual trigger: docker exec ems-dev-backup-cron /usr/local/bin/backup-now.sh
+  # Neo4j backup is a volume snapshot (crash-consistent; acceptable for dev).
+  backup-cron:
+    image: alpine:3.19
+    container_name: ems-dev-backup-cron
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        set -e
+        apk add --no-cache postgresql16-client age redis
+        mkdir -p /backups/postgresql /backups/neo4j /backups/valkey
+
+        # Write runtime environment for cron scripts (resolved at container startup)
+        printf 'POSTGRES_USER="%s"\n'          "$$POSTGRES_USER"                  >  /etc/backup.env
+        printf 'POSTGRES_PASSWORD="%s"\n'      "$$POSTGRES_PASSWORD"              >> /etc/backup.env
+        printf 'BACKUP_RETENTION_DAYS="%s"\n'  "$${BACKUP_RETENTION_DAYS:-7}"     >> /etc/backup.env
+        printf 'AGE_PUBLIC_KEY="%s"\n'         "$${AGE_PUBLIC_KEY:-}"             >> /etc/backup.env
+
+        if [ -z "$$AGE_PUBLIC_KEY" ]; then
+          echo "[backup-cron] NOTE: AGE_PUBLIC_KEY not set — backups will NOT be encrypted."
+        fi
+
+        # --- PostgreSQL backup: pg_dump --format=custom all 8 databases ---
+        cat > /usr/local/bin/backup-pg.sh << 'PGSCRIPT'
+        #!/bin/sh
+        . /etc/backup.env
+        TS=$$(date -u +%Y%m%d_%H%M%S)
+        OK=0; FAIL=0
+        for DB in master_db user_db license_db notification_db audit_db ai_db process_db keycloak_db; do
+          FILE="/backups/postgresql/$${DB}_$${TS}.dump"
+          if PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump \
+              -h postgres -p 5432 -U "$$POSTGRES_USER" \
+              --format=custom --compress=6 --no-owner --no-privileges "$$DB" > "$$FILE"; then
+            if [ -n "$$AGE_PUBLIC_KEY" ]; then
+              age -r "$$AGE_PUBLIC_KEY" -o "$${FILE}.age" "$$FILE" && rm -f "$$FILE" && FILE="$${FILE}.age"
+            fi
+            echo "[backup-pg] OK: $$DB -> $$(basename $$FILE)"
+            OK=$$((OK+1))
+          else
+            rm -f "$$FILE"
+            echo "[backup-pg] FAIL: $$DB" >&2
+            FAIL=$$((FAIL+1))
+          fi
+        done
+        echo "[backup-pg] $${TS}: $${OK}/8 OK, $${FAIL} failed"
+        find /backups/postgresql -name '*.dump'     -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        find /backups/postgresql -name '*.dump.age' -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        PGSCRIPT
+        chmod +x /usr/local/bin/backup-pg.sh
+
+        # --- Neo4j backup: volume snapshot (crash-consistent tar archive) ---
+        cat > /usr/local/bin/backup-neo4j.sh << 'N4SCRIPT'
+        #!/bin/sh
+        . /etc/backup.env
+        TS=$$(date -u +%Y%m%d_%H%M%S)
+        FILE="/backups/neo4j/neo4j-data_$${TS}.tar.gz"
+        if tar -czf "$$FILE" -C /neo4j-data . ; then
+          if [ -n "$$AGE_PUBLIC_KEY" ]; then
+            age -r "$$AGE_PUBLIC_KEY" -o "$${FILE}.age" "$$FILE" && rm -f "$$FILE" && FILE="$${FILE}.age"
+          fi
+          echo "[backup-neo4j] $${TS}: OK -> $$(basename $$FILE)"
+        else
+          rm -f "$$FILE"
+          echo "[backup-neo4j] $${TS}: FAIL" >&2
+        fi
+        find /backups/neo4j -name '*.tar.gz'     -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        find /backups/neo4j -name '*.tar.gz.age' -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        N4SCRIPT
+        chmod +x /usr/local/bin/backup-neo4j.sh
+
+        # --- Valkey backup: BGSAVE trigger + copy dump.rdb ---
+        cat > /usr/local/bin/backup-valkey.sh << 'VKSCRIPT'
+        #!/bin/sh
+        . /etc/backup.env
+        TS=$$(date -u +%Y%m%d_%H%M%S)
+        BEFORE=$$(redis-cli -h valkey LASTSAVE 2>/dev/null || echo 0)
+        redis-cli -h valkey BGSAVE 2>/dev/null || true
+        i=0
+        while [ $$i -lt 30 ]; do
+          AFTER=$$(redis-cli -h valkey LASTSAVE 2>/dev/null || echo 0)
+          [ "$$AFTER" != "$$BEFORE" ] && break
+          sleep 2; i=$$((i+1))
+        done
+        if [ -f /valkey-data/dump.rdb ]; then
+          FILE="/backups/valkey/valkey-dump_$${TS}.rdb"
+          cp /valkey-data/dump.rdb "$$FILE"
+          if [ -n "$$AGE_PUBLIC_KEY" ]; then
+            age -r "$$AGE_PUBLIC_KEY" -o "$${FILE}.age" "$$FILE" && rm -f "$$FILE" && FILE="$${FILE}.age"
+          fi
+          echo "[backup-valkey] $${TS}: OK -> $$(basename $$FILE)"
+        else
+          echo "[backup-valkey] $${TS}: WARN no dump.rdb (pre-first-save)"
+        fi
+        find /backups/valkey -name '*.rdb'     -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        find /backups/valkey -name '*.rdb.age' -mtime "+$$BACKUP_RETENTION_DAYS" -delete 2>/dev/null
+        VKSCRIPT
+        chmod +x /usr/local/bin/backup-valkey.sh
+
+        # --- Manual trigger: run all backups immediately ---
+        cat > /usr/local/bin/backup-now.sh << 'ALLSCRIPT'
+        #!/bin/sh
+        echo "=== Starting manual backup $$(date -u) ==="
+        /usr/local/bin/backup-pg.sh
+        /usr/local/bin/backup-neo4j.sh
+        /usr/local/bin/backup-valkey.sh
+        echo "=== Manual backup complete ==="
+        ALLSCRIPT
+        chmod +x /usr/local/bin/backup-now.sh
+
+        # Configure cron schedule
+        printf '%s\n' \
+          '0 */6 * * * /usr/local/bin/backup-pg.sh' \
+          '0 3   * * * /usr/local/bin/backup-neo4j.sh' \
+          '0 *   * * * /usr/local/bin/backup-valkey.sh' \
+          > /etc/crontabs/root
+
+        echo "[backup-cron] Service started. PG: every 6h | Neo4j: 03:00 daily | Valkey: hourly"
+        echo "[backup-cron] Manual: docker exec ems-dev-backup-cron /usr/local/bin/backup-now.sh"
+
+        # Run initial backup in background so crond starts immediately
+        /usr/local/bin/backup-now.sh &
+
+        # Start crond in foreground (keeps container alive)
+        crond -f -d 6
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
+      AGE_PUBLIC_KEY: ${AGE_PUBLIC_KEY:-}
+    volumes:
+      - dev_postgres_backups:/backups/postgresql
+      - dev_neo4j_data:/neo4j-data:ro
+      - dev_neo4j_backups:/backups/neo4j
+      - dev_valkey_data:/valkey-data:ro
+      - dev_valkey_backups:/backups/valkey
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    networks:
+      - ems-dev-data
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+# ==============================================================================
+# VOLUMES
+# All persistent data volumes are owned by the data tier.
+# The app tier CANNOT remove these via `docker compose -f app.yml down -v`.
+# ==============================================================================
+volumes:
+  dev_postgres_data:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "postgresql"
+      com.emsist.backup: "required"
+  dev_postgres_backups:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "postgresql-backups"
+  dev_neo4j_data:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "neo4j"
+      com.emsist.backup: "required"
+  dev_neo4j_logs:
+    labels:
+      com.emsist.persist: "false"
+      com.emsist.env: "dev"
+      com.emsist.service: "neo4j-logs"
+  dev_neo4j_backups:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "neo4j-backups"
+  dev_valkey_data:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "valkey"
+  dev_valkey_backups:
+    labels:
+      com.emsist.persist: "true"
+      com.emsist.env: "dev"
+      com.emsist.service: "valkey-backups"
+
+# ==============================================================================
+# NETWORKS
+# The data tier OWNS all three networks.
+# The app tier references them as `external: true`.
+# This ensures `docker compose -f app.yml down` cannot remove networks
+# that data services depend on.
+#
+# Three-tier network segmentation (ADR-018, arc42/07 Section 7.9):
+#   ems-dev-data:     Data stores only (internal -- no host access)
+#   ems-dev-backend:  Backend services + keycloak + mailhog
+#   ems-dev-frontend: Frontend + api-gateway only
+# ==============================================================================
+networks:
+  ems-dev-data:
+    driver: bridge
+    internal: true
+  ems-dev-backend:
+    driver: bridge
+  ems-dev-frontend:
+    driver: bridge

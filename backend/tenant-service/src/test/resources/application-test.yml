@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  flyway:
+    enabled: false
+
+# Disable Eureka for tests
+eureka:
+  client:
+    enabled: false
+
+# Disable Kafka for tests
+spring.kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    auto-startup: false
+
+# Logging
+logging:
+  level:
+    com.ems: DEBUG
+    org.springframework.security: DEBUG

@@ -1,0 +1,102 @@
+// ============================================
+// MAIN CONTAINER
+// Standard styling for all pages - DO NOT CUSTOMIZE
+// ============================================
+
+// Import this in any page that needs the main container:
+// @import '../../../styles/main-container';
+
+$background: #faf9f5;
+
+// ============================================
+// MAIN CONTAINER
+// ============================================
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  background: $background;
+}
+
+// ============================================
+// CONTENT AREA (with optional sidebar)
+// ============================================
+
+.content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  &.has-sidebar {
+    // Layout with sidebar
+  }
+}
+
+// ============================================
+// SCROLLABLE CONTENT
+// ============================================
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+
+  @media (min-width: 992px) {
+    padding: 32px;
+  }
+
+  @media (min-width: 1920px) {
+    padding: 40px;
+  }
+}
+
+// ============================================
+// CONTENT SECTIONS
+// ============================================
+
+.content-section {
+  background: var(--nm-bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow:
+    var(--nm-shadow-md) var(--nm-shadow-md) var(--nm-blur-md) var(--nm-shadow-dark),
+    calc(-1 * var(--nm-shadow-md)) calc(-1 * var(--nm-shadow-md)) var(--nm-blur-md) var(--nm-shadow-light);
+  border: 1px solid var(--nm-border);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  margin: 0;
+  font-family: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.section-description {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #545e6e;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

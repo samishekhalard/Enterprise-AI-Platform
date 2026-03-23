@@ -1,0 +1,578 @@
+openapi: 3.1.0
+info:
+  title: Tenant Service API
+  description: API for managing tenants, domains, branding, and authentication configuration
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8082
+    description: Development server
+  - url: https://api.ems.com
+    description: Production server
+
+tags:
+  - name: Tenants
+    description: Tenant CRUD operations
+  - name: Domains
+    description: Domain management
+  - name: Configuration
+    description: Tenant configuration (branding, auth, session)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/tenants:
+    get:
+      tags: [Tenants]
+      summary: List all tenants
+      description: Get paginated list of tenants with optional filters
+      operationId: listTenants
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/TenantStatus'
+        - name: type
+          in: query
+          schema:
+            $ref: '#/components/schemas/TenantType'
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of tenants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantListResponse'
+
+    post:
+      tags: [Tenants]
+      summary: Create new tenant
+      operationId: createTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+      responses:
+        '201':
+          description: Tenant created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSummary'
+        '409':
+          description: Slug already exists
+
+  /api/tenants/{tenantId}:
+    get:
+      tags: [Tenants]
+      summary: Get tenant by ID
+      operationId: getTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSummary'
+        '404':
+          description: Tenant not found
+
+    put:
+      tags: [Tenants]
+      summary: Update tenant
+      operationId: updateTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Tenant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSummary'
+        '404':
+          description: Tenant not found
+
+    delete:
+      tags: [Tenants]
+      summary: Delete tenant
+      operationId: deleteTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '204':
+          description: Tenant deleted
+        '404':
+          description: Tenant not found
+
+  /api/tenants/resolve:
+    get:
+      tags: [Tenants]
+      summary: Resolve tenant from hostname
+      description: Used by frontend to resolve tenant configuration from domain
+      operationId: resolveTenant
+      security: []
+      parameters:
+        - name: X-Forwarded-Host
+          in: header
+          schema:
+            type: string
+        - name: Host
+          in: header
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tenant resolved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResolveResponse'
+        '404':
+          description: Tenant not found for domain
+
+  /api/tenants/validate/slug/{slug}:
+    get:
+      tags: [Tenants]
+      summary: Check if slug is available
+      operationId: validateSlug
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Availability check result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+
+  /api/tenants/{tenantId}/lock:
+    post:
+      tags: [Tenants]
+      summary: Lock tenant
+      description: Prevents users from logging in
+      operationId: lockTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSummary'
+
+  /api/tenants/{tenantId}/unlock:
+    post:
+      tags: [Tenants]
+      summary: Unlock tenant
+      operationId: unlockTenant
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Tenant unlocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantSummary'
+
+  /api/tenants/{tenantId}/domains:
+    get:
+      tags: [Domains]
+      summary: List tenant domains
+      operationId: getTenantDomains
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: List of domains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantDomain'
+
+    post:
+      tags: [Domains]
+      summary: Add domain to tenant
+      operationId: addDomain
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                isPrimary:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Domain added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDomain'
+
+  /api/tenants/{tenantId}/domains/{domainId}/verify:
+    post:
+      tags: [Domains]
+      summary: Verify domain ownership
+      operationId: verifyDomain
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Domain verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDomain'
+
+  /api/tenants/{tenantId}/domains/{domainId}:
+    delete:
+      tags: [Domains]
+      summary: Remove domain from tenant
+      operationId: removeDomain
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - name: domainId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Domain removed
+
+  /api/tenants/{tenantId}/config:
+    get:
+      tags: [Configuration]
+      summary: Get full tenant configuration
+      operationId: getTenantConfig
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      responses:
+        '200':
+          description: Full tenant configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfig'
+
+  /api/tenants/{tenantId}/auth-providers:
+    put:
+      tags: [Configuration]
+      summary: Update auth providers
+      operationId: updateAuthProviders
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Auth providers updated
+
+  /api/tenants/{tenantId}/branding:
+    put:
+      tags: [Configuration]
+      summary: Update branding
+      operationId: updateBranding
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandingConfig'
+      responses:
+        '200':
+          description: Branding updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandingConfig'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Tenant identifier
+
+  schemas:
+    TenantStatus:
+      type: string
+      enum: [ACTIVE, LOCKED, SUSPENDED, PENDING]
+
+    TenantType:
+      type: string
+      enum: [MASTER, DOMINANT, REGULAR]
+
+    TenantTier:
+      type: string
+      enum: [FREE, STANDARD, PROFESSIONAL, ENTERPRISE]
+
+    TenantSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        uuid:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        shortName:
+          type: string
+        tenantType:
+          $ref: '#/components/schemas/TenantType'
+        tier:
+          $ref: '#/components/schemas/TenantTier'
+        status:
+          $ref: '#/components/schemas/TenantStatus'
+        createdAt:
+          type: string
+          format: date-time
+
+    TenantListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantSummary'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    CreateTenantRequest:
+      type: object
+      required: [fullName, shortName, tenantType, tier, adminEmail]
+      properties:
+        fullName:
+          type: string
+          maxLength: 255
+        shortName:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        tenantType:
+          $ref: '#/components/schemas/TenantType'
+        tier:
+          $ref: '#/components/schemas/TenantTier'
+        primaryDomain:
+          type: string
+        adminEmail:
+          type: string
+          format: email
+        licenses:
+          type: object
+          properties:
+            powerUsers:
+              type: integer
+            contributors:
+              type: integer
+            viewers:
+              type: integer
+
+    UpdateTenantRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+        shortName:
+          type: string
+        description:
+          type: string
+        tier:
+          $ref: '#/components/schemas/TenantTier'
+        status:
+          $ref: '#/components/schemas/TenantStatus'
+
+    TenantDomain:
+      type: object
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+        isPrimary:
+          type: boolean
+        isVerified:
+          type: boolean
+        sslStatus:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    TenantResolveResponse:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantSummary'
+        authProviders:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthProviderConfig'
+        branding:
+          $ref: '#/components/schemas/BrandingConfig'
+        resolved:
+          type: boolean
+        hostname:
+          type: string
+
+    TenantConfig:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantSummary'
+        authProviders:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthProviderConfig'
+        branding:
+          $ref: '#/components/schemas/BrandingConfig'
+        sessionConfig:
+          $ref: '#/components/schemas/SessionConfig'
+        mfaConfig:
+          $ref: '#/components/schemas/MfaConfig'
+
+    AuthProviderConfig:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+        icon:
+          type: string
+        isEnabled:
+          type: boolean
+        isPrimary:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    BrandingConfig:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+        primaryColorDark:
+          type: string
+        secondaryColor:
+          type: string
+        logoUrl:
+          type: string
+        logoUrlDark:
+          type: string
+        faviconUrl:
+          type: string
+        fontFamily:
+          type: string
+
+    SessionConfig:
+      type: object
+      properties:
+        accessTokenLifetime:
+          type: integer
+        refreshTokenLifetime:
+          type: integer
+        idleTimeout:
+          type: integer
+        absoluteTimeout:
+          type: integer
+        maxConcurrentSessions:
+          type: integer
+
+    MfaConfig:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        required:
+          type: boolean
+        allowedMethods:
+          type: array
+          items:
+            type: string
+        defaultMethod:
+          type: string

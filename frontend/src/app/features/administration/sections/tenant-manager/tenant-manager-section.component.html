@@ -1,0 +1,492 @@
+<section class="tenant-manager">
+  <div class="split-grid">
+    <aside class="tenant-list">
+      <p-card styleClass="tenant-list-card">
+        <div class="list-head">
+          <h3>Tenants</h3>
+          <div class="head-actions">
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="primary"
+              icon="pi pi-plus"
+              [disabled]="actionLoading() || masterFirstMode"
+              (click)="openCreateTenantModal()"
+            >
+              Create
+            </button>
+            <button
+              type="button"
+              pButton
+              size="small"
+              severity="secondary"
+              icon="pi pi-refresh"
+              [loading]="loading()"
+              [disabled]="loading() || actionLoading()"
+              (click)="loadTenants()"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <input
+          type="search"
+          pInputText
+          class="tenant-search"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          placeholder="Search tenants"
+          aria-label="Search tenants"
+        />
+
+        @if (error()) {
+          <p-message severity="error">{{ error() }}</p-message>
+        }
+
+        @if (actionError()) {
+          <p-message severity="error">{{ actionError() }}</p-message>
+        }
+
+        @if (actionInfo()) {
+          <p-message severity="success">{{ actionInfo() }}</p-message>
+        }
+
+        @if (masterFirstMode) {
+          <p-message severity="info">
+            Master-tenant-first mode is active. Other tenant management will follow.
+          </p-message>
+        }
+
+        @if (loading()) {
+          <div class="loading-row">
+            <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+            <span>Loading tenants...</span>
+          </div>
+        }
+
+        <ul class="tenant-items">
+          @for (tenant of filteredTenants(); track tenant.id) {
+            <li>
+              <button
+                type="button"
+                pButton
+                class="tenant-item"
+                [outlined]="selectedTenant()?.id !== tenant.id"
+                [severity]="selectedTenant()?.id === tenant.id ? 'primary' : 'secondary'"
+                (click)="selectTenant(tenant)"
+              >
+                <span class="tenant-top">
+                  <strong>{{ tenant.name }}</strong>
+                  <p-tag [value]="tenant.status" [severity]="statusSeverity(tenant.status)" />
+                </span>
+                <span class="tenant-meta">{{ tenant.uuid ?? 'UUID unavailable' }}</span>
+              </button>
+            </li>
+          } @empty {
+            <li class="muted">No tenants found.</li>
+          }
+        </ul>
+      </p-card>
+    </aside>
+
+    <section class="tenant-details">
+      @if (selectedTenant(); as tenant) {
+        <p-card styleClass="detail-head-card">
+          <div class="detail-head-row">
+            <div>
+              <h3>{{ tenant.name }}</h3>
+              <p>
+                Tenant UUID: {{ tenant.uuid ?? 'n/a' }} | Type: {{ tenant.type }} | Tier:
+                {{ tenant.tier ?? 'n/a' }}
+              </p>
+            </div>
+            <div class="tenant-controls">
+              <button
+                type="button"
+                pButton
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                [disabled]="actionLoading()"
+                (click)="openEditTenantModal()"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                pButton
+                size="small"
+                [severity]="isLockedTenant(tenant) ? 'success' : 'warn'"
+                [outlined]="true"
+                [disabled]="actionLoading() || isMasterTenant(tenant)"
+                (click)="toggleTenantLock(tenant)"
+              >
+                {{ isLockedTenant(tenant) ? 'Unlock' : 'Lock' }}
+              </button>
+              <button
+                type="button"
+                pButton
+                size="small"
+                severity="danger"
+                [outlined]="true"
+                [disabled]="actionLoading() || !canDeleteTenant(tenant)"
+                (click)="deleteTenant(tenant)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </p-card>
+
+        <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="tenant-tabs">
+          <p-tablist>
+            <p-tab value="overview">Overview</p-tab>
+            <p-tab value="users">Users</p-tab>
+            <p-tab value="branding">Branding</p-tab>
+            <p-tab value="licenses" [disabled]="isMasterTenant(tenant)">Licenses</p-tab>
+            @if (isMasterTenant(tenant)) {
+              <p-tab value="authentication">Authentication</p-tab>
+            }
+          </p-tablist>
+
+          <p-tabpanels>
+            <p-tabpanel value="overview">
+              <p-card styleClass="content-card">
+                <h4>Overview</h4>
+                <div class="overview-grid">
+                  <div>
+                    <span class="label">UUID</span><strong>{{ tenant.uuid ?? 'n/a' }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Full Name</span
+                    ><strong>{{ tenant.fullName ?? tenant.name }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Status</span>
+                    <p-tag [value]="tenant.status" [severity]="statusSeverity(tenant.status)" />
+                  </div>
+                  <div>
+                    <span class="label">Tier</span><strong>{{ tenant.tier ?? 'n/a' }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Users</span><strong>{{ tenant.usersCount ?? 0 }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Domains</span
+                    ><strong>{{ tenant.domainsCount ?? 0 }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Primary Domain</span
+                    ><strong>{{ tenant.primaryDomain ?? 'n/a' }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Protected</span
+                    ><strong>{{ tenant.isProtected ? 'Yes' : 'No' }}</strong>
+                  </div>
+                </div>
+              </p-card>
+            </p-tabpanel>
+
+            <p-tabpanel value="users">
+              <app-user-embedded [tenantId]="tenantScopeId(tenant)" [tenantName]="tenant.name" />
+            </p-tabpanel>
+
+            <p-tabpanel value="branding">
+              <div class="branding-card">
+                <app-branding-studio
+                  [tenantId]="tenantScopeId(tenant)"
+                  [initialBranding]="currentBranding()"
+                  (brandingSaved)="onBrandingSaved($event)"
+                />
+              </div>
+            </p-tabpanel>
+
+            <p-tabpanel value="licenses">
+              @if (isMasterTenant(tenant)) {
+                <p-card styleClass="content-card license-disabled-card">
+                  <h4>Licensing Disabled</h4>
+                  <p class="muted">
+                    Master tenant does not use per-tenant seat allocation. Select a regular or
+                    dominant tenant to manage licensing.
+                  </p>
+                </p-card>
+              } @else {
+                <app-license-embedded
+                  [tenantId]="tenantScopeId(tenant)"
+                  [tenantName]="tenant.name"
+                />
+              }
+            </p-tabpanel>
+
+            @if (isMasterTenant(tenant)) {
+              <p-tabpanel value="authentication">
+                <app-master-auth-section
+                  [tenantId]="tenantScopeId(tenant)"
+                  [tenantName]="tenant.name"
+                />
+              </p-tabpanel>
+            }
+          </p-tabpanels>
+        </p-tabs>
+      } @else {
+        <p-card styleClass="empty-state-card">
+          <p class="muted">Select a tenant to view administration details.</p>
+        </p-card>
+      }
+    </section>
+  </div>
+</section>
+
+@if (showCreateModal()) {
+  <div
+    class="modal-overlay"
+    role="button"
+    tabindex="0"
+    aria-label="Close create tenant dialog"
+    (click)="$event.target === $event.currentTarget && closeCreateTenantModal()"
+    (keydown.enter)="closeCreateTenantModal()"
+    (keydown.space)="closeCreateTenantModal(); $event.preventDefault()"
+  >
+    <section class="tenant-modal" role="dialog" aria-modal="true" aria-label="Create Tenant">
+      <header class="tenant-modal-header">
+        <h4>Create Tenant</h4>
+        <button type="button" class="modal-close" (click)="closeCreateTenantModal()">×</button>
+      </header>
+
+      <div class="tenant-modal-grid">
+        <label class="field">
+          <span>Full Name</span>
+          <input
+            pInputText
+            [ngModel]="createForm().fullName"
+            (ngModelChange)="updateCreateField('fullName', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Short Name</span>
+          <input
+            pInputText
+            [ngModel]="createForm().shortName"
+            (ngModelChange)="updateCreateField('shortName', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Admin Email</span>
+          <input
+            pInputText
+            type="email"
+            [ngModel]="createForm().adminEmail"
+            (ngModelChange)="updateCreateField('adminEmail', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Tenant Type</span>
+          <select
+            [ngModel]="createForm().tenantType"
+            (ngModelChange)="updateCreateField('tenantType', $event)"
+          >
+            @for (option of typeOptions; track option) {
+              <option [ngValue]="option">{{ option }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Tier</span>
+          <select [ngModel]="createForm().tier" (ngModelChange)="updateCreateField('tier', $event)">
+            @for (option of tierOptions; track option) {
+              <option [ngValue]="option">{{ option }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Primary Domain</span>
+          <input
+            pInputText
+            [ngModel]="createForm().primaryDomain"
+            (ngModelChange)="updateCreateField('primaryDomain', $event)"
+          />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          rows="3"
+          [ngModel]="createForm().description"
+          (ngModelChange)="updateCreateField('description', $event)"
+        ></textarea>
+      </label>
+
+      <section class="create-license-panel">
+        <h5>Initial License Allocation</h5>
+        <p class="muted">Optional seat allocation payload for tenant provisioning.</p>
+
+        <div class="create-license-grid">
+          <label class="field">
+            <span>Power Users</span>
+            <input
+              type="range"
+              min="0"
+              max="500"
+              [ngModel]="createForm().licenses.powerUsers"
+              (ngModelChange)="updateCreateLicenseField('powerUsers', +$event)"
+            />
+            <input
+              pInputText
+              type="number"
+              min="0"
+              [ngModel]="createForm().licenses.powerUsers"
+              (ngModelChange)="updateCreateLicenseField('powerUsers', +$event)"
+            />
+          </label>
+          <label class="field">
+            <span>Contributors</span>
+            <input
+              type="range"
+              min="0"
+              max="500"
+              [ngModel]="createForm().licenses.contributors"
+              (ngModelChange)="updateCreateLicenseField('contributors', +$event)"
+            />
+            <input
+              pInputText
+              type="number"
+              min="0"
+              [ngModel]="createForm().licenses.contributors"
+              (ngModelChange)="updateCreateLicenseField('contributors', +$event)"
+            />
+          </label>
+          <label class="field">
+            <span>Viewers</span>
+            <input
+              type="range"
+              min="0"
+              max="1000"
+              [ngModel]="createForm().licenses.viewers"
+              (ngModelChange)="updateCreateLicenseField('viewers', +$event)"
+            />
+            <input
+              pInputText
+              type="number"
+              min="0"
+              [ngModel]="createForm().licenses.viewers"
+              (ngModelChange)="updateCreateLicenseField('viewers', +$event)"
+            />
+          </label>
+        </div>
+
+        <p class="license-total">
+          Total:
+          {{
+            createForm().licenses.powerUsers +
+              createForm().licenses.contributors +
+              createForm().licenses.viewers
+          }}
+        </p>
+      </section>
+
+      <footer class="tenant-modal-footer">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="actionLoading()"
+          (click)="closeCreateTenantModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          [loading]="actionLoading()"
+          [disabled]="actionLoading()"
+          (click)="createTenant()"
+        >
+          Create Tenant
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+
+@if (showEditModal()) {
+  <div
+    class="modal-overlay"
+    role="button"
+    tabindex="0"
+    aria-label="Close edit tenant dialog"
+    (click)="$event.target === $event.currentTarget && closeEditTenantModal()"
+    (keydown.enter)="closeEditTenantModal()"
+    (keydown.space)="closeEditTenantModal(); $event.preventDefault()"
+  >
+    <section class="tenant-modal" role="dialog" aria-modal="true" aria-label="Edit Tenant">
+      <header class="tenant-modal-header">
+        <h4>Edit Tenant</h4>
+        <button type="button" class="modal-close" (click)="closeEditTenantModal()">×</button>
+      </header>
+
+      <div class="tenant-modal-grid">
+        <label class="field">
+          <span>Full Name</span>
+          <input
+            pInputText
+            [ngModel]="editForm().fullName"
+            (ngModelChange)="updateEditField('fullName', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Short Name</span>
+          <input
+            pInputText
+            [ngModel]="editForm().shortName"
+            (ngModelChange)="updateEditField('shortName', $event)"
+          />
+        </label>
+        <label class="field">
+          <span>Tier</span>
+          <select [ngModel]="editForm().tier" (ngModelChange)="updateEditField('tier', $event)">
+            @for (option of tierOptions; track option) {
+              <option [ngValue]="option">{{ option }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          rows="3"
+          [ngModel]="editForm().description"
+          (ngModelChange)="updateEditField('description', $event)"
+        ></textarea>
+      </label>
+
+      <footer class="tenant-modal-footer">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="actionLoading()"
+          (click)="closeEditTenantModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          [loading]="actionLoading()"
+          [disabled]="actionLoading()"
+          (click)="updateTenant()"
+        >
+          Save Changes
+        </button>
+      </footer>
+    </section>
+  </div>
+}

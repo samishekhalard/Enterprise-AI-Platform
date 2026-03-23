@@ -1,0 +1,165 @@
+@use '../../../administration.tokens';
+
+.variant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.variant-card {
+  position: relative;
+  border-radius: var(--nm-radius, 12px);
+  padding: 12px;
+  cursor: pointer;
+  background: var(--bs-color-surface);
+  border: 2px solid transparent;
+  transition:
+    border-color 0.2s,
+    transform 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bs-color-accent);
+    outline-offset: 2px;
+  }
+
+  &.selected {
+    border-color: var(--bs-color-accent);
+  }
+}
+
+// Demo box changes appearance based on variant type
+.variant-demo-box {
+  width: 100%;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--bs-color-surface);
+  margin-bottom: 8px;
+}
+
+// Different visual previews per variant
+[data-variant='raised'] .variant-demo-box {
+  box-shadow: var(--bs-shadow-preset-pill);
+}
+
+[data-variant='inset'] .variant-demo-box {
+  box-shadow: var(--bs-shadow-search-inset);
+}
+
+[data-variant='flat'] .variant-demo-box {
+  box-shadow: none;
+  border: var(--bs-border-swatch);
+}
+
+[data-variant='default'] .variant-demo-box {
+  box-shadow: var(--adm-action-shadow-default);
+}
+
+[data-variant='pills'] .variant-demo-box {
+  border-radius: 24px;
+  box-shadow: var(--bs-shadow-preset-pill);
+}
+
+[data-variant='outlined'] .variant-demo-box {
+  box-shadow: none;
+  border: 2px solid var(--bs-color-accent);
+  background: transparent;
+}
+
+[data-variant='ghost'] .variant-demo-box {
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+[data-variant='striped'] .variant-demo-box {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--bs-color-surface),
+    var(--bs-color-surface) 4px,
+    color-mix(in srgb, var(--bs-color-text) 5%, transparent) 4px,
+    color-mix(in srgb, var(--bs-color-text) 5%, transparent) 8px
+  );
+}
+
+[data-variant='raised-panels'] .variant-demo-box {
+  box-shadow: var(--bs-shadow-preset-pill);
+}
+
+[data-variant='flush'] .variant-demo-box {
+  box-shadow: none;
+  border-radius: 0;
+  border-top: var(--adm-divider-soft);
+  border-bottom: var(--adm-divider-soft);
+}
+
+[data-variant='bordered'] .variant-demo-box {
+  box-shadow: none;
+  border: 2px solid var(--bs-color-accent);
+}
+
+[data-variant='cards'] .variant-demo-box {
+  border-radius: 12px;
+  box-shadow: var(--bs-shadow-preset-pill);
+}
+
+[data-variant='underline'] .variant-demo-box {
+  box-shadow: none;
+  border-radius: 0;
+  border-bottom: 3px solid var(--bs-color-accent);
+}
+
+[data-variant='dark'] .variant-demo-box {
+  background: var(--adm-text-strong);
+  box-shadow: var(--adm-action-shadow-hover);
+}
+
+[data-variant='light'] .variant-demo-box {
+  background: var(--adm-white);
+  box-shadow: var(--adm-action-shadow-default);
+}
+
+[data-variant='minimal'] .variant-demo-box {
+  box-shadow: none;
+  background: var(--tm-bg-hover-highlight);
+}
+
+[data-variant='large'] .variant-demo-box {
+  height: 64px;
+  box-shadow: var(--adm-action-shadow-default);
+}
+
+[data-variant='colored'] .variant-demo-box {
+  background: var(--bs-color-accent);
+  opacity: 0.7;
+}
+
+.variant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.variant-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--bs-color-text);
+}
+
+.variant-desc {
+  font-size: 0.75rem;
+  color: var(--bs-color-text);
+  opacity: 0.65;
+  line-height: 1.3;
+}
+
+.variant-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--bs-color-accent);
+}

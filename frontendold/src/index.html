@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Bitx Prodct</title>
+  <base href="/">
+  <!-- Responsive viewport supporting up to 4K -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- WCAG 2.1 - Theme color for mobile browsers -->
+  <meta name="theme-color" content="#054239">
+  <!-- WCAG 2.1 - Description for screen readers and SEO -->
+  <meta name="description" content="Bitx Prodct - Create, document, and export persona profiles and user journey maps.">
+  <!-- Prevent automatic phone number detection -->
+  <meta name="format-detection" content="telephone=no">
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <!-- Fallback font if Gotham Rounded not available -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap">
+  </noscript>
+  <style>
+    /* Critical CSS for initial load - prevents FOUC */
+    html {
+      font-size: 16px;
+      height: 100%;
+      overflow: hidden;
+    }
+    @media (min-width: 1920px) {
+      html { font-size: 18px; }
+    }
+    @media (min-width: 3840px) {
+      html { font-size: 24px; }
+    }
+    body {
+      font-family: 'Gotham Rounded', 'Nunito', system-ui, -apple-system, sans-serif;
+      background-color: #faf9f5;
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    app-root {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    /* Loading indicator for app shell */
+    .app-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Gotham Rounded', 'Nunito', system-ui, sans-serif;
+      color: #054239;
+    }
+  </style>
+</head>
+<body>
+  <app-root>
+    <!-- WCAG 2.1 - Loading state for screen readers -->
+    <div class="app-loading" role="status" aria-live="polite">
+      <span>Loading Bitx Prodct...</span>
+    </div>
+  </app-root>
+  <!-- No-JS fallback -->
+  <noscript>
+    <p style="text-align: center; padding: 2rem; font-family: system-ui;">
+      Please enable JavaScript to use Bitx Prodct.
+    </p>
+  </noscript>
+</body>
+</html>

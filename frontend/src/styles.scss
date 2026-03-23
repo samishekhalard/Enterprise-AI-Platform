@@ -1,0 +1,138 @@
+@use './app/core/theme/advanced-css-governance';
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Book.otf') format('opentype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Medium.otf') format('opentype');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --tp-primary: #428177;
+  --tp-primary-dark: #054239;
+  --tp-primary-light: #b9a779;
+  --tp-info: #054239;
+  --tp-success: #428177;
+  --tp-warning: #988561;
+  --tp-danger: #6b1f2a;
+  --tp-surface: #edebe0;
+  --tp-bg: #edebe0;
+  --tp-text: #3d3a3b;
+  --tp-text-secondary: #3d3a3b;
+  --tp-text-muted: #3d3a3b;
+  --tp-border: #b9a779;
+  --tp-focus-ring: 0 0 0 3px rgba(66, 129, 119, 0.35);
+
+  --nm-bg: #edebe0;
+  --nm-shadow-dark: rgba(152, 133, 97, 0.38);
+  --nm-shadow-light: rgba(255, 255, 255, 0.88);
+  --nm-accent: #428177;
+  --nm-radius: 16px;
+  --nm-depth: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    'Gotham Rounded',
+    'Nunito',
+    'Segoe UI',
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+  color: var(--tp-text);
+  background: var(--tp-bg);
+}
+
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+.app-panel {
+  border: 1px solid var(--tp-border);
+  border-radius: 0.75rem;
+  background: var(--tp-surface);
+  padding: 1rem;
+}
+
+.app-alert {
+  margin-bottom: 1rem;
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+}
+
+.app-alert-error {
+  background: rgba(107, 31, 42, 0.12);
+  border-color: #6b1f2a;
+  color: #4a151e;
+}
+
+.app-btn {
+  border: 1px solid var(--tp-border);
+  border-radius: 0.5rem;
+  background: #edebe0;
+  color: var(--tp-text);
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-btn:hover,
+.app-btn:focus-visible {
+  border-color: #b9a779;
+  background: rgba(185, 167, 121, 0.2);
+}
+
+.app-btn:focus-visible {
+  outline: 3px solid var(--tp-primary);
+  outline-offset: 2px;
+  box-shadow: var(--tp-focus-ring);
+}
+
+.app-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app-btn-primary {
+  background: linear-gradient(135deg, var(--tp-primary), var(--tp-primary-dark));
+  border-color: var(--tp-primary);
+  color: #ffffff;
+}
+
+.app-btn-primary:hover,
+.app-btn-primary:focus-visible {
+  background: linear-gradient(135deg, var(--tp-primary-dark), #002623);
+  border-color: var(--tp-primary-dark);
+}

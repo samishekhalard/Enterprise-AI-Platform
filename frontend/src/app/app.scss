@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.app-splash {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  background:
+    radial-gradient(900px 500px at 14% 8%, rgba(66, 129, 119, 0.22), transparent 58%),
+    radial-gradient(700px 420px at 88% 0%, rgba(237, 235, 224, 0.42), transparent 56%),
+    var(--tp-bg, #edebe0);
+}
+
+.app-splash-logo {
+  width: clamp(140px, 20vw, 220px);
+  height: auto;
+}
+
+.app-splash-text {
+  margin: 0;
+  color: var(--tp-muted, #3d3a3b);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,54 @@
+<div class="app-shell">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="header-container">
+    <div class="header-inner">
+      <div class="header-island brand-island">
+        <a class="brand-logo" routerLink="/administration" aria-label="ThinkPLUS Home">
+          <img src="assets/images/logo.svg" alt="ThinkPLUS" />
+        </a>
+        <div class="brand-block">
+          <h1>{{ title }}</h1>
+          @if (subtitle) {
+            <p>{{ subtitle }}</p>
+          }
+        </div>
+      </div>
+
+      <nav class="header-island topnav" aria-label="Primary navigation">
+        @for (item of navItems; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          >
+            {{ item.label }}
+          </a>
+        }
+
+        @if (authenticated) {
+          <button type="button" (click)="onLogout()">Sign Out</button>
+        } @else {
+          <a routerLink="/auth/login">Sign In</a>
+        }
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="content-container" tabindex="-1">
+    <div class="content-inner">
+      <ng-content select="[shell-content]" />
+    </div>
+  </main>
+
+  <footer class="footer-container">
+    <div class="footer-inner">
+      <div class="footer-island">
+        <ng-content select="[shell-footer]" />
+        @if (footerText) {
+          <p class="footer-text">{{ footerText }}</p>
+        }
+      </div>
+    </div>
+  </footer>
+</div>
