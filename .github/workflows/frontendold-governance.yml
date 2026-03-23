@@ -4,24 +4,9 @@ on:
   pull_request:
     paths:
       - "frontendold/**"
-      - "docs/wireframes/mobile-tenant-auth-providers.html"
-      - "docs/lld/auth-facade-lld.md"
       - "scripts/custom-css-audit.sh"
       - "scripts/custom-css-allowlist.txt"
       - ".github/workflows/frontendold-governance.yml"
-  push:
-    branches:
-      - main
-    paths:
-      - "frontendold/**"
-      - "docs/wireframes/mobile-tenant-auth-providers.html"
-      - "docs/lld/auth-facade-lld.md"
-      - "scripts/custom-css-audit.sh"
-      - "scripts/custom-css-allowlist.txt"
-      - ".github/workflows/frontendold-governance.yml"
-  schedule:
-    - cron: "0 6 * * 1"
-    - cron: "0 6 1 * *"
   workflow_dispatch:
 
 jobs:

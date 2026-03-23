@@ -27,12 +27,12 @@ cd "${ROOT_DIR}"
 # Transport-security anti-patterns:
 # - Plain HTTP in runtime config files
 # - Explicit HTTPS-strict bypass flags for Keycloak
-rg -n \
+grep -rn -E \
   "http://|KC_HOSTNAME_STRICT_HTTPS:\\s*\"false\"|KC_HTTP_ENABLED:\\s*\"true\"" \
   backend/*/src/main/resources/application*.yml \
   docker-compose*.yml \
   frontend/src/environments/*.ts \
-  | sort > "${TMP_CURRENT}"
+  2>/dev/null | sort > "${TMP_CURRENT}" || true
 
 sort "${ALLOWLIST}" > "${ALLOWLIST}.sorted"
 mv "${ALLOWLIST}.sorted" "${ALLOWLIST}"

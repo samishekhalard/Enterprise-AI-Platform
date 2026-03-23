@@ -2,9 +2,6 @@ name: API Contract Security
 
 on:
   pull_request:
-  push:
-    branches:
-      - main
 
 jobs:
   openapi-governance:

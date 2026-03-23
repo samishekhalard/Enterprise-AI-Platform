@@ -34,7 +34,6 @@
 | Valkey | Distributed cache data store |
 | Kafka | Event streaming platform |
 
-
 ## 12.4 Quality and Operations Terms
 
 | Term | Definition |
