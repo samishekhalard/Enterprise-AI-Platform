@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" fill="none" stroke="#F97316">
-  <circle cx="1024" cy="1024" r="875" stroke-width="70" fill="#F5F5F5"/>
-  <circle cx="1024" cy="1024" r="750" stroke-width="70" fill="#F5F5F5"/>
-  <!-- Filled envelope for throw -->
-  <rect x="574" y="724" width="900" height="600" rx="40" fill="#F97316"/>
-  <path stroke="#F5F5F5" stroke-width="50" fill="none" d="M574 724l450 280l450-280"/>
-</svg>

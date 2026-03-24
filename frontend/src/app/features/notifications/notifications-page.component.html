@@ -1,0 +1,166 @@
+<app-page-frame
+  [title]="'Notifications'"
+  [subtitle]="'Manage your notifications and alerts.'"
+>
+  <div page-actions class="actions-bar">
+    <div class="filter-group">
+      <button
+        pButton
+        type="button"
+        data-testid="filter-all"
+        label="All"
+        [outlined]="readFilter() !== 'all'"
+        severity="secondary"
+        size="small"
+        (click)="onFilterChange('all')"
+      ></button>
+      <button
+        pButton
+        type="button"
+        data-testid="filter-unread"
+        label="Unread"
+        [outlined]="readFilter() !== 'unread'"
+        severity="secondary"
+        size="small"
+        (click)="onFilterChange('unread')"
+      ></button>
+      <button
+        pButton
+        type="button"
+        data-testid="filter-read"
+        label="Read"
+        [outlined]="readFilter() !== 'read'"
+        severity="secondary"
+        size="small"
+        (click)="onFilterChange('read')"
+      ></button>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      data-testid="mark-all-read"
+      label="Mark all as read"
+      icon="pi pi-check-double"
+      severity="info"
+      size="small"
+      [disabled]="markingAllRead() || !hasUnread()"
+      [loading]="markingAllRead()"
+      (click)="onMarkAllAsRead()"
+    ></button>
+  </div>
+
+  <section page-content>
+    @if (error()) {
+      <p-message
+        severity="error"
+        [text]="error()!"
+        data-testid="error-message"
+      />
+    }
+
+    @if (loading()) {
+      <div class="loading-container" data-testid="loading-spinner">
+        <p-progressSpinner
+          strokeWidth="3"
+          [style]="{ width: '48px', height: '48px' }"
+        />
+        <p class="loading-text">Loading notifications...</p>
+      </div>
+    }
+
+    @if (!loading() && !error() && !hasNotifications()) {
+      <div class="empty-state" data-testid="empty-state">
+        <i class="pi pi-bell-slash empty-icon"></i>
+        <h3>No notifications</h3>
+        <p>You're all caught up. New notifications will appear here.</p>
+      </div>
+    }
+
+    @if (!loading() && hasNotifications()) {
+      <ul class="notification-list" data-testid="notification-list">
+        @for (notification of notifications(); track notification.id) {
+          <li
+            class="notification-item"
+            [class.unread]="!notification.read"
+            [attr.data-testid]="'notification-' + notification.id"
+          >
+            <div class="notification-icon-wrapper">
+              <i [class]="notificationIcon(notification.type)"></i>
+            </div>
+
+            <div class="notification-body">
+              <div class="notification-header">
+                <span class="notification-title" data-testid="notification-title">
+                  {{ notification.title }}
+                </span>
+                <p-tag
+                  [value]="notification.type"
+                  [severity]="typeSeverity(notification.type)"
+                  data-testid="notification-type-tag"
+                />
+              </div>
+
+              <p class="notification-message" data-testid="notification-message">
+                {{ notification.message }}
+              </p>
+
+              <div class="notification-meta">
+                <span class="notification-timestamp" data-testid="notification-timestamp">
+                  {{ formatTimestamp(notification.createdAt) }}
+                </span>
+                @if (!notification.read) {
+                  <button
+                    pButton
+                    type="button"
+                    data-testid="mark-read-btn"
+                    label="Mark as read"
+                    icon="pi pi-check"
+                    [text]="true"
+                    size="small"
+                    (click)="onMarkAsRead(notification)"
+                  ></button>
+                } @else {
+                  <span class="read-indicator" data-testid="read-indicator">
+                    <i class="pi pi-check"></i> Read
+                  </span>
+                }
+              </div>
+            </div>
+          </li>
+        } @empty {
+          <li class="empty-state" data-testid="empty-state">
+            <p>No notifications match the current filter.</p>
+          </li>
+        }
+      </ul>
+
+      <div class="pagination-bar" data-testid="pagination-bar">
+        <button
+          pButton
+          type="button"
+          data-testid="prev-page"
+          icon="pi pi-chevron-left"
+          [text]="true"
+          [disabled]="!hasPreviousPage()"
+          (click)="previousPage()"
+        ></button>
+
+        <span class="page-info" data-testid="page-info">
+          Page {{ page() + 1 }} of {{ totalPages() }}
+          ({{ totalElements() }} total)
+        </span>
+
+        <button
+          pButton
+          type="button"
+          data-testid="next-page"
+          icon="pi pi-chevron-right"
+          [text]="true"
+          [disabled]="!hasNextPage()"
+          (click)="nextPage()"
+        ></button>
+      </div>
+    }
+  </section>
+</app-page-frame>

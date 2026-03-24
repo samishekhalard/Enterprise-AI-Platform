@@ -7,6 +7,18 @@ const DEFAULT_LANDING_ROUTE = normalizeRoute(environment.defaultLandingRoute);
 export const routes: Routes = [
   { path: 'login', pathMatch: 'full', redirectTo: 'auth/login' },
   {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.page').then((m) => m.DashboardPageComponent),
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/profile.page').then((m) => m.ProfilePageComponent),
+  },
+  {
     path: 'administration',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -19,6 +31,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/tenants/tenants.page').then((m) => m.TenantsPageComponent),
+  },
+  {
+    path: 'notifications',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/notifications/notifications-page.component').then(
+        (m) => m.NotificationsPageComponent,
+      ),
   },
   {
     path: 'auth/login',
@@ -59,9 +79,9 @@ export const routes: Routes = [
 
 function normalizeRoute(value: string | undefined): string {
   if (!value) {
-    return 'administration';
+    return 'dashboard';
   }
 
   const normalized = value.replace(/^\/+/, '').trim();
-  return normalized.length > 0 ? normalized : 'administration';
+  return normalized.length > 0 ? normalized : 'dashboard';
 }

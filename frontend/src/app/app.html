@@ -12,6 +12,8 @@
     [footerText]="'Container governance enabled: header, content, and footer layout contract active.'"
     (logout)="onLogout()"
   >
+    <app-notification-bell shell-header-actions />
+
     <section shell-content>
       <router-outlet />
     </section>

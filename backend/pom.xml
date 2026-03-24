@@ -26,8 +26,6 @@
         <module>tenant-service</module>
         <module>user-service</module>
         <module>license-service</module>
-        <module>product-service</module>
-        <module>persona-service</module>
         <module>notification-service</module>
         <module>audit-service</module>
         <module>ai-service</module>

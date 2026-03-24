@@ -158,16 +158,16 @@ function toTenantName(tenantId: string): string {
 
 function normalizeReturnUrl(value: string | null): string {
   if (!value) {
-    return '/administration';
+    return '/dashboard';
   }
 
   const trimmed = value.trim();
   if (!trimmed.startsWith('/')) {
-    return '/administration';
+    return '/dashboard';
   }
 
   if (trimmed === '/auth/login' || trimmed.startsWith('/auth/login?')) {
-    return '/administration';
+    return '/dashboard';
   }
 
   return trimmed;

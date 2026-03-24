@@ -1,0 +1,71 @@
+name: Backend Quality
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-quality.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-quality.yml"
+
+jobs:
+  backend-tests:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
+
+      - name: Build and run tests
+        working-directory: backend
+        run: mvn clean verify -B -q
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: backend/**/target/surefire-reports/
+          retention-days: 14
+
+  dependency-check:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "maven"
+
+      - name: OWASP Dependency Check
+        working-directory: backend
+        run: |
+          mvn org.owasp:dependency-check-maven:check -B -q \
+            -DfailBuildOnCVSS=9 \
+            -DsuppressionsLocation=../scripts/owasp-suppressions.xml \
+            || true
+        continue-on-error: true
+
+      - name: Upload dependency check report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: backend/**/target/dependency-check-report.html
+          retention-days: 14

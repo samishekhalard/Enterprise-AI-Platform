@@ -404,6 +404,36 @@ export interface DefinitionsPagedResponse<T> {
   readonly totalPages: number;
 }
 
+// ─── Notification Service ────────────────────────────────────────────────────
+export type NotificationType = 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS';
+export type NotificationChannel = 'SYSTEM' | 'EMAIL' | 'PUSH';
+
+export interface Notification {
+  readonly id: string;
+  readonly tenantId: string;
+  readonly userId: string;
+  readonly title: string;
+  readonly message: string;
+  readonly type: NotificationType;
+  readonly channel: NotificationChannel;
+  readonly read: boolean;
+  readonly readAt?: string;
+  readonly createdAt: string;
+  readonly metadata?: Record<string, unknown>;
+}
+
+export interface NotificationPagedResponse {
+  readonly content: readonly Notification[];
+  readonly page: number;
+  readonly size: number;
+  readonly totalElements: number;
+  readonly totalPages: number;
+}
+
+export interface UnreadCountResponse {
+  readonly count: number;
+}
+
 export interface UserSession {
   readonly id: string;
   readonly deviceName: string | null;

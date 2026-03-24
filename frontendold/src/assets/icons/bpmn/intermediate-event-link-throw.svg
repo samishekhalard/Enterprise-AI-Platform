@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" fill="none" stroke="#F97316">
-  <circle cx="1024" cy="1024" r="875" stroke-width="70" fill="#F5F5F5"/>
-  <circle cx="1024" cy="1024" r="750" stroke-width="70" fill="#F5F5F5"/>
-  <!-- Filled link arrow for throw -->
-  <path fill="#F97316" stroke="#F97316" stroke-width="80" stroke-linejoin="round" d="M624 1024h500l-200-300v200h400v200h-400v200z"/>
-</svg>

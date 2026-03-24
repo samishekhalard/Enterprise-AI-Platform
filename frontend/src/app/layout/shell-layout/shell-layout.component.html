@@ -4,7 +4,7 @@
   <header class="header-container">
     <div class="header-inner">
       <div class="header-island brand-island">
-        <a class="brand-logo" routerLink="/administration" aria-label="ThinkPLUS Home">
+        <a class="brand-logo" routerLink="/dashboard" aria-label="ThinkPLUS Home">
           <img src="assets/images/logo.svg" alt="ThinkPLUS" />
         </a>
         <div class="brand-block">
@@ -25,6 +25,8 @@
             {{ item.label }}
           </a>
         }
+
+        <ng-content select="[shell-header-actions]" />
 
         @if (authenticated) {
           <button type="button" (click)="onLogout()">Sign Out</button>

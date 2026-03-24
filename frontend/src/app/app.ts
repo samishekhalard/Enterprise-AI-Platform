@@ -3,11 +3,13 @@ import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthFacade } from './core/auth/auth-facade';
+import { NotificationService } from './core/services/notification.service';
+import { NotificationBellComponent } from './layout/notification-bell.component';
 import { ShellLayoutComponent, ShellNavItem } from './layout/shell-layout/shell-layout.component';
 
 @Component({
   selector: 'app-root',
-  imports: [ShellLayoutComponent, RouterOutlet],
+  imports: [ShellLayoutComponent, NotificationBellComponent, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -15,6 +17,7 @@ export class App {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly auth = inject(AuthFacade);
+  private readonly notificationService = inject(NotificationService);
   private readonly currentUrl = signal(resolveInitialUrl(this.router));
   private readonly appReadyState = signal(this.router.navigated);
 
@@ -23,8 +26,10 @@ export class App {
   protected readonly isAuthenticated = this.auth.isAuthenticated;
 
   protected readonly navItems: readonly ShellNavItem[] = [
+    { label: 'Dashboard', route: '/dashboard' },
     { label: 'Administration', route: '/administration' },
     { label: 'Tenants', route: '/tenants' },
+    { label: 'Profile', route: '/profile' },
   ];
 
   constructor() {
@@ -36,11 +41,18 @@ export class App {
       .subscribe((event) => {
         this.currentUrl.set(event.urlAfterRedirects);
         this.appReadyState.set(true);
+        this.refreshUnreadCount();
       });
   }
 
   protected onLogout(): void {
     this.auth.logout().subscribe();
+  }
+
+  private refreshUnreadCount(): void {
+    if (this.auth.isAuthenticated()) {
+      this.notificationService.getUnreadCount().subscribe();
+    }
   }
 }
 
