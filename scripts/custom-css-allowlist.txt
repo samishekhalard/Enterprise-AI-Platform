@@ -1,0 +1,2 @@
+# Format: CODE|FILE|SELECTOR
+# Existing tracked debt (non-blocking). New entries require architecture/frontend review.

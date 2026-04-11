@@ -1,0 +1,494 @@
+[
+  {
+    "viewport": "desktop",
+    "screen": "login",
+    "screenTitle": "Login Screen",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/auth/login",
+      "headings": [
+        "Welcome to master"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign in with Email",
+        "Contact support"
+      ],
+      "cardCount": 0,
+      "sectionCount": 0
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/login",
+      "headings": [
+        "Welcome to master"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Empower. Transform. Succeed.",
+        "English",
+        "Sign in with Email",
+        "Contact support",
+        "Keyboard Shortcuts"
+      ],
+      "cardCount": 0,
+      "sectionCount": 0
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": [
+          "Welcome to master"
+        ]
+      },
+      "navLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  },
+  {
+    "viewport": "desktop",
+    "screen": "admin-tenant-manager",
+    "screenTitle": "Administration - Tenant Manager",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/administration?section=tenant-manager",
+      "headings": [
+        "Tenants",
+        "Keyboard Shortcuts"
+      ],
+      "navLabels": [
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Sign out",
+        "Refresh"
+      ],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign out",
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Refresh"
+      ],
+      "cardCount": 2,
+      "sectionCount": 3
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/administration?section=tenant-manager",
+      "headings": [
+        "Administration Keyboard Hints",
+        "Tenant Manager",
+        "Total Tenants",
+        "Active",
+        "Locked",
+        "Licenses Used",
+        "Expiring Soon",
+        "Warnings",
+        "No Tenants"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Skip to main content",
+        "Create Tenant",
+        "Privacy",
+        "Terms",
+        "Support"
+      ],
+      "cardCount": 1,
+      "sectionCount": 3
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [
+          "Tenants",
+          "Keyboard Shortcuts"
+        ],
+        "onlyInCompare": [
+          "Administration Keyboard Hints",
+          "Tenant Manager",
+          "Total Tenants",
+          "Active",
+          "Locked",
+          "Licenses Used",
+          "Expiring Soon",
+          "Warnings",
+          "No Tenants"
+        ],
+        "shared": []
+      },
+      "navLabels": {
+        "onlyInBase": [
+          "Tenant Manager",
+          "License Manager",
+          "Master Locale",
+          "Master Definitions",
+          "Master Authentication",
+          "Sign out",
+          "Refresh"
+        ],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  },
+  {
+    "viewport": "desktop",
+    "screen": "admin-license-manager",
+    "screenTitle": "Administration - License Manager",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/administration?section=license-manager",
+      "headings": [
+        "License Manager",
+        "Import License File",
+        "Enabled Features",
+        "Keyboard Shortcuts"
+      ],
+      "navLabels": [
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Sign out"
+      ],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign out",
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Refresh",
+        "Choose .lic file",
+        "Import"
+      ],
+      "cardCount": 1,
+      "sectionCount": 4
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/administration?section=license-manager",
+      "headings": [
+        "Administration Keyboard Hints",
+        "License Management",
+        "No Licenses Configured"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Skip to main content",
+        "Import License",
+        "Add Your First License",
+        "Privacy",
+        "Terms",
+        "Support"
+      ],
+      "cardCount": 1,
+      "sectionCount": 3
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [
+          "License Manager",
+          "Import License File",
+          "Enabled Features",
+          "Keyboard Shortcuts"
+        ],
+        "onlyInCompare": [
+          "Administration Keyboard Hints",
+          "License Management",
+          "No Licenses Configured"
+        ],
+        "shared": []
+      },
+      "navLabels": {
+        "onlyInBase": [
+          "Tenant Manager",
+          "License Manager",
+          "Master Locale",
+          "Master Definitions",
+          "Master Authentication",
+          "Sign out"
+        ],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  },
+  {
+    "viewport": "mobile",
+    "screen": "login",
+    "screenTitle": "Login Screen",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/auth/login",
+      "headings": [
+        "Welcome to master"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign in with Email",
+        "Contact support"
+      ],
+      "cardCount": 0,
+      "sectionCount": 0
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/login",
+      "headings": [
+        "Welcome to master"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Empower. Transform. Succeed.",
+        "English",
+        "Sign in with Email",
+        "Contact support",
+        "Keyboard Shortcuts"
+      ],
+      "cardCount": 0,
+      "sectionCount": 0
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": [
+          "Welcome to master"
+        ]
+      },
+      "navLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  },
+  {
+    "viewport": "mobile",
+    "screen": "admin-tenant-manager",
+    "screenTitle": "Administration - Tenant Manager",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/administration?section=tenant-manager",
+      "headings": [
+        "Tenants",
+        "Keyboard Shortcuts"
+      ],
+      "navLabels": [
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Sign out",
+        "Refresh"
+      ],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign out",
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Refresh"
+      ],
+      "cardCount": 2,
+      "sectionCount": 3
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/administration?section=tenant-manager",
+      "headings": [
+        "Administration Keyboard Hints",
+        "Tenant Manager",
+        "Total Tenants",
+        "Active",
+        "Locked",
+        "Licenses Used",
+        "Expiring Soon",
+        "Warnings",
+        "No Tenants"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Skip to main content",
+        "Create Tenant",
+        "Privacy",
+        "Terms",
+        "Support"
+      ],
+      "cardCount": 1,
+      "sectionCount": 3
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [
+          "Tenants",
+          "Keyboard Shortcuts"
+        ],
+        "onlyInCompare": [
+          "Administration Keyboard Hints",
+          "Tenant Manager",
+          "Total Tenants",
+          "Active",
+          "Locked",
+          "Licenses Used",
+          "Expiring Soon",
+          "Warnings",
+          "No Tenants"
+        ],
+        "shared": []
+      },
+      "navLabels": {
+        "onlyInBase": [
+          "Tenant Manager",
+          "License Manager",
+          "Master Locale",
+          "Master Definitions",
+          "Master Authentication",
+          "Sign out",
+          "Refresh"
+        ],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  },
+  {
+    "viewport": "mobile",
+    "screen": "admin-license-manager",
+    "screenTitle": "Administration - License Manager",
+    "frontend": {
+      "title": "ThinkPLUS EMS",
+      "url": "http://127.0.0.1:4300/administration?section=license-manager",
+      "headings": [
+        "License Manager",
+        "Import License File",
+        "Enabled Features",
+        "Keyboard Shortcuts"
+      ],
+      "navLabels": [
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Sign out"
+      ],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Sign out",
+        "Tenant Manager",
+        "License Manager",
+        "Master Locale",
+        "Master Definitions",
+        "Master Authentication",
+        "Refresh",
+        "Choose .lic file",
+        "Import"
+      ],
+      "cardCount": 1,
+      "sectionCount": 4
+    },
+    "frontendold": {
+      "title": "master | Bitx Prodct",
+      "url": "http://127.0.0.1:4301/administration?section=license-manager",
+      "headings": [
+        "Administration Keyboard Hints",
+        "License Management",
+        "No Licenses Configured"
+      ],
+      "navLabels": [],
+      "tabLabels": [],
+      "ctaLabels": [
+        "Skip to main content",
+        "Import License",
+        "Add Your First License",
+        "Privacy",
+        "Terms",
+        "Support"
+      ],
+      "cardCount": 1,
+      "sectionCount": 3
+    },
+    "diffs": {
+      "headings": {
+        "onlyInBase": [
+          "License Manager",
+          "Import License File",
+          "Enabled Features",
+          "Keyboard Shortcuts"
+        ],
+        "onlyInCompare": [
+          "Administration Keyboard Hints",
+          "License Management",
+          "No Licenses Configured"
+        ],
+        "shared": []
+      },
+      "navLabels": {
+        "onlyInBase": [
+          "Tenant Manager",
+          "License Manager",
+          "Master Locale",
+          "Master Definitions",
+          "Master Authentication",
+          "Sign out"
+        ],
+        "onlyInCompare": [],
+        "shared": []
+      },
+      "tabLabels": {
+        "onlyInBase": [],
+        "onlyInCompare": [],
+        "shared": []
+      }
+    }
+  }
+]

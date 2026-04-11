@@ -1,0 +1,253 @@
+<app-page-frame
+  [title]="'My Profile'"
+  [subtitle]="'Manage your account settings and preferences'"
+>
+  <section page-content>
+    <div class="profile-grid">
+      <!-- Profile Information -->
+      <p-card data-testid="profile-info-card">
+        <ng-template #header>
+          <div class="card-header">
+            <i class="pi pi-user"></i>
+            <span>Profile Information</span>
+          </div>
+        </ng-template>
+
+        <div class="profile-details" data-testid="profile-details">
+          <div class="detail-row">
+            <span class="detail-label">Name</span>
+            <span class="detail-value" data-testid="profile-name">{{ profile().name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email</span>
+            <span class="detail-value" data-testid="profile-email">{{ profile().email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Role</span>
+            <span class="detail-value" data-testid="profile-role">
+              <p-tag [value]="profile().role" severity="info" />
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Tenant</span>
+            <span class="detail-value" data-testid="profile-tenant">{{ profile().tenant }}</span>
+          </div>
+        </div>
+      </p-card>
+
+      <!-- Change Password -->
+      <p-card data-testid="profile-password-card">
+        <ng-template #header>
+          <div class="card-header">
+            <i class="pi pi-lock"></i>
+            <span>Change Password</span>
+          </div>
+        </ng-template>
+
+        @if (passwordError()) {
+          <p-message
+            severity="error"
+            [text]="passwordError()!"
+            data-testid="password-error"
+          />
+        }
+
+        @if (passwordSuccess()) {
+          <p-message
+            severity="success"
+            [text]="passwordSuccess()!"
+            data-testid="password-success"
+          />
+        }
+
+        <form
+          [formGroup]="passwordForm"
+          (ngSubmit)="onChangePassword()"
+          class="password-form"
+          novalidate
+        >
+          <div class="form-field">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <p-password
+              id="currentPassword"
+              formControlName="currentPassword"
+              [feedback]="false"
+              [toggleMask]="true"
+              placeholder="Enter current password"
+              data-testid="input-current-password"
+              styleClass="w-full"
+            />
+            @if (isFieldInvalid('currentPassword')) {
+              <small class="field-error" data-testid="error-current-password">
+                Current password is required.
+              </small>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="newPassword" class="form-label">New Password</label>
+            <p-password
+              id="newPassword"
+              formControlName="newPassword"
+              [toggleMask]="true"
+              placeholder="Enter new password (min 8 chars)"
+              data-testid="input-new-password"
+              styleClass="w-full"
+            />
+            @if (isFieldInvalid('newPassword')) {
+              <small class="field-error" data-testid="error-new-password">
+                New password must be at least 8 characters.
+              </small>
+            }
+          </div>
+
+          <div class="form-field">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <p-password
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              [feedback]="false"
+              [toggleMask]="true"
+              placeholder="Re-enter new password"
+              data-testid="input-confirm-password"
+              styleClass="w-full"
+            />
+            @if (isFieldInvalid('confirmPassword')) {
+              <small class="field-error" data-testid="error-confirm-password">
+                Password confirmation is required.
+              </small>
+            }
+          </div>
+
+          <p-button
+            type="submit"
+            label="Change Password"
+            icon="pi pi-check"
+            [loading]="passwordLoading()"
+            [disabled]="passwordLoading()"
+            data-testid="btn-change-password"
+          />
+        </form>
+      </p-card>
+
+      <!-- Active Sessions -->
+      <p-card data-testid="profile-sessions-card">
+        <ng-template #header>
+          <div class="card-header">
+            <i class="pi pi-desktop"></i>
+            <span>Active Sessions</span>
+          </div>
+        </ng-template>
+
+        @if (sessionsError()) {
+          <p-message
+            severity="error"
+            [text]="sessionsError()!"
+            data-testid="sessions-error"
+          />
+        }
+
+        @if (sessionsLoading()) {
+          <div class="loading-container" data-testid="sessions-loading">
+            <p-progressSpinner
+              strokeWidth="3"
+              animationDuration="1s"
+              [style]="{ width: '36px', height: '36px' }"
+            />
+          </div>
+        }
+
+        <div class="sessions-list" data-testid="sessions-list">
+          @for (sess of sessions(); track sess.id) {
+            <div
+              class="session-item"
+              [class.session-current]="sess.isCurrent"
+              [attr.data-testid]="'session-' + sess.id"
+            >
+              <div class="session-info">
+                <span class="session-device">
+                  {{ sess.deviceName ?? 'Unknown device' }}
+                  @if (sess.isCurrent) {
+                    <p-tag value="Current" severity="success" class="session-badge" />
+                  }
+                </span>
+                <span class="session-meta">
+                  {{ sess.ipAddress ?? 'Unknown IP' }}
+                  &middot;
+                  {{ sess.status }}
+                </span>
+                <span class="session-meta">
+                  Last active: {{ sess.lastActivity ?? 'Unknown' }}
+                </span>
+              </div>
+              <p-tag
+                [value]="sess.status"
+                [severity]="sess.status === 'ACTIVE' ? 'success' : 'warn'"
+              />
+            </div>
+          } @empty {
+            @if (!sessionsLoading()) {
+              <p class="muted" data-testid="sessions-empty">No active sessions found.</p>
+            }
+          }
+        </div>
+
+        @if (sessions().length > 0) {
+          <div class="sessions-actions">
+            <p-button
+              label="Revoke All Sessions"
+              icon="pi pi-times"
+              severity="danger"
+              [outlined]="true"
+              [loading]="sessionsLoading()"
+              (onClick)="revokeAllSessions()"
+              data-testid="btn-revoke-sessions"
+            />
+            <p-button
+              label="Refresh"
+              icon="pi pi-refresh"
+              [outlined]="true"
+              [loading]="sessionsLoading()"
+              (onClick)="loadSessions()"
+              data-testid="btn-refresh-sessions"
+            />
+          </div>
+        }
+      </p-card>
+
+      <!-- Preferences -->
+      <p-card data-testid="profile-preferences-card">
+        <ng-template #header>
+          <div class="card-header">
+            <i class="pi pi-palette"></i>
+            <span>Preferences</span>
+          </div>
+        </ng-template>
+
+        <div class="preference-item">
+          <div class="preference-info">
+            <span class="preference-label">Dark Mode</span>
+            <span class="preference-desc">Switch between light and dark theme</span>
+          </div>
+          <button
+            type="button"
+            class="theme-toggle"
+            [class.active]="darkMode()"
+            (click)="toggleDarkMode()"
+            [attr.aria-pressed]="darkMode()"
+            aria-label="Toggle dark mode"
+            data-testid="btn-toggle-dark-mode"
+          >
+            <span class="toggle-track">
+              <span class="toggle-thumb">
+                <i [class]="darkMode() ? 'pi pi-moon' : 'pi pi-sun'"></i>
+              </span>
+            </span>
+          </button>
+        </div>
+      </p-card>
+    </div>
+  </section>
+
+  <p page-footer>Profile settings are stored locally. Password changes require backend integration.</p>
+</app-page-frame>

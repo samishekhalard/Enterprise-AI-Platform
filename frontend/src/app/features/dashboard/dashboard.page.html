@@ -1,0 +1,154 @@
+<app-page-frame
+  [title]="'Dashboard'"
+  [subtitle]="'Welcome back, ' + userName()"
+>
+  <div page-actions class="controls">
+    <button
+      type="button"
+      class="app-btn"
+      data-testid="dashboard-refresh-btn"
+      (click)="loadStats()"
+      [disabled]="loading()"
+    >
+      Refresh
+    </button>
+  </div>
+
+  <section page-content>
+    @if (error()) {
+      <section class="app-alert app-alert-error" role="alert" data-testid="dashboard-error">
+        {{ error() }}
+      </section>
+    }
+
+    @if (loading()) {
+      <div class="loading-container" data-testid="dashboard-loading">
+        <p-progressSpinner
+          strokeWidth="3"
+          animationDuration="1s"
+          [style]="{ width: '48px', height: '48px' }"
+        />
+        <p class="muted">Loading dashboard data...</p>
+      </div>
+    }
+
+    <!-- Welcome banner -->
+    <section class="welcome-banner" data-testid="dashboard-welcome">
+      <div class="welcome-content">
+        <h3>Welcome, {{ userName() }}</h3>
+        <p class="welcome-role">
+          Role: <strong>{{ userRole() }}</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- Stats grid -->
+    <section class="stats-grid" data-testid="dashboard-stats">
+      <p-card data-testid="stat-total-tenants">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-building"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats()?.totalTenants ?? '--' }}</span>
+            <span class="stat-label">Total Tenants</span>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card data-testid="stat-active-users">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-users"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats()?.activeUsers ?? '--' }}</span>
+            <span class="stat-label">Active Users</span>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card data-testid="stat-license-status">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-shield"></i>
+          </div>
+          <div class="stat-info">
+            @if (stats()?.licenseStatus) {
+              <p-tag
+                [value]="stats()!.licenseStatus"
+                [severity]="licenseTagSeverity()"
+                data-testid="license-tag"
+              />
+            } @else {
+              <span class="stat-value">--</span>
+            }
+            <span class="stat-label">License Status</span>
+          </div>
+        </div>
+      </p-card>
+
+      <p-card data-testid="stat-active-processes">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="pi pi-sync"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats()?.activeProcesses ?? '--' }}</span>
+            <span class="stat-label">Active Processes</span>
+          </div>
+        </div>
+      </p-card>
+    </section>
+
+    <!-- Two-column layout: Activity + Quick links -->
+    <section class="dashboard-columns">
+      <!-- Recent activity -->
+      <div class="activity-section">
+        <h3 class="section-title">Recent Activity</h3>
+        <div class="activity-feed" data-testid="dashboard-activity-feed">
+          @for (activity of activities(); track activity.id) {
+            <div class="activity-item" [attr.data-testid]="'activity-' + activity.id">
+              <div class="activity-icon">
+                <i [class]="activity.icon"></i>
+              </div>
+              <div class="activity-body">
+                <p class="activity-desc">{{ activity.description }}</p>
+                <span class="activity-time">{{ activity.timestamp }}</span>
+              </div>
+              <p-tag
+                [value]="activity.type"
+                [severity]="activitySeverity(activity.type)"
+                class="activity-tag"
+              />
+            </div>
+          } @empty {
+            <p class="muted" data-testid="dashboard-activity-empty">No recent activity.</p>
+          }
+        </div>
+      </div>
+
+      <!-- Quick navigation -->
+      <div class="quicklinks-section">
+        <h3 class="section-title">Quick Navigation</h3>
+        <div class="quicklinks-grid" data-testid="dashboard-quicklinks">
+          @for (link of quickLinks(); track link.route) {
+            <a
+              [routerLink]="link.route"
+              class="quicklink-card"
+              [attr.data-testid]="'quicklink-' + link.label.toLowerCase()"
+            >
+              <i [class]="link.icon" class="quicklink-icon"></i>
+              <div class="quicklink-info">
+                <strong>{{ link.label }}</strong>
+                <span class="quicklink-desc">{{ link.description }}</span>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <p page-footer>Dashboard provides an overview of the system. Data refreshes on page load.</p>
+</app-page-frame>
