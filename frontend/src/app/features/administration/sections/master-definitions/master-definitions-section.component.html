@@ -1,0 +1,1631 @@
+<section class="definitions-manager">
+  <!-- ── Error banner ─────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="tp-banner tp-banner-error" role="alert">
+      <div class="error-message">
+        <ng-icon name="phosphorWarningThin" aria-hidden="true" />
+        <span>{{ error() }}</span>
+      </div>
+      <div class="error-actions">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          size="small"
+          label="Retry"
+          aria-label="Retry loading object types"
+          data-testid="definitions-retry-btn"
+          (click)="loadObjectTypes()"
+        >
+          <ng-icon name="phosphorArrowClockwiseThin" size="16" />
+        </button>
+        <button
+          type="button"
+          pButton
+          [text]="true"
+          severity="secondary"
+          aria-label="Dismiss error"
+          data-testid="definitions-dismiss-error-btn"
+          (click)="error.set(null)"
+        >
+          <ng-icon name="phosphorXThin" size="16" />
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="split-grid">
+    <!-- ── Left panel: object type list ───────────────────────────────────── -->
+    <div class="list-panel">
+      <div class="list-card">
+        <!-- Toolbar -->
+        <div class="list-head">
+          <h3>Object Types</h3>
+          <div class="head-actions">
+            <div class="view-toggle" role="radiogroup" aria-label="Object type view mode">
+              <button
+                type="button"
+                pButton
+                [text]="true"
+                severity="secondary"
+                [class.active]="viewMode() === 'list'"
+                [attr.aria-checked]="viewMode() === 'list'"
+                role="radio"
+                aria-label="Table view"
+                data-testid="definitions-view-list-btn"
+                (click)="setViewMode('list')"
+              >
+                <ng-icon name="phosphorListThin" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                pButton
+                [text]="true"
+                severity="secondary"
+                [class.active]="viewMode() === 'card'"
+                [attr.aria-checked]="viewMode() === 'card'"
+                role="radio"
+                aria-label="Card view"
+                data-testid="definitions-view-card-btn"
+                (click)="setViewMode('card')"
+              >
+                <ng-icon name="phosphorSquaresFourThin" aria-hidden="true" />
+              </button>
+            </div>
+            <button
+              type="button"
+              pButton
+              severity="primary"
+              label="New Type"
+              aria-label="Create new object type"
+              data-testid="definitions-new-type-btn"
+              (click)="openWizard()"
+            >
+              <ng-icon name="phosphorPlusThin" size="16" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Search + filter row -->
+        <div class="filter-row">
+          <span class="search-wrap">
+            <ng-icon name="phosphorMagnifyingGlassThin" class="search-icon" aria-hidden="true" />
+            <input
+              type="search"
+              pInputText
+              class="type-search"
+              [ngModel]="search()"
+              (ngModelChange)="search.set($event)"
+              placeholder="Search types..."
+              aria-label="Search object types"
+              data-testid="definitions-search-input"
+            />
+          </span>
+          <p-select
+            [options]="statusOptions"
+            [ngModel]="statusFilter()"
+            (ngModelChange)="statusFilter.set($event)"
+            optionLabel="label"
+            optionValue="value"
+            [pt]="statusSelectPt"
+            styleClass="status-dropdown"
+            aria-label="Filter by status"
+            data-testid="definitions-status-filter"
+            appendTo="body"
+          />
+        </div>
+
+        <!-- Loading state -->
+        @if (loading()) {
+          <div class="skeleton-list" aria-busy="true" aria-label="Loading object types">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <div class="skeleton-row">
+                <p-skeleton shape="circle" width="32px" height="32px" />
+                <div class="skeleton-text">
+                  <p-skeleton width="60%" height="14px" />
+                  <p-skeleton width="40%" height="12px" />
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (viewMode() === 'list') {
+          <!-- Table / list view -->
+          @if (filteredTypes().length > 0) {
+            <ul class="type-items" role="listbox" aria-label="Object types list">
+              @for (ot of filteredTypes(); track ot.id) {
+                <li
+                  class="type-item"
+                  [class.selected]="selectedObjectType()?.id === ot.id"
+                  role="option"
+                  [attr.aria-selected]="selectedObjectType()?.id === ot.id"
+                  tabindex="0"
+                  data-testid="definitions-type-item"
+                  (click)="selectObjectType(ot)"
+                  (keydown.enter)="selectObjectType(ot)"
+                  (keydown.space)="selectObjectType(ot); $event.preventDefault()"
+                >
+                  <div class="type-row">
+                    <span
+                      class="icon-circle"
+                      [style.background-color]="ot.iconColor"
+                      aria-hidden="true"
+                    >
+                      <ng-icon [name]="ot.iconName | iconName" aria-hidden="true" />
+                    </span>
+                    <div class="type-info">
+                      <strong>{{ ot.name }}</strong>
+                      <span class="type-key">{{ ot.typeKey }}</span>
+                    </div>
+                    <p-tag
+                      [value]="getStatusLabel(ot.status)"
+                      [severity]="getStatusSeverity(ot.status)"
+                      [rounded]="true"
+                    />
+                    <p-tag
+                      [value]="getStateLabel(ot.state)"
+                      [severity]="getStateSeverity(ot.state)"
+                      [rounded]="true"
+                      data-testid="definitions-state-badge"
+                    />
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      class="action-btn"
+                      aria-label="Duplicate object type {{ ot.name }}"
+                      data-testid="definitions-duplicate-btn"
+                      pTooltip="Duplicate"
+                      (click)="duplicateItem(ot, $event)"
+                    >
+                      <ng-icon name="phosphorCopyThin" size="16" />
+                    </button>
+                    @if (ot.state === 'customized') {
+                      <button
+                        type="button"
+                        pButton
+                        [text]="true"
+                        severity="warn"
+                        class="action-btn"
+                        aria-label="Restore object type {{ ot.name }} to default"
+                        data-testid="definitions-restore-btn"
+                        pTooltip="Restore to Default"
+                        (click)="restoreToDefault(ot, $event)"
+                      >
+                        <ng-icon name="phosphorArrowCounterClockwiseThin" size="16" />
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="danger"
+                      class="delete-btn"
+                      [disabled]="(ot.instanceCount ?? 0) > 0 || ot.state === 'default'"
+                      aria-label="Delete object type {{ ot.name }}"
+                      data-testid="definitions-delete-btn"
+                      pTooltip="{{
+                        (ot.instanceCount ?? 0) > 0
+                          ? 'Cannot delete: has active instances'
+                          : ot.state === 'default'
+                            ? 'Cannot delete default types'
+                            : 'Delete'
+                      }}"
+                      (click)="confirmDelete(ot, $event)"
+                    >
+                      <ng-icon name="phosphorTrashThin" size="16" />
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="empty-list" data-testid="definitions-empty-state">
+              <ng-icon name="phosphorTrayThin" class="empty-icon" aria-hidden="true" size="48" />
+              <p>No object types match your criteria.</p>
+            </div>
+          }
+        } @else {
+          <!-- Card grid view -->
+          @if (filteredTypes().length > 0) {
+            <div class="card-grid" data-testid="definitions-card-grid">
+              @for (ot of filteredTypes(); track ot.id) {
+                <article
+                  class="type-card"
+                  [class.selected]="selectedObjectType()?.id === ot.id"
+                  tabindex="0"
+                  data-testid="definitions-type-card"
+                  (click)="selectObjectType(ot)"
+                  (keydown.enter)="selectObjectType(ot)"
+                  (keydown.space)="selectObjectType(ot); $event.preventDefault()"
+                >
+                  <div class="card-head">
+                    <span
+                      class="icon-circle"
+                      [style.background-color]="ot.iconColor"
+                      aria-hidden="true"
+                    >
+                      <ng-icon [name]="ot.iconName | iconName" aria-hidden="true" />
+                    </span>
+                    <p-tag
+                      [value]="getStatusLabel(ot.status)"
+                      [severity]="getStatusSeverity(ot.status)"
+                      [rounded]="true"
+                    />
+                  </div>
+                  <strong class="card-name">{{ ot.name }}</strong>
+                  <div class="card-meta">
+                    <span class="badge-count" pTooltip="Attributes">
+                      <ng-icon name="phosphorListThin" aria-hidden="true" size="14" />
+                      {{ ot.attributes?.length ?? 0 }}
+                    </span>
+                    <span class="badge-count" pTooltip="Connections">
+                      <ng-icon name="phosphorShareNetworkThin" aria-hidden="true" size="14" />
+                      {{ ot.connections?.length ?? 0 }}
+                    </span>
+                  </div>
+                  <div class="card-actions">
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      size="small"
+                      aria-label="Duplicate object type {{ ot.name }}"
+                      data-testid="definitions-card-duplicate-btn"
+                      pTooltip="Duplicate"
+                      (click)="duplicateItem(ot, $event)"
+                    >
+                      <ng-icon name="phosphorCopyThin" size="16" />
+                    </button>
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="danger"
+                      size="small"
+                      class="card-delete-btn"
+                      [disabled]="(ot.instanceCount ?? 0) > 0 || ot.state === 'default'"
+                      aria-label="Delete object type {{ ot.name }}"
+                      data-testid="definitions-card-delete-btn"
+                      pTooltip="Delete"
+                      (click)="confirmDelete(ot, $event)"
+                    >
+                      <ng-icon name="phosphorTrashThin" size="16" />
+                    </button>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="empty-list" data-testid="definitions-empty-state">
+              <ng-icon name="phosphorTrayThin" class="empty-icon" aria-hidden="true" size="48" />
+              <p>No object types match your criteria.</p>
+            </div>
+          }
+        }
+
+        <!-- Record count -->
+        @if (!loading() && filteredTypes().length > 0) {
+          <p class="record-count muted">
+            Showing {{ filteredTypes().length }} of {{ totalRecords() }} object types
+          </p>
+        }
+      </div>
+    </div>
+
+    <!-- ── Right panel: detail ────────────────────────────────────────────── -->
+    <div class="detail-panel">
+      @if (selectedObjectType(); as ot) {
+        <div class="detail-card" data-testid="definitions-detail-panel">
+          @if (!detailEditMode()) {
+            <!-- ── View mode ── -->
+            <header class="detail-header">
+              <div class="detail-title-row">
+                <span
+                  class="icon-circle icon-circle-lg"
+                  [style.background-color]="ot.iconColor"
+                  aria-hidden="true"
+                >
+                  <ng-icon [name]="ot.iconName | iconName" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3>{{ ot.name }}</h3>
+                  <code class="type-key-code">{{ ot.typeKey }}</code>
+                </div>
+              </div>
+              <div class="detail-header-actions">
+                <p-tag
+                  [value]="getStatusLabel(ot.status)"
+                  [severity]="getStatusSeverity(ot.status)"
+                  [rounded]="true"
+                />
+                <p-tag
+                  [value]="getStateLabel(ot.state)"
+                  [severity]="getStateSeverity(ot.state)"
+                  [rounded]="true"
+                />
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  label="Edit"
+                  size="small"
+                  aria-label="Edit object type"
+                  data-testid="definitions-edit-btn"
+                  (click)="enterEditMode(ot)"
+                >
+                  <ng-icon name="phosphorPencilSimpleThin" size="16" />
+                </button>
+                <button
+                  type="button"
+                  pButton
+                  severity="danger"
+                  size="small"
+                  [text]="true"
+                  [disabled]="(ot.instanceCount ?? 0) > 0 || ot.state === 'default'"
+                  aria-label="Delete object type"
+                  data-testid="definitions-detail-delete-btn"
+                  pTooltip="{{
+                    (ot.instanceCount ?? 0) > 0
+                      ? 'Cannot delete: has active instances'
+                      : ot.state === 'default'
+                        ? 'Cannot delete default types'
+                        : 'Delete'
+                  }}"
+                  (click)="confirmDelete(ot, $event)"
+                >
+                  <ng-icon name="phosphorTrashThin" size="16" />
+                </button>
+              </div>
+            </header>
+
+            @if (ot.description) {
+              <p class="detail-description">{{ ot.description }}</p>
+            }
+
+            <div class="detail-meta-grid">
+              <div class="meta-field">
+                <span class="label">Code</span>
+                <strong>{{ ot.code }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">State</span>
+                <strong>{{ getStateLabel(ot.state) }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">Attributes</span>
+                <strong>{{ ot.attributes?.length ?? 0 }}</strong>
+              </div>
+              <div class="meta-field">
+                <span class="label">Connections</span>
+                <strong>{{ ot.connections?.length ?? 0 }}</strong>
+              </div>
+              @if (ot.instanceCount !== undefined) {
+                <div class="meta-field">
+                  <span class="label">Instances</span>
+                  <strong>{{ ot.instanceCount }}</strong>
+                </div>
+              }
+              @if (ot.createdAt) {
+                <div class="meta-field">
+                  <span class="label">Created</span>
+                  <strong>{{ ot.createdAt | date: 'dd MMM y, HH:mm' }}</strong>
+                </div>
+              }
+              @if (ot.updatedAt) {
+                <div class="meta-field">
+                  <span class="label">Updated</span>
+                  <strong>{{ ot.updatedAt | date: 'dd MMM y, HH:mm' }}</strong>
+                </div>
+              }
+            </div>
+
+            <!-- ── Fact Sheet Tabs ─────────────────────────────────────── -->
+            <div class="fact-sheet-tabs" data-testid="fact-sheet-tabs">
+              <p-tabs
+                [value]="factSheetTab()"
+                (valueChange)="factSheetTab.set($event?.toString() ?? 'attributes')"
+                [pt]="$any(factSheetTabsPt)"
+              >
+                <p-tablist>
+                  <p-tab value="attributes">
+                    <ng-icon name="phosphorListThin" aria-hidden="true" size="16" />
+                    Attributes ({{ ot.attributes?.length ?? 0 }})
+                  </p-tab>
+                  <p-tab value="connections">
+                    <ng-icon name="phosphorShareNetworkThin" aria-hidden="true" size="16" />
+                    Connections ({{ ot.connections?.length ?? 0 }})
+                  </p-tab>
+                  <p-tab value="instances">
+                    <ng-icon name="phosphorSquaresFourThin" aria-hidden="true" size="16" />
+                    Instances ({{ ot.instanceCount ?? 0 }})
+                  </p-tab>
+                </p-tablist>
+
+                <p-tabpanels>
+                  <!-- ── Attributes Tab ── -->
+                  <p-tabpanel value="attributes">
+                    <section class="attributes-section" data-testid="detail-attributes-section">
+                      <div class="section-header">
+                        <h4>Attributes</h4>
+                        <button
+                          type="button"
+                          pButton
+                          [text]="true"
+                          severity="secondary"
+                          size="small"
+                          label="Add"
+                          aria-label="Add attribute to object type"
+                          data-testid="detail-add-attribute-btn"
+                          (click)="openAddAttributeDialog()"
+                        >
+                          <ng-icon name="phosphorPlusThin" size="16" />
+                        </button>
+                      </div>
+                      @if (ot.attributes && ot.attributes.length > 0) {
+                        <div class="attributes-list">
+                          @for (attr of ot.attributes; track attr.attributeTypeId) {
+                            <div class="attribute-row">
+                              <ng-icon
+                                name="phosphorTagThin"
+                                class="attr-icon"
+                                aria-hidden="true"
+                                size="16"
+                              />
+                              <div class="attr-row-info">
+                                <strong>{{ attr.name }}</strong>
+                                @if (attr.attributeGroup) {
+                                  <span class="attr-group muted">{{ attr.attributeGroup }}</span>
+                                }
+                              </div>
+                              <p-tag
+                                [value]="attr.dataType"
+                                severity="secondary"
+                                [rounded]="true"
+                              />
+                              @if (attr.isRequired) {
+                                <p-tag value="Required" severity="warn" [rounded]="true" />
+                              }
+                              <span class="row-spacer"></span>
+                              <button
+                                type="button"
+                                pButton
+                                [text]="true"
+                                severity="danger"
+                                size="small"
+                                class="remove-btn"
+                                aria-label="Remove attribute {{ attr.name }}"
+                                data-testid="detail-remove-attribute-btn"
+                                (click)="removeAttributeFromSelected(attr.attributeTypeId)"
+                              >
+                                <ng-icon name="phosphorXThin" size="16" />
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      } @else {
+                        <div class="empty-tab-state">
+                          <ng-icon name="phosphorTrayThin" aria-hidden="true" size="32" />
+                          <p>No attributes linked yet.</p>
+                          <button
+                            type="button"
+                            pButton
+                            severity="secondary"
+                            label="Add Attribute"
+                            aria-label="Add Attribute"
+                            size="small"
+                            (click)="openAddAttributeDialog()"
+                          >
+                            <ng-icon name="phosphorPlusThin" size="16" />
+                          </button>
+                        </div>
+                      }
+                    </section>
+                  </p-tabpanel>
+
+                  <!-- ── Connections Tab ── -->
+                  <p-tabpanel value="connections">
+                    <section class="connections-section" data-testid="detail-connections-section">
+                      <div class="section-header">
+                        <h4>Connections</h4>
+                        <button
+                          type="button"
+                          pButton
+                          [text]="true"
+                          severity="secondary"
+                          size="small"
+                          label="Add"
+                          aria-label="Add connection to object type"
+                          data-testid="detail-add-connection-btn"
+                          (click)="openAddConnectionDialog()"
+                        >
+                          <ng-icon name="phosphorPlusThin" size="16" />
+                        </button>
+                      </div>
+                      @if (ot.connections && ot.connections.length > 0) {
+                        <div class="connections-list">
+                          @for (conn of ot.connections; track $index) {
+                            <div class="connection-row">
+                              <ng-icon
+                                name="phosphorArrowsLeftRightThin"
+                                class="conn-icon"
+                                aria-hidden="true"
+                                size="16"
+                              />
+                              <div class="conn-row-info">
+                                <strong>{{ conn.activeName }}</strong>
+                                <span class="muted">to {{ conn.targetObjectTypeName }}</span>
+                              </div>
+                              <p-tag [value]="conn.cardinality" severity="info" [rounded]="true" />
+                              @if (conn.isDirected) {
+                                <p-tag value="Directed" severity="secondary" [rounded]="true" />
+                              }
+                              <span class="row-spacer"></span>
+                              <button
+                                type="button"
+                                pButton
+                                [text]="true"
+                                severity="danger"
+                                size="small"
+                                class="remove-btn"
+                                aria-label="Remove connection to {{ conn.targetObjectTypeName }}"
+                                data-testid="detail-remove-connection-btn"
+                                (click)="removeConnectionFromSelected(conn.targetObjectTypeId)"
+                              >
+                                <ng-icon name="phosphorXThin" size="16" />
+                              </button>
+                            </div>
+                          }
+                        </div>
+                      } @else {
+                        <div class="empty-tab-state">
+                          <ng-icon name="phosphorShareNetworkThin" aria-hidden="true" size="32" />
+                          <p>No connections defined yet.</p>
+                          <button
+                            type="button"
+                            pButton
+                            severity="secondary"
+                            label="Add Connection"
+                            aria-label="Add Connection"
+                            size="small"
+                            (click)="openAddConnectionDialog()"
+                          >
+                            <ng-icon name="phosphorPlusThin" size="16" />
+                          </button>
+                        </div>
+                      }
+                    </section>
+                  </p-tabpanel>
+
+                  <!-- ── Instances Tab ── -->
+                  <p-tabpanel value="instances">
+                    <section class="instances-section" data-testid="detail-instances-section">
+                      <div class="section-header">
+                        <h4>Instances of {{ ot.name }}</h4>
+                      </div>
+                      @if ((ot.instanceCount ?? 0) > 0) {
+                        <div class="instances-placeholder">
+                          <ng-icon name="phosphorSquaresFourThin" aria-hidden="true" size="32" />
+                          <p>
+                            {{ ot.instanceCount }} instance(s) of this object type exist in the
+                            system.
+                          </p>
+                          <p class="muted">Instance management is available in the CMDB module.</p>
+                        </div>
+                      } @else {
+                        <div class="empty-tab-state">
+                          <ng-icon name="phosphorSquaresFourThin" aria-hidden="true" size="32" />
+                          <p>No instances of this object type exist yet.</p>
+                          <p class="muted">
+                            Instances are created in the CMDB module using this type definition.
+                          </p>
+                        </div>
+                      }
+                    </section>
+                  </p-tabpanel>
+                </p-tabpanels>
+              </p-tabs>
+            </div>
+          } @else {
+            <!-- ── Edit mode ── -->
+            <header class="detail-header">
+              <h3>Edit Object Type</h3>
+              <code class="type-key-code muted">{{ ot.typeKey }}</code>
+            </header>
+
+            <div class="edit-form" data-testid="definitions-edit-form">
+              <div class="wizard-field">
+                <label for="edit-name">Name <span class="required">*</span></label>
+                <input
+                  id="edit-name"
+                  type="text"
+                  pInputText
+                  class="wizard-input"
+                  [ngModel]="editName()"
+                  (ngModelChange)="editName.set($event)"
+                  placeholder="Object type name"
+                  maxlength="100"
+                  aria-label="Name"
+                  data-testid="edit-name-input"
+                />
+              </div>
+
+              <div class="wizard-field">
+                <label for="edit-desc">Description</label>
+                <textarea
+                  id="edit-desc"
+                  pTextarea
+                  class="wizard-textarea"
+                  rows="3"
+                  [ngModel]="editDescription()"
+                  (ngModelChange)="editDescription.set($event)"
+                  placeholder="Description"
+                  maxlength="500"
+                  aria-label="Description"
+                  data-testid="edit-description-input"
+                ></textarea>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Status</label>
+                <div class="status-buttons" role="radiogroup" aria-label="Status">
+                  @for (opt of statusOptions | slice: 1; track opt.value) {
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      class="status-btn"
+                      [class.selected]="editStatus() === opt.value"
+                      (click)="editStatus.set($any(opt.value))"
+                      [attr.aria-pressed]="editStatus() === opt.value"
+                    >
+                      {{ opt.label }}
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Icon</label>
+                <div class="icon-grid" role="listbox" aria-label="Choose an icon">
+                  @for (icon of iconOptions; track icon) {
+                    <button
+                      type="button"
+                      pButton
+                      [text]="true"
+                      severity="secondary"
+                      class="icon-grid-item"
+                      [class.selected]="editIconName() === icon"
+                      (click)="editIconName.set(icon)"
+                      [attr.aria-label]="icon"
+                      role="option"
+                      [attr.aria-selected]="editIconName() === icon"
+                    >
+                      <ng-icon [name]="icon" aria-hidden="true" />
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="wizard-field">
+                <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+                <label>Icon Color</label>
+                <div class="color-picker-row">
+                  <div
+                    class="icon-preview-box"
+                    [style.background-color]="editIconColor()"
+                    aria-hidden="true"
+                  >
+                    <ng-icon [name]="editIconName()" />
+                  </div>
+                  <div class="color-swatches" role="listbox" aria-label="Choose a color">
+                    @for (color of colorSwatches; track $index) {
+                      <button
+                        type="button"
+                        pButton
+                        [text]="true"
+                        severity="secondary"
+                        class="color-swatch"
+                        [class.selected]="editIconColor() === color"
+                        [style.background-color]="color"
+                        (click)="editIconColor.set(color)"
+                        [attr.aria-label]="'Color ' + color"
+                        role="option"
+                        [attr.aria-selected]="editIconColor() === color"
+                      ></button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  [text]="true"
+                  label="Cancel"
+                  aria-label="Cancel editing"
+                  data-testid="edit-cancel-btn"
+                  (click)="cancelEditMode()"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  severity="primary"
+                  label="Save"
+                  [disabled]="!editName().trim() || editSaving()"
+                  [loading]="editSaving()"
+                  aria-label="Save changes"
+                  data-testid="edit-save-btn"
+                  (click)="saveEdit()"
+                >
+                  <ng-icon name="phosphorCheckThin" size="16" />
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-detail-card" data-testid="definitions-empty-detail">
+          <ng-icon name="phosphorArrowLeftThin" class="empty-icon" aria-hidden="true" size="48" />
+          <h4>Select an Object Type</h4>
+          <p class="muted">
+            Choose an object type from the list to view its details, attributes, and connections.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── Delete Confirmation Dialog ────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showDeleteConfirm()"
+  (visibleChange)="showDeleteConfirm.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '420px' }"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  header="Delete Object Type"
+  aria-label="Delete confirmation"
+  data-testid="definitions-delete-confirm-dialog"
+  (onHide)="cancelDelete()"
+>
+  <p>
+    Delete <strong>{{ pendingDeleteItem()?.name }}</strong
+    >? This action cannot be undone.
+  </p>
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        data-testid="definitions-delete-cancel-btn"
+        (click)="cancelDelete()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        pButton
+        severity="danger"
+        data-testid="definitions-delete-confirm-btn"
+        (click)="executeDelete()"
+      >
+        <ng-icon name="phosphorTrashThin" size="16" />
+        Delete
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Create Wizard Dialog ─────────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showWizard()"
+  (visibleChange)="showWizard.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="wizard-dialog"
+  [style]="wizardDialogStyle"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="wizardDialogPt"
+  aria-label="Create new object type wizard"
+  data-testid="definitions-wizard-dialog"
+  (onHide)="closeWizard()"
+>
+  <ng-template pTemplate="header">
+    <div class="wizard-dialog-header">
+      <span class="wizard-dialog-title">Create New Object Type</span>
+      <span class="wizard-dialog-subtitle">Define a new object type for your repository</span>
+    </div>
+  </ng-template>
+
+  <!-- Step indicators -->
+  <div class="wizard-steps">
+    @for (
+      step of ['Basic Info', 'Connections', 'Attributes', 'Status'];
+      track step;
+      let i = $index
+    ) {
+      <div
+        class="wizard-step"
+        [class.active]="stepIndex() === i"
+        [class.completed]="stepIndex() > i"
+      >
+        <span class="step-number">{{ i + 1 }}</span>
+        <span class="step-label">{{ step }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── Step 0: Basic Info ────────────────────────────────────────────── -->
+  @if (stepIndex() === 0) {
+    <div class="wizard-body" data-testid="wizard-step-basic">
+      <!-- Code (readonly, auto-assigned) -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Code</label>
+        <div class="readonly-input-wrap">
+          <input
+            type="text"
+            pInputText
+            class="wizard-input readonly-input"
+            value="OBJ_XXX"
+            [attr.readonly]="true"
+            aria-label="Object type code (auto-assigned)"
+            aria-readonly="true"
+          />
+          <ng-icon name="phosphorLockThin" class="readonly-lock" aria-hidden="true" size="16" />
+        </div>
+        <small class="field-hint">
+          <ng-icon name="phosphorInfoThin" aria-hidden="true" size="14" />
+          Code will be automatically assigned
+        </small>
+      </div>
+
+      <!-- Name (required, char count) -->
+      <div class="wizard-field">
+        <label for="wiz-name">Name <span class="required">*</span></label>
+        <input
+          id="wiz-name"
+          type="text"
+          pInputText
+          class="wizard-input"
+          [ngModel]="wizardName()"
+          (ngModelChange)="wizardName.set($event)"
+          placeholder="Enter object type name..."
+          maxlength="100"
+          aria-label="Object type name (required)"
+          data-testid="wizard-name-input"
+        />
+        <small class="char-count">{{ wizardName().length }}/100 characters</small>
+      </div>
+
+      <!-- Icon grid -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Icon</label>
+        <div
+          class="icon-grid"
+          role="listbox"
+          aria-label="Choose an icon"
+          data-testid="wizard-icon-grid"
+        >
+          @for (icon of iconOptions; track icon) {
+            <button
+              type="button"
+              pButton
+              [text]="true"
+              severity="secondary"
+              class="icon-grid-item"
+              [class.selected]="wizardIconName() === icon"
+              (click)="wizardIconName.set(icon)"
+              [attr.aria-label]="icon"
+              [attr.title]="icon"
+              role="option"
+              [attr.aria-selected]="wizardIconName() === icon"
+            >
+              <ng-icon [name]="icon" aria-hidden="true" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Icon color swatches -->
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Icon Color</label>
+        <div class="color-picker-row">
+          <div
+            class="icon-preview-box"
+            [style.background-color]="wizardIconColor()"
+            aria-hidden="true"
+          >
+            <ng-icon [name]="wizardIconName()" />
+          </div>
+          <div class="color-swatches" role="listbox" aria-label="Choose a color">
+            @for (color of colorSwatches; track $index) {
+              <button
+                type="button"
+                pButton
+                [text]="true"
+                severity="secondary"
+                class="color-swatch"
+                [class.selected]="wizardIconColor() === color"
+                [style.background-color]="color"
+                (click)="wizardIconColor.set(color)"
+                [attr.aria-label]="'Color ' + color"
+                [attr.title]="color"
+                role="option"
+                [attr.aria-selected]="wizardIconColor() === color"
+              ></button>
+            }
+            <label class="custom-color-label" title="Custom color">
+              <ng-icon name="phosphorPaletteThin" aria-hidden="true" size="16" />
+              Custom
+              <input
+                type="color"
+                class="hidden-color-input"
+                [ngModel]="wizardIconColor()"
+                (ngModelChange)="wizardIconColor.set($event)"
+                aria-label="Custom color picker"
+              />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description (textarea, char count) -->
+      <div class="wizard-field">
+        <label for="wiz-desc">Description</label>
+        <textarea
+          id="wiz-desc"
+          pTextarea
+          class="wizard-textarea"
+          rows="3"
+          [ngModel]="wizardDescription()"
+          (ngModelChange)="wizardDescription.set($event)"
+          placeholder="Describe the purpose of this object type..."
+          maxlength="500"
+          aria-label="Object type description"
+          data-testid="wizard-description-input"
+        ></textarea>
+        <small class="char-count">{{ wizardDescription().length }}/500 characters</small>
+      </div>
+    </div>
+  }
+
+  <!-- ── Step 1: Connections ───────────────────────────────────────────── -->
+  @if (stepIndex() === 1) {
+    <div class="wizard-body" data-testid="wizard-step-connections">
+      @if (wizardConnections().length > 0) {
+        <div class="connection-list">
+          @for (conn of wizardConnections(); track $index; let i = $index) {
+            <div class="connection-item">
+              <ng-icon
+                name="phosphorArrowsLeftRightThin"
+                class="conn-icon"
+                aria-hidden="true"
+                size="16"
+              />
+              <div class="conn-info">
+                <strong>{{ conn.activeName }}</strong>
+                <span class="muted"
+                  >→ {{ conn.targetObjectTypeName }} · {{ conn.cardinality }}</span
+                >
+              </div>
+              <button
+                type="button"
+                pButton
+                [text]="true"
+                severity="danger"
+                size="small"
+                (click)="removeConnection(i)"
+                aria-label="Remove connection"
+              >
+                <ng-icon name="phosphorXThin" size="16" />
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-step-hint">
+          No connections added yet. Use the form below to connect this type to another.
+        </p>
+      }
+
+      <div class="add-form">
+        <h5 class="add-form-title">Add Connection</h5>
+
+        <div class="wizard-field">
+          <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+          <label>Target Object Type</label>
+          <p-select
+            [options]="objectTypes()"
+            [ngModel]="draftTargetTypeId()"
+            (ngModelChange)="draftTargetTypeId.set($event)"
+            optionLabel="name"
+            optionValue="id"
+            [pt]="fieldSelectPt"
+            placeholder="Select target type..."
+            [showClear]="true"
+            styleClass="w-full"
+            aria-label="Target object type"
+            appendTo="body"
+          />
+        </div>
+
+        <div class="form-row-2">
+          <div class="wizard-field">
+            <label for="draft-active">Active Name</label>
+            <input
+              id="draft-active"
+              type="text"
+              pInputText
+              class="wizard-input"
+              [ngModel]="draftActiveName()"
+              (ngModelChange)="draftActiveName.set($event)"
+              placeholder="e.g. manages"
+              aria-label="Active relationship name"
+            />
+          </div>
+          <div class="wizard-field">
+            <label for="draft-passive">Passive Name</label>
+            <input
+              id="draft-passive"
+              type="text"
+              pInputText
+              class="wizard-input"
+              [ngModel]="draftPassiveName()"
+              (ngModelChange)="draftPassiveName.set($event)"
+              placeholder="e.g. managed by"
+              aria-label="Passive relationship name"
+            />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="wizard-field">
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label>Cardinality</label>
+            <p-select
+              [options]="cardinalityOptions"
+              [ngModel]="draftCardinality()"
+              (ngModelChange)="draftCardinality.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              [pt]="fieldSelectPt"
+              styleClass="w-full"
+              aria-label="Connection cardinality"
+              appendTo="body"
+            />
+          </div>
+          <div class="wizard-field directed-check">
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label>Directed</label>
+            <p-toggleSwitch
+              [ngModel]="draftIsDirected()"
+              (ngModelChange)="draftIsDirected.set($event)"
+              aria-label="Is directed connection"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          label="Add Connection"
+          aria-label="Add Connection"
+          size="small"
+          [disabled]="!draftTargetTypeId() || !draftActiveName().trim()"
+          (click)="addDraftConnection()"
+          data-testid="wizard-add-connection-btn"
+        >
+          <ng-icon name="phosphorPlusThin" size="16" />
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Step 2: Attributes ────────────────────────────────────────────── -->
+  @if (stepIndex() === 2) {
+    <div class="wizard-body" data-testid="wizard-step-attributes">
+      <div class="step-header-row">
+        <p class="step-hint">
+          Select the attributes that apply to this object type, or create new ones.
+        </p>
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          label="New Attribute Type"
+          aria-label="New Attribute Type"
+          size="small"
+          (click)="openCreateAttrTypeDialog()"
+          data-testid="wizard-create-attr-type-btn"
+        >
+          <ng-icon name="phosphorPlusThin" size="16" />
+        </button>
+      </div>
+      @if (availableAttributeTypes().length > 0) {
+        <div class="attribute-pick-list">
+          @for (attr of availableAttributeTypes(); track attr.id) {
+            <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+            <label class="attribute-pick-item" [class.selected]="isAttributeSelected(attr.id)">
+              <p-toggleSwitch
+                [ngModel]="isAttributeSelected(attr.id)"
+                (ngModelChange)="toggleAttributeId(attr.id)"
+              />
+              <div class="attr-info">
+                <strong>{{ attr.name }}</strong>
+                <span class="attr-meta">
+                  <code>{{ attr.attributeKey }}</code>
+                  <span class="muted">· {{ attr.dataType }}</span>
+                  @if (attr.attributeGroup) {
+                    <span class="muted">· {{ attr.attributeGroup }}</span>
+                  }
+                </span>
+              </div>
+            </label>
+          }
+        </div>
+      } @else {
+        <div class="empty-step-hint">
+          <ng-icon name="phosphorInfoThin" aria-hidden="true" size="16" />
+          No attribute types available. Click "New Attribute Type" above to create one.
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Step 3: Status ────────────────────────────────────────────────── -->
+  @if (stepIndex() === 3) {
+    <div class="wizard-body" data-testid="wizard-step-status">
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Initial Status</label>
+        <div class="status-buttons" role="radiogroup" aria-label="Choose initial status">
+          @for (opt of statusOptions | slice: 1; track opt.value) {
+            <button
+              type="button"
+              pButton
+              [text]="true"
+              severity="secondary"
+              class="status-btn"
+              [class.selected]="wizardStatus() === opt.value"
+              (click)="wizardStatus.set($any(opt.value))"
+              [attr.aria-pressed]="wizardStatus() === opt.value"
+            >
+              {{ opt.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Review summary -->
+      <div class="review-summary">
+        <h4>Review</h4>
+        <div class="review-grid">
+          <div class="review-field">
+            <span class="label">Name</span>
+            <strong>{{ wizardName() || '(empty)' }}</strong>
+          </div>
+          <div class="review-field">
+            <span class="label">Icon</span>
+            <span class="review-icon-preview">
+              <span
+                class="icon-circle icon-circle-sm"
+                [style.background-color]="wizardIconColor()"
+                aria-hidden="true"
+              >
+                <ng-icon [name]="wizardIconName()" />
+              </span>
+              <code>{{ wizardIconName() }}</code>
+            </span>
+          </div>
+          <div class="review-field">
+            <span class="label">Status</span>
+            <p-tag
+              [value]="getStatusLabel(wizardStatus())"
+              [severity]="getStatusSeverity(wizardStatus())"
+              [rounded]="true"
+            />
+          </div>
+          <div class="review-field">
+            <span class="label">Connections</span>
+            <strong>{{ wizardConnections().length }}</strong>
+          </div>
+          <div class="review-field">
+            <span class="label">Attributes</span>
+            <strong>{{ wizardAttributeIds().size }}</strong>
+          </div>
+          @if (wizardDescription()) {
+            <div class="review-field review-field-full">
+              <span class="label">Description</span>
+              <span>{{ wizardDescription() }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      @if (stepIndex() > 0) {
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [text]="true"
+          label="Back"
+          aria-label="Go to previous step"
+          data-testid="wizard-back-btn"
+          (click)="prevStep()"
+        >
+          <ng-icon name="phosphorArrowLeftThin" size="16" />
+        </button>
+      }
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        label="Cancel"
+        aria-label="Cancel creating object type"
+        data-testid="wizard-cancel-btn"
+        (click)="closeWizard()"
+      ></button>
+      @if (stepIndex() < 3) {
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          label="Next"
+          [disabled]="stepIndex() === 0 && !wizardName().trim()"
+          aria-label="Go to next step"
+          data-testid="wizard-next-btn"
+          (click)="nextStep()"
+        >
+          <ng-icon name="phosphorArrowRightThin" size="16" />
+        </button>
+      } @else {
+        <button
+          type="button"
+          pButton
+          severity="primary"
+          label="Create"
+          [disabled]="!wizardName().trim() || wizardSaving()"
+          [loading]="wizardSaving()"
+          aria-label="Create object type"
+          data-testid="wizard-create-btn"
+          (click)="saveObjectType()"
+        >
+          <ng-icon name="phosphorCheckThin" size="16" />
+        </button>
+      }
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Add Attribute Dialog ──────────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showAddAttributeDialog()"
+  (visibleChange)="showAddAttributeDialog.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '440px' }"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  header="Add Attribute"
+  aria-label="Add attribute to object type"
+  data-testid="add-attribute-dialog"
+>
+  <div class="dialog-form">
+    <div class="wizard-field">
+      <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+      <label>Attribute Type</label>
+      <p-select
+        [options]="detailAvailableAttributes()"
+        [ngModel]="detailDraftAttrId()"
+        (ngModelChange)="detailDraftAttrId.set($event)"
+        optionLabel="name"
+        optionValue="id"
+        [pt]="fieldSelectPt"
+        placeholder="Select attribute..."
+        styleClass="w-full"
+        aria-label="Select attribute type"
+        data-testid="add-attr-select"
+        appendTo="body"
+      />
+    </div>
+    <div class="wizard-field directed-check">
+      <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+      <label>Required</label>
+      <p-toggleSwitch
+        [ngModel]="detailDraftAttrRequired()"
+        (ngModelChange)="detailDraftAttrRequired.set($event)"
+        aria-label="Is required attribute"
+      />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        label="Cancel"
+        aria-label="Cancel"
+        (click)="showAddAttributeDialog.set(false)"
+      ></button>
+      <button
+        type="button"
+        pButton
+        severity="primary"
+        label="Add Attribute"
+        aria-label="Add Attribute"
+        [disabled]="!detailDraftAttrId()"
+        data-testid="add-attr-confirm-btn"
+        (click)="addAttributeToSelected()"
+      >
+        <ng-icon name="phosphorPlusThin" size="16" />
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Add Connection Dialog ─────────────────────────────────────────────── -->
+<p-dialog
+  [visible]="showAddConnectionDialog()"
+  (visibleChange)="showAddConnectionDialog.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '520px' }"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  header="Add Connection"
+  aria-label="Add connection to object type"
+  data-testid="add-connection-dialog"
+>
+  <div class="dialog-form">
+    <div class="wizard-field">
+      <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+      <label>Target Object Type</label>
+      <p-select
+        [options]="objectTypes()"
+        [ngModel]="detailDraftTargetTypeId()"
+        (ngModelChange)="detailDraftTargetTypeId.set($event)"
+        optionLabel="name"
+        optionValue="id"
+        [pt]="fieldSelectPt"
+        placeholder="Select target type..."
+        [showClear]="true"
+        styleClass="w-full"
+        aria-label="Target object type"
+        data-testid="add-conn-target-select"
+        appendTo="body"
+      />
+    </div>
+    <div class="form-row-2">
+      <div class="wizard-field">
+        <label for="detail-active">Active Name</label>
+        <input
+          id="detail-active"
+          type="text"
+          pInputText
+          class="wizard-input"
+          [ngModel]="detailDraftActiveName()"
+          (ngModelChange)="detailDraftActiveName.set($event)"
+          placeholder="e.g. hosts"
+          aria-label="Active relationship name"
+        />
+      </div>
+      <div class="wizard-field">
+        <label for="detail-passive">Passive Name</label>
+        <input
+          id="detail-passive"
+          type="text"
+          pInputText
+          class="wizard-input"
+          [ngModel]="detailDraftPassiveName()"
+          (ngModelChange)="detailDraftPassiveName.set($event)"
+          placeholder="e.g. hosted by"
+          aria-label="Passive relationship name"
+        />
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Cardinality</label>
+        <p-select
+          [options]="cardinalityOptions"
+          [ngModel]="detailDraftCardinality()"
+          (ngModelChange)="detailDraftCardinality.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [pt]="fieldSelectPt"
+          styleClass="w-full"
+          aria-label="Connection cardinality"
+          appendTo="body"
+        />
+      </div>
+      <div class="wizard-field directed-check">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Directed</label>
+        <p-toggleSwitch
+          [ngModel]="detailDraftIsDirected()"
+          (ngModelChange)="detailDraftIsDirected.set($event)"
+          aria-label="Is directed connection"
+        />
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        label="Cancel"
+        aria-label="Cancel"
+        (click)="showAddConnectionDialog.set(false)"
+      ></button>
+      <button
+        type="button"
+        pButton
+        severity="primary"
+        label="Add Connection"
+        aria-label="Add Connection"
+        [disabled]="!detailDraftTargetTypeId() || !detailDraftActiveName().trim()"
+        data-testid="add-conn-confirm-btn"
+        (click)="addConnectionToSelected()"
+      >
+        <ng-icon name="phosphorPlusThin" size="16" />
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Create Attribute Type Dialog ────────────────────────────────────── -->
+<p-dialog
+  [visible]="showCreateAttrTypeDialog()"
+  (visibleChange)="showCreateAttrTypeDialog.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '480px' }"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  header="Create Attribute Type"
+  aria-label="Create new attribute type"
+  data-testid="create-attr-type-dialog"
+>
+  <div class="dialog-form">
+    <div class="wizard-field">
+      <label for="new-attr-name">Name <span class="required">*</span></label>
+      <input
+        id="new-attr-name"
+        type="text"
+        pInputText
+        class="wizard-input"
+        [ngModel]="newAttrName()"
+        (ngModelChange)="newAttrName.set($event)"
+        placeholder="e.g. IP Address"
+        maxlength="100"
+        data-testid="new-attr-name-input"
+      />
+    </div>
+    <div class="wizard-field">
+      <label for="new-attr-key">Key</label>
+      <input
+        id="new-attr-key"
+        type="text"
+        pInputText
+        class="wizard-input"
+        [ngModel]="newAttrKey()"
+        (ngModelChange)="newAttrKey.set($event)"
+        placeholder="Auto-generated from name if empty"
+        maxlength="100"
+      />
+      <small class="field-hint">
+        <ng-icon name="phosphorInfoThin" aria-hidden="true" size="14" />
+        Leave empty to auto-generate from name
+      </small>
+    </div>
+    <div class="form-row-2">
+      <div class="wizard-field">
+        <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
+        <label>Data Type <span class="required">*</span></label>
+        <p-select
+          [options]="dataTypeOptions"
+          [ngModel]="newAttrDataType()"
+          (ngModelChange)="newAttrDataType.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [pt]="fieldSelectPt"
+          styleClass="w-full"
+          aria-label="Data type"
+          appendTo="body"
+        />
+      </div>
+      <div class="wizard-field">
+        <label for="new-attr-group">Group</label>
+        <input
+          id="new-attr-group"
+          type="text"
+          pInputText
+          class="wizard-input"
+          [ngModel]="newAttrGroup()"
+          (ngModelChange)="newAttrGroup.set($event)"
+          placeholder="e.g. network"
+        />
+      </div>
+    </div>
+    <div class="wizard-field">
+      <label for="new-attr-desc">Description</label>
+      <textarea
+        id="new-attr-desc"
+        pTextarea
+        class="wizard-textarea"
+        rows="2"
+        [ngModel]="newAttrDescription()"
+        (ngModelChange)="newAttrDescription.set($event)"
+        placeholder="Optional description..."
+        maxlength="500"
+      ></textarea>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="wizard-footer">
+      <span class="wizard-spacer"></span>
+      <button
+        type="button"
+        pButton
+        severity="secondary"
+        [text]="true"
+        label="Cancel"
+        aria-label="Cancel"
+        (click)="showCreateAttrTypeDialog.set(false)"
+      ></button>
+      <button
+        type="button"
+        pButton
+        severity="primary"
+        label="Create"
+        aria-label="Create"
+        [disabled]="!newAttrName().trim() || newAttrSaving()"
+        [loading]="newAttrSaving()"
+        data-testid="create-attr-type-confirm-btn"
+        (click)="createNewAttrType()"
+      >
+        <ng-icon name="phosphorCheckThin" size="16" />
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>

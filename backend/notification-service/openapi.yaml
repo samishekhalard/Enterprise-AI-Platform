@@ -1,0 +1,526 @@
+openapi: 3.1.0
+info:
+  title: Notification Service API
+  description: API for managing notifications, templates, and preferences
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8086
+    description: Development server
+
+tags:
+  - name: Notifications
+    description: Notification management
+  - name: Templates
+    description: Notification templates
+  - name: Preferences
+    description: User notification preferences
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/notifications:
+    get:
+      tags: [Notifications]
+      summary: List notifications
+      operationId: listNotifications
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [EMAIL, SMS, PUSH, IN_APP]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [PENDING, SENT, DELIVERED, FAILED, READ]
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPage'
+
+    post:
+      tags: [Notifications]
+      summary: Send notification
+      operationId: sendNotification
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+      responses:
+        '201':
+          description: Notification queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '400':
+          description: Invalid request
+
+  /api/v1/notifications/{notificationId}:
+    get:
+      tags: [Notifications]
+      summary: Get notification by ID
+      operationId: getNotification
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Notification details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '404':
+          description: Notification not found
+
+  /api/v1/notifications/batch:
+    post:
+      tags: [Notifications]
+      summary: Send batch notifications
+      operationId: sendBatchNotifications
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchNotificationRequest'
+      responses:
+        '202':
+          description: Batch queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchNotificationResponse'
+
+  /api/v1/templates:
+    get:
+      tags: [Templates]
+      summary: List notification templates
+      operationId: listTemplates
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [EMAIL, SMS, PUSH]
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationTemplate'
+
+    post:
+      tags: [Templates]
+      summary: Create notification template
+      operationId: createTemplate
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+
+  /api/v1/templates/{templateId}:
+    get:
+      tags: [Templates]
+      summary: Get template by ID
+      operationId: getTemplate
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+
+    put:
+      tags: [Templates]
+      summary: Update template
+      operationId: updateTemplate
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+
+    delete:
+      tags: [Templates]
+      summary: Delete template
+      operationId: deleteTemplate
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Template deleted
+
+  /api/v1/preferences:
+    get:
+      tags: [Preferences]
+      summary: Get current user preferences
+      operationId: getUserPreferences
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: User preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+
+    put:
+      tags: [Preferences]
+      summary: Update user preferences
+      operationId: updateUserPreferences
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPreferences'
+      responses:
+        '200':
+          description: Preferences updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+
+  /api/v1/preferences/{userId}:
+    get:
+      tags: [Preferences]
+      summary: Get user preferences by ID (admin)
+      operationId: getUserPreferencesById
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        userId:
+          type: string
+          format: uuid
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH, IN_APP]
+        templateCode:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        recipient:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, SENT, DELIVERED, FAILED, READ]
+        errorMessage:
+          type: string
+        metadata:
+          type: object
+        sentAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+        readAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    SendNotificationRequest:
+      type: object
+      required: [channel, recipient]
+      properties:
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH, IN_APP]
+        recipient:
+          type: string
+          description: Email, phone number, or user ID
+        userId:
+          type: string
+          format: uuid
+        templateCode:
+          type: string
+          description: Template code (if using template)
+        subject:
+          type: string
+          description: Subject (for email, required if no template)
+        body:
+          type: string
+          description: Body content (required if no template)
+        variables:
+          type: object
+          description: Template variables
+        metadata:
+          type: object
+        scheduledAt:
+          type: string
+          format: date-time
+
+    BatchNotificationRequest:
+      type: object
+      required: [channel, recipients]
+      properties:
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH]
+        recipients:
+          type: array
+          items:
+            type: object
+            properties:
+              recipient:
+                type: string
+              userId:
+                type: string
+                format: uuid
+              variables:
+                type: object
+        templateCode:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+
+    BatchNotificationResponse:
+      type: object
+      properties:
+        batchId:
+          type: string
+          format: uuid
+        totalCount:
+          type: integer
+        status:
+          type: string
+          enum: [QUEUED, PROCESSING, COMPLETED, FAILED]
+
+    NotificationPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    NotificationTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH]
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateTemplateRequest:
+      type: object
+      required: [code, name, channel, body]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        channel:
+          type: string
+          enum: [EMAIL, SMS, PUSH]
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        isActive:
+          type: boolean
+          default: true
+
+    NotificationPreferences:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          $ref: '#/components/schemas/ChannelPreference'
+        sms:
+          $ref: '#/components/schemas/ChannelPreference'
+        push:
+          $ref: '#/components/schemas/ChannelPreference'
+        inApp:
+          $ref: '#/components/schemas/ChannelPreference'
+        quietHours:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            startTime:
+              type: string
+              format: time
+            endTime:
+              type: string
+              format: time
+            timezone:
+              type: string
+
+    ChannelPreference:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        categories:
+          type: object
+          additionalProperties:
+            type: boolean
+          description: Category-specific preferences

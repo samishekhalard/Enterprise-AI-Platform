@@ -1,0 +1,324 @@
+<p-dialog
+  header="Create Tenant"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [style]="dialogStyle"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  data-testid="create-tenant-dialog"
+>
+  <!-- ─── Form Phase ──────────────────────────────────────────────────────── -->
+  @if (phase() === 'form') {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="create-tenant-form"
+      data-testid="create-tenant-form"
+    >
+      <!-- Tenant Name -->
+      <div class="field">
+        <label for="tenantName" class="field-label">
+          Tenant Name <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="tenantName"
+          formControlName="tenantName"
+          placeholder="e.g. Digital Dubai Authority"
+          autocomplete="organization"
+          data-testid="tenant-name-input"
+          [class.ng-invalid]="hasError('tenantName', 'required') || hasError('tenantName', 'tenantNameLength') || hasError('tenantName', 'tenantNameChars') || hasError('tenantName', 'tenantNameTaken')"
+        />
+
+        @if (isValidating('tenantName')) {
+          <span class="validating-hint">Checking availability...</span>
+        }
+
+        @if (hasError('tenantName', 'required')) {
+          <p-message severity="error" data-testid="tenant-name-required-error">
+            Tenant name is required.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameLength')) {
+          <p-message severity="error" data-testid="tenant-name-length-error">
+            Name must be between 2 and 100 characters.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameChars')) {
+          <p-message severity="error" data-testid="tenant-name-chars-error">
+            Name may only contain letters, numbers, spaces, hyphens, underscores, and periods.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameTaken')) {
+          <p-message severity="error" data-testid="tenant-name-taken-error">
+            This tenant name is already in use.
+          </p-message>
+        }
+      </div>
+
+      <!-- Short Name (technical slug — user input) -->
+      <div class="field">
+        <label for="shortName" class="field-label">
+          Short Name <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="shortName"
+          formControlName="shortName"
+          placeholder="e.g. digital-dubai"
+          autocomplete="off"
+          data-testid="short-name-input"
+          [class.ng-invalid]="hasError('shortName', 'required') || hasError('shortName', 'shortNameLength') || hasError('shortName', 'shortNameFormat') || hasError('shortName', 'shortNameTaken')"
+        />
+        <span class="field-hint">
+          Lowercase letters, numbers, and hyphens only. Used as the tenant identifier.
+        </span>
+
+        @if (isValidating('shortName')) {
+          <span class="validating-hint">Checking availability...</span>
+        }
+
+        @if (hasError('shortName', 'required')) {
+          <p-message severity="error" data-testid="short-name-required-error">
+            Short name is required.
+          </p-message>
+        }
+        @if (hasError('shortName', 'shortNameLength')) {
+          <p-message severity="error" data-testid="short-name-length-error">
+            Short name must be between 2 and 50 characters.
+          </p-message>
+        }
+        @if (hasError('shortName', 'shortNameFormat')) {
+          <p-message severity="error" data-testid="short-name-format-error">
+            Only lowercase letters, numbers, and hyphens. Must start and end with a letter or number.
+          </p-message>
+        }
+        @if (hasError('shortName', 'shortNameTaken')) {
+          <p-message severity="error" data-testid="short-name-taken-error">
+            This short name is already in use.
+          </p-message>
+        }
+      </div>
+
+      <!-- Tenant URL -->
+      <div class="field">
+        <label for="tenantUrl" class="field-label">
+          Tenant URL <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="tenantUrl"
+          formControlName="tenantUrl"
+          placeholder="e.g. ems.digitaldubai.ae"
+          autocomplete="off"
+          data-testid="tenant-url-input"
+          [class.ng-invalid]="hasError('tenantUrl', 'required') || hasError('tenantUrl', 'tenantUrlFormat') || hasError('tenantUrl', 'tenantUrlClaimed')"
+        />
+
+        @if (isValidating('tenantUrl')) {
+          <span class="validating-hint">Checking tenant URL availability...</span>
+        }
+
+        @if (hasError('tenantUrl', 'required')) {
+          <p-message severity="error" data-testid="tenant-url-required-error">
+            Tenant URL is required.
+          </p-message>
+        }
+        @if (hasError('tenantUrl', 'tenantUrlFormat')) {
+          <p-message severity="error" data-testid="tenant-url-format-error">
+            Enter a valid tenant URL (e.g. ems.digitaldubai.ae).
+          </p-message>
+        }
+        @if (hasError('tenantUrl', 'tenantUrlClaimed')) {
+          <p-message severity="error" data-testid="tenant-url-claimed-error">
+            This tenant URL is already associated with another tenant.
+          </p-message>
+        }
+      </div>
+
+      <!-- Tenant Admin Email -->
+      <div class="field">
+        <label for="adminEmail" class="field-label">
+          Tenant Admin Email <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="adminEmail"
+          formControlName="adminEmail"
+          type="email"
+          placeholder="admin@digitalduba.ae"
+          autocomplete="email"
+          data-testid="admin-email-input"
+          [class.ng-invalid]="hasError('adminEmail', 'required') || hasError('adminEmail', 'email')"
+        />
+
+        @if (hasError('adminEmail', 'required')) {
+          <p-message severity="error" data-testid="email-required-error">
+            Admin email is required.
+          </p-message>
+        }
+        @if (hasError('adminEmail', 'email')) {
+          <p-message severity="error" data-testid="email-format-error">
+            Enter a valid email address.
+          </p-message>
+        }
+      </div>
+
+      <!-- Tenant License Gate -->
+      @if (!canCreateTenant()) {
+        <div class="tenant-license-gate" data-testid="tenant-license-gate">
+          <p-message severity="error">
+            No tenant licenses available. Contact your license administrator to add more tenant
+            licenses before creating a new tenant.
+          </p-message>
+        </div>
+      }
+
+      <!-- License Allocation -->
+      <div class="license-allocation" data-testid="license-allocation-section">
+        <h3>License Allocation</h3>
+        <p class="license-info">
+          Allocate dedicated seats from available platform licenses.
+        </p>
+
+        @for (license of licenseAvailability(); track license.type) {
+          <div class="license-slider-row" [attr.data-testid]="'license-slider-' + license.type">
+            <div class="license-header">
+              <label>{{ license.label }} Seats</label>
+              <span class="license-available">
+                {{ license.available }} available of {{ license.totalPlatform }}
+              </span>
+            </div>
+            <div class="slider-with-value">
+              <p-slider
+                [min]="0"
+                [max]="license.available"
+                [ngModel]="getSliderValue(license.type)"
+                (ngModelChange)="setSliderValue(license.type, $event)"
+                [ngModelOptions]="{ standalone: true }"
+                [attr.data-testid]="'slider-' + license.type"
+              />
+              <span class="slider-value">{{ getSliderValue(license.type) }}</span>
+            </div>
+          </div>
+        }
+
+        @if (adminSeats() === 0) {
+          <p-message severity="warn" data-testid="admin-seat-warning">
+            At least 1 Admin seat is required for the tenant administrator.
+          </p-message>
+        }
+      </div>
+
+      <!-- Form Footer -->
+      <div class="form-footer">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (onClick)="close()"
+          data-testid="cancel-button"
+        />
+        <p-button
+          label="Create Tenant"
+          severity="primary"
+          type="submit"
+          [disabled]="!canSubmit()"
+          [loading]="formPending()"
+          data-testid="submit-button"
+        />
+      </div>
+    </form>
+  }
+
+  <!-- ─── Provisioning Phase ──────────────────────────────────────────────── -->
+  @if (phase() === 'provisioning') {
+    <div class="provisioning-phase" data-testid="provisioning-phase">
+      <div class="provisioning-summary">
+        <h4 class="provisioning-title">
+          @if (provisioningComplete()) {
+            Tenant Created Successfully
+          } @else if (provisioningError()) {
+            Provisioning Failed
+          } @else {
+            Provisioning Tenant...
+          }
+        </h4>
+
+        @if (provisioningComplete() && createdTenantId()) {
+          <span class="tenant-id-display" data-testid="tenant-uuid">
+            ID: <code>{{ createdTenantId() }}</code>
+          </span>
+        }
+
+        <p-progressbar
+          [value]="provisioningProgress()"
+          [showValue]="true"
+          [style]="{ height: '8px' }"
+          data-testid="provisioning-progress"
+        />
+      </div>
+
+      <!-- Vertical step list -->
+      <ol class="provisioning-steps" data-testid="provisioning-steps">
+        @for (step of provisioningSteps(); track step.id) {
+          <li
+            class="provisioning-step"
+            [class]="stepStatusClass(step.status)"
+            [attr.data-testid]="'provisioning-step-' + step.id"
+          >
+            <span class="step-icon">
+              <i [class]="stepStatusIcon(step.status)"></i>
+            </span>
+            <div class="step-content">
+              <span class="step-label">{{ step.label }}</span>
+              <span class="step-description">{{ step.description }}</span>
+            </div>
+          </li>
+        }
+      </ol>
+
+      @if (provisioningError()) {
+        <p-message severity="error" data-testid="provisioning-error">
+          {{ provisioningError() }}
+        </p-message>
+      }
+
+      <!-- Provisioning footer actions -->
+      <div class="form-footer">
+        @if (provisioningError()) {
+          <p-button
+            label="Retry"
+            severity="warn"
+            icon="pi pi-refresh"
+            (onClick)="retry()"
+            data-testid="retry-button"
+          />
+          <p-button
+            label="Close"
+            severity="secondary"
+            (onClick)="close()"
+            data-testid="close-error-button"
+          />
+        } @else if (provisioningComplete()) {
+          <p-button
+            label="Close"
+            severity="secondary"
+            (onClick)="close()"
+            data-testid="close-success-button"
+          />
+          <p-button
+            label="Go to Tenant"
+            severity="primary"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (onClick)="navigateToTenant()"
+            data-testid="go-to-tenant-button"
+          />
+        }
+      </div>
+    </div>
+  }
+</p-dialog>

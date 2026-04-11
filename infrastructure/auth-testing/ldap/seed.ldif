@@ -1,0 +1,226 @@
+# ==============================================================================
+# EMSIST Test LDAP Directory — Seed Data
+# ==============================================================================
+# Organization: dc=ems,dc=test
+# Admin bind:   cn=admin,dc=ems,dc=test / admin
+#
+# Structure:
+#   dc=ems,dc=test
+#   ├── ou=users           (user accounts)
+#   ├── ou=groups           (role-based groups matching EMS role hierarchy)
+#   ├── ou=service-accounts (service/system accounts)
+#   └── ou=disabled         (disabled accounts for negative testing)
+#
+# Test Users:
+#   viewer@ems.test      / ViewerPass1!     → VIEWER role
+#   user@ems.test        / UserPass1!       → USER role
+#   manager@ems.test     / ManagerPass1!    → MANAGER role
+#   admin@ems.test       / AdminPass1!      → ADMIN role
+#   superadmin@ems.test  / SuperAdminPass1! → SUPER_ADMIN role
+#   multi.role@ems.test  / MultiPass1!      → USER + MANAGER (multi-group)
+#   new.user@ems.test    / NewUserPass1!    → no group (for testing unassigned)
+#   disabled@ems.test    / DisabledPass1!   → disabled account
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Organizational Units
+# ------------------------------------------------------------------------------
+dn: ou=users,dc=ems,dc=test
+objectClass: organizationalUnit
+ou: users
+description: EMS user accounts
+
+dn: ou=groups,dc=ems,dc=test
+objectClass: organizationalUnit
+ou: groups
+description: EMS role-based groups
+
+dn: ou=service-accounts,dc=ems,dc=test
+objectClass: organizationalUnit
+ou: service-accounts
+description: Service and system accounts
+
+dn: ou=disabled,dc=ems,dc=test
+objectClass: organizationalUnit
+ou: disabled
+description: Disabled/locked accounts for negative testing
+
+# ------------------------------------------------------------------------------
+# Groups (matching EMS role hierarchy: SUPER_ADMIN > ADMIN > MANAGER > USER > VIEWER)
+# ------------------------------------------------------------------------------
+dn: cn=VIEWER,ou=groups,dc=ems,dc=test
+objectClass: groupOfNames
+cn: VIEWER
+description: EMS Viewer role group
+member: uid=viewer,ou=users,dc=ems,dc=test
+
+dn: cn=USER,ou=groups,dc=ems,dc=test
+objectClass: groupOfNames
+cn: USER
+description: EMS User role group
+member: uid=testuser,ou=users,dc=ems,dc=test
+member: uid=multi.role,ou=users,dc=ems,dc=test
+
+dn: cn=MANAGER,ou=groups,dc=ems,dc=test
+objectClass: groupOfNames
+cn: MANAGER
+description: EMS Manager role group
+member: uid=manager,ou=users,dc=ems,dc=test
+member: uid=multi.role,ou=users,dc=ems,dc=test
+
+dn: cn=ADMIN,ou=groups,dc=ems,dc=test
+objectClass: groupOfNames
+cn: ADMIN
+description: EMS Admin role group
+member: uid=admin.user,ou=users,dc=ems,dc=test
+
+dn: cn=SUPER_ADMIN,ou=groups,dc=ems,dc=test
+objectClass: groupOfNames
+cn: SUPER_ADMIN
+description: EMS Super Admin role group
+member: uid=superadmin,ou=users,dc=ems,dc=test
+
+# ------------------------------------------------------------------------------
+# Users
+# ------------------------------------------------------------------------------
+
+# Viewer — minimal read-only access
+dn: uid=viewer,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: viewer
+cn: Test Viewer
+sn: Viewer
+givenName: Test
+mail: viewer@ems.test
+userPassword: ViewerPass1!
+employeeNumber: EMS-V001
+title: Viewer
+l: Dubai
+st: Dubai
+postalCode: 00000
+
+# Standard user
+dn: uid=testuser,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: testuser
+cn: Test User
+sn: User
+givenName: Test
+mail: user@ems.test
+userPassword: UserPass1!
+employeeNumber: EMS-U001
+title: User
+l: Abu Dhabi
+st: Abu Dhabi
+
+# Manager
+dn: uid=manager,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: manager
+cn: Test Manager
+sn: Manager
+givenName: Test
+mail: manager@ems.test
+userPassword: ManagerPass1!
+employeeNumber: EMS-M001
+title: Department Manager
+l: Sharjah
+st: Sharjah
+
+# Admin
+dn: uid=admin.user,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: admin.user
+cn: Test Admin
+sn: Admin
+givenName: Test
+mail: admin@ems.test
+userPassword: AdminPass1!
+employeeNumber: EMS-A001
+title: System Administrator
+l: Dubai
+st: Dubai
+
+# Super Admin
+dn: uid=superadmin,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: superadmin
+cn: LDAP SuperAdmin
+sn: SuperAdmin
+givenName: LDAP
+mail: superadmin@ems.test
+userPassword: SuperAdminPass1!
+employeeNumber: EMS-SA001
+title: Super Administrator
+l: Dubai
+st: Dubai
+
+# Multi-role user (belongs to USER + MANAGER groups)
+dn: uid=multi.role,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: multi.role
+cn: Multi Role
+sn: Role
+givenName: Multi
+mail: multi.role@ems.test
+userPassword: MultiPass1!
+employeeNumber: EMS-MR001
+title: Team Lead
+
+# New user — no group membership (for testing unassigned access)
+dn: uid=new.user,ou=users,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: new.user
+cn: New User
+sn: User
+givenName: New
+mail: new.user@ems.test
+userPassword: NewUserPass1!
+employeeNumber: EMS-N001
+title: New Employee
+
+# ------------------------------------------------------------------------------
+# Disabled user (in disabled OU for negative testing)
+# ------------------------------------------------------------------------------
+dn: uid=disabled,ou=disabled,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: disabled
+cn: Disabled User
+sn: User
+givenName: Disabled
+mail: disabled@ems.test
+userPassword: DisabledPass1!
+employeeNumber: EMS-D001
+title: Former Employee
+description: Account disabled — for negative auth testing
+
+# ------------------------------------------------------------------------------
+# Service Account (for testing service-to-service LDAP binds)
+# ------------------------------------------------------------------------------
+dn: uid=svc-ems-auth,ou=service-accounts,dc=ems,dc=test
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+uid: svc-ems-auth
+cn: EMS Auth Service
+sn: Service
+givenName: Auth
+mail: svc-auth@ems.test
+userPassword: SvcAuthPass1!
+description: Service account for EMS auth-facade LDAP binds

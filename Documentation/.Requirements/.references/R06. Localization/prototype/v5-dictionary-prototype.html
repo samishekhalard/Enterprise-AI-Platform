@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMSIST Localization — Dictionary Management Prototype v5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM TOKENS — Copied from style.css (source of truth)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tp-primary: #428177;
+  --tp-primary-dark: #054239;
+  --tp-primary-light: #b9a779;
+  --tp-info: #054239;
+  --tp-success: #428177;
+  --tp-warning: #988561;
+  --tp-danger: #6b1f2a;
+  --tp-surface: #edebe0;
+  --tp-bg: #edebe0;
+  --tp-text: #3d3a3b;
+  --tp-text-secondary: #3d3a3b;
+  --tp-text-muted: #3d3a3b;
+  --tp-border: #b9a779;
+  --tp-focus-ring: 0 0 0 3px rgba(66, 129, 119, 0.35);
+  --tp-text-dark: #161616;
+  --tp-white: #ffffff;
+
+  --tp-danger-bg: color-mix(in srgb, var(--tp-danger) 6%, transparent);
+  --tp-danger-border: color-mix(in srgb, var(--tp-danger) 15%, transparent);
+  --tp-primary-bg: color-mix(in srgb, var(--tp-primary) 6%, transparent);
+  --tp-primary-bg-hover: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --tp-error: #ef4444;
+  --tp-error-bg: color-mix(in srgb, var(--tp-error) 10%, transparent);
+  --tp-error-border: color-mix(in srgb, var(--tp-error) 30%, transparent);
+  --tp-error-text: #b91c1c;
+
+  --nm-bg: #edebe0;
+  --nm-shadow-dark: rgba(152, 133, 97, 0.38);
+  --nm-shadow-light: rgba(255, 255, 255, 0.88);
+  --nm-accent: #428177;
+  --nm-radius: 16px;
+  --nm-depth: 12px;
+
+  --icon-size-xs: 14px;
+  --icon-size-sm: 18px;
+  --icon-size-md: 24px;
+  --icon-size-lg: 32px;
+  --icon-size-xl: 48px;
+
+  --tp-space-0: 0;
+  --tp-space-1: 0.25rem;
+  --tp-space-2: 0.5rem;
+  --tp-space-3: 0.75rem;
+  --tp-space-4: 1rem;
+  --tp-space-5: 1.25rem;
+  --tp-space-6: 1.5rem;
+  --tp-space-8: 2rem;
+  --tp-space-10: 2.5rem;
+  --tp-space-12: 3rem;
+  --tp-space-16: 4rem;
+
+  --tp-toast-success-bg: color-mix(in srgb, #428177 8%, transparent);
+  --tp-toast-success-border: color-mix(in srgb, #428177 12%, transparent);
+  --tp-toast-success-text: #054239;
+  --tp-toast-error-bg: color-mix(in srgb, #ef4444 8%, transparent);
+  --tp-toast-error-border: color-mix(in srgb, #ef4444 12%, transparent);
+  --tp-toast-error-text: #b91c1c;
+  --tp-toast-warn-bg: color-mix(in srgb, #988561 8%, transparent);
+  --tp-toast-warn-border: color-mix(in srgb, #988561 12%, transparent);
+  --tp-toast-warn-text: #5a4a2a;
+  --tp-toast-info-bg: color-mix(in srgb, #054239 8%, transparent);
+  --tp-toast-info-border: color-mix(in srgb, #054239 12%, transparent);
+  --tp-toast-info-text: #054239;
+
+  --tp-elevation-default: 0 4px 10px rgba(22, 22, 22, 0.24);
+  --tp-elevation-hover: 0 7px 16px rgba(22, 22, 22, 0.3);
+  --tp-elevation-pressed: inset 0 2px 6px rgba(22, 22, 22, 0.22);
+  --tp-touch-target-min-size: 44px;
+
+  --adm-font-code: 'Courier New', monospace;
+  --adm-font-brand: 'Gotham Rounded', 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  --adm-bg: var(--tp-bg, #edebe0);
+  --adm-surface: var(--tp-surface, #edebe0);
+  --adm-surface-alt: #edebe0;
+  --adm-button-face: #edebe0;
+  --adm-white: #ffffff;
+  --adm-on-primary: #ffffff;
+  --adm-black-rgb: 22, 22, 22;
+  --adm-primary: var(--tp-primary, #428177);
+  --adm-primary-hover: #054239;
+  --adm-danger: var(--tp-danger, #6b1f2a);
+  --adm-danger-hover: #4a151e;
+  --adm-text-strong: #3d3a3b;
+  --adm-text-muted: #3d3a3b;
+  --adm-text-deep-rgb: 22, 22, 22;
+  --adm-radius-control: 0.72rem;
+  --adm-radius-card: 1rem;
+  --adm-radius-pill: 999px;
+  --adm-shadow-light: rgba(255, 255, 255, 0.95);
+  --adm-shadow-dark: rgba(152, 133, 97, 0.32);
+  --adm-pattern-opacity: 0.045;
+  --adm-pattern-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23428177' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3Cpath d='M22 10L38 42 M98 10L82 42 M22 110L38 78 M98 110L82 78'/%3E%3Cpath d='M10 22L42 38 M10 98L42 78 M110 22L78 38 M110 98L78 78'/%3E%3C/g%3E%3C/svg%3E");
+
+  --adm-island-shadow: 6px 6px 14px var(--adm-shadow-dark), -6px -6px 14px var(--adm-shadow-light);
+  --adm-divider-soft: 1px solid rgba(var(--adm-black-rgb), 0.09);
+  --adm-action-shadow-default: 0 4px 10px rgba(var(--adm-black-rgb), 0.24);
+  --adm-action-shadow-hover: 0 7px 16px rgba(var(--adm-black-rgb), 0.3);
+  --adm-action-shadow-pressed: inset 0 2px 6px rgba(var(--adm-black-rgb), 0.22);
+  --adm-action-primary-bg: var(--adm-primary);
+  --adm-action-primary-bg-hover: var(--adm-primary-hover);
+  --adm-action-primary-text: #ffffff;
+  --adm-action-primary-border: 1px solid rgba(5, 66, 57, 0.6);
+  --adm-action-secondary-bg: rgba(237, 235, 224, 0.86);
+  --adm-action-secondary-text: var(--adm-text-strong);
+  --adm-action-secondary-border: 1px solid rgba(var(--adm-black-rgb), 0.2);
+  --adm-action-danger-bg: rgba(237, 235, 224, 0.92);
+  --adm-action-danger-text: var(--adm-danger);
+  --adm-action-danger-border: 1px solid rgba(107, 31, 42, 0.46);
+  --adm-dialog-shadow:
+    16px 16px 30px rgba(var(--adm-black-rgb), 0.26), -8px -8px 16px rgba(255, 255, 255, 0.42);
+
+  --adm-button-bezel-gradient: linear-gradient(145deg, #428177, #054239);
+  --adm-button-face-gradient: linear-gradient(145deg, #edebe0, #edebe0);
+  --adm-button-face-border: 2px solid #428177;
+  --adm-button-shadow-before:
+    6px 6px 14px rgba(var(--adm-black-rgb), 0.38), -4px -4px 10px rgba(255, 255, 255, 0.55);
+  --adm-button-shadow-before-hover:
+    8px 8px 18px rgba(var(--adm-black-rgb), 0.45), -5px -5px 12px rgba(255, 255, 255, 0.62);
+  --adm-button-shadow-before-active:
+    3px 3px 8px rgba(var(--adm-black-rgb), 0.3), -2px -2px 6px rgba(255, 255, 255, 0.4);
+  --adm-button-shadow-after:
+    inset 1px 1px 3px rgba(255, 255, 255, 0.35), inset -2px -2px 5px rgba(var(--adm-black-rgb), 0.2);
+
+  --tm-bg: var(--tp-bg, #edebe0);
+  --tm-surface: var(--tp-surface, #edebe0);
+  --tm-surface-alt: #edebe0;
+  --tm-shadow-dark: rgba(152, 133, 97, 0.38);
+  --tm-shadow-light: rgba(255, 255, 255, 0.88);
+  --tm-accent: var(--tp-primary, #428177);
+  --tm-accent-rgb: 66, 129, 119;
+  --tm-accent-soft: rgba(66, 129, 119, 0.17);
+  --tm-text: #3d3a3b;
+  --tm-muted: #3d3a3b;
+  --tm-shadow-card: 12px 12px 24px var(--tm-shadow-dark), -10px -10px 20px var(--tm-shadow-light);
+  --tm-shadow-search-inset:
+    inset 5px 5px 10px rgba(152, 133, 97, 0.35), inset -5px -5px 10px rgba(255, 255, 255, 0.82);
+  --tm-shadow-tablist:
+    inset 4px 4px 9px rgba(152, 133, 97, 0.36), inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+  --tm-shadow-tab-active:
+    4px 4px 8px rgba(152, 133, 97, 0.32), -4px -4px 8px rgba(255, 255, 255, 0.9);
+  --tm-shadow-input-inset:
+    inset 4px 4px 8px rgba(152, 133, 97, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.86);
+  --tm-info-bg: rgba(66, 129, 119, 0.13);
+  --tm-info-text: #054239;
+  --tm-overlay-bg: rgba(22, 22, 22, 0.24);
+
+  --loc-coverage-high: rgba(66, 129, 119, 0.85);
+  --loc-coverage-medium: rgba(185, 167, 121, 0.85);
+  --loc-coverage-low: rgba(107, 31, 42, 0.65);
+  --loc-flag-size: 24px;
+  --loc-rtl-badge-bg: rgba(185, 167, 121, 0.18);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--tp-text);
+  background: var(--tp-bg, #edebe0);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--adm-pattern-opacity);
+  background-image: var(--adm-pattern-image);
+  background-size: 120px 120px;
+  background-repeat: repeat;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.header-container {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding-top: 1rem;
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding-inline: 1.5rem;
+  padding-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.8rem;
+  position: relative;
+  z-index: 1;
+}
+
+.header-island {
+  background: #edebe0;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow:
+    6px 6px 16px rgba(152, 133, 97, 0.32),
+    -6px -6px 16px rgba(255, 255, 255, 0.92);
+}
+
+.brand-island {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.8rem;
+  min-width: min(460px, 100%);
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.75rem;
+  background: linear-gradient(180deg, #ffffff, #edebe0);
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.8),
+    inset -1px -1px 1px rgba(152, 133, 97, 0.2);
+  text-decoration: none;
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--tp-primary);
+  font-size: 0.7rem;
+}
+
+.brand-logo:focus-visible {
+  outline: 3px solid #054239;
+  outline-offset: 2px;
+}
+
+.brand-block h1 {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+
+.brand-block p {
+  margin: 0.15rem 0 0;
+  color: var(--tp-text-secondary);
+  font-size: 0.8rem;
+}
+
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  padding: 0.45rem;
+}
+
+.topnav a,
+.topnav button {
+  text-decoration: none;
+  color: var(--tp-text);
+  background: #edebe0;
+  border: 1px solid #b9a779;
+  border-radius: 999px;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: var(--tp-touch-target-min-size, 44px);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  transition: all 0.2s ease;
+}
+
+.lang-switcher-btn {
+  text-decoration: none;
+  color: var(--tp-text);
+  background: #edebe0;
+  border: 1px solid #b9a779;
+  border-radius: 999px;
+  padding: 0.42rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  min-height: var(--tp-touch-target-min-size, 44px);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  transition: all 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .topnav a:hover,
+  .topnav button:hover,
+  .lang-switcher-btn:hover {
+    color: #ffffff;
+    background: var(--tp-primary);
+    border-color: var(--tp-primary);
+  }
+}
+
+.topnav a.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--tp-primary), var(--tp-primary-dark));
+  border-color: var(--tp-primary-dark);
+}
+
+.topnav a:focus-visible,
+.topnav button:focus-visible,
+.lang-switcher-btn:focus-visible {
+  color: #ffffff;
+  background: var(--tp-primary);
+  border-color: var(--tp-primary);
+  outline: 3px solid #054239;
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANGUAGE SWITCHER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lang-switcher {
+  position: relative;
+}
+
+.lang-switcher-btn .flag { font-size: 1.2rem; line-height: 1; }
+.lang-switcher-btn .code { text-transform: uppercase; }
+.lang-switcher-btn .chevron {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.15s ease;
+}
+.lang-switcher-btn[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.lang-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  inset-inline-end: 0;
+  min-width: 260px;
+  background: var(--tp-surface);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: var(--adm-radius-card);
+  box-shadow: var(--adm-island-shadow);
+  padding: var(--tp-space-1);
+  z-index: 100;
+  animation: dropdownIn 0.15s ease-out;
+}
+.lang-dropdown.open { display: block; }
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.lang-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-height: 44px;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: start;
+  color: var(--tp-text);
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.lang-dropdown-item:hover {
+  background: rgba(66, 129, 119, 0.08);
+}
+.lang-dropdown-item.active {
+  color: var(--tp-primary);
+  font-weight: 700;
+}
+.lang-dropdown-item .check {
+  width: 16px;
+  text-align: center;
+  color: var(--tp-primary);
+}
+.lang-dropdown-item .flag { font-size: 1.2rem; }
+.lang-dropdown-item .name { flex: 1; }
+.lang-dropdown-item .native-name {
+  font-size: 0.75rem;
+  color: var(--tp-text-muted);
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAIN CONTENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.content-container {
+  position: relative;
+  z-index: 1;
+  padding-block: 0.5rem 1.75rem;
+}
+
+.content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding-inline: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LOCALE SECTION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.locale-section {
+  position: relative;
+  padding: 1.5rem;
+  background: var(--tp-surface);
+  border-radius: var(--adm-radius-card);
+  box-shadow: var(--tm-shadow-card);
+}
+
+/* ── Tab Bar ── */
+.tab-bar {
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: var(--adm-radius-card);
+  box-shadow: var(--tm-shadow-tablist);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--tp-text-secondary);
+  border-radius: var(--adm-radius-control);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 38px;
+  font-family: inherit;
+}
+
+.tab-btn:hover:not(.active) {
+  color: var(--tp-text);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.tab-btn.active {
+  color: var(--tp-primary);
+  background: var(--tp-surface);
+  box-shadow: var(--tm-shadow-tab-active);
+  font-weight: 700;
+}
+
+.tab-btn .tab-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+.tab-btn.active .tab-icon { opacity: 1; }
+
+/* ── Tab Content ── */
+.tab-content {
+  animation: fadeIn 0.15s ease-in;
+}
+.tab-content[hidden] { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Toolbar ── */
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 0 1 280px;
+}
+.search-input-wrap .search-icon {
+  position: absolute;
+  inset-inline-start: var(--tp-space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--tp-text-muted);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: var(--tp-space-2) var(--tp-space-3) var(--tp-space-2) var(--tp-space-10);
+  padding-inline-start: 2.2rem;
+  padding-inline-end: var(--tp-space-3);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--adm-radius-control);
+  background: var(--tp-surface);
+  box-shadow: var(--tm-shadow-search-inset);
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--tp-text);
+  min-height: 38px;
+}
+.search-input::placeholder { color: var(--tp-text-muted); opacity: 0.6; }
+.search-input:focus {
+  outline: none;
+  border-color: var(--tp-primary);
+  box-shadow: var(--tm-shadow-search-inset), 0 0 0 2px rgba(66, 129, 119, 0.2);
+}
+
+/* ── Select ── */
+.nm-select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--tp-border);
+  border-radius: var(--adm-radius-control);
+  background: var(--tp-surface);
+  box-shadow: var(--tm-shadow-search-inset);
+  font-family: inherit;
+  font-size: 0.85rem;
+  min-height: 38px;
+  color: var(--tp-text);
+  cursor: pointer;
+}
+.nm-select:focus {
+  outline: none;
+  border-color: var(--tp-primary);
+  box-shadow: var(--tm-shadow-search-inset), 0 0 0 2px rgba(66, 129, 119, 0.2);
+}
+
+/* ── Table ── */
+.nm-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+}
+.nm-table thead th {
+  text-align: start;
+  padding: 0.6rem 0.75rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tp-text-secondary);
+  border-bottom: 1px solid rgba(152, 133, 97, 0.18);
+}
+.nm-table tbody tr {
+  transition: background 0.1s;
+}
+.nm-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+.nm-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.3);
+}
+.nm-table tbody tr:nth-child(even):hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+.nm-table tbody td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(152, 133, 97, 0.08);
+  vertical-align: middle;
+}
+.nm-table code {
+  font-family: var(--adm-font-code);
+  font-size: 0.8rem;
+  background: rgba(152, 133, 97, 0.1);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+/* ── Row locked state ── */
+.nm-table tbody tr.row-locked {
+  opacity: 0.85;
+}
+.nm-table tbody tr.row-locked td {
+  background: rgba(152, 133, 97, 0.04);
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--adm-radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  gap: 0.2rem;
+}
+.badge-info { background: rgba(66, 129, 119, 0.12); color: #054239; }
+.badge-warn { background: rgba(185, 167, 121, 0.18); color: #3d3a3b; }
+.badge-success { background: rgba(66, 129, 119, 0.15); color: #054239; }
+.badge-danger { background: rgba(107, 31, 42, 0.1); color: #6b1f2a; }
+.badge-module { background: rgba(66, 129, 119, 0.1); color: #054239; font-size: 0.68rem; }
+.badge-default { background: rgba(66, 129, 119, 0.18); color: #054239; }
+.badge-fallback { background: rgba(185, 167, 121, 0.22); color: #3d3a3b; }
+.badge-rtl { background: var(--loc-rtl-badge-bg); color: #3d3a3b; }
+
+/* ── Checkbox (custom) ── */
+.custom-checkbox {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--tp-border);
+  border-radius: 4px;
+  background: var(--tp-surface);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.custom-checkbox.checked {
+  background: var(--tp-primary);
+  border-color: var(--tp-primary);
+}
+.custom-checkbox.checked::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+.custom-checkbox.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.custom-checkbox.locked.checked {
+  background: rgba(152, 133, 97, 0.45);
+  border-color: rgba(152, 133, 97, 0.45);
+}
+.lock-icon {
+  font-size: 0.7rem;
+  margin-inline-start: 0.25rem;
+  opacity: 0.5;
+}
+
+/* ── Buttons ── */
+.nm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: var(--adm-radius-control);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+  transition: all 0.2s ease;
+}
+
+.nm-btn-primary {
+  background: linear-gradient(145deg, var(--tp-primary), var(--tp-primary-dark));
+  color: var(--tp-white);
+  box-shadow: var(--adm-button-shadow-before);
+}
+.nm-btn-primary:hover {
+  box-shadow: var(--adm-button-shadow-before-hover);
+  transform: translateY(-1px);
+}
+.nm-btn-primary:active {
+  box-shadow: var(--adm-button-shadow-before-active);
+  transform: translateY(0);
+}
+
+.nm-btn-secondary {
+  background: var(--tp-surface);
+  color: var(--tp-text);
+  border: 1px solid rgba(22, 22, 22, 0.2);
+  box-shadow: var(--adm-button-shadow-before);
+}
+.nm-btn-secondary:hover {
+  box-shadow: var(--adm-button-shadow-before-hover);
+  transform: translateY(-1px);
+}
+
+.nm-btn-danger {
+  background: var(--tp-surface);
+  color: var(--tp-danger);
+  border: 1px solid rgba(107, 31, 42, 0.46);
+  box-shadow: var(--adm-button-shadow-before);
+}
+
+.nm-btn-ghost {
+  background: transparent;
+  color: var(--tp-text-secondary);
+  border: 1px solid transparent;
+}
+.nm-btn-ghost:hover {
+  background: rgba(66, 129, 119, 0.08);
+  color: var(--tp-text);
+}
+
+.nm-btn-sm {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  min-height: 30px;
+}
+
+.nm-btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.nm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Back button ── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(22, 22, 22, 0.15);
+  border-radius: var(--adm-radius-control);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--tp-primary);
+  min-height: 36px;
+  transition: all 0.15s;
+}
+.back-btn:hover {
+  background: rgba(66, 129, 119, 0.08);
+}
+.back-btn:focus-visible {
+  box-shadow: var(--tp-focus-ring);
+  outline: none;
+}
+.back-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Dictionary header ── */
+.dict-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.dict-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.dict-header .badge {
+  font-size: 0.72rem;
+}
+
+/* ── Translation cell ── */
+.translation-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.translation-cell.empty {
+  color: var(--tp-text-muted);
+  font-style: italic;
+  opacity: 0.5;
+}
+.translation-cell.editable {
+  cursor: text;
+  border-bottom: 1px dashed var(--tp-border);
+  padding-bottom: 1px;
+}
+.translation-cell.modified {
+  position: relative;
+}
+.translation-cell.modified::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: -6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--tp-primary);
+}
+
+/* ── Pagination ── */
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0 0;
+  flex-wrap: wrap;
+}
+.pagination-info {
+  font-size: 0.78rem;
+  color: var(--tp-text-muted);
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.pagination button {
+  min-width: 32px;
+  height: 32px;
+  border: 1px solid var(--tp-border);
+  border-radius: 6px;
+  background: var(--tp-surface);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--tp-text-secondary);
+  transition: all 0.15s;
+}
+.pagination button:hover { background: rgba(255, 255, 255, 0.6); }
+.pagination button.active {
+  background: var(--tp-primary);
+  color: var(--tp-white);
+  border-color: var(--tp-primary);
+}
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.page-size-select {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--tp-border);
+  border-radius: 4px;
+  background: var(--tp-surface);
+  font-family: inherit;
+  font-size: 0.78rem;
+  color: var(--tp-text);
+  min-height: 30px;
+}
+
+/* ── Dialog Overlay ── */
+.dialog-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 22, 22, 0.3);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.dialog-overlay.open { display: flex; }
+
+.dialog {
+  background: var(--tp-surface);
+  border-radius: var(--adm-radius-card);
+  box-shadow: var(--adm-dialog-shadow);
+  min-width: 480px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: dialogIn 0.2s ease-out;
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(152, 133, 97, 0.15);
+}
+.dialog-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.dialog-close {
+  width: var(--tp-touch-target-min-size);
+  height: var(--tp-touch-target-min-size);
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--tp-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog-close:hover { background: rgba(152, 133, 97, 0.12); }
+.dialog-close:focus-visible { box-shadow: var(--tp-focus-ring); outline: none; }
+
+.dialog-body { padding: 1.25rem; }
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid rgba(152, 133, 97, 0.15);
+}
+
+/* ── Form Fields ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+.field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tp-text-secondary);
+}
+.field input, .field textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--tp-border);
+  border-radius: var(--adm-radius-control);
+  background: var(--tp-surface);
+  box-shadow: var(--tm-shadow-search-inset);
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--tp-text);
+  resize: vertical;
+}
+.field input:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--tp-primary);
+  box-shadow: var(--tm-shadow-search-inset), 0 0 0 2px rgba(66, 129, 119, 0.2);
+}
+.field input[readonly], .field textarea[readonly] {
+  opacity: 0.7;
+  cursor: default;
+}
+.field .char-count {
+  font-size: 0.7rem;
+  color: var(--tp-text-muted);
+  text-align: end;
+}
+.field.rtl-field input, .field.rtl-field textarea {
+  direction: rtl;
+  text-align: end;
+  font-family: 'Noto Sans Arabic', Tahoma, sans-serif;
+}
+.field .field-error {
+  font-size: 0.72rem;
+  color: var(--tp-error-text);
+  display: none;
+}
+.field.has-error input,
+.field.has-error textarea {
+  border-color: var(--tp-error);
+}
+.field.has-error .field-error {
+  display: block;
+}
+
+/* ── Restore comparison ── */
+.restore-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+.restore-compare-side {
+  padding: 0.75rem;
+  border-radius: var(--adm-radius-control);
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(152, 133, 97, 0.12);
+}
+.restore-compare-side h4 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tp-text-muted);
+  margin-bottom: 0.35rem;
+}
+.restore-compare-side p {
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+.restore-compare-side.current {
+  border-color: rgba(107, 31, 42, 0.2);
+}
+.restore-compare-side.master {
+  border-color: rgba(66, 129, 119, 0.25);
+}
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: var(--tp-space-12) var(--tp-space-8);
+  color: var(--tp-text-muted);
+  font-size: 0.9rem;
+}
+.empty-state-icon {
+  font-size: 2.5rem;
+  margin-block-end: var(--tp-space-4);
+  opacity: 0.5;
+}
+.empty-state-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tp-text-secondary);
+  margin-block-end: var(--tp-space-2);
+}
+
+/* ── Toast ── */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--adm-radius-control);
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: toastIn 0.25s ease-out;
+  min-width: 260px;
+}
+.toast-success { background: var(--tp-toast-success-bg); color: var(--tp-toast-success-text); border-inline-start: 4px solid var(--tp-success); }
+.toast-error { background: var(--tp-toast-error-bg); color: var(--tp-toast-error-text); border-inline-start: 4px solid var(--tp-error); }
+.toast-warn { background: var(--tp-toast-warn-bg); color: var(--tp-toast-warn-text); border-inline-start: 4px solid var(--tp-warning); }
+.toast-info { background: var(--tp-toast-info-bg); color: var(--tp-toast-info-text); border-inline-start: 4px solid var(--tp-info); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Footer ── */
+.footer-container {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 1rem;
+}
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.footer-island {
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: #edebe0;
+  box-shadow:
+    6px 6px 16px rgba(152, 133, 97, 0.32),
+    -6px -6px 16px rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--tp-text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .nm-table { display: block; overflow-x: auto; }
+  .restore-compare { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .header-inner,
+  .content-inner,
+  .footer-inner { padding-inline: 1rem; }
+  .brand-island { min-width: 0; width: 100%; }
+  .topnav { justify-content: flex-start; }
+  .topnav a { font-size: 0.78rem; padding: 0.38rem 0.68rem; }
+  .locale-section { padding: 1rem; }
+  .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .toolbar { flex-direction: column; }
+  .search-input-wrap { flex: 1 1 100%; }
+  .dialog { min-width: 0; width: 95vw; }
+  .dict-header { flex-direction: column; align-items: flex-start; }
+  .pagination-bar { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 480px) {
+  .tab-btn .tab-label { display: none; }
+  .tab-btn .tab-icon { width: 18px; height: 18px; }
+  .locale-section { padding: 0.75rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  inset-block-start: -3rem;
+  z-index: 40;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.55rem;
+  background: #edebe0;
+  border: 1px solid #b9a779;
+  color: var(--tp-text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.skip-link:focus-visible {
+  inset-block-start: 0.8rem;
+  outline: 3px solid #054239;
+  outline-offset: 2px;
+}
+
+.nm-btn:focus-visible,
+.tab-btn:focus-visible,
+.custom-checkbox:focus-visible,
+.pagination button:focus-visible,
+.nm-select:focus-visible,
+.lang-dropdown-item:focus-visible,
+.page-size-select:focus-visible {
+  outline: none;
+  box-shadow: var(--tp-focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Print ── */
+@media print {
+  .header-container, .footer-container, .toast-container { display: none; }
+  .locale-section { box-shadow: none; border: 1px solid #ccc; }
+  body::before { display: none; }
+}
+  </style>
+</head>
+<body>
+
+<!-- Skip Link -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+<!-- ================================================================== -->
+<!-- HEADER                                                              -->
+<!-- ================================================================== -->
+<header class="header-container">
+  <div class="header-inner">
+    <div class="header-island brand-island">
+      <a class="brand-logo" href="#" aria-label="ThinkPLUS Home">think+</a>
+      <div class="brand-block">
+        <h1>EMSIST</h1>
+        <p>Administration</p>
+      </div>
+    </div>
+
+    <nav class="header-island topnav" aria-label="Primary navigation">
+      <a href="#" class="active">Administration</a>
+      <a href="#">About</a>
+
+      <!-- Language Switcher (Screen 4) -->
+      <div class="lang-switcher" id="lang-switcher">
+        <button
+          type="button"
+          class="lang-switcher-btn"
+          id="lang-switcher-btn"
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          aria-label="Change language"
+        >
+          <span class="flag" id="current-flag">&#x1F1FA;&#x1F1F8;</span>
+          <span class="code" id="current-code">EN</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="lang-dropdown" id="lang-dropdown" role="listbox" aria-label="Select language">
+          <!-- Populated dynamically from active languages -->
+        </div>
+      </div>
+
+      <button type="button">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================================================================== -->
+<!-- MAIN CONTENT                                                        -->
+<!-- ================================================================== -->
+<main class="content-container" id="main-content" tabindex="-1">
+  <div class="content-inner">
+    <div class="locale-section">
+
+      <!-- Tab Bar -->
+      <div class="tab-bar" role="tablist" aria-label="Localization Management">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-languages" id="btn-languages" data-tab="languages">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="tab-label">Languages</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dictionary" id="btn-dictionary" data-tab="dictionary">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="tab-label">Dictionary</span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 1: LANGUAGE MANAGEMENT (Screen 1)                           -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-languages" role="tabpanel" aria-labelledby="btn-languages">
+        <div class="toolbar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search-input" type="search" placeholder="Search languages..." aria-label="Search languages" id="lang-search">
+          </div>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="nm-table" id="lang-table" aria-label="Available languages">
+            <thead>
+              <tr>
+                <th style="width:50px">Active</th>
+                <th>Code</th>
+                <th>Language Name</th>
+                <th>Native Name</th>
+                <th>Direction</th>
+                <th style="width:100px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lang-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="empty-state" id="lang-empty" style="display:none">
+          <div class="empty-state-icon" aria-hidden="true">&#x1F50D;</div>
+          <div class="empty-state-heading">No languages found</div>
+          <button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="document.getElementById('lang-search').value=''; renderLanguageTable();">Clear Search</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 2: DICTIONARY VIEW (Screen 2)                              -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-dictionary" role="tabpanel" aria-labelledby="btn-dictionary" hidden>
+        <div class="dict-header" id="dict-header">
+          <button class="back-btn" onclick="switchToTab('languages')" aria-label="Back to Language Management">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back
+          </button>
+          <h2 id="dict-title">Dictionary &mdash; Arabic (ar)</h2>
+          <span class="badge badge-rtl" id="dict-dir-badge">RTL</span>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search-input" type="search" placeholder="Search by key or English text..." aria-label="Search dictionary" id="dict-search">
+          </div>
+          <select class="nm-select" id="dict-module-filter" aria-label="Filter by module">
+            <option value="">All Modules</option>
+            <option value="AUTH">AUTH</option>
+            <option value="SHELL">SHELL</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="COMMON">COMMON</option>
+          </select>
+          <span style="font-size:0.78rem;color:var(--tp-text-muted);margin-inline-start:auto" id="dict-count-label">Showing 1-10 of 20 entries</span>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="nm-table" id="dict-table" aria-label="Dictionary entries">
+            <thead>
+              <tr>
+                <th>Technical Name</th>
+                <th>Module</th>
+                <th>English Default</th>
+                <th id="dict-target-col-header">Arabic Value</th>
+                <th style="width:90px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="dict-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination-bar" id="dict-pagination-bar">
+          <div style="display:flex;align-items:center;gap:0.5rem">
+            <label for="dict-page-size" style="font-size:0.78rem;color:var(--tp-text-muted)">Per page:</label>
+            <select class="page-size-select" id="dict-page-size" aria-label="Items per page">
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+          <div class="pagination" id="dict-pagination"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- ================================================================== -->
+<!-- FOOTER                                                              -->
+<!-- ================================================================== -->
+<footer class="footer-container">
+  <div class="footer-inner">
+    <div class="footer-island">
+      Dictionary Management Prototype v5 &mdash; EMSIST Design System &mdash; March 2026
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================== -->
+<!-- EDIT TRANSLATION DIALOG (Screen 3)                                  -->
+<!-- ================================================================== -->
+<div class="dialog-overlay" id="edit-dialog" role="dialog" aria-modal="true" aria-labelledby="edit-dialog-title">
+  <div class="dialog" style="min-width:520px">
+    <div class="dialog-header">
+      <h2 id="edit-dialog-title">Edit Translation</h2>
+      <button class="dialog-close" onclick="closeDialog('edit-dialog')" aria-label="Close">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <div class="field">
+        <label>Technical Name</label>
+        <input type="text" id="edit-tech-name" readonly style="font-family:var(--adm-font-code);font-size:0.82rem">
+      </div>
+      <div class="field">
+        <label>Module</label>
+        <div id="edit-module-badge"></div>
+      </div>
+      <div class="field">
+        <label>English Default (Reference)</label>
+        <input type="text" id="edit-english-value" readonly>
+      </div>
+      <div class="field" id="edit-translation-field">
+        <label id="edit-translation-label">Translation Value</label>
+        <textarea id="edit-translation-value" rows="3" aria-describedby="edit-char-count edit-translation-error"></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="field-error" id="edit-translation-error">Translation value cannot be empty</span>
+          <span class="char-count" id="edit-char-count">0 / 5000</span>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="nm-btn nm-btn-ghost" onclick="closeDialog('edit-dialog')">Cancel</button>
+      <button class="nm-btn nm-btn-primary" id="edit-save-btn" onclick="saveTranslation()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- RESTORE CONFIRMATION DIALOG (Screen 5)                              -->
+<!-- ================================================================== -->
+<div class="dialog-overlay" id="restore-dialog" role="dialog" aria-modal="true" aria-labelledby="restore-dialog-title">
+  <div class="dialog" style="max-width:520px">
+    <div class="dialog-header">
+      <h2 id="restore-dialog-title">Restore to Original</h2>
+      <button class="dialog-close" onclick="closeDialog('restore-dialog')" aria-label="Close">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p style="font-size:0.85rem;line-height:1.6;margin-bottom:0.75rem">
+        Restore this translation to the master value?
+      </p>
+      <p style="font-size:0.78rem;color:var(--tp-text-muted);margin-bottom:0.75rem">
+        Key: <code id="restore-key-name" style="font-family:var(--adm-font-code)"></code>
+      </p>
+      <div class="restore-compare">
+        <div class="restore-compare-side current">
+          <h4>Current Value</h4>
+          <p id="restore-current-value"></p>
+        </div>
+        <div class="restore-compare-side master">
+          <h4>Master Value</h4>
+          <p id="restore-master-value"></p>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="nm-btn nm-btn-ghost" onclick="closeDialog('restore-dialog')">Cancel</button>
+      <button class="nm-btn nm-btn-danger" id="restore-confirm-btn" onclick="confirmRestore()">Restore</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- JAVASCRIPT                                                          -->
+<!-- ================================================================== -->
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', nativeName: 'English', dir: 'LTR', flag: '\u{1F1FA}\u{1F1F8}', active: true, isDefault: true, isFallback: true },
+  { code: 'ar', name: 'Arabic', nativeName: '\u0627\u0644\u0639\u0631\u0628\u064A\u0629', dir: 'RTL', flag: '\u{1F1E6}\u{1F1EA}', active: true, isDefault: false, isFallback: false },
+  { code: 'fr', name: 'French', nativeName: 'Fran\u00E7ais', dir: 'LTR', flag: '\u{1F1EB}\u{1F1F7}', active: false, isDefault: false, isFallback: false },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', dir: 'LTR', flag: '\u{1F1E9}\u{1F1EA}', active: false, isDefault: false, isFallback: false },
+  { code: 'es', name: 'Spanish', nativeName: 'Espa\u00F1ol', dir: 'LTR', flag: '\u{1F1EA}\u{1F1F8}', active: false, isDefault: false, isFallback: false },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', dir: 'LTR', flag: '\u{1F1EE}\u{1F1F9}', active: false, isDefault: false, isFallback: false },
+  { code: 'pt', name: 'Portuguese', nativeName: 'Portugu\u00EAs', dir: 'LTR', flag: '\u{1F1E7}\u{1F1F7}', active: false, isDefault: false, isFallback: false },
+  { code: 'ja', name: 'Japanese', nativeName: '\u65E5\u672C\u8A9E', dir: 'LTR', flag: '\u{1F1EF}\u{1F1F5}', active: false, isDefault: false, isFallback: false },
+  { code: 'zh', name: 'Chinese', nativeName: '\u4E2D\u6587', dir: 'LTR', flag: '\u{1F1E8}\u{1F1F3}', active: false, isDefault: false, isFallback: false },
+  { code: 'hi', name: 'Hindi', nativeName: '\u0939\u093F\u0928\u094D\u0926\u0940', dir: 'LTR', flag: '\u{1F1EE}\u{1F1F3}', active: false, isDefault: false, isFallback: false },
+];
+
+const DICTIONARY = [
+  // AUTH module
+  { key: 'auth.login.welcome', module: 'AUTH', defaultValue: 'Welcome to EMSIST', translations: { ar: '\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643\u0645 \u0641\u064A EMSIST', fr: 'Bienvenue sur EMSIST', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0645\u0631\u062D\u0628\u0627\u064B \u0628\u0643\u0645 \u0641\u064A EMSIST' } },
+  { key: 'auth.login.sign_in', module: 'AUTH', defaultValue: 'Sign In', translations: { ar: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644', fr: 'Se connecter', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644' } },
+  { key: 'auth.login.email_label', module: 'AUTH', defaultValue: 'Email or Username', translations: { ar: '\u0627\u0644\u0628\u0631\u064A\u062F \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645', fr: "E-mail ou nom d'utilisateur", de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0627\u0644\u0628\u0631\u064A\u062F \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645' } },
+  { key: 'auth.login.password_label', module: 'AUTH', defaultValue: 'Password', translations: { ar: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631', fr: 'Mot de passe', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631' } },
+  { key: 'auth.login.forgot_password', module: 'AUTH', defaultValue: 'Forgot password?', translations: { ar: '\u0646\u0633\u064A\u062A \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061F', fr: 'Mot de passe oubli\u00E9 ?', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0646\u0633\u064A\u062A \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631\u061F' } },
+  { key: 'auth.login.sign_in_button', module: 'AUTH', defaultValue: 'Sign In', translations: { ar: '\u062F\u062E\u0648\u0644', fr: 'Connexion', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062F\u062E\u0648\u0644' } },
+  // SHELL module
+  { key: 'shell.nav.dashboard', module: 'SHELL', defaultValue: 'Dashboard', translations: { ar: '\u0644\u0648\u062D\u0629 \u0627\u0644\u0645\u0639\u0644\u0648\u0645\u0627\u062A', fr: 'Tableau de bord', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645' }, modified: { ar: true } },
+  { key: 'shell.nav.administration', module: 'SHELL', defaultValue: 'Administration', translations: { ar: '\u0627\u0644\u0625\u062F\u0627\u0631\u0629', fr: 'Administration', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0627\u0644\u0625\u062F\u0627\u0631\u0629' } },
+  { key: 'shell.nav.about', module: 'SHELL', defaultValue: 'About', translations: { ar: '\u062D\u0648\u0644', fr: '\u00C0 propos', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062D\u0648\u0644' } },
+  { key: 'shell.header.sign_out', module: 'SHELL', defaultValue: 'Sign Out', translations: { ar: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C', fr: 'D\u00E9connexion', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C' } },
+  { key: 'shell.header.notifications', module: 'SHELL', defaultValue: 'Notifications', translations: { ar: '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A', fr: 'Notifications', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A' } },
+  // ADMIN module
+  { key: 'admin.section.tenant_manager', module: 'ADMIN', defaultValue: 'Tenant Manager', translations: { ar: '\u0645\u062F\u064A\u0631 \u0627\u0644\u0645\u0633\u062A\u0623\u062C\u0631\u064A\u0646', fr: 'Gestionnaire de locataires', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0625\u062F\u0627\u0631\u0629 \u0627\u0644\u0645\u0633\u062A\u0623\u062C\u0631\u064A\u0646' }, modified: { ar: true } },
+  { key: 'admin.section.license_manager', module: 'ADMIN', defaultValue: 'License Manager', translations: { ar: '\u0645\u062F\u064A\u0631 \u0627\u0644\u062A\u0631\u0627\u062E\u064A\u0635', fr: 'Gestionnaire de licences', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0645\u062F\u064A\u0631 \u0627\u0644\u062A\u0631\u0627\u062E\u064A\u0635' } },
+  { key: 'admin.section.master_definitions', module: 'ADMIN', defaultValue: 'Master Definitions', translations: { ar: '\u0627\u0644\u062A\u0639\u0631\u064A\u0641\u0627\u062A \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629', fr: 'D\u00E9finitions principales', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0627\u0644\u062A\u0639\u0631\u064A\u0641\u0627\u062A \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629' } },
+  { key: 'admin.section.master_locale', module: 'ADMIN', defaultValue: 'Master Locale', translations: { ar: '\u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629', fr: 'Localisation principale', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629' } },
+  // COMMON module
+  { key: 'common.save', module: 'COMMON', defaultValue: 'Save', translations: { ar: '\u062D\u0641\u0638', fr: 'Enregistrer', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062D\u0641\u0638' } },
+  { key: 'common.cancel', module: 'COMMON', defaultValue: 'Cancel', translations: { ar: '\u0625\u0644\u063A\u0627\u0621', fr: 'Annuler', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0625\u0644\u063A\u0627\u0621' } },
+  { key: 'common.delete', module: 'COMMON', defaultValue: 'Delete', translations: { ar: '\u062D\u0630\u0641', fr: 'Supprimer', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062D\u0630\u0641' } },
+  { key: 'common.confirm', module: 'COMMON', defaultValue: 'Confirm', translations: { ar: '\u062A\u0623\u0643\u064A\u062F', fr: 'Confirmer', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u062A\u0623\u0643\u064A\u062F' } },
+  { key: 'common.search', module: 'COMMON', defaultValue: 'Search', translations: { ar: '\u0628\u062D\u062B', fr: 'Rechercher', de: '', es: '', it: '', pt: '', ja: '', zh: '', hi: '' }, masterValues: { ar: '\u0628\u062D\u062B' } },
+];
+
+// ── State ──
+let currentDictLang = 'ar';
+let dictPage = 1;
+let dictPageSize = 10;
+let editingEntry = null;
+let restoringEntry = null;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════
+
+function switchToTab(tabName) {
+  document.querySelectorAll('.tab-btn[role="tab"]').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  const btn = document.getElementById('btn-' + tabName);
+  if (btn) {
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+  }
+  document.querySelectorAll('.tab-content[role="tabpanel"]').forEach(p => p.hidden = true);
+  const panel = document.getElementById('tab-' + tabName);
+  if (panel) panel.hidden = false;
+}
+
+document.querySelectorAll('.tab-btn[role="tab"]').forEach(btn => {
+  btn.addEventListener('click', () => switchToTab(btn.dataset.tab));
+});
+
+// Keyboard navigation for tabs
+document.querySelector('.tab-bar').addEventListener('keydown', (e) => {
+  const tabs = [...document.querySelectorAll('.tab-btn[role="tab"]')];
+  const idx = tabs.indexOf(document.activeElement);
+  if (idx === -1) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    const next = (idx + dir + tabs.length) % tabs.length;
+    tabs[next].focus();
+    tabs[next].click();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LANGUAGE SWITCHER (Screen 4)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const switcherBtn = document.getElementById('lang-switcher-btn');
+const dropdown = document.getElementById('lang-dropdown');
+
+function renderLanguageSwitcher() {
+  const activeLanguages = LANGUAGES.filter(l => l.active);
+  const currentLang = document.documentElement.lang.split('-')[0] || 'en';
+
+  dropdown.innerHTML = activeLanguages.map(l => {
+    const isActive = l.code === currentLang;
+    return `<button class="lang-dropdown-item ${isActive ? 'active' : ''}" role="option" aria-selected="${isActive}" data-code="${l.code}" data-flag="${l.flag}" data-name="${l.name}" data-native="${l.nativeName}" data-dir="${l.dir}">
+      <span class="check">${isActive ? '\u2713' : ''}</span>
+      <span class="flag">${l.flag}</span>
+      <span class="name">${l.name}</span>
+      <span class="native-name">${l.nativeName}</span>
+    </button>`;
+  }).join('');
+
+  // Re-bind click handlers
+  dropdown.querySelectorAll('.lang-dropdown-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const code = item.dataset.code;
+      const flag = item.dataset.flag;
+      const name = item.dataset.name;
+      const dir = item.dataset.dir;
+
+      document.getElementById('current-flag').textContent = flag;
+      document.getElementById('current-code').textContent = code.toUpperCase();
+
+      document.documentElement.dir = dir.toLowerCase();
+      document.documentElement.lang = code;
+
+      dropdown.classList.remove('open');
+      switcherBtn.setAttribute('aria-expanded', 'false');
+
+      renderLanguageSwitcher();
+      showToast('success', 'Language changed to ' + name);
+    });
+  });
+}
+
+switcherBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = dropdown.classList.toggle('open');
+  switcherBtn.setAttribute('aria-expanded', String(open));
+});
+
+document.addEventListener('click', () => {
+  dropdown.classList.remove('open');
+  switcherBtn.setAttribute('aria-expanded', 'false');
+});
+
+dropdown.addEventListener('click', (e) => e.stopPropagation());
+
+// Keyboard nav for switcher
+switcherBtn.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    dropdown.classList.remove('open');
+    switcherBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (e.key === 'ArrowDown' && dropdown.classList.contains('open')) {
+    e.preventDefault();
+    dropdown.querySelector('.lang-dropdown-item')?.focus();
+  }
+});
+
+dropdown.addEventListener('keydown', (e) => {
+  const items = [...dropdown.querySelectorAll('.lang-dropdown-item')];
+  const idx = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' && idx < items.length - 1) { e.preventDefault(); items[idx + 1].focus(); }
+  if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); items[idx - 1].focus(); }
+  if (e.key === 'Escape') { dropdown.classList.remove('open'); switcherBtn.focus(); switcherBtn.setAttribute('aria-expanded', 'false'); }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 1: LANGUAGE MANAGEMENT TABLE
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderLanguageTable(filter) {
+  if (filter === undefined) filter = document.getElementById('lang-search').value.toLowerCase();
+
+  const filtered = LANGUAGES.filter(l =>
+    l.code.toLowerCase().includes(filter) ||
+    l.name.toLowerCase().includes(filter) ||
+    l.nativeName.toLowerCase().includes(filter)
+  );
+
+  const tbody = document.getElementById('lang-tbody');
+  const table = document.getElementById('lang-table');
+  const empty = document.getElementById('lang-empty');
+
+  if (filtered.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  table.style.display = '';
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(l => {
+    const isLocked = l.isDefault || l.isFallback;
+    const checkboxClass = 'custom-checkbox' + (l.active ? ' checked' : '') + (isLocked ? ' locked' : '');
+    const rowClass = isLocked ? 'row-locked' : '';
+
+    let badges = '';
+    if (l.isDefault) badges += '<span class="badge badge-default">Default</span> ';
+    if (l.isFallback) badges += '<span class="badge badge-fallback">Fallback</span> ';
+
+    const lockIcon = isLocked ? '<span class="lock-icon" aria-hidden="true">&#x1F512;</span>' : '';
+
+    const dirBadge = l.dir === 'RTL'
+      ? '<span class="badge badge-rtl">RTL</span>'
+      : '<span class="badge badge-info">LTR</span>';
+
+    return '<tr class="' + rowClass + '">' +
+      '<td><div style="display:flex;align-items:center;gap:0.25rem">' +
+        '<button class="' + checkboxClass + '" role="checkbox" aria-checked="' + l.active + '" aria-label="' + (isLocked ? l.name + ' (locked)' : 'Toggle ' + l.name) + '" ' + (isLocked ? 'disabled tabindex="-1"' : '') + ' onclick="toggleLanguage(\'' + l.code + '\')" tabindex="0"></button>' +
+        lockIcon +
+      '</div></td>' +
+      '<td><code>' + l.code + '</code></td>' +
+      '<td><strong>' + l.name + '</strong> ' + badges + '</td>' +
+      '<td>' + l.nativeName + '</td>' +
+      '<td>' + dirBadge + '</td>' +
+      '<td>' +
+        '<button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="openDictionary(\'' + l.code + '\')" aria-label="View dictionary for ' + l.name + '">' +
+          '<svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+          ' View Dictionary' +
+        '</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+document.getElementById('lang-search').addEventListener('input', (e) => {
+  renderLanguageTable(e.target.value.toLowerCase());
+});
+
+function toggleLanguage(code) {
+  const lang = LANGUAGES.find(l => l.code === code);
+  if (!lang || lang.isDefault || lang.isFallback) return;
+
+  lang.active = !lang.active;
+  showToast('success', lang.name + (lang.active ? ' activated' : ' deactivated'));
+  renderLanguageTable();
+  renderLanguageSwitcher();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 2: DICTIONARY VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openDictionary(langCode) {
+  currentDictLang = langCode;
+  dictPage = 1;
+  document.getElementById('dict-search').value = '';
+  document.getElementById('dict-module-filter').value = '';
+
+  const lang = LANGUAGES.find(l => l.code === langCode);
+  if (!lang) return;
+
+  document.getElementById('dict-title').innerHTML = 'Dictionary &mdash; ' + lang.name + ' (' + langCode + ')';
+  document.getElementById('dict-target-col-header').textContent = lang.name + ' Value';
+
+  const dirBadge = document.getElementById('dict-dir-badge');
+  if (lang.dir === 'RTL') {
+    dirBadge.textContent = 'RTL';
+    dirBadge.className = 'badge badge-rtl';
+    dirBadge.style.display = '';
+  } else {
+    dirBadge.textContent = 'LTR';
+    dirBadge.className = 'badge badge-info';
+    dirBadge.style.display = '';
+  }
+
+  renderDictTable();
+  switchToTab('dictionary');
+}
+
+function getFilteredDict() {
+  const search = document.getElementById('dict-search').value.toLowerCase();
+  const moduleFilter = document.getElementById('dict-module-filter').value;
+
+  return DICTIONARY.filter(e => {
+    const matchSearch = !search ||
+      e.key.toLowerCase().includes(search) ||
+      e.defaultValue.toLowerCase().includes(search);
+    const matchModule = !moduleFilter || e.module === moduleFilter;
+    return matchSearch && matchModule;
+  });
+}
+
+function renderDictTable() {
+  const filtered = getFilteredDict();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / dictPageSize));
+  if (dictPage > totalPages) dictPage = totalPages;
+
+  const start = (dictPage - 1) * dictPageSize;
+  const pageItems = filtered.slice(start, start + dictPageSize);
+
+  document.getElementById('dict-count-label').textContent =
+    'Showing ' + (filtered.length === 0 ? '0' : (start + 1)) + '-' + Math.min(start + dictPageSize, filtered.length) + ' of ' + filtered.length + ' entries';
+
+  const lang = LANGUAGES.find(l => l.code === currentDictLang);
+  const isRTL = lang && lang.dir === 'RTL';
+
+  const tbody = document.getElementById('dict-tbody');
+  tbody.innerHTML = pageItems.map(e => {
+    const translation = e.translations[currentDictLang] || '';
+    const isModified = e.modified && e.modified[currentDictLang];
+    const isEmpty = !translation;
+    const translationClass = 'translation-cell' + (isEmpty ? ' empty' : '') + (isModified ? ' modified' : '');
+    const translationDir = isRTL ? ' dir="rtl" style="font-family:\'Noto Sans Arabic\',Tahoma,sans-serif"' : '';
+
+    let actions = '<button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="openEditDialog(\'' + e.key + '\')" aria-label="Edit ' + e.key + '" title="Edit">' +
+      '<svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
+
+    if (isModified) {
+      actions += ' <button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="openRestoreDialog(\'' + e.key + '\')" aria-label="Restore ' + e.key + '" title="Restore to original" style="color:var(--tp-warning)">' +
+        '<svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>';
+    }
+
+    return '<tr>' +
+      '<td><code>' + e.key + '</code></td>' +
+      '<td><span class="badge badge-module">' + e.module + '</span></td>' +
+      '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + e.defaultValue + '</td>' +
+      '<td class="' + translationClass + '"' + translationDir + '>' + (translation || '(not translated)') + '</td>' +
+      '<td style="white-space:nowrap">' + actions + '</td>' +
+    '</tr>';
+  }).join('');
+
+  renderDictPagination(filtered.length, totalPages);
+}
+
+function renderDictPagination(total, totalPages) {
+  const container = document.getElementById('dict-pagination');
+  if (totalPages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let html = '<button ' + (dictPage <= 1 ? 'disabled' : '') + ' onclick="dictGoToPage(' + (dictPage - 1) + ')" aria-label="Previous page">&laquo;</button>';
+
+  for (let i = 1; i <= totalPages; i++) {
+    if (totalPages > 7 && i > 2 && i < totalPages - 1 && Math.abs(i - dictPage) > 1) {
+      if (i === 3 || i === totalPages - 2) html += '<button disabled>&hellip;</button>';
+      continue;
+    }
+    html += '<button class="' + (i === dictPage ? 'active' : '') + '" onclick="dictGoToPage(' + i + ')">' + i + '</button>';
+  }
+
+  html += '<button ' + (dictPage >= totalPages ? 'disabled' : '') + ' onclick="dictGoToPage(' + (dictPage + 1) + ')" aria-label="Next page">&raquo;</button>';
+
+  container.innerHTML = html;
+}
+
+function dictGoToPage(page) {
+  dictPage = page;
+  renderDictTable();
+}
+
+document.getElementById('dict-search').addEventListener('input', () => {
+  dictPage = 1;
+  renderDictTable();
+});
+
+document.getElementById('dict-module-filter').addEventListener('change', () => {
+  dictPage = 1;
+  renderDictTable();
+});
+
+document.getElementById('dict-page-size').addEventListener('change', (e) => {
+  dictPageSize = parseInt(e.target.value);
+  dictPage = 1;
+  renderDictTable();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 3: EDIT TRANSLATION DIALOG
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openEditDialog(key) {
+  editingEntry = DICTIONARY.find(e => e.key === key);
+  if (!editingEntry) return;
+
+  const lang = LANGUAGES.find(l => l.code === currentDictLang);
+  const isRTL = lang && lang.dir === 'RTL';
+
+  document.getElementById('edit-tech-name').value = editingEntry.key;
+  document.getElementById('edit-module-badge').innerHTML = '<span class="badge badge-module">' + editingEntry.module + '</span>';
+  document.getElementById('edit-english-value').value = editingEntry.defaultValue;
+
+  const translationField = document.getElementById('edit-translation-field');
+  const translationLabel = document.getElementById('edit-translation-label');
+  const textarea = document.getElementById('edit-translation-value');
+
+  translationLabel.textContent = (lang ? lang.name : currentDictLang) + ' Translation';
+
+  if (isRTL) {
+    translationField.classList.add('rtl-field');
+    textarea.dir = 'rtl';
+  } else {
+    translationField.classList.remove('rtl-field');
+    textarea.dir = 'ltr';
+  }
+
+  const currentValue = editingEntry.translations[currentDictLang] || '';
+  textarea.value = currentValue;
+  updateCharCount(currentValue);
+
+  // Clear validation state
+  translationField.classList.remove('has-error');
+
+  document.getElementById('edit-dialog').classList.add('open');
+  setTimeout(() => textarea.focus(), 100);
+}
+
+function updateCharCount(value) {
+  document.getElementById('edit-char-count').textContent = value.length + ' / 5000';
+}
+
+document.getElementById('edit-translation-value').addEventListener('input', (e) => {
+  updateCharCount(e.target.value);
+  // Clear error on input
+  document.getElementById('edit-translation-field').classList.remove('has-error');
+});
+
+function saveTranslation() {
+  const textarea = document.getElementById('edit-translation-value');
+  const value = textarea.value.trim();
+
+  if (!value) {
+    document.getElementById('edit-translation-field').classList.add('has-error');
+    textarea.focus();
+    return;
+  }
+
+  if (editingEntry) {
+    const oldValue = editingEntry.translations[currentDictLang];
+    editingEntry.translations[currentDictLang] = value;
+
+    // Track modification if value differs from master
+    const masterVal = editingEntry.masterValues ? editingEntry.masterValues[currentDictLang] : undefined;
+    if (masterVal && value !== masterVal) {
+      if (!editingEntry.modified) editingEntry.modified = {};
+      editingEntry.modified[currentDictLang] = true;
+    } else if (editingEntry.modified) {
+      editingEntry.modified[currentDictLang] = false;
+    }
+  }
+
+  closeDialog('edit-dialog');
+  showToast('success', 'Translation saved for ' + editingEntry.key);
+  renderDictTable();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREEN 5: RESTORE CONFIRMATION DIALOG
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openRestoreDialog(key) {
+  restoringEntry = DICTIONARY.find(e => e.key === key);
+  if (!restoringEntry) return;
+
+  document.getElementById('restore-key-name').textContent = restoringEntry.key;
+
+  const currentValue = restoringEntry.translations[currentDictLang] || '';
+  const masterValue = (restoringEntry.masterValues && restoringEntry.masterValues[currentDictLang]) || restoringEntry.defaultValue;
+
+  const lang = LANGUAGES.find(l => l.code === currentDictLang);
+  const isRTL = lang && lang.dir === 'RTL';
+  const dirAttr = isRTL ? ' dir="rtl" style="font-family:\'Noto Sans Arabic\',Tahoma,sans-serif"' : '';
+
+  document.getElementById('restore-current-value').innerHTML = '<span' + dirAttr + '>' + currentValue + '</span>';
+  document.getElementById('restore-master-value').innerHTML = '<span' + dirAttr + '>' + masterValue + '</span>';
+
+  document.getElementById('restore-dialog').classList.add('open');
+}
+
+function confirmRestore() {
+  if (restoringEntry) {
+    const masterValue = (restoringEntry.masterValues && restoringEntry.masterValues[currentDictLang]) || restoringEntry.defaultValue;
+    restoringEntry.translations[currentDictLang] = masterValue;
+    if (restoringEntry.modified) {
+      restoringEntry.modified[currentDictLang] = false;
+    }
+  }
+
+  closeDialog('restore-dialog');
+  showToast('success', 'Translation restored to master value for ' + restoringEntry.key);
+  renderDictTable();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DIALOGS — SHARED
+// ═══════════════════════════════════════════════════════════════════════════
+
+function closeDialog(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.dialog-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.dialog-overlay.open').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// Trap focus inside open dialogs
+document.querySelectorAll('.dialog-overlay').forEach(overlay => {
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusable = overlay.querySelectorAll('button:not([disabled]), input:not([readonly]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+
+const TOAST_DURATIONS = { success: 4000, info: 5000, error: 6000, warn: 5000 };
+
+function showToast(type, message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.setAttribute('role', 'alert');
+  const icons = { success: '\u2713', error: '\u2715', info: '\u2139', warn: '\u26A0' };
+  toast.innerHTML = '<span aria-hidden="true">' + (icons[type] || '\u2139') + '</span> ' + message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(40px)';
+    toast.style.transition = 'all 0.2s ease-in';
+    setTimeout(() => toast.remove(), 200);
+  }, TOAST_DURATIONS[type] || 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+
+renderLanguageTable('');
+renderLanguageSwitcher();
+</script>
+
+</body>
+</html>

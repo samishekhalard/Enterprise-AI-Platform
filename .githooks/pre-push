@@ -1,0 +1,144 @@
+#!/bin/bash
+# =============================================================================
+# SDLC Pre-Push Gate
+# =============================================================================
+#
+# Blocks push when frontend or backend source code has changed on the current
+# branch (vs the remote tracking branch) and the full validation suite fails.
+#
+# Gate scope:
+#   - frontend: format, lint, typecheck, design-system checks, unit tests, build
+#   - backend:  mvn clean verify (if backend changes detected)
+#
+# This is Gate 2 in the four-gate governance model:
+#   Gate 1: pre-commit  (staged-file checks, fast)
+#   Gate 2: pre-push    (full developer validation, slower)
+#   Gate 3: PR CI       (authoritative merge gate, clean environment)
+#   Gate 4: nightly     (heavy regression, visual drift)
+#
+# Install:
+#   git config core.hooksPath .githooks
+# =============================================================================
+
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# ----------------------------------------------------------
+# Determine what changed between local branch and remote
+# ----------------------------------------------------------
+REMOTE="$1"
+URL="$2"
+
+# Read each ref being pushed
+FRONTEND_CHANGED=false
+BACKEND_CHANGED=false
+
+while read local_ref local_sha remote_ref remote_sha; do
+  # Skip delete pushes
+  if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    continue
+  fi
+
+  # Determine the range of commits being pushed
+  if [[ "$remote_sha" == "0000000000000000000000000000000000000000" ]]; then
+    # New branch — compare against main
+    RANGE="$(git merge-base HEAD main 2>/dev/null || echo HEAD~10)..HEAD"
+  else
+    RANGE="${remote_sha}..${local_sha}"
+  fi
+
+  # Check which areas changed
+  CHANGED_FILES="$(git diff --name-only "$RANGE" 2>/dev/null || true)"
+
+  if printf '%s\n' "$CHANGED_FILES" | grep -qE '^frontend/src/'; then
+    FRONTEND_CHANGED=true
+  fi
+
+  if printf '%s\n' "$CHANGED_FILES" | grep -qE '^backend/.*/src/'; then
+    BACKEND_CHANGED=true
+  fi
+done
+
+# ----------------------------------------------------------
+# No source changes — allow push freely
+# ----------------------------------------------------------
+if [[ "$FRONTEND_CHANGED" == "false" && "$BACKEND_CHANGED" == "false" ]]; then
+  exit 0
+fi
+
+# ----------------------------------------------------------
+# Evidence freshness check
+# ----------------------------------------------------------
+echo -e "${YELLOW}Pre-push gate: checking SDLC evidence freshness...${NC}"
+if [[ -f "$ROOT_DIR/scripts/check-sdlc-evidence-freshness.sh" ]]; then
+  bash "$ROOT_DIR/scripts/check-sdlc-evidence-freshness.sh"
+fi
+
+# ----------------------------------------------------------
+# Frontend validation
+# ----------------------------------------------------------
+if [[ "$FRONTEND_CHANGED" == "true" ]]; then
+  echo ""
+  echo -e "${YELLOW}Pre-push gate: frontend source changed — running full validation...${NC}"
+  echo ""
+
+  cd "$ROOT_DIR/frontend"
+
+  echo "  [1/8] format:check"
+  npm run format:check
+
+  echo "  [2/8] lint"
+  npm run lint
+
+  echo "  [3/8] typecheck"
+  npm run typecheck
+
+  echo "  [4/8] lint:design-system"
+  npm run lint:design-system
+
+  echo "  [5/8] design-system checks (tokens, spacing, admin tokens)"
+  npm run check:design-tokens
+  npm run check:spacing-scale
+  npm run check:showcase-alignment
+  npm run check:admin-style-tokens
+
+  echo "  [6/8] test:design-system"
+  npm run test:design-system
+
+  echo "  [7/8] unit tests"
+  npm run test
+
+  echo "  [8/8] build"
+  npm run build
+
+  cd "$ROOT_DIR"
+
+  echo ""
+  echo -e "${GREEN}Frontend pre-push validation passed.${NC}"
+fi
+
+# ----------------------------------------------------------
+# Backend validation
+# ----------------------------------------------------------
+if [[ "$BACKEND_CHANGED" == "true" ]]; then
+  echo ""
+  echo -e "${YELLOW}Pre-push gate: backend source changed — running mvn verify...${NC}"
+  echo ""
+
+  cd "$ROOT_DIR/backend"
+  ./mvnw clean verify -q
+  cd "$ROOT_DIR"
+
+  echo ""
+  echo -e "${GREEN}Backend pre-push validation passed.${NC}"
+fi
+
+echo ""
+echo -e "${GREEN}Pre-push gate passed.${NC}"
+exit 0

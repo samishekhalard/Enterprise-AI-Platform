@@ -1,0 +1,93 @@
+name: Frontend Strict Quality
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-strict-quality.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - ".github/workflows/frontend-strict-quality.yml"
+
+jobs:
+  frontend-strict-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Design system lint
+        run: npm run lint:design-system
+
+      - name: Design token contract
+        run: npm run check:design-tokens
+
+      - name: Component showcase alignment
+        run: npm run check:showcase-alignment
+
+      - name: Strict spacing drift on changed SCSS
+        working-directory: .
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            git fetch origin "${GITHUB_BASE_REF}" --depth=1
+            RANGE="origin/${GITHUB_BASE_REF}...HEAD"
+          elif git rev-parse HEAD^ >/dev/null 2>&1; then
+            RANGE="HEAD^...HEAD"
+          else
+            RANGE="HEAD"
+          fi
+          mapfile -t changed_scss < <(git diff --name-only --diff-filter=ACMR "$RANGE" | grep '^frontend/src/.*\.scss$' || true)
+          if [[ ${#changed_scss[@]} -eq 0 ]]; then
+            echo "No changed frontend SCSS files detected."
+            exit 0
+          fi
+          bash scripts/check-spacing-scale.sh --fail-on-warnings "${changed_scss[@]}"
+
+      - name: Admin style token contract
+        run: npm run check:admin-style-tokens
+
+      - name: Layout contract
+        run: ../scripts/check-frontend-layout-contract.sh frontend
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Design system contract tests
+        run: npm run test:design-system
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: E2E quality gates (browser matrix + visual + SEO)
+        run: npm run e2e:quality
+
+      - name: Build
+        run: npm run build

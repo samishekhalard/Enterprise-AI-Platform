@@ -1,0 +1,29 @@
+# Auth0 Provider Configuration
+# Activate with: spring.profiles.active=auth0
+# Or: AUTH_PROVIDER=auth0
+
+auth:
+  facade:
+    provider: auth0
+
+    # Auth0 specific role claim paths
+    role-claim-paths:
+      - permissions                      # Auth0 RBAC permissions
+      - "https://yourdomain.com/roles"   # Custom namespace (replace with your domain)
+      - roles                            # Standard claim if configured
+
+    # Auth0 user claim mappings
+    user-claim-mappings:
+      user-id: sub                       # Auth0: auth0|userId
+      email: email
+      first-name: given_name
+      last-name: family_name
+      tenant-id: "https://yourdomain.com/tenant_id"  # Custom namespace claim
+      identity-provider: sub              # Auth0 encodes provider in sub
+
+    # Provider-specific configuration
+    provider-config:
+      domain: ${AUTH0_DOMAIN:your-tenant.auth0.com}
+      audience: ${AUTH0_AUDIENCE:https://your-api.example.com}
+      client-id: ${AUTH0_CLIENT_ID:}
+      client-secret: ${AUTH0_CLIENT_SECRET:}

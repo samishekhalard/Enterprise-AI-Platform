@@ -1,0 +1,3948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Scenarios Prototype</title>
+  <style>
+    @font-face {
+      font-family: "Gotham Rounded";
+      src: url("../../../../../frontend/src/assets/fonts/GothamRounded-Book.otf") format("opentype");
+      font-weight: 300 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Gotham Rounded";
+      src: url("../../../../../frontend/src/assets/fonts/GothamRounded-Medium.otf") format("opentype");
+      font-weight: 500 600;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Gotham Rounded";
+      src: url("../../../../../frontend/src/assets/fonts/GothamRounded-Bold.otf") format("opentype");
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    :root {
+      --tp-primary: #428177;
+      --tp-primary-dark: #054239;
+      --tp-surface: #f2efe9;
+      --tp-surface-raised: #faf8f4;
+      --tp-surface-light: #faf8f5;
+      --tp-bg: #f2efe9;
+      --tp-text: #3d3a3b;
+      --tp-text-dark: #2a241c;
+      --tp-text-muted: #999590;
+      --tp-text-secondary: #7a7672;
+      --tp-border: #e0ddda;
+      --tp-border-light: #e8e5e0;
+      --tp-grey: #999590;
+      --tp-grey-light: #d4d1cc;
+      --tp-danger: #6b1f2a;
+      --tp-error: #ef4444;
+      --tp-warning: #988561;
+      --nm-radius: 16px;
+      --nm-radius-sm: 8px;
+      --nm-radius-md: 12px;
+      --nm-radius-lg: 16px;
+      --nm-radius-xl: 24px;
+      --nm-radius-pill: 999px;
+      --tp-space-1: 0.25rem;
+      --tp-space-2: 0.5rem;
+      --tp-space-3: 0.75rem;
+      --tp-space-4: 1rem;
+      --tp-space-5: 1.25rem;
+      --tp-space-6: 1.5rem;
+      --tp-space-8: 2rem;
+      --tp-space-10: 2.5rem;
+      --tp-space-12: 3rem;
+      --tp-font-sm: 0.82rem;
+      --tp-font-md: 1rem;
+      --tp-font-lg: 1.15rem;
+      --tp-font-xl: 1.35rem;
+      --tp-touch-target: 44px;
+      --tp-focus-ring: 0 0 0 2px color-mix(in srgb, var(--tp-primary) 25%, transparent);
+      --tp-pattern-opacity: 0.06;
+      --nm-shadow-dialog: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+      --nm-shadow-island: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
+      --nm-island-border: 1px solid color-mix(in srgb, var(--tp-border) 60%, transparent);
+      --nm-shadow-light: rgba(255,255,255,0.7);
+      --nm-shadow-dark: rgba(0,0,0,0.06);
+      --proto-max: 90vw;
+      --shell-stack-width: 520px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: "Gotham Rounded", "Nunito", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--tp-text);
+      line-height: 1.5;
+      background: var(--tp-bg);
+      min-height: 100dvh;
+      padding-block: var(--tp-space-6);
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    body > .container {
+      height: calc(100dvh - (var(--tp-space-6) * 2));
+      min-height: 0;
+    }
+
+    #proto-login input::placeholder {
+      color: color-mix(in srgb, var(--tp-bg) 54%, transparent);
+      opacity: 1;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      position: relative;
+    }
+
+    .app-shell::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: var(--tp-pattern-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23428177' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 120px 120px;
+      background-repeat: repeat;
+    }
+
+    .shell-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: var(--tp-space-4);
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--proto-max);
+      margin: 0 auto;
+      padding-inline: var(--tp-space-6);
+    }
+
+    .shell-header-inner {
+      padding-bottom: var(--tp-space-3);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: var(--tp-space-3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-island {
+      background: var(--tp-bg);
+      border-radius: var(--nm-radius-lg);
+      border: var(--nm-island-border);
+      box-shadow: var(--nm-shadow-island);
+    }
+
+    .brand-island {
+      display: flex;
+      align-items: center;
+      gap: var(--tp-space-3);
+      padding: var(--tp-space-2) var(--tp-space-3);
+    }
+
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--nm-radius-md);
+      background: linear-gradient(180deg, var(--tp-surface-raised), var(--tp-bg));
+      box-shadow: inset 1px 1px 1px var(--nm-shadow-light), inset -1px -1px 1px var(--nm-shadow-dark);
+      color: var(--tp-primary-dark);
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand-block h1 {
+      font-size: var(--tp-font-lg);
+      letter-spacing: 0.01em;
+      color: var(--tp-text-dark);
+      font-weight: 700;
+    }
+
+    .brand-block p {
+      margin-top: 2px;
+      color: var(--tp-text-secondary);
+      font-size: var(--tp-font-sm);
+    }
+
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: var(--tp-space-1);
+      padding: var(--tp-space-2);
+    }
+
+    .topnav a,
+    .topnav button {
+      text-decoration: none;
+      color: var(--tp-text);
+      background: var(--tp-bg);
+      border: 1px solid var(--tp-border);
+      border-radius: 999px;
+      padding: var(--tp-space-2) var(--tp-space-3);
+      font-size: var(--tp-font-sm);
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      min-height: 38px;
+    }
+
+    .topnav a.active,
+    .topnav button.active {
+      border-color: color-mix(in srgb, var(--tp-primary) 28%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .topnav a:hover,
+    .topnav button:hover {
+      color: var(--tp-primary-dark);
+      border-color: color-mix(in srgb, var(--tp-primary) 32%, transparent);
+    }
+
+    .shell-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .shell-content-inner {
+      padding-bottom: var(--tp-space-10);
+      display: grid;
+      gap: var(--tp-space-6);
+    }
+
+    .page-title-bar {
+      background: var(--tp-surface-raised);
+      border: 1px solid var(--tp-border);
+      border-radius: var(--nm-radius-lg);
+      box-shadow: var(--nm-shadow-island);
+      padding: var(--tp-space-5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--tp-space-4);
+      flex-wrap: wrap;
+    }
+
+    .page-title-bar h2 {
+      font-size: var(--tp-font-xl);
+      font-weight: 700;
+      color: var(--tp-text);
+      margin-bottom: 0.2rem;
+    }
+
+    .page-title-bar p {
+      color: var(--tp-text-secondary);
+      font-size: var(--tp-font-sm);
+    }
+
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+      color: var(--tp-text-muted);
+      font-size: var(--tp-font-sm);
+    }
+
+    .breadcrumb a {
+      color: var(--tp-text-muted);
+      text-decoration: none;
+    }
+
+    .breadcrumb .current {
+      color: var(--tp-text);
+      font-weight: 600;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--nm-radius-pill);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .tag-success {
+      background: color-mix(in srgb, var(--tp-primary) 14%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tag-info {
+      background: color-mix(in srgb, var(--tp-primary-dark) 10%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tag-warning {
+      background: color-mix(in srgb, var(--tp-warning) 18%, transparent);
+      color: #5a4a2a;
+    }
+
+    .proto-layout {
+      display: grid;
+      grid-template-columns: 560px minmax(0, 1fr);
+      gap: var(--tp-space-6);
+      height: 100%;
+      min-height: 0;
+      align-items: stretch;
+    }
+
+    .proto-layout > * {
+      min-height: 0;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--tp-surface-raised);
+      border: 1px solid var(--tp-border);
+      border-radius: var(--nm-radius);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: var(--tp-space-4);
+      font-weight: 700;
+      color: var(--tp-text-dark);
+      border-bottom: 1px solid var(--tp-border);
+    }
+
+    .card-subtitle {
+      font-weight: 400;
+      font-size: var(--tp-font-sm);
+      color: var(--tp-text-muted);
+      margin-top: 2px;
+    }
+
+    .card-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: var(--tp-space-4);
+    }
+
+    .card-footer {
+      padding: var(--tp-space-3) var(--tp-space-4);
+      border-top: 1px solid var(--tp-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--tp-space-3);
+    }
+
+    .control-stack {
+      display: grid;
+      gap: var(--tp-space-4);
+    }
+
+    .control-group {
+      display: grid;
+      gap: var(--tp-space-2);
+    }
+
+    .control-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--tp-text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .segmented,
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: var(--tp-touch-target);
+      padding: 0.5rem 1.25rem;
+      border-radius: var(--nm-radius-pill);
+      border: 1px solid transparent;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--tp-primary);
+      color: var(--tp-surface-light);
+      border-color: var(--tp-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--tp-primary-dark);
+      border-color: var(--tp-primary-dark);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--tp-text);
+      border-color: var(--tp-border);
+    }
+
+    .btn-secondary:hover {
+      background: color-mix(in srgb, var(--tp-border) 30%, transparent);
+    }
+
+    .btn-text {
+      background: transparent;
+      color: var(--tp-primary);
+      border-color: transparent;
+      padding-inline: 0.75rem;
+    }
+
+    .btn-text:hover {
+      background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+    }
+
+    .chips .btn,
+    .segmented .btn {
+      min-height: 38px;
+      padding: 0.45rem 0.95rem;
+      font-size: 0.8rem;
+    }
+
+    .tree-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: var(--tp-space-4);
+    }
+
+    .tree-toolbar-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-height: 38px;
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--nm-radius-pill);
+      border: 1px solid color-mix(in srgb, var(--tp-border) 78%, transparent);
+      background: var(--tp-surface-raised);
+      color: var(--tp-text-dark);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .tree-toolbar-button:hover {
+      border-color: color-mix(in srgb, var(--tp-primary) 30%, transparent);
+      color: var(--tp-primary-dark);
+      background: color-mix(in srgb, var(--tp-primary) 5%, var(--tp-surface-raised));
+    }
+
+    .tree-toolbar-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      height: 1rem;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .tree-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+    }
+
+    .p-tree {
+      width: 100%;
+      min-height: 0;
+      overflow: auto;
+      padding: var(--tp-space-4);
+      border-radius: var(--nm-radius-md);
+      border: 1px solid color-mix(in srgb, var(--tp-border) 70%, transparent);
+      background: color-mix(in srgb, var(--tp-surface) 55%, white);
+    }
+
+    .legend-panel {
+      margin-top: var(--tp-space-4);
+      padding: var(--tp-space-4);
+      border-radius: var(--nm-radius-md);
+      border: 1px solid color-mix(in srgb, var(--tp-border) 70%, transparent);
+      background: color-mix(in srgb, var(--tp-surface) 55%, white);
+    }
+
+    .tree-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      align-items: center;
+    }
+
+    .tree-legend-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--tp-text-muted);
+    }
+
+    .tree,
+    .p-tree-root {
+      list-style: none;
+      display: grid;
+      gap: 0.55rem;
+      padding: 0;
+      margin: 0;
+      min-width: 0;
+    }
+
+    .tree ul,
+    .p-treenode-children {
+      list-style: none;
+      display: grid;
+      gap: 0.45rem;
+      margin: 0.45rem 0 0 0.9rem;
+      padding: 0 0 0 0.95rem;
+      border-left: 1px solid color-mix(in srgb, var(--tp-border) 72%, transparent);
+    }
+
+    .tree-node {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .tree-node-icon {
+      flex: none;
+      width: 1.35rem;
+      height: 1.35rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: color-mix(in srgb, var(--tp-text-secondary) 86%, transparent);
+    }
+
+    .tree-node-icon svg {
+      width: 1rem;
+      height: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .tree-node.kind-shell .tree-node-icon {
+      color: color-mix(in srgb, var(--tp-primary-dark) 90%, transparent);
+    }
+
+    .tree-node.kind-container .tree-node-icon {
+      color: color-mix(in srgb, var(--tp-primary-dark) 76%, transparent);
+    }
+
+    .tree-node.kind-element .tree-node-icon {
+      color: color-mix(in srgb, var(--tp-text-secondary) 92%, transparent);
+    }
+
+    .tree-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 32px;
+      min-width: 0;
+      width: 100%;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: var(--tp-surface-raised);
+      border: 1px solid color-mix(in srgb, var(--tp-border) 80%, transparent);
+      color: var(--tp-text-dark);
+      font-size: 0.8rem;
+      line-height: 1.35;
+      font-weight: 600;
+      cursor: text;
+      white-space: nowrap;
+      overflow: hidden;
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
+
+    .tree-label-text {
+      min-width: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tree-role-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.64rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tree-role-display {
+      background: color-mix(in srgb, var(--tp-text-muted) 12%, white);
+      color: var(--tp-text-secondary);
+      border-color: color-mix(in srgb, var(--tp-text-muted) 18%, transparent);
+    }
+
+    .tree-role-required {
+      background: color-mix(in srgb, var(--tp-warning) 16%, white);
+      color: #6d4b14;
+      border-color: color-mix(in srgb, var(--tp-warning) 30%, transparent);
+    }
+
+    .tree-role-optional {
+      background: color-mix(in srgb, var(--tp-primary) 10%, white);
+      color: var(--tp-primary-dark);
+      border-color: color-mix(in srgb, var(--tp-primary) 22%, transparent);
+    }
+
+    .tree-role-feedback {
+      background: color-mix(in srgb, var(--tp-danger) 12%, white);
+      color: #7f2439;
+      border-color: color-mix(in srgb, var(--tp-danger) 24%, transparent);
+    }
+
+    .tree-role-submit {
+      background: color-mix(in srgb, var(--tp-primary) 12%, white);
+      color: #1b6a4f;
+      border-color: color-mix(in srgb, var(--tp-primary) 24%, transparent);
+    }
+
+    .tree-role-toggle {
+      background: color-mix(in srgb, var(--tp-primary-dark) 8%, white);
+      color: var(--tp-primary-dark);
+      border-color: color-mix(in srgb, var(--tp-primary-dark) 16%, transparent);
+    }
+
+    .tree-role-navigate {
+      background: color-mix(in srgb, var(--tp-primary-dark) 10%, white);
+      color: #235981;
+      border-color: color-mix(in srgb, var(--tp-primary-dark) 18%, transparent);
+    }
+
+    .tree-node.root .tree-label {
+      background: color-mix(in srgb, var(--tp-primary) 10%, var(--tp-surface-raised));
+      border-color: color-mix(in srgb, var(--tp-primary) 24%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-node.region .tree-label {
+      background: color-mix(in srgb, var(--tp-primary-dark) 6%, var(--tp-surface-raised));
+    }
+
+    #selectorTree .tree-label {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .tree-node.clickable {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .tree-node.clickable .tree-label {
+      flex: 1 1 auto;
+    }
+
+    .tree,
+    .tree *,
+    .proto-layout,
+    .proto-layout * {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .tree-branch-row {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .tree-expander {
+      flex: none;
+      width: 1.6rem;
+      min-width: 1.6rem;
+      height: 1.6rem;
+      margin-top: 0.15rem;
+      border: 1px solid color-mix(in srgb, var(--tp-border) 80%, transparent);
+      border-radius: 999px;
+      background: var(--tp-surface-raised);
+      color: var(--tp-text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .tree-expander:hover {
+      border-color: color-mix(in srgb, var(--tp-primary) 28%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-branch.collapsed > .tree-children {
+      display: none;
+    }
+
+    .tree-branch.collapsed > .tree-branch-row .tree-expander {
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-expander-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1rem;
+      height: 1rem;
+      transition: transform 0.15s ease;
+    }
+
+    .tree-branch:not(.collapsed) > .tree-branch-row .tree-expander-icon {
+      transform: rotate(90deg);
+    }
+
+    .tree-panel,
+    .p-tree,
+    .card,
+    .card-header,
+    .card-body,
+    .proto-surface,
+    .proto-surface-header,
+    .proto-stage,
+    .page-title-bar,
+    .breadcrumb,
+    .logo-container,
+    .welcome-container,
+    .auth-region,
+    .auth-banner,
+    .tenant-registry-dropdown,
+    .tenant-dropdown-trigger,
+    .tenant-dropdown-filter,
+    .state-panel,
+    .support-row,
+    .provider-option-panel,
+    .provider-expand-toggle,
+    .provider-remember-control,
+    .auth-btn,
+    .topnav a,
+    .topnav button {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .tree-node.clickable:hover .tree-label,
+    .tree-node.clickable:hover .tree-expander {
+      border-color: color-mix(in srgb, var(--tp-primary) 28%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-node.clickable:hover .tree-label {
+      background: color-mix(in srgb, var(--tp-primary) 6%, var(--tp-surface-raised));
+    }
+
+    .tree-node.clickable.active .tree-label,
+    .tree-node.clickable.active .tree-expander {
+      border-color: color-mix(in srgb, var(--tp-primary) 34%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-node.clickable.active .tree-label {
+      background: color-mix(in srgb, var(--tp-primary) 12%, var(--tp-surface-raised));
+    }
+
+    .tree-node.clickable.active .tree-node-icon,
+    .tree-node.clickable.inspected .tree-node-icon {
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-node.clickable.inspectable {
+      width: 100%;
+    }
+
+    .tree-node.clickable.inspected .tree-label,
+    .tree-node.clickable.inspected .tree-expander {
+      border-color: color-mix(in srgb, var(--tp-primary) 36%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .tree-node.clickable.inspected .tree-label {
+      background: color-mix(in srgb, var(--tp-primary) 16%, var(--tp-surface-raised));
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--tp-primary) 18%, transparent);
+    }
+
+    .element-focused {
+      outline: 3px solid color-mix(in srgb, var(--tp-primary) 60%, white);
+      outline-offset: 4px;
+    }
+
+    .element-hovered {
+      outline: 2px dashed color-mix(in srgb, var(--tp-primary) 48%, white);
+      outline-offset: 4px;
+    }
+
+    .proto-surface {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--tp-surface-raised);
+      border: 1px solid var(--tp-border);
+      border-radius: var(--nm-radius-lg);
+      box-shadow: var(--nm-shadow-island);
+      overflow: hidden;
+    }
+
+    .proto-surface-header {
+      padding: var(--tp-space-4) var(--tp-space-5);
+      border-bottom: 1px solid var(--tp-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: var(--tp-space-4);
+      flex-wrap: wrap;
+    }
+
+    .proto-surface-header h3 {
+      font-size: var(--tp-font-xl);
+      font-weight: 700;
+      color: var(--tp-text-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .proto-surface-header p {
+      font-size: var(--tp-font-sm);
+      color: var(--tp-text-secondary);
+    }
+
+    .proto-stage {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding: var(--tp-space-5);
+      background: linear-gradient(180deg, #e7ebe5 0%, #ece4d5 100%);
+    }
+
+    .login-shell {
+      height: 100%;
+      min-height: 0;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--nm-radius-lg);
+      background: transparent;
+      color: var(--tp-bg);
+      padding-block: 2.25rem;
+    }
+
+    .shell-background-container {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .shell-background {
+      position: absolute;
+      inset: 0;
+    }
+
+    .shell-background-color {
+      position: absolute;
+      inset: 0;
+      background: var(--tp-primary);
+    }
+
+    .shell-background-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.13;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23FAF8F5' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3Cpath d='M22 10L38 42 M98 10L82 42 M22 110L38 78 M98 110L82 78'/%3E%3Cpath d='M10 22L42 38 M10 98L42 78 M110 22L78 38 M110 98L78 78'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 120px 120px;
+      background-repeat: repeat;
+    }
+
+    .login-shell-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, var(--shell-stack-width));
+      grid-template-areas:
+        "welcome"
+        "logo"
+        "auth"
+        "support";
+      gap: var(--tp-space-4);
+      justify-content: center;
+      justify-items: center;
+      align-content: center;
+      align-items: center;
+    }
+
+    .login-shell-inner.centered {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "auth"
+        "support";
+      justify-items: center;
+    }
+
+    .logo-container,
+    .welcome-container {
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 16%, transparent);
+      background: color-mix(in srgb, var(--tp-primary) 88%, transparent);
+      box-shadow:
+        10px 10px 22px color-mix(in srgb, var(--tp-primary-dark) 34%, transparent),
+        -8px -8px 18px color-mix(in srgb, var(--tp-primary) 20%, transparent);
+    }
+
+    .logo-container {
+      grid-area: logo;
+      display: grid;
+      gap: var(--tp-space-3);
+      justify-self: center;
+      align-self: center;
+      width: 100%;
+      max-width: var(--shell-stack-width);
+      padding: 1rem 1.25rem;
+      border-radius: 1.6rem;
+      justify-items: center;
+      align-content: center;
+    }
+
+    .container-heading {
+      margin: 0;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--tp-bg) 88%, transparent);
+    }
+
+    .svg-logo-renderer {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      min-height: 44px;
+      padding: 0.25rem 0;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-transform: lowercase;
+      width: fit-content;
+    }
+
+    .welcome-container {
+      grid-area: welcome;
+      justify-self: center;
+      align-self: center;
+      width: 100%;
+      max-width: var(--shell-stack-width);
+      display: grid;
+      gap: var(--tp-space-3);
+      padding: 1.4rem 1.5rem;
+      border-radius: 1.5rem;
+      text-align: center;
+    }
+
+    .welcome-container .container-heading {
+      justify-self: center;
+    }
+
+    .welcome-container h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.02;
+      font-weight: 600;
+      color: var(--tp-bg);
+      letter-spacing: 0.01em;
+    }
+
+    .welcome-container h2 {
+      color: color-mix(in srgb, var(--tp-bg) 82%, transparent);
+      font-size: var(--tp-font-lg);
+      font-weight: 500;
+      max-width: 42ch;
+      margin-inline: auto;
+    }
+
+    .auth-region {
+      grid-area: auth;
+      width: 100%;
+      max-width: var(--shell-stack-width);
+      justify-self: center;
+    }
+
+    .auth-region.centered {
+      justify-self: center;
+    }
+
+    .auth-region.sign-in-surface-active {
+      position: relative;
+      width: 100%;
+      display: grid;
+      gap: 1.15rem;
+      text-align: left;
+      padding: 2.25rem 2rem 1.9rem;
+      border-radius: 24px;
+      border: 1px solid transparent;
+      background-color: var(--tp-primary);
+      box-shadow: 14px 14px 28px color-mix(in srgb, var(--tp-primary-dark) 42%, transparent);
+    }
+
+    .support-container {
+      grid-area: support;
+      width: 100%;
+      max-width: var(--shell-stack-width);
+      justify-self: center;
+      align-self: start;
+      display: grid;
+      gap: var(--tp-space-3);
+      padding: 1rem 1.25rem;
+      border-radius: 1.35rem;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 16%, transparent);
+      background: color-mix(in srgb, var(--tp-primary) 88%, transparent);
+      box-shadow:
+        10px 10px 22px color-mix(in srgb, var(--tp-primary-dark) 34%, transparent),
+        -8px -8px 18px color-mix(in srgb, var(--tp-primary) 20%, transparent);
+    }
+
+    .auth-region.sign-in-surface-active::before {
+      content: "";
+      position: absolute;
+      top: 1.5rem;
+      bottom: 1.5rem;
+      left: 1rem;
+      width: 2px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--tp-bg) 18%, transparent);
+      pointer-events: none;
+    }
+
+    .auth-step-container {
+      position: relative;
+      display: grid;
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 0.85rem 1rem;
+    }
+
+    .step-header-container {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .step-indicator {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 22%, transparent);
+      background: color-mix(in srgb, var(--tp-primary-dark) 22%, transparent);
+      color: color-mix(in srgb, var(--tp-bg) 74%, transparent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      box-shadow:
+        5px 5px 10px color-mix(in srgb, var(--tp-primary-dark) 26%, transparent),
+        -4px -4px 10px color-mix(in srgb, var(--tp-primary) 16%, transparent);
+    }
+
+    .step-title-container {
+      min-width: 0;
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .step-title {
+      color: color-mix(in srgb, var(--tp-bg) 96%, transparent);
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .step-caption {
+      color: color-mix(in srgb, var(--tp-bg) 68%, transparent);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .step-content-container {
+      grid-column: 2 / -1;
+      display: grid;
+      gap: 1rem;
+      padding-top: 0.1rem;
+    }
+
+    .auth-step-container > .status-message-container {
+      grid-column: 2 / -1;
+      display: grid;
+      gap: 0.85rem;
+      padding-top: 0.1rem;
+    }
+
+    .auth-step-container.step-active .step-indicator {
+      background: color-mix(in srgb, var(--tp-bg) 14%, var(--tp-primary));
+      color: var(--tp-bg);
+      border-color: color-mix(in srgb, var(--tp-bg) 32%, transparent);
+    }
+
+    .auth-step-container.step-active .step-title {
+      color: var(--tp-bg);
+    }
+
+    .auth-step-container.step-complete .step-indicator {
+      background: color-mix(in srgb, #e0d4a8 78%, var(--tp-primary));
+      border-color: color-mix(in srgb, #f4ebc9 48%, transparent);
+      color: var(--tp-primary-dark);
+    }
+
+    .auth-step-container.step-disabled .step-indicator {
+      opacity: 0.72;
+    }
+
+    .auth-step-container.step-disabled .step-title,
+    .auth-step-container.step-disabled .step-caption {
+      color: color-mix(in srgb, var(--tp-bg) 58%, transparent);
+    }
+
+    .auth-top {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .tenant-registry-dropdown {
+      position: relative;
+      width: 100%;
+    }
+
+    .tenant-dropdown-trigger {
+      width: 100%;
+      min-height: 48px;
+      padding: 0.55rem 0.75rem;
+      border-radius: 1rem;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      background: var(--tp-primary);
+      color: color-mix(in srgb, var(--tp-bg) 92%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      box-shadow:
+        5px 5px 12px color-mix(in srgb, var(--tp-primary-dark) 42%, transparent),
+        -5px -5px 12px color-mix(in srgb, var(--tp-primary) 22%, transparent);
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+    }
+
+    .tenant-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .tenant-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 0.7rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--tp-bg) 14%, transparent);
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 18%, transparent);
+      color: color-mix(in srgb, var(--tp-bg) 96%, transparent);
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tenant-placeholder {
+      color: color-mix(in srgb, var(--tp-bg) 62%, transparent);
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .tenant-dropdown-caret {
+      flex: none;
+      color: color-mix(in srgb, var(--tp-bg) 72%, transparent);
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
+    .tenant-dropdown-panel {
+      position: absolute;
+      top: calc(100% + 0.55rem);
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: grid;
+      gap: 0.75rem;
+      padding: 0.85rem;
+      border-radius: 1rem;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      background: color-mix(in srgb, var(--tp-primary-dark) 82%, var(--tp-primary));
+      box-shadow: 14px 14px 28px color-mix(in srgb, var(--tp-primary-dark) 46%, transparent);
+    }
+
+    .tenant-dropdown-filter-row {
+      display: flex;
+    }
+
+    .tenant-dropdown-filter {
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      padding: 0 0.9rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 16%, transparent);
+      background: color-mix(in srgb, var(--tp-primary) 82%, transparent);
+      color: color-mix(in srgb, var(--tp-bg) 94%, transparent);
+      font: inherit;
+      outline: none;
+    }
+
+    .tenant-dropdown-filter::placeholder {
+      color: color-mix(in srgb, var(--tp-bg) 58%, transparent);
+    }
+
+    .tenant-dropdown-options {
+      display: grid;
+      gap: 0.8rem;
+      max-height: 250px;
+      overflow: auto;
+      padding-right: 0.2rem;
+    }
+
+    .tenant-option-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 38px;
+      padding: 0.45rem 0.7rem;
+      border-radius: 0.85rem;
+      background: color-mix(in srgb, var(--tp-primary) 78%, transparent);
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 12%, transparent);
+      cursor: pointer;
+      color: color-mix(in srgb, var(--tp-bg) 94%, transparent);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .tenant-option-row input {
+      margin: 0;
+      accent-color: #f2e7be;
+    }
+
+    .tenant-empty-state {
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.85rem;
+      background: color-mix(in srgb, var(--tp-primary) 76%, transparent);
+      color: color-mix(in srgb, var(--tp-bg) 70%, transparent);
+      font-size: 0.82rem;
+    }
+
+    .remember-selection-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: color-mix(in srgb, var(--tp-bg) 82%, transparent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: fit-content;
+    }
+
+    .remember-selection-control input {
+      margin: 0;
+      accent-color: #f2e7be;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .auth-banner {
+      padding: 0.8rem 1rem;
+      border-radius: 18px;
+      font-size: var(--tp-font-sm);
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 10%, transparent);
+      box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 18%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 12%, transparent);
+    }
+
+    .auth-banner.info {
+      color: color-mix(in srgb, var(--tp-bg) 92%, transparent);
+      background: color-mix(in srgb, var(--tp-primary) 88%, transparent);
+    }
+
+    .auth-banner.warning {
+      color: #fff3d7;
+      background: color-mix(in srgb, #8a6d2b 52%, transparent);
+    }
+
+    .auth-banner.error {
+      color: #ffe8e8;
+      background: color-mix(in srgb, #87363d 58%, transparent);
+    }
+
+    .provider-list,
+    .field-stack {
+      display: grid;
+      gap: 0.9rem;
+    }
+
+    .provider-option-panel {
+      width: 100%;
+      display: grid;
+      gap: 0;
+      min-height: 0;
+      padding: 0;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      border-radius: 1.35rem;
+      background: var(--tp-primary);
+      color: var(--tp-bg);
+      font-family: inherit;
+      overflow: hidden;
+      box-shadow:
+        7px 7px 14px color-mix(in srgb, var(--tp-primary-dark) 52%, transparent),
+        -6px -6px 12px color-mix(in srgb, var(--tp-primary) 24%, transparent);
+      text-align: left;
+      cursor: pointer;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+    }
+
+    .provider-option-panel:hover {
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--tp-bg) 22%, transparent);
+      box-shadow:
+        9px 9px 16px color-mix(in srgb, var(--tp-primary-dark) 54%, transparent),
+        -7px -7px 14px color-mix(in srgb, var(--tp-primary) 26%, transparent);
+    }
+
+    .provider-button-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem;
+      min-height: 72px;
+      padding: 0.95rem 1rem 0.9rem;
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--tp-primary-dark) 22%, transparent) 0%,
+          color-mix(in srgb, var(--tp-primary) 8%, transparent) 100%
+        );
+    }
+
+    .provider-header-main {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .provider-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 999px;
+      flex: none;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 14%, transparent);
+      background: color-mix(in srgb, var(--tp-bg) 12%, transparent);
+      color: var(--tp-bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 16%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 10%, transparent);
+    }
+
+    .provider-header-copy {
+      min-width: 0;
+      display: grid;
+      gap: 0.2rem;
+    }
+
+    .provider-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--tp-bg);
+    }
+
+    .provider-header-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .provider-remember-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: color-mix(in srgb, var(--tp-bg) 82%, transparent);
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .provider-remember-control input {
+      accent-color: var(--tp-bg);
+      inline-size: 0.95rem;
+      block-size: 0.95rem;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .provider-expand-toggle {
+      inline-size: 2rem;
+      block-size: 2rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 16%, transparent);
+      background: color-mix(in srgb, var(--tp-bg) 9%, transparent);
+      color: var(--tp-bg);
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+    }
+
+    .provider-expand-toggle:hover {
+      background: color-mix(in srgb, var(--tp-bg) 14%, transparent);
+      transform: scale(1.03);
+    }
+
+    .provider-variant-panel {
+      display: grid;
+      gap: 0.85rem;
+      padding: 0.95rem 1rem 1rem;
+      border-top: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      background: color-mix(in srgb, var(--tp-primary-dark) 16%, transparent);
+    }
+
+    .provider-description {
+      color: color-mix(in srgb, var(--tp-bg) 78%, transparent);
+      font-size: 0.83rem;
+      line-height: 1.45;
+    }
+
+    .provider-variant-copy {
+      color: color-mix(in srgb, var(--tp-bg) 86%, transparent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .provider-preview-grid {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .provider-preview-note {
+      color: color-mix(in srgb, var(--tp-bg) 74%, transparent);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      padding: 0.8rem 0.9rem;
+      border-radius: 1rem;
+      border: 1px solid color-mix(in srgb, var(--tp-bg) 12%, transparent);
+      background: color-mix(in srgb, var(--tp-bg) 8%, transparent);
+    }
+
+    .provider-variant-actions {
+      display: flex;
+    }
+
+    .provider-inline-submit {
+      width: 100%;
+      min-height: 48px;
+      padding: 0 1.15rem;
+      font-size: var(--tp-font-md);
+      border-radius: 24px;
+    }
+
+    .neo-field {
+      display: grid;
+      gap: var(--tp-space-2);
+    }
+
+    .neo-field-label {
+      display: inline-block;
+      color: color-mix(in srgb, var(--tp-bg) 96%, transparent);
+      font-size: var(--tp-font-md);
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      margin-inline-start: var(--tp-space-2);
+    }
+
+    .neo-input-wrap {
+      position: relative;
+    }
+
+    .neo-input {
+      height: 56px;
+      width: 100%;
+      padding-inline-start: var(--tp-space-12);
+      padding-inline-end: var(--tp-space-4);
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 10%, transparent);
+      outline: none;
+      font-size: var(--tp-font-lg);
+      font-family: inherit;
+      background: var(--tp-primary);
+      color: var(--tp-bg);
+      border-radius: 28px;
+      box-shadow:
+        inset 2px 2px 5px color-mix(in srgb, var(--tp-primary-dark) 46%, transparent),
+        inset -3px -3px 8px color-mix(in srgb, var(--tp-primary) 24%, transparent);
+      transition:
+        box-shadow 0.16s ease,
+        border-color 0.16s ease;
+    }
+
+    .neo-input::placeholder {
+      color: color-mix(in srgb, var(--tp-bg) 54%, transparent);
+      opacity: 1;
+    }
+
+    .neo-input:focus {
+      border-color: color-mix(in srgb, var(--tp-primary) 60%, transparent);
+      box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 40%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 20%, transparent);
+    }
+
+    .neo-input[readonly] {
+      cursor: default;
+    }
+
+    .neo-input-password {
+      padding-inline-end: calc(var(--tp-space-12) + var(--tp-space-1));
+    }
+
+    .neo-icon {
+      position: absolute;
+      inset-inline-start: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      color: color-mix(in srgb, var(--tp-bg) 78%, transparent);
+      width: 50px;
+      height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .neo-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      inset-inline-end: var(--tp-space-2);
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: color-mix(in srgb, var(--tp-bg) 78%, transparent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .password-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .password-toggle:hover {
+      color: var(--tp-bg);
+      background: color-mix(in srgb, var(--tp-surface-light) 9%, transparent);
+    }
+
+    .state-panel {
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 18%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 12%, transparent);
+      color: color-mix(in srgb, var(--tp-bg) 88%, transparent);
+    }
+
+    .state-panel h4 {
+      font-size: var(--tp-font-md);
+      color: var(--tp-bg);
+      margin-bottom: 0.25rem;
+    }
+
+    .auth-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .auth-btn {
+      min-height: 58px;
+      padding: 0 1.25rem;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 14%, transparent);
+      border-radius: 28px;
+      background: var(--tp-primary);
+      color: var(--tp-bg);
+      font-family: inherit;
+      font-size: var(--tp-font-lg);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow:
+        7px 7px 14px color-mix(in srgb, var(--tp-primary-dark) 52%, transparent),
+        -6px -6px 12px color-mix(in srgb, var(--tp-primary) 24%, transparent);
+    }
+
+    .auth-btn.secondary {
+      min-height: 44px;
+      font-size: var(--tp-font-md);
+      padding: 0.25rem 1rem;
+      justify-self: start;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .support-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: center;
+      font-size: var(--tp-font-md);
+      color: color-mix(in srgb, var(--tp-bg) 64%, transparent);
+      flex-wrap: wrap;
+    }
+
+    .support-row a,
+    .support-row button {
+      color: var(--tp-bg);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      background: transparent;
+      border: none;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .not-found-region {
+      width: 100%;
+      max-width: var(--shell-stack-width);
+      display: grid;
+      gap: 1.1rem;
+      padding: 2.25rem 2rem 1.9rem;
+      border-radius: 24px;
+      border: 1px solid transparent;
+      background-color: var(--tp-primary);
+      box-shadow: 14px 14px 28px color-mix(in srgb, var(--tp-primary-dark) 42%, transparent);
+      color: var(--tp-bg);
+    }
+
+    .not-found-region h2 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .mfa-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      display: grid;
+      place-items: center;
+      padding: 1.75rem;
+    }
+
+    .mfa-overlay-background {
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(6px);
+    }
+
+    .mfa-overlay-background-color {
+      position: absolute;
+      inset: 0;
+      background: color-mix(in srgb, var(--tp-primary-dark) 42%, transparent);
+    }
+
+    .mfa-overlay-background-pattern {
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23FAF8F5' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 120px 120px;
+      background-repeat: repeat;
+    }
+
+    .mfa-modal {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 32rem);
+      display: grid;
+      gap: 1.1rem;
+      padding: 2rem 1.75rem 1.6rem;
+      border-radius: 24px;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      background-color: var(--tp-primary);
+      box-shadow:
+        14px 14px 28px color-mix(in srgb, var(--tp-primary-dark) 42%, transparent),
+        -8px -8px 20px color-mix(in srgb, var(--tp-primary) 16%, transparent);
+      color: var(--tp-bg);
+    }
+
+    .mfa-modal-header {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .mfa-modal-header h2 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .mfa-modal-header p {
+      margin: 0;
+      color: color-mix(in srgb, var(--tp-bg) 80%, transparent);
+      font-size: var(--tp-font-md);
+    }
+
+    .otp-input-group {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    .otp-slot {
+      width: 100%;
+      min-height: 60px;
+      border: 1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--tp-primary-dark) 14%, transparent);
+      box-shadow:
+        inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 18%, transparent),
+        inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 12%, transparent);
+      color: var(--tp-bg);
+      font: inherit;
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+
+    .mfa-action-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .mfa-action-bar .auth-btn {
+      min-width: 140px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--tp-border);
+      border-radius: var(--nm-radius);
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .summary-table th {
+      background: var(--tp-surface);
+      color: var(--tp-text-dark);
+      font-weight: 600;
+      padding: var(--tp-space-3) var(--tp-space-4);
+      border-bottom: 1px solid var(--tp-border);
+      text-align: left;
+      font-size: var(--tp-font-sm);
+    }
+
+    .summary-table td {
+      padding: var(--tp-space-3) var(--tp-space-4);
+      border-bottom: 1px solid color-mix(in srgb, var(--tp-border) 50%, transparent);
+      font-size: var(--tp-font-md);
+    }
+
+    .summary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    @media (max-width: 1080px) {
+      .container {
+        padding-inline: var(--tp-space-4);
+      }
+
+      .shell-header-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .proto-layout,
+      .login-shell-inner {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "welcome"
+          "logo"
+          "auth";
+      }
+
+      .auth-region {
+        justify-self: center;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="proto-layout" id="prototype" data-inspect-id="prototype-layout">
+        <aside class="card">
+          <div class="card-header">UI Components</div>
+          <div class="card-body">
+            <div class="tree-toolbar">
+              <button type="button" class="tree-toolbar-button" id="expandAllTree">
+                <span class="tree-toolbar-icon" aria-hidden="true">+</span>
+                <span>Expand all</span>
+              </button>
+              <button type="button" class="tree-toolbar-button" id="collapseAllTree">
+                <span class="tree-toolbar-icon" aria-hidden="true">−</span>
+                <span>Collapse all</span>
+              </button>
+            </div>
+            <div class="tree-panel">
+              <div class="p-tree p-component">
+                <ul class="tree p-tree-root" id="selectorTree"></ul>
+              </div>
+            </div>
+            <div class="legend-panel">
+              <div class="tree-legend">
+                <span class="tree-legend-label">Legend</span>
+                <span class="tree-role-badge tree-role-display">display</span>
+                <span class="tree-role-badge tree-role-required">required</span>
+                <span class="tree-role-badge tree-role-optional">optional</span>
+                <span class="tree-role-badge tree-role-feedback">feedback</span>
+                <span class="tree-role-badge tree-role-submit">submit</span>
+                <span class="tree-role-badge tree-role-toggle">toggle</span>
+                <span class="tree-role-badge tree-role-navigate">navigate</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="proto-surface">
+          <div class="proto-surface-header">
+            <div>
+              <h3 id="screenTitle">Preview</h3>
+            </div>
+          </div>
+          <div class="proto-stage">
+            <div class="login-shell" id="proto-login" data-inspect-id="login-shell">
+              <div class="shell-background-container" data-inspect-id="login-shell-background">
+                <div class="shell-background shell-background-color" data-inspect-id="login-shell-background-color"></div>
+                <div class="shell-background shell-background-pattern" data-inspect-id="login-shell-background-pattern"></div>
+              </div>
+              <div class="container login-shell-inner" id="loginShellInner" data-inspect-id="login-shell-inner">
+                <div class="logo-container" data-inspect-id="logo-container">
+                  <div class="svg-logo-renderer" data-inspect-id="svg-logo-renderer">think+</div>
+                </div>
+                <section class="welcome-container" data-inspect-id="welcome-container">
+                  <h1 id="welcomeTitle" data-inspect-id="welcome-title">Welcome to EMSIST</h1>
+                  <h2 id="welcomeSubtitle" data-inspect-id="welcome-subtitle">Empower. Transform. Succeed.</h2>
+                </section>
+
+                <div class="auth-region sign-in-surface-active" id="authRegion" data-inspect-id="auth-region">
+                    <section class="auth-step-container step-active" id="tenantSelectionStep" data-inspect-id="tenant-selection-step-container">
+                      <div class="step-header-container" data-inspect-id="tenant-selection-header-container">
+                        <div class="step-indicator" data-inspect-id="tenant-selection-step-indicator">1</div>
+                        <div class="step-title-container" data-inspect-id="tenant-selection-title-container">
+                          <h2 class="step-title" data-inspect-id="tenant-selection-step-title">Select Tenant</h2>
+                        </div>
+                      </div>
+                      <div class="step-content-container auth-top" data-inspect-id="tenant-selection-content-container">
+                        <div class="tenant-registry-dropdown" data-inspect-id="tenant-registry-dropdown">
+                          <button
+                            type="button"
+                            class="tenant-dropdown-trigger"
+                            id="tenantRegistryTrigger"
+                            data-inspect-id="tenant-registry-dropdown-trigger"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                          >
+                            <span class="tenant-chip-list" id="tenantRegistryChips" data-inspect-id="tenant-registry-chips"></span>
+                            <span class="tenant-dropdown-caret" data-inspect-id="tenant-registry-dropdown-caret" aria-hidden="true">▾</span>
+                          </button>
+                          <div class="tenant-dropdown-panel hidden" id="tenantRegistryPanel" data-inspect-id="tenant-registry-dropdown-panel">
+                            <div class="tenant-dropdown-filter-row" data-inspect-id="tenant-registry-dropdown-filter-row">
+                              <label class="sr-only" for="tenantRegistryFilter">Search tenant registry</label>
+                              <input
+                                id="tenantRegistryFilter"
+                                class="tenant-dropdown-filter"
+                                type="search"
+                                placeholder="Search tenant registry"
+                                autocomplete="off"
+                                data-inspect-id="tenant-registry-dropdown-filter"
+                              >
+                            </div>
+                            <div class="tenant-dropdown-options" id="tenantRegistryOptionsList" data-inspect-id="tenant-registry-dropdown-options-list"></div>
+                          </div>
+                        </div>
+                        <label class="remember-selection-control" data-inspect-id="remember-selection-control">
+                          <input id="rememberTenantSelection" type="checkbox" data-inspect-id="remember-selection-checkbox">
+                          <span data-inspect-id="remember-selection-label">Remember tenant selection</span>
+                        </label>
+                      </div>
+                    </section>
+
+                    <section class="auth-step-container step-disabled" id="authenticationMethodStep" data-inspect-id="authentication-method-step-container">
+                      <div class="step-header-container" data-inspect-id="authentication-method-header-container">
+                        <div class="step-indicator" data-inspect-id="authentication-method-step-indicator">2</div>
+                        <div class="step-title-container" data-inspect-id="authentication-method-title-container">
+                          <h2 class="step-title" id="authenticationMethodStepTitle" data-inspect-id="authentication-method-step-title">Select Login Method</h2>
+                        </div>
+                      </div>
+                      <div class="status-message-container" data-inspect-id="status-message-container">
+                        <div class="auth-banner info hidden" id="authBanner" data-inspect-id="auth-banner"></div>
+                      </div>
+                      <div class="step-content-container provider-selection-container hidden" id="providersView" data-inspect-id="providers-view">
+                        <div class="step-content-container no-auth-container hidden" id="noAuthContainer" data-inspect-id="no-auth-container">
+                          <div class="state-panel hidden" id="noAuthPanel" data-inspect-id="no-auth-panel">
+                            <h4 id="noAuthTitle" data-inspect-id="no-auth-title">No active providers</h4>
+                            <p id="noAuthText" data-inspect-id="no-auth-text">Support or tenant administration must activate an authentication integration before sign-in can proceed.</p>
+                          </div>
+                        </div>
+                        <div class="provider-list" id="providerList" data-inspect-id="provider-list"></div>
+                      </div>
+                      <div class="step-content-container interaction-body-container hidden" data-inspect-id="interaction-body-container">
+                          <div class="neo-field hidden" id="identifierField" data-inspect-id="identifier-field">
+                            <label class="neo-field-label" for="identifierInput" data-inspect-id="identifier-label">IdentifierField</label>
+                            <div class="neo-input-wrap" data-inspect-id="identifier-input-wrap">
+                              <input id="identifierInput" class="neo-input" type="text" value="jane.doe" placeholder="Enter your username" data-inspect-id="identifier-input">
+                              <span class="neo-icon" data-inspect-id="identifier-icon" aria-hidden="true">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z"/>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                          <div class="neo-field hidden" id="passwordField" data-inspect-id="password-field">
+                            <label class="neo-field-label" for="passwordInput" data-inspect-id="password-label">PasswordField</label>
+                            <div class="neo-input-wrap" data-inspect-id="password-input-wrap">
+                              <input id="passwordInput" class="neo-input neo-input-password" type="password" value="password" placeholder="Enter your password" data-inspect-id="password-input">
+                              <span class="neo-icon" data-inspect-id="password-icon" aria-hidden="true">
+                                <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z"/>
+                                </svg>
+                              </span>
+                              <button type="button" class="password-toggle" data-password-toggle="passwordInput" aria-label="Show password" title="Show password" data-inspect-id="password-toggle">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                                  <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="neo-field hidden" id="providerFieldWrap" data-inspect-id="provider-field-wrap">
+                            <label class="neo-field-label" for="providerFieldInput" data-inspect-id="provider-field-label">ProviderSpecificFieldGroup</label>
+                            <div class="neo-input-wrap" data-inspect-id="provider-field-input-wrap">
+                              <input id="providerFieldInput" class="neo-input" type="text" value="" placeholder="Provider-specific context" data-inspect-id="provider-field-input">
+                              <span class="neo-icon" data-inspect-id="provider-field-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z"/>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                          <div class="method-status-container hidden" id="methodStatusContainer" data-inspect-id="method-status-container">
+                            <div class="state-panel hidden" id="methodStatePanel" data-inspect-id="method-state-panel">
+                              <h4 id="methodStateTitle">Validation issue</h4>
+                              <p id="methodStateText">This method-specific error state preserves the entered form.</p>
+                            </div>
+                          </div>
+                      </div>
+                    </section>
+
+                <div class="not-found-region hidden" id="notFoundView" data-inspect-id="not-found-view">
+                    <h2 id="notFoundTitle" data-inspect-id="not-found-title">Tenant not found</h2>
+                    <p id="notFoundText" data-inspect-id="not-found-text">Tenant deleted or does not exist. No authentication controls remain on this state.</p>
+                    <button type="button" class="auth-btn secondary" id="notFoundAction" data-inspect-id="not-found-action">Back to Login</button>
+                  </div>
+                </div>
+
+                <div class="support-container" data-inspect-id="support-container">
+                  <div class="support-row" id="supportRow" data-inspect-id="support-row">
+                    <span id="supportCopy" data-inspect-id="support-copy">Having trouble signing in?</span>
+                    <button type="button" id="supportAction" data-inspect-id="support-action">Contact support</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mfa-overlay hidden" id="mfaOverlay" data-inspect-id="mfa-overlay">
+                <div class="mfa-overlay-background" data-inspect-id="mfa-overlay-background">
+                  <div class="mfa-overlay-background-color" data-inspect-id="mfa-overlay-background-color"></div>
+                  <div class="mfa-overlay-background-pattern" data-inspect-id="mfa-overlay-background-pattern"></div>
+                </div>
+                <section class="mfa-modal" id="mfaModal" data-inspect-id="mfa-modal">
+                  <div class="mfa-modal-header" data-inspect-id="mfa-modal-header">
+                    <h2 id="mfaTitle" data-inspect-id="mfa-title">Verification required</h2>
+                    <p id="mfaDescription" data-inspect-id="mfa-description">Enter the 6-digit verification code.</p>
+                  </div>
+                  <div class="status-message-container" data-inspect-id="mfa-status-message-container">
+                    <div class="auth-banner info hidden" id="mfaBanner" data-inspect-id="mfa-banner"></div>
+                  </div>
+                  <div class="mfa-code-container" data-inspect-id="mfa-code-container">
+                    <div class="otp-input-group" id="otpInputGroup" data-inspect-id="otp-input-group">
+                      <input class="otp-slot" id="otpDigit1" type="text" inputmode="numeric" maxlength="1" value="1" data-inspect-id="otp-digit-1" aria-label="Verification digit 1">
+                      <input class="otp-slot" id="otpDigit2" type="text" inputmode="numeric" maxlength="1" value="2" data-inspect-id="otp-digit-2" aria-label="Verification digit 2">
+                      <input class="otp-slot" id="otpDigit3" type="text" inputmode="numeric" maxlength="1" value="3" data-inspect-id="otp-digit-3" aria-label="Verification digit 3">
+                      <input class="otp-slot" id="otpDigit4" type="text" inputmode="numeric" maxlength="1" value="4" data-inspect-id="otp-digit-4" aria-label="Verification digit 4">
+                      <input class="otp-slot" id="otpDigit5" type="text" inputmode="numeric" maxlength="1" value="5" data-inspect-id="otp-digit-5" aria-label="Verification digit 5">
+                      <input class="otp-slot" id="otpDigit6" type="text" inputmode="numeric" maxlength="1" value="6" data-inspect-id="otp-digit-6" aria-label="Verification digit 6">
+                    </div>
+                  </div>
+                  <div class="mfa-action-bar" data-inspect-id="mfa-action-bar">
+                    <button type="button" class="auth-btn secondary" id="mfaBackAction" data-inspect-id="mfa-back-action">Back</button>
+                    <button type="button" class="auth-btn" id="mfaVerifyAction" data-inspect-id="mfa-verify-action">Verify</button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+</div>
+
+  <script>
+    const shellMeta = {
+      login: {
+        label: "SC01 Login Screen",
+        touchpoints: ["providers", "method"]
+      },
+      mfa: {
+        label: "SC02 MFA Screen",
+        touchpoints: ["mfa"]
+      },
+      notfound: {
+        label: "SC03 Tenant Not Found Screen",
+        touchpoints: ["notfound"]
+      }
+    };
+
+    const variantsByTouchpoint = {
+      providers: ["active", "none", "session-expired", "logged-out", "locale-selector", "no-license", "license-expired", "suspended"],
+      method: ["email-password", "ldap", "oidc", "saml", "oauth2", "uae-pass", "invalid-credentials", "no-seat", "rate-limited", "provider-unavailable"],
+      mfa: ["totp", "invalid-code", "recovery-code", "session-expired"],
+      notfound: ["tenant-not-found"]
+    };
+
+    const touchpointMeta = {
+      providers: {
+        shell: "login",
+        shortLabel: "TP01 Providers",
+        touchpoint: "TP01 Available Auth Providers",
+        description: "First login screen showing the active authentication methods available for the resolved tenant."
+      },
+      method: {
+        shell: "login",
+        shortLabel: "TP02 Method",
+        touchpoint: "TP02 Auth Method Screen",
+        description: "Method-specific login screen shown after the user selects an authentication method."
+      },
+      mfa: {
+        shell: "mfa",
+        shortLabel: "TP03 MFA",
+        touchpoint: "TP03 MFA Verification",
+        description: "Step-up verification shell shown before issuing the full session."
+      },
+      notfound: {
+        shell: "notfound",
+        shortLabel: "SC03 Not Found Screen",
+        touchpoint: "SC03 Tenant Not Found Screen",
+        description: "Dedicated not-found shell shown when the requested tenant is deleted or does not exist."
+      }
+    };
+
+    const variantLabels = {
+      active: "Active Providers List",
+      none: "No Active Providers",
+      "session-expired": "Session Expired Banner",
+      "logged-out": "Logged Out Banner",
+      "locale-selector": "Tenant Registry Selector",
+      "no-license": "No Tenant License - Default Admin Only",
+      "license-expired": "Tenant License Expired - Default Admin Only",
+      suspended: "Suspended Tenant - Access Blocked",
+      "email-password": "Email/Password Sign-In",
+      ldap: "LDAP/AD Sign-In",
+      oidc: "OIDC Sign-In",
+      saml: "SAML Sign-In",
+      oauth2: "OAuth2 Sign-In",
+      "uae-pass": "UAE Pass Redirect Handoff",
+      "invalid-credentials": "Invalid Credentials Error",
+      "no-seat": "No Active Seat Error",
+      "rate-limited": "Rate-Limited Error",
+      "provider-unavailable": "Auth Provider Unavailable Error",
+      totp: "TOTP Code Entry",
+      "invalid-code": "Invalid MFA Code Error",
+      "recovery-code": "Recovery Code Entry",
+      "tenant-not-found": "Tenant Not Found"
+    };
+
+    const bodyRegionSelectorByTouchpoint = {
+      providers: "div#providersView",
+      method: "div#identifierField.neo-field",
+      mfa: "section#mfaModal.mfa-modal",
+      notfound: "div#notFoundView.not-found-region"
+    };
+
+    const inspectTargetByTouchpoint = {
+      providers: "providers-view",
+      method: "identifier-field",
+      mfa: "mfa-modal",
+      notfound: "not-found-view"
+    };
+
+    const inspectLabelByTouchpoint = {
+      providers: "Provider Selection Container",
+      method: "Authentication Method Fields",
+      mfa: "Verification Modal Container",
+      notfound: "Tenant Not Found Container"
+    };
+
+    const state = {
+      shell: "login",
+      touchpoint: "providers",
+      variant: "active"
+    };
+
+    let focusedTargetId = "login-shell-inner";
+    let focusedTreeKey = "shell:login";
+    const collapsedTreeKeys = new Set();
+    const initializedTreeKeys = new Set();
+    let tenantRegistryOpen = false;
+    let selectedTenantKey = "";
+    let expandedProviderKey = "";
+    let rememberedProviderKey = "";
+
+    const tenantRegistryOptions = [
+      { label: "Master Tenant", value: "master" },
+      { label: "Default Admin", value: "default-admin" },
+      { label: "Digital Identity", value: "digital-identity" },
+      { label: "Customs Gateway", value: "customs-gateway" },
+      { label: "Abu Dhabi Mobility", value: "abu-dhabi-mobility" },
+      { label: "Dubai Utilities", value: "dubai-utilities" },
+      { label: "Sharjah Health", value: "sharjah-health" },
+      { label: "Ajman Courts", value: "ajman-courts" },
+      { label: "Fujairah Ports", value: "fujairah-ports" }
+    ];
+
+    const tenantRegistryLabelMap = new Map(
+      tenantRegistryOptions.map((item) => [item.value, item.label])
+    );
+
+    const tenantAuthenticationMethods = {
+      master: [
+        ["LDAP / AD", "", "active"],
+        ["OIDC", "Azure AD template", "active"],
+        ["UAE Pass", "Redirect exception", "active"]
+      ],
+      "default-admin": [
+        ["Default Admin", "Emergency platform access", "restricted"]
+      ],
+      "digital-identity": [
+        ["UAE Pass", "National identity federation", "active"],
+        ["OIDC", "Federal workforce SSO", "active"]
+      ],
+      "customs-gateway": [
+        ["SAML", "Customs federation", "active"],
+        ["LDAP / AD", "Legacy operations directory", "active"]
+      ],
+      "abu-dhabi-mobility": [
+        ["OIDC", "Mobility staff sign-in", "active"],
+        ["OAuth2", "Partner operator access", "active"]
+      ],
+      "dubai-utilities": [
+        ["SAML", "Utility workforce federation", "active"],
+        ["OIDC", "Contractor access", "active"]
+      ],
+      "sharjah-health": [
+        ["OIDC", "Clinical workforce identity", "active"],
+        ["LDAP / AD", "Hospital directory", "active"]
+      ],
+      "ajman-courts": [
+        ["SAML", "Judicial federation", "active"],
+        ["UAE Pass", "Litigant identity handoff", "active"]
+      ],
+      "fujairah-ports": [
+        ["LDAP / AD", "Port operations directory", "active"],
+        ["OAuth2", "Shipping partner access", "active"]
+      ]
+    };
+
+    const nodes = {
+      selectorTree: document.getElementById("selectorTree"),
+      expandAllTree: document.getElementById("expandAllTree"),
+      collapseAllTree: document.getElementById("collapseAllTree"),
+      screenTitle: document.getElementById("screenTitle"),
+      loginShellInner: document.getElementById("loginShellInner"),
+      logoContainer: document.querySelector("[data-inspect-id=\"logo-container\"]"),
+      welcomeContainer: document.querySelector("[data-inspect-id=\"welcome-container\"]"),
+      welcomeTitle: document.getElementById("welcomeTitle"),
+      welcomeSubtitle: document.getElementById("welcomeSubtitle"),
+      authRegion: document.getElementById("authRegion"),
+      notFoundView: document.getElementById("notFoundView"),
+      tenantSelectionStep: document.getElementById("tenantSelectionStep"),
+      tenantSelectionStepIndicator: document.querySelector("[data-inspect-id=\"tenant-selection-step-indicator\"]"),
+      authenticationMethodStep: document.getElementById("authenticationMethodStep"),
+      authenticationMethodStepIndicator: document.querySelector("[data-inspect-id=\"authentication-method-step-indicator\"]"),
+      authenticationMethodStepTitle: document.getElementById("authenticationMethodStepTitle"),
+      statusMessageContainer: document.querySelector("[data-inspect-id=\"status-message-container\"]"),
+      interactionBodyContainer: document.querySelector("[data-inspect-id=\"interaction-body-container\"]"),
+      supportContainer: document.querySelector("[data-inspect-id=\"support-container\"]"),
+      tenantRegistryDropdown: document.querySelector("[data-inspect-id=\"tenant-registry-dropdown\"]"),
+      tenantRegistryTrigger: document.getElementById("tenantRegistryTrigger"),
+      tenantRegistryPanel: document.getElementById("tenantRegistryPanel"),
+      tenantRegistryChips: document.getElementById("tenantRegistryChips"),
+      tenantRegistryFilter: document.getElementById("tenantRegistryFilter"),
+      tenantRegistryOptionsList: document.getElementById("tenantRegistryOptionsList"),
+      rememberTenantSelection: document.getElementById("rememberTenantSelection"),
+      authBanner: document.getElementById("authBanner"),
+      noAuthContainer: document.getElementById("noAuthContainer"),
+      noAuthPanel: document.getElementById("noAuthPanel"),
+      noAuthTitle: document.getElementById("noAuthTitle"),
+      noAuthText: document.getElementById("noAuthText"),
+      providersView: document.getElementById("providersView"),
+      providerList: document.getElementById("providerList"),
+      identifierField: document.getElementById("identifierField"),
+      passwordField: document.getElementById("passwordField"),
+      providerFieldWrap: document.getElementById("providerFieldWrap"),
+      providerFieldInput: document.getElementById("providerFieldInput"),
+      methodStatusContainer: document.getElementById("methodStatusContainer"),
+      methodStatePanel: document.getElementById("methodStatePanel"),
+      methodStateTitle: document.getElementById("methodStateTitle"),
+      methodStateText: document.getElementById("methodStateText"),
+      mfaOverlay: document.getElementById("mfaOverlay"),
+      mfaModal: document.getElementById("mfaModal"),
+      mfaTitle: document.getElementById("mfaTitle"),
+      mfaDescription: document.getElementById("mfaDescription"),
+      mfaBanner: document.getElementById("mfaBanner"),
+      mfaBackAction: document.getElementById("mfaBackAction"),
+      mfaVerifyAction: document.getElementById("mfaVerifyAction"),
+      supportRow: document.getElementById("supportRow"),
+      supportCopy: document.getElementById("supportCopy"),
+      supportAction: document.getElementById("supportAction"),
+      notFoundAction: document.getElementById("notFoundAction")
+    };
+
+    function getTreeNodeKind(options = {}) {
+      if (options.kind) return options.kind;
+      if (options.type === "shell" || options.root) return "shell";
+      if (options.region) return "container";
+      return "element";
+    }
+
+    function getTreeNodeContext(options = {}) {
+      const context = {
+        shell: options.shell || "",
+        touchpoint: options.touchpoint || "",
+        variant: options.variant || "",
+        providerKey: options.providerKey || ""
+      };
+      const key = options.key || "";
+
+      if (key) {
+        const parts = key.split(":");
+
+        if (!context.shell && parts[0] === "shell" && parts[1]) {
+          context.shell = parts[1];
+        } else if (!context.touchpoint && ["touchpoint", "region"].includes(parts[0]) && parts[1]) {
+          context.touchpoint = parts[1];
+        } else if (!context.touchpoint && parts[0] === "variant" && parts[1]) {
+          context.touchpoint = parts[1];
+          if (!context.variant && parts[2]) context.variant = parts[2];
+        } else if (!context.touchpoint && ["container", "element"].includes(parts[0]) && parts[1]) {
+          context.touchpoint = parts[1];
+          if (!context.variant && parts[2]) context.variant = parts[2];
+        } else if (!context.shell && parts[0] && shellMeta[parts[0]]) {
+          context.shell = parts[0];
+        }
+      }
+
+      if (!context.shell && context.touchpoint && touchpointMeta[context.touchpoint]) {
+        context.shell = touchpointMeta[context.touchpoint].shell;
+      }
+
+      return context;
+    }
+
+    function getTreeNodeIconMarkup(kind) {
+      if (kind === "shell") {
+        return `
+          <span class="tree-node-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3.5" y="4.5" width="17" height="15" rx="2"></rect>
+              <path d="M3.5 8.5h17"></path>
+              <path d="M6.5 6.5h.01"></path>
+              <path d="M9.5 6.5h.01"></path>
+              <path d="M6.5 12h11"></path>
+              <path d="M6.5 16h7"></path>
+            </svg>
+          </span>
+        `;
+      }
+
+      if (kind === "container") {
+        return `
+          <span class="tree-node-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="4.5" y="5.5" width="15" height="4" rx="1.2"></rect>
+              <rect x="4.5" y="11.5" width="15" height="7" rx="1.2"></rect>
+            </svg>
+          </span>
+        `;
+      }
+
+      return `
+        <span class="tree-node-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+            <path d="M9 12h6"></path>
+            <path d="M12 9v6"></path>
+          </svg>
+        </span>
+      `;
+    }
+
+    function buildTreeButton(label, options = {}) {
+      const classes = ["tree-node", "p-treenode-content", "clickable"];
+      if (options.root) classes.push("root");
+      if (options.active) classes.push("active");
+      if (options.targetId) classes.push("inspectable");
+      if (options.key && options.key === focusedTreeKey) classes.push("inspected");
+      const iconKind = getTreeNodeKind(options);
+      const context = getTreeNodeContext(options);
+      classes.push(`kind-${iconKind}`);
+
+      const attrs = [`class="${classes.join(" ")}"`];
+      if (options.type) attrs.push(`data-node-type="${options.type}"`);
+      if (context.shell) attrs.push(`data-shell="${context.shell}"`);
+      if (context.touchpoint) attrs.push(`data-touchpoint="${context.touchpoint}"`);
+      if (context.variant) attrs.push(`data-variant="${context.variant}"`);
+      if (context.providerKey) attrs.push(`data-provider-key="${context.providerKey}"`);
+      if (options.targetId) attrs.push(`data-target-id="${options.targetId}"`);
+      if (options.key) attrs.push(`data-node-key="${options.key}"`);
+      return `<div ${attrs.join(" ")}>${getTreeNodeIconMarkup(iconKind)}<span class="tree-label"><span class="tree-label-text">${label}</span></span></div>`;
+    }
+
+    function getValidationRole(targetId) {
+      if (!targetId) return null;
+
+      if (targetId === "tenant-registry-dropdown-trigger") {
+        return { label: "required", className: "required" };
+      }
+
+      if (
+        targetId === "remember-selection-checkbox" ||
+        targetId.startsWith("provider-remember-input-")
+      ) {
+        return { label: "optional", className: "optional" };
+      }
+
+      if (
+        targetId === "auth-banner" ||
+        targetId === "mfa-banner"
+      ) {
+        return { label: "feedback", className: "feedback" };
+      }
+
+      if (
+        targetId.startsWith("provider-submit-") ||
+        targetId === "mfa-verify-action"
+      ) {
+        return { label: "submit", className: "submit" };
+      }
+
+      if (
+        targetId.startsWith("provider-toggle-") ||
+        targetId.startsWith("provider-password-toggle-")
+      ) {
+        return { label: "toggle", className: "toggle" };
+      }
+
+      if (
+        targetId === "support-action" ||
+        targetId === "mfa-back-action" ||
+        targetId === "not-found-action"
+      ) {
+        return { label: "navigate", className: "navigate" };
+      }
+
+      if (
+        targetId.startsWith("provider-username-input-") ||
+        targetId.startsWith("provider-password-input-") ||
+        targetId.startsWith("otp-digit-")
+      ) {
+        return { label: "required", className: "required" };
+      }
+
+      return { label: "display", className: "display" };
+    }
+
+    function getTreeLabelContent(label, options = {}, iconKind = getTreeNodeKind(options)) {
+      const role = iconKind === "element" ? getValidationRole(options.targetId) : null;
+      const badge = role
+        ? `<span class="tree-role-badge tree-role-${role.className}">${role.label}</span>`
+        : "";
+      return `<span class="tree-label"><span class="tree-label-text">${label}</span>${badge}</span>`;
+    }
+
+    function buildTreeLabel(label, options = {}) {
+      const classes = ["tree-node", "p-treenode-content"];
+      if (options.root) classes.push("root");
+      if (options.region) classes.push("region");
+      if (options.targetId) classes.push("inspectable", "clickable");
+      if (options.key && options.key === focusedTreeKey) classes.push("inspected");
+      const iconKind = getTreeNodeKind(options);
+      const context = getTreeNodeContext(options);
+      classes.push(`kind-${iconKind}`);
+
+      const attrs = [`class="${classes.join(" ")}"`];
+      if (context.shell) attrs.push(`data-shell="${context.shell}"`);
+      if (context.touchpoint) attrs.push(`data-touchpoint="${context.touchpoint}"`);
+      if (context.variant) attrs.push(`data-variant="${context.variant}"`);
+      if (context.providerKey) attrs.push(`data-provider-key="${context.providerKey}"`);
+      if (options.targetId) attrs.push(`data-target-id="${options.targetId}"`);
+      if (options.key) attrs.push(`data-node-key="${options.key}"`);
+
+      return `<div ${attrs.join(" ")}>${getTreeNodeIconMarkup(iconKind)}${getTreeLabelContent(label, options, iconKind)}</div>`;
+    }
+
+    function getProviderKeyForTree(title) {
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function isRedirectProviderForTree(title) {
+      const normalized = getProviderKeyForTree(title);
+      return ["oidc", "saml", "oauth2", "uae-pass"].some((key) => normalized.includes(key));
+    }
+
+    function getProviderItemsForTree() {
+      const effectiveTenantKey = selectedTenantKey || "master";
+      const activeProviders = tenantAuthenticationMethods[effectiveTenantKey] || [
+        ["LDAP / AD", "", "active"]
+      ];
+      return activeProviders;
+    }
+
+    function getProviderTreeSample() {
+      const masterProviders = tenantAuthenticationMethods.master || [];
+      let sample = null;
+
+      masterProviders.forEach(([title], index) => {
+        if (sample) return;
+        if (!isRedirectProviderForTree(title)) {
+          sample = {
+            slot: index + 1,
+            providerKey: getProviderKeyForTree(title),
+            title
+          };
+        }
+      });
+
+      if (sample) return sample;
+
+      const [fallbackTitle = "LDAP / AD"] = masterProviders[0] || [];
+      return {
+        slot: 1,
+        providerKey: getProviderKeyForTree(fallbackTitle),
+        title: fallbackTitle
+      };
+    }
+
+    function getRepresentativeProviderItems(items) {
+      if (!items.length) return [];
+
+      const credentialProvider = items.find(([title]) => !isRedirectProviderForTree(title));
+      return credentialProvider ? [credentialProvider] : [items[0]];
+    }
+
+    function buildProviderOptionNodes(shellKey) {
+      const { slot, providerKey } = getProviderTreeSample();
+      const headerChildren = [
+        buildTreeLabel("Auth Logo", {
+          targetId: `provider-logo-${slot}`,
+          key: `${shellKey}:provider-logo-${slot}`,
+          touchpoint: "providers",
+          variant: "active",
+          providerKey
+        }),
+        buildTreeLabel("Auth Method Name", {
+          targetId: `provider-title-${slot}`,
+          key: `${shellKey}:provider-title-${slot}`,
+          touchpoint: "providers",
+          variant: "active",
+          providerKey
+        }),
+        buildTreeLabel("Remember Me Selection", {
+          targetId: `provider-remember-input-${slot}`,
+          key: `${shellKey}:provider-remember-input-${slot}`,
+          touchpoint: "providers",
+          variant: "active",
+          providerKey
+        }),
+        buildTreeLabel("Expand Action", {
+          targetId: `provider-toggle-${slot}`,
+          key: `${shellKey}:provider-toggle-${slot}`,
+          touchpoint: "providers",
+          variant: "active",
+          providerKey
+        })
+      ];
+
+      const variantChildren = [
+        `<li>
+          ${buildTreeLabel("User Name Field Container", {
+            region: true,
+            targetId: `provider-username-field-${slot}`,
+            key: `${shellKey}:provider-username-field-${slot}`,
+            touchpoint: "providers",
+            variant: "active",
+            providerKey
+          })}
+          <ul>
+            <li>${buildTreeLabel("User Name Label", {
+              targetId: `provider-username-label-${slot}`,
+              key: `${shellKey}:provider-username-label-${slot}`,
+              touchpoint: "providers",
+              variant: "active",
+              providerKey
+            })}</li>
+            <li>${buildTreeLabel("User Name Input", {
+              targetId: `provider-username-input-${slot}`,
+              key: `${shellKey}:provider-username-input-${slot}`,
+              touchpoint: "providers",
+              variant: "active",
+              providerKey
+            })}</li>
+          </ul>
+        </li>`,
+        `<li>
+          ${buildTreeLabel("Password Field Container", {
+            region: true,
+            targetId: `provider-password-field-${slot}`,
+            key: `${shellKey}:provider-password-field-${slot}`,
+            touchpoint: "providers",
+            variant: "active",
+            providerKey
+          })}
+          <ul>
+            <li>${buildTreeLabel("Password Label", {
+              targetId: `provider-password-label-${slot}`,
+              key: `${shellKey}:provider-password-label-${slot}`,
+              touchpoint: "providers",
+              variant: "active",
+              providerKey
+            })}</li>
+            <li>${buildTreeLabel("Password Input", {
+              targetId: `provider-password-input-${slot}`,
+              key: `${shellKey}:provider-password-input-${slot}`,
+              touchpoint: "providers",
+              variant: "active",
+              providerKey
+            })}</li>
+            <li>${buildTreeLabel("Password Visibility Toggle", {
+              targetId: `provider-password-toggle-${slot}`,
+              key: `${shellKey}:provider-password-toggle-${slot}`,
+              touchpoint: "providers",
+              variant: "active",
+              providerKey
+            })}</li>
+          </ul>
+        </li>`,
+        `<li>${buildTreeLabel("Sign In Action", {
+          targetId: `provider-submit-${slot}`,
+          key: `${shellKey}:provider-submit-${slot}`,
+          touchpoint: "providers",
+          variant: "active",
+          providerKey
+        })}</li>`
+      ];
+
+      return `
+        <li>
+          ${buildTreeLabel("Provider Header Container", {
+            region: true,
+            targetId: `provider-header-${slot}`,
+            key: `${shellKey}:provider-header-${slot}`,
+            touchpoint: "providers",
+            variant: "active",
+            providerKey
+          })}
+          <ul>
+            ${headerChildren.map((child) => `<li>${child}</li>`).join("")}
+          </ul>
+        </li>
+        <li>
+          ${buildTreeLabel("Provider Variant Container", {
+            region: true,
+            targetId: `provider-variant-panel-${slot}`,
+            key: `${shellKey}:provider-variant-panel-${slot}`,
+            touchpoint: "providers",
+            variant: "active",
+            providerKey
+          })}
+          <ul>
+            ${variantChildren.join("")}
+          </ul>
+        </li>
+      `;
+    }
+
+    function setSignInSurfaceVisible(visible) {
+      nodes.tenantSelectionStep.classList.toggle("hidden", !visible);
+      nodes.authenticationMethodStep.classList.toggle("hidden", !visible);
+      nodes.supportContainer.classList.toggle("hidden", !visible);
+    }
+
+    function setTenantRegistryOpen(open) {
+      tenantRegistryOpen = open;
+      nodes.tenantRegistryPanel.classList.toggle("hidden", !open);
+      nodes.tenantRegistryTrigger.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function renderTenantRegistryChips() {
+      if (!selectedTenantKey) {
+        nodes.tenantRegistryChips.innerHTML = `<span class="tenant-placeholder">Select tenant</span>`;
+        return;
+      }
+
+      nodes.tenantRegistryChips.innerHTML = `<span class="tenant-chip">${tenantRegistryLabelMap.get(selectedTenantKey) || selectedTenantKey}</span>`;
+    }
+
+    function renderTenantRegistryOptions(filterText = "") {
+      const normalizedFilter = filterText.trim().toLowerCase();
+      const optionsMarkup = tenantRegistryOptions
+        .filter((item) => {
+          if (!normalizedFilter) return true;
+          return item.label.toLowerCase().includes(normalizedFilter) || item.value.toLowerCase().includes(normalizedFilter);
+        })
+        .map((item) => `
+          <label class="tenant-option-row">
+            <input type="radio" name="tenantRegistryOption" value="${item.value}" ${selectedTenantKey === item.value ? "checked" : ""}>
+            <span>${item.label}</span>
+          </label>
+        `)
+        .join("");
+
+      nodes.tenantRegistryOptionsList.innerHTML = optionsMarkup || `<div class="tenant-empty-state">No tenants found.</div>`;
+    }
+
+    function initializeTenantRegistryControl() {
+      renderTenantRegistryChips();
+      renderTenantRegistryOptions();
+
+      nodes.tenantRegistryTrigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        setTenantRegistryOpen(!tenantRegistryOpen);
+        if (tenantRegistryOpen) {
+          nodes.tenantRegistryFilter.focus();
+        }
+      });
+
+      nodes.tenantRegistryFilter.addEventListener("input", () => {
+        renderTenantRegistryOptions(nodes.tenantRegistryFilter.value);
+      });
+
+      nodes.tenantRegistryOptionsList.addEventListener("change", (event) => {
+        const input = event.target;
+        if (!(input instanceof HTMLInputElement) || input.type !== "radio") return;
+
+        if (selectedTenantKey !== input.value) {
+          expandedProviderKey = "";
+          rememberedProviderKey = "";
+        }
+        selectedTenantKey = input.value;
+        renderTenantRegistryChips();
+        renderTenantRegistryOptions(nodes.tenantRegistryFilter.value);
+        setTenantRegistryOpen(false);
+        render();
+      });
+
+      document.addEventListener("click", (event) => {
+        if (nodes.tenantRegistryDropdown.contains(event.target)) return;
+        setTenantRegistryOpen(false);
+      });
+    }
+
+    function updateSelectionStepper(stepTwoTitle, options = {}) {
+      const singleStep = Boolean(options.singleStep);
+
+      if (singleStep) {
+        nodes.tenantSelectionStep.classList.add("hidden");
+        nodes.authenticationMethodStep.classList.add("step-active");
+        nodes.authenticationMethodStep.classList.remove("step-complete", "step-disabled");
+        nodes.interactionBodyContainer.classList.remove("hidden");
+        nodes.authenticationMethodStepIndicator.textContent = "1";
+        nodes.authenticationMethodStepTitle.textContent = stepTwoTitle;
+        return;
+      }
+
+      nodes.tenantSelectionStep.classList.remove("hidden");
+      nodes.tenantSelectionStepIndicator.textContent = "1";
+      nodes.authenticationMethodStepIndicator.textContent = "2";
+
+      nodes.tenantSelectionStep.classList.toggle("step-active", true);
+      nodes.tenantSelectionStep.classList.toggle("step-complete", false);
+      nodes.tenantSelectionStep.classList.toggle("step-disabled", false);
+      nodes.authenticationMethodStep.classList.toggle("step-active", true);
+      nodes.authenticationMethodStep.classList.toggle("step-complete", false);
+      nodes.authenticationMethodStep.classList.toggle("step-disabled", false);
+      nodes.interactionBodyContainer.classList.toggle("hidden", false);
+      nodes.authenticationMethodStepTitle.textContent = stepTwoTitle;
+    }
+
+    function buildStructureNodes(items) {
+      return items.map((item) => {
+        const children = item.children ? `<ul>${buildStructureNodes(item.children)}</ul>` : "";
+        return `<li>${buildTreeLabel(item.label, {
+          region: item.region,
+          shell: item.shell,
+          touchpoint: item.touchpoint,
+          variant: item.variant,
+          targetId: item.targetId,
+          key: item.key
+        })}${children}</li>`;
+      }).join("");
+    }
+
+    function getLoginInteractionStructure() {
+      return [
+        {
+          label: "Identifier Label",
+          targetId: "identifier-label",
+          key: "element:method:email-password:identifier-label",
+          touchpoint: "method",
+          variant: "email-password"
+        },
+        {
+          label: "Identifier Input",
+          targetId: "identifier-input",
+          key: "element:method:email-password:identifier-input",
+          touchpoint: "method",
+          variant: "email-password"
+        },
+        {
+          label: "Password Label",
+          targetId: "password-label",
+          key: "element:method:email-password:password-label",
+          touchpoint: "method",
+          variant: "email-password"
+        },
+        {
+          label: "Password Input",
+          targetId: "password-input",
+          key: "element:method:email-password:password-input",
+          touchpoint: "method",
+          variant: "email-password"
+        },
+        {
+          label: "Provider Context Label",
+          targetId: "provider-field-label",
+          key: "element:method:ldap:provider-field-label",
+          touchpoint: "method",
+          variant: "ldap"
+        },
+        {
+          label: "Provider Context Input",
+          targetId: "provider-field-input",
+          key: "element:method:ldap:provider-field-input",
+          touchpoint: "method",
+          variant: "ldap"
+        },
+        {
+          label: "Method Status Panel",
+          targetId: "method-state-panel",
+          key: "element:method:invalid-credentials:method-state-panel",
+          touchpoint: "method",
+          variant: "invalid-credentials"
+        }
+      ];
+    }
+
+    function getMfaStructure() {
+      return [
+        {
+          label: "Verification Header Container",
+          region: true,
+          targetId: "mfa-modal-header",
+          key: "container:mfa:totp:mfa-modal-header",
+          touchpoint: "mfa",
+          variant: "totp",
+          children: [
+            { label: "Verification Title", targetId: "mfa-title", key: "element:mfa:totp:mfa-title", touchpoint: "mfa", variant: "totp" },
+            { label: "Verification Description", targetId: "mfa-description", key: "element:mfa:totp:mfa-description", touchpoint: "mfa", variant: "totp" }
+          ]
+        },
+        {
+          label: "Status Message Container",
+          region: true,
+          targetId: "mfa-status-message-container",
+          key: "container:mfa:invalid-code:mfa-status-message-container",
+          touchpoint: "mfa",
+          variant: "invalid-code",
+          children: [
+            { label: "Status Banner", targetId: "mfa-banner", key: "element:mfa:invalid-code:mfa-banner", touchpoint: "mfa", variant: "invalid-code" }
+          ]
+        },
+        {
+          label: "Verification Code Container",
+          region: true,
+          targetId: "mfa-code-container",
+          key: "container:mfa:totp:mfa-code-container",
+          touchpoint: "mfa",
+          variant: "totp",
+          children: [
+            { label: "OTP Digit 1", targetId: "otp-digit-1", key: "element:mfa:totp:otp-digit-1", touchpoint: "mfa", variant: "totp" },
+            { label: "OTP Digit 2", targetId: "otp-digit-2", key: "element:mfa:totp:otp-digit-2", touchpoint: "mfa", variant: "totp" },
+            { label: "OTP Digit 3", targetId: "otp-digit-3", key: "element:mfa:totp:otp-digit-3", touchpoint: "mfa", variant: "totp" },
+            { label: "OTP Digit 4", targetId: "otp-digit-4", key: "element:mfa:totp:otp-digit-4", touchpoint: "mfa", variant: "totp" },
+            { label: "OTP Digit 5", targetId: "otp-digit-5", key: "element:mfa:totp:otp-digit-5", touchpoint: "mfa", variant: "totp" },
+            { label: "OTP Digit 6", targetId: "otp-digit-6", key: "element:mfa:totp:otp-digit-6", touchpoint: "mfa", variant: "totp" }
+          ]
+        },
+        {
+          label: "Verification Action Bar",
+          region: true,
+          targetId: "mfa-action-bar",
+          key: "container:mfa:totp:mfa-action-bar",
+          touchpoint: "mfa",
+          variant: "totp",
+          children: [
+            { label: "Back Action", targetId: "mfa-back-action", key: "element:mfa:totp:mfa-back-action", touchpoint: "mfa", variant: "totp" },
+            { label: "Verify Action", targetId: "mfa-verify-action", key: "element:mfa:totp:mfa-verify-action", touchpoint: "mfa", variant: "totp" }
+          ]
+        }
+      ];
+    }
+
+    function buildLoginShellTree(shellKey) {
+      const active = state.shell === shellKey;
+
+      return `
+        <li>
+          ${buildTreeButton(shellMeta[shellKey].label, {
+            type: "shell",
+            shell: shellKey,
+            root: true,
+            active,
+            key: `shell:${shellKey}`
+          })}
+          <ul>
+            <li>
+              ${buildTreeLabel("Shell Background Container", {
+                region: true,
+                targetId: "login-shell-background",
+                key: `${shellKey}:login-shell-background`
+              })}
+              <ul>
+                <li>${buildTreeLabel("Shell Background", {
+                  targetId: "login-shell-background",
+                  key: `${shellKey}:login-shell-background-base`
+                })}</li>
+                <li>${buildTreeLabel("Shell Background Color", {
+                  targetId: "login-shell-background-color",
+                  key: `${shellKey}:login-shell-background-color`
+                })}</li>
+                <li>${buildTreeLabel("Shell Background Pattern", {
+                  targetId: "login-shell-background-pattern",
+                  key: `${shellKey}:login-shell-background-pattern`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Shell Header Container", {
+                region: true,
+                targetId: "welcome-container",
+                key: `${shellKey}:welcome-container`
+              })}
+              <ul>
+                <li>${buildTreeLabel("Shell Title", {
+                  targetId: "welcome-title",
+                  key: `${shellKey}:welcome-title`
+                })}</li>
+                <li>${buildTreeLabel("Shell Subtitle", {
+                  targetId: "welcome-subtitle",
+                  key: `${shellKey}:welcome-subtitle`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Logo Container", {
+                region: true,
+                targetId: "logo-container",
+                key: `${shellKey}:logo-container`
+              })}
+              <ul>
+                <li>${buildTreeLabel("SVG Logo Renderer", {
+                  targetId: "svg-logo-renderer",
+                  key: `${shellKey}:svg-logo-renderer`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Sign-In Surface Container", {
+                region: true,
+                targetId: "auth-region",
+                key: `${shellKey}:auth-region`
+              })}
+              <ul>
+                <li>
+                  ${buildTreeLabel("Tenant Selection Step Container", {
+                    region: true,
+                    targetId: "tenant-selection-step-container",
+                    key: `${shellKey}:tenant-selection-step-container`
+                  })}
+                  <ul>
+                    <li>
+                      ${buildTreeLabel("Tenant Selection Header Container", {
+                        region: true,
+                        targetId: "tenant-selection-header-container",
+                        key: `${shellKey}:tenant-selection-header-container`
+                      })}
+                      <ul>
+                        <li>${buildTreeLabel("Tenant Selection Step Indicator", {
+                          targetId: "tenant-selection-step-indicator",
+                          key: `${shellKey}:tenant-selection-step-indicator`
+                        })}</li>
+                        <li>${buildTreeLabel("Tenant Selection Step Title", {
+                          targetId: "tenant-selection-step-title",
+                          key: `${shellKey}:tenant-selection-step-title`
+                        })}</li>
+                      </ul>
+                    </li>
+                    <li>
+                      ${buildTreeLabel("Tenant Selection Content Container", {
+                        region: true,
+                        targetId: "tenant-selection-content-container",
+                        key: `${shellKey}:tenant-selection-content-container`
+                      })}
+                      <ul>
+                        <li>${buildTreeLabel("Tenant Registry Searchable Dropdown", {
+                          targetId: "tenant-registry-dropdown-trigger",
+                          key: `${shellKey}:tenant-registry-dropdown-trigger`
+                        })}</li>
+                        <li>${buildTreeLabel("Remember Tenant Selection Checkbox", {
+                          targetId: "remember-selection-checkbox",
+                          key: `${shellKey}:remember-selection-checkbox`
+                        })}</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  ${buildTreeLabel("Authentication Methods Step Container", {
+                    region: true,
+                    targetId: "authentication-method-step-container",
+                    key: `${shellKey}:authentication-method-step-container`
+                  })}
+                  <ul>
+                    <li>
+                      ${buildTreeLabel("Authentication Methods Header Container", {
+                        region: true,
+                        targetId: "authentication-method-header-container",
+                        key: `${shellKey}:authentication-method-header-container`
+                      })}
+                      <ul>
+                        <li>${buildTreeLabel("Authentication Methods Step Indicator", {
+                          targetId: "authentication-method-step-indicator",
+                          key: `${shellKey}:authentication-method-step-indicator`
+                        })}</li>
+                        <li>${buildTreeLabel("Authentication Methods Step Title", {
+                          targetId: "authentication-method-step-title",
+                          key: `${shellKey}:authentication-method-step-title`
+                        })}</li>
+                      </ul>
+                    </li>
+                    <li>
+                      ${buildTreeLabel("Status Message Container", {
+                        region: true,
+                        targetId: "status-message-container",
+                        key: `${shellKey}:status-message-container`,
+                        touchpoint: "providers",
+                        variant: "session-expired"
+                      })}
+                      <ul>
+                        <li>${buildTreeLabel("Status Banner", {
+                          targetId: "auth-banner",
+                          key: `${shellKey}:auth-banner`,
+                          touchpoint: "providers",
+                          variant: "session-expired"
+                        })}</li>
+                      </ul>
+                    </li>
+                    <li>
+                      ${buildTreeLabel("Provider Selection Container", {
+                        region: true,
+                        targetId: "providers-view",
+                        key: `${shellKey}:providers-view`,
+                        touchpoint: "providers",
+                        variant: "active"
+                      })}
+                      <ul>
+                        <li>
+                          ${buildTreeLabel("No Auth Container", {
+                            region: true,
+                            targetId: "no-auth-container",
+                            key: `${shellKey}:no-auth-container`,
+                            touchpoint: "providers",
+                            variant: "none"
+                          })}
+                          <ul>
+                            <li>${buildTreeLabel("No Auth Title", {
+                              targetId: "no-auth-title",
+                              key: `${shellKey}:no-auth-title`,
+                              touchpoint: "providers",
+                              variant: "none"
+                            })}</li>
+                            <li>${buildTreeLabel("No Auth Description", {
+                              targetId: "no-auth-text",
+                              key: `${shellKey}:no-auth-text`,
+                              touchpoint: "providers",
+                              variant: "none"
+                            })}</li>
+                          </ul>
+                        </li>
+                        ${buildProviderOptionNodes(shellKey)}
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+            </ul>
+          </li>
+          <li>
+            ${buildTreeLabel("Support Container", {
+              region: true,
+              targetId: "support-container",
+              key: `${shellKey}:support-container`
+            })}
+            <ul>
+              <li>${buildTreeLabel("Support Message", {
+                targetId: "support-copy",
+                key: `${shellKey}:support-copy`
+              })}</li>
+              <li>${buildTreeLabel("Support Action", {
+                targetId: "support-action",
+                key: `${shellKey}:support-action`
+              })}</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+        `;
+    }
+
+    function buildMfaShellTree(shellKey) {
+      const active = state.shell === shellKey;
+
+      return `
+        <li>
+          ${buildTreeButton(shellMeta[shellKey].label, {
+            type: "shell",
+            shell: shellKey,
+            root: true,
+            active,
+            key: `shell:${shellKey}`
+          })}
+          <ul>
+            <li>
+              ${buildTreeLabel("Overlay Background Container", {
+                region: true,
+                targetId: "mfa-overlay-background",
+                key: `${shellKey}:mfa-overlay-background`,
+                touchpoint: "mfa",
+                variant: "totp"
+              })}
+              <ul>
+                <li>${buildTreeLabel("Overlay Background", {
+                  targetId: "mfa-overlay-background",
+                  key: `${shellKey}:mfa-overlay-background-base`,
+                  touchpoint: "mfa",
+                  variant: "totp"
+                })}</li>
+                <li>${buildTreeLabel("Overlay Background Color", {
+                  targetId: "mfa-overlay-background-color",
+                  key: `${shellKey}:mfa-overlay-background-color`,
+                  touchpoint: "mfa",
+                  variant: "totp"
+                })}</li>
+                <li>${buildTreeLabel("Overlay Background Pattern", {
+                  targetId: "mfa-overlay-background-pattern",
+                  key: `${shellKey}:mfa-overlay-background-pattern`,
+                  touchpoint: "mfa",
+                  variant: "totp"
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Verification Modal Container", {
+                region: true,
+                targetId: "mfa-modal",
+                key: `${shellKey}:mfa-modal`,
+                touchpoint: "mfa",
+                variant: "totp"
+              })}
+              <ul>
+                ${buildStructureNodes(getMfaStructure())}
+              </ul>
+            </li>
+          </ul>
+        </li>
+      `;
+    }
+
+    function buildNotFoundShellTree(shellKey) {
+      const active = state.shell === shellKey;
+
+      return `
+        <li>
+          ${buildTreeButton(shellMeta[shellKey].label, {
+            type: "shell",
+            shell: shellKey,
+            root: true,
+            active,
+            key: `shell:${shellKey}`
+          })}
+          <ul>
+            <li>
+              ${buildTreeLabel("Shell Background Container", {
+                region: true,
+                targetId: "login-shell-background",
+                key: `${shellKey}:login-shell-background`
+              })}
+              <ul>
+                <li>${buildTreeLabel("Shell Background", {
+                  targetId: "login-shell-background",
+                  key: `${shellKey}:login-shell-background-base`
+                })}</li>
+                <li>${buildTreeLabel("Shell Background Color", {
+                  targetId: "login-shell-background-color",
+                  key: `${shellKey}:login-shell-background-color`
+                })}</li>
+                <li>${buildTreeLabel("Shell Background Pattern", {
+                  targetId: "login-shell-background-pattern",
+                  key: `${shellKey}:login-shell-background-pattern`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Shell Header Container", {
+                region: true,
+                targetId: "welcome-container",
+                key: `${shellKey}:welcome-container`
+              })}
+              <ul>
+                <li>${buildTreeLabel("Shell Title", {
+                  targetId: "welcome-title",
+                  key: `${shellKey}:welcome-title`
+                })}</li>
+                <li>${buildTreeLabel("Shell Subtitle", {
+                  targetId: "welcome-subtitle",
+                  key: `${shellKey}:welcome-subtitle`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Logo Container", {
+                region: true,
+                targetId: "logo-container",
+                key: `${shellKey}:logo-container`
+              })}
+              <ul>
+                <li>${buildTreeLabel("SVG Logo Renderer", {
+                  targetId: "svg-logo-renderer",
+                  key: `${shellKey}:svg-logo-renderer`
+                })}</li>
+              </ul>
+            </li>
+            <li>
+              ${buildTreeLabel("Tenant Not Found Container", {
+                region: true,
+                targetId: "not-found-view",
+                key: `${shellKey}:not-found-view`
+              })}
+              <ul>
+                <li>${buildTreeLabel("Not Found Title", {
+                  targetId: "not-found-title",
+                  key: `${shellKey}:not-found-title`
+                })}</li>
+                <li>${buildTreeLabel("Not Found Description", {
+                  targetId: "not-found-text",
+                  key: `${shellKey}:not-found-text`
+                })}</li>
+                <li>${buildTreeLabel("Back to Login Action", {
+                  targetId: "not-found-action",
+                  key: `${shellKey}:not-found-action`
+                })}</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      `;
+    }
+
+    function renderSelectorTree() {
+      nodes.selectorTree.innerHTML = `
+        ${buildLoginShellTree("login")}
+        ${buildMfaShellTree("mfa")}
+        ${buildNotFoundShellTree("notfound")}
+      `;
+
+      decorateSelectorTree();
+      refreshTreeLabelTooltips();
+      let dragSelecting = false;
+
+      const activateNode = (button) => {
+          const node = button.closest(".tree-node.clickable");
+          if (!node) return;
+          const selectedText = window.getSelection ? window.getSelection().toString().trim() : "";
+          if (selectedText || dragSelecting) return;
+
+          const nodeType = node.dataset.nodeType;
+          const targetId = node.dataset.targetId;
+          const nodeKey = node.dataset.nodeKey;
+
+          if (nodeType === "shell") {
+            state.shell = node.dataset.shell;
+            state.touchpoint = shellMeta[state.shell].touchpoints[0];
+            state.variant = variantsByTouchpoint[state.touchpoint][0];
+            focusedTargetId = state.shell === "notfound"
+              ? "not-found-view"
+              : state.shell === "mfa"
+                ? "mfa-modal"
+                : "login-shell-inner";
+            focusedTreeKey = nodeKey || `shell:${state.shell}`;
+          } else if (nodeType === "touchpoint") {
+            state.touchpoint = node.dataset.touchpoint;
+            state.shell = touchpointMeta[state.touchpoint].shell;
+            state.variant = variantsByTouchpoint[state.touchpoint][0];
+            focusedTargetId = targetId || inspectTargetByTouchpoint[state.touchpoint];
+            focusedTreeKey = nodeKey || `touchpoint:${state.touchpoint}`;
+          } else if (nodeType === "variant") {
+            state.touchpoint = node.dataset.touchpoint;
+            state.shell = touchpointMeta[state.touchpoint].shell;
+            state.variant = node.dataset.variant;
+            focusedTargetId = targetId || inspectTargetByTouchpoint[state.touchpoint];
+            focusedTreeKey = nodeKey || `variant:${state.touchpoint}:${state.variant}`;
+          } else {
+            const contextShell = node.dataset.shell;
+            const contextTouchpoint = node.dataset.touchpoint;
+            const contextVariant = node.dataset.variant;
+            const contextProviderKey = node.dataset.providerKey;
+
+            if (contextTouchpoint) {
+              state.touchpoint = contextTouchpoint;
+              state.shell = touchpointMeta[state.touchpoint].shell;
+
+              if (contextVariant && variantsByTouchpoint[state.touchpoint].includes(contextVariant)) {
+                state.variant = contextVariant;
+              } else if (!variantsByTouchpoint[state.touchpoint].includes(state.variant)) {
+                state.variant = variantsByTouchpoint[state.touchpoint][0];
+              }
+            } else if (contextShell) {
+              state.shell = contextShell;
+
+              if (!shellMeta[state.shell].touchpoints.includes(state.touchpoint)) {
+                state.touchpoint = shellMeta[state.shell].touchpoints[0];
+                state.variant = variantsByTouchpoint[state.touchpoint][0];
+              } else if (!variantsByTouchpoint[state.touchpoint].includes(state.variant)) {
+                state.variant = variantsByTouchpoint[state.touchpoint][0];
+              }
+            }
+
+            if (state.touchpoint === "providers" && contextProviderKey) {
+              const availableProviderKeys = getProviderItemsForTree().map(([title]) => getProviderKeyForTree(title));
+              if (!availableProviderKeys.includes(contextProviderKey)) {
+                selectedTenantKey = "";
+              }
+              expandedProviderKey = contextProviderKey;
+              state.variant = "active";
+            }
+
+            focusedTargetId = targetId || null;
+            focusedTreeKey = nodeKey || null;
+          }
+
+          render();
+      };
+
+      nodes.selectorTree.querySelectorAll(".tree-node.clickable").forEach((node) => {
+        node.addEventListener("mousedown", (event) => {
+          const startX = event.clientX;
+          const startY = event.clientY;
+          dragSelecting = false;
+
+          const handleMove = (moveEvent) => {
+            if (Math.abs(moveEvent.clientX - startX) > 4 || Math.abs(moveEvent.clientY - startY) > 4) {
+              dragSelecting = true;
+            }
+          };
+
+          const handleUp = () => {
+            document.removeEventListener("mousemove", handleMove);
+            document.removeEventListener("mouseup", handleUp);
+            requestAnimationFrame(() => {
+              dragSelecting = false;
+            });
+          };
+
+          document.addEventListener("mousemove", handleMove);
+          document.addEventListener("mouseup", handleUp);
+        });
+
+        node.addEventListener("click", (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          if (target && target.closest(".tree-expander")) {
+            return;
+          }
+
+          const selectedText = window.getSelection ? window.getSelection().toString().trim() : "";
+          if (selectedText || dragSelecting) {
+            event.preventDefault();
+            return;
+          }
+
+          activateNode(node);
+        });
+      });
+
+      nodes.selectorTree.querySelectorAll(".tree-node.inspectable").forEach((node) => {
+        const targetId = node.dataset.targetId;
+        if (!targetId) return;
+
+        node.addEventListener("mouseenter", () => {
+          applyHoveredElement(targetId);
+        });
+
+        node.addEventListener("mouseleave", () => {
+          clearHoveredElement();
+          applyFocusedElement();
+        });
+      });
+    }
+
+    function decorateSelectorTree() {
+      nodes.selectorTree.querySelectorAll("li").forEach((item) => {
+        const node = item.querySelector(":scope > .tree-node");
+        const children = item.querySelector(":scope > ul");
+
+        if (!node || !children) return;
+
+        item.classList.add("tree-branch", "p-treenode");
+        children.classList.add("tree-children", "p-treenode-children");
+
+        let row = item.querySelector(":scope > .tree-branch-row");
+        if (!row) {
+          row = document.createElement("div");
+          row.className = "tree-branch-row p-treenode-content-row";
+          item.insertBefore(row, node);
+        }
+
+        let expander = row.querySelector(".tree-expander");
+        if (!expander) {
+          expander = document.createElement("button");
+          expander.type = "button";
+          expander.className = "tree-expander p-tree-toggler p-link";
+          expander.setAttribute("aria-label", "Toggle branch");
+          expander.innerHTML = `<span class="tree-expander-icon" aria-hidden="true">›</span>`;
+          row.appendChild(expander);
+        }
+
+        if (node.parentElement !== row) {
+          row.appendChild(node);
+        }
+
+        const nodeKey = node.dataset.nodeKey || node.textContent.trim();
+        if (!initializedTreeKeys.has(nodeKey)) {
+          initializedTreeKeys.add(nodeKey);
+          collapsedTreeKeys.add(nodeKey);
+        }
+
+        const collapsed = collapsedTreeKeys.has(nodeKey);
+        item.classList.toggle("collapsed", collapsed);
+        expander.setAttribute("aria-expanded", collapsed ? "false" : "true");
+
+        expander.onclick = () => {
+          const isCollapsed = item.classList.toggle("collapsed");
+          expander.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+
+          if (isCollapsed) {
+            collapsedTreeKeys.add(nodeKey);
+          } else {
+            collapsedTreeKeys.delete(nodeKey);
+          }
+        };
+      });
+    }
+
+    function setAllTreeBranches(collapsed) {
+      nodes.selectorTree.querySelectorAll(".tree-branch").forEach((item) => {
+        const node = item.querySelector(":scope > .tree-branch-row > .tree-node");
+        const expander = item.querySelector(":scope > .tree-branch-row > .tree-expander");
+        const nodeKey = node?.dataset.nodeKey || node?.textContent?.trim();
+
+        item.classList.toggle("collapsed", collapsed);
+
+        if (expander) {
+          expander.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        }
+
+        if (nodeKey) {
+          if (collapsed) {
+            collapsedTreeKeys.add(nodeKey);
+          } else {
+            collapsedTreeKeys.delete(nodeKey);
+          }
+        }
+      });
+    }
+
+    function initializeTreeControls() {
+      nodes.expandAllTree?.addEventListener("click", () => {
+        setAllTreeBranches(false);
+      });
+
+      nodes.collapseAllTree?.addEventListener("click", () => {
+        setAllTreeBranches(true);
+      });
+    }
+
+    function refreshTreeLabelTooltips() {
+      nodes.selectorTree.querySelectorAll(".tree-label-text").forEach((label) => {
+        label.removeAttribute("title");
+        if (label.scrollWidth > label.clientWidth + 1) {
+          label.setAttribute("title", label.textContent.trim());
+        }
+      });
+    }
+
+    function applyFocusedElement() {
+      document.querySelectorAll(".element-focused").forEach((element) => {
+        element.classList.remove("element-focused");
+      });
+
+      if (!focusedTargetId) return;
+
+      let element = document.querySelector(`[data-inspect-id="${focusedTargetId}"]`);
+
+      while (element && element.classList.contains("hidden")) {
+        element = element.parentElement?.closest?.("[data-inspect-id]") || null;
+      }
+
+      if (!element) return;
+
+      element.classList.add("element-focused");
+      element.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+
+    function clearHoveredElement() {
+      document.querySelectorAll(".element-hovered").forEach((element) => {
+        element.classList.remove("element-hovered");
+      });
+    }
+
+    function applyHoveredElement(targetId) {
+      clearHoveredElement();
+
+      if (!targetId || targetId === focusedTargetId) return;
+
+      const element = document.querySelector(`[data-inspect-id="${targetId}"]`);
+      if (element && !element.classList.contains("hidden")) {
+        element.classList.add("element-hovered");
+      }
+    }
+
+    function renderProviderButtons(items) {
+      const getProviderMonogram = (title) => {
+        const parts = title
+          .replace(/[^a-zA-Z0-9]+/g, " ")
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+
+        if (!parts.length) return "ID";
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      };
+
+      const getProviderKey = (title) => title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      const getNeoFieldIcon = (icon) => {
+        if (icon === "user") {
+          return `
+            <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z"/>
+            </svg>
+          `;
+        }
+
+        if (icon === "context") {
+          return `
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z"/>
+            </svg>
+          `;
+        }
+
+        return `
+          <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+            <path d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z"/>
+          </svg>
+        `;
+      };
+
+      const buildNeoFieldMarkup = ({ label, value = "", placeholder = "", type = "text", icon = "lock", passwordToggle = false, inputId, labelInspectId, inputInspectId, toggleInspectId = "", fieldInspectId = "" }) => `
+        <div class="neo-field" ${fieldInspectId ? `data-inspect-id="${fieldInspectId}"` : ""}>
+          <label class="neo-field-label" for="${inputId}" data-inspect-id="${labelInspectId}">${label}</label>
+          <div class="neo-input-wrap">
+            <input
+              id="${inputId}"
+              class="neo-input${passwordToggle ? " neo-input-password" : ""}"
+              type="${type}"
+              value="${value}"
+              placeholder="${placeholder}"
+              autocomplete="off"
+              data-inspect-id="${inputInspectId}"
+            >
+            <span class="neo-icon" aria-hidden="true">${getNeoFieldIcon(icon)}</span>
+            ${passwordToggle ? `
+              <button type="button" class="password-toggle" data-password-toggle="${inputId}" aria-label="Show password" title="Show password" data-inspect-id="${toggleInspectId}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            ` : ""}
+          </div>
+        </div>
+      `;
+
+      const getProviderVariantMarkup = (title, subtitle, slot) => {
+        const providerKey = getProviderKey(title);
+        const normalized = providerKey;
+        const isRedirectMethod = ["oidc", "saml", "oauth2", "uae-pass"].some((key) => normalized.includes(key));
+        const fields = [];
+
+        if (isRedirectMethod) {
+          const redirectCopy = normalized.includes("uae-pass")
+            ? "Selecting this method opens the external identity handoff to complete sign-in."
+            : "Selecting this method opens the external identity provider flow for credential validation.";
+
+          return `
+            <div class="provider-variant-copy">Redirect sign-in variant</div>
+            <div class="provider-description">${subtitle}</div>
+            <div class="provider-preview-note">${redirectCopy}</div>
+            <div class="provider-variant-actions">
+              <button type="button" class="auth-btn provider-inline-submit" data-provider-submit="${providerKey}" data-inspect-id="provider-submit-${slot}">Sign In</button>
+            </div>
+          `;
+        }
+
+        fields.push(buildNeoFieldMarkup({
+          label: "User name",
+          value: "jane.doe",
+          placeholder: "Enter your username",
+          type: "text",
+          icon: "user",
+          inputId: `${providerKey}-username`,
+          labelInspectId: `provider-username-label-${slot}`,
+          inputInspectId: `provider-username-input-${slot}`,
+          fieldInspectId: `provider-username-field-${slot}`
+        }));
+        fields.push(buildNeoFieldMarkup({
+          label: "Password",
+          value: "password",
+          placeholder: "Enter your password",
+          type: "password",
+          icon: "lock",
+          passwordToggle: true,
+          inputId: `${providerKey}-password`,
+          labelInspectId: `provider-password-label-${slot}`,
+          inputInspectId: `provider-password-input-${slot}`,
+          toggleInspectId: `provider-password-toggle-${slot}`,
+          fieldInspectId: `provider-password-field-${slot}`
+        }));
+
+        return `
+          <div class="provider-preview-grid">${fields.join("")}</div>
+          <div class="provider-variant-actions">
+            <button type="button" class="auth-btn provider-inline-submit" data-provider-submit="${providerKey}" data-inspect-id="provider-submit-${slot}">Sign In</button>
+          </div>
+        `;
+      };
+
+      const availableProviderKeys = items.map(([title]) => getProviderKey(title));
+      if (expandedProviderKey && !availableProviderKeys.includes(expandedProviderKey)) {
+        expandedProviderKey = "";
+      }
+      if (rememberedProviderKey && !availableProviderKeys.includes(rememberedProviderKey)) {
+        rememberedProviderKey = "";
+      }
+      if (!expandedProviderKey && availableProviderKeys.length) {
+        expandedProviderKey = availableProviderKeys[0];
+      }
+
+      nodes.providerList.innerHTML = items.map(([title, subtitle], index) => {
+        const providerKey = getProviderKey(title);
+        const expanded = expandedProviderKey === providerKey;
+        const remembered = rememberedProviderKey === providerKey;
+
+        return `
+        <article class="provider-option-panel" data-slot="${index + 1}" data-inspect-id="provider-button-${index + 1}">
+          <span class="provider-button-header" data-inspect-id="provider-header-${index + 1}">
+            <span class="provider-header-main">
+              <span class="provider-icon" data-inspect-id="provider-logo-${index + 1}" aria-hidden="true">${getProviderMonogram(title)}</span>
+              <span class="provider-header-copy">
+                <span class="provider-title" data-inspect-id="provider-title-${index + 1}">${title}</span>
+              </span>
+            </span>
+            <span class="provider-header-actions">
+              <label class="provider-remember-control" data-inspect-id="provider-remember-${index + 1}">
+                <input type="radio" name="rememberProviderSelection" value="${providerKey}" data-provider-remember="${providerKey}" data-inspect-id="provider-remember-input-${index + 1}" ${remembered ? "checked" : ""}>
+                <span>Remember me</span>
+              </label>
+              <button type="button" class="provider-expand-toggle" data-provider-toggle="${providerKey}" data-inspect-id="provider-toggle-${index + 1}" aria-expanded="${expanded ? "true" : "false"}">${expanded ? "−" : "+"}</button>
+            </span>
+          </span>
+          <div class="provider-variant-panel ${expanded ? "" : "hidden"}" data-inspect-id="provider-variant-panel-${index + 1}">${getProviderVariantMarkup(title, subtitle, index + 1)}</div>
+        </article>
+      `;
+      }).join("");
+    }
+
+    function initializeProviderOptionInteractions() {
+      nodes.providerList.addEventListener("click", (event) => {
+        const toggle = event.target.closest("[data-provider-toggle]");
+        if (!toggle) return;
+
+        const providerKey = toggle.dataset.providerToggle;
+        expandedProviderKey = expandedProviderKey === providerKey ? "" : providerKey;
+        render();
+      });
+
+      nodes.providerList.addEventListener("change", (event) => {
+        const input = event.target;
+        if (!(input instanceof HTMLInputElement) || input.type !== "radio" || !input.dataset.providerRemember) {
+          return;
+        }
+
+        rememberedProviderKey = input.dataset.providerRemember;
+        render();
+      });
+    }
+
+    function getPasswordToggleIconMarkup(visible) {
+      if (visible) {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 3l18 18"></path>
+            <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+            <path d="M9.9 5.1A10.7 10.7 0 0 1 12 5c5 0 9 3.7 10 7-0.4 1.4-1.4 3-2.9 4.3"></path>
+            <path d="M6.3 6.3C4.6 7.5 3.4 9.2 2 12c1 3.3 5 7 10 7 1.7 0 3.2-0.4 4.6-1.1"></path>
+          </svg>
+        `;
+      }
+
+      return `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      `;
+    }
+
+    function initializePasswordToggleInteractions() {
+      document.addEventListener("click", (event) => {
+        const toggle = event.target instanceof Element
+          ? event.target.closest("[data-password-toggle]")
+          : null;
+
+        if (!toggle) return;
+
+        const inputId = toggle.dataset.passwordToggle;
+        const input = document.getElementById(inputId);
+
+        if (!(input instanceof HTMLInputElement)) return;
+
+        const nextVisible = input.type === "password";
+        input.type = nextVisible ? "text" : "password";
+        toggle.innerHTML = getPasswordToggleIconMarkup(nextVisible);
+        toggle.setAttribute("aria-label", nextVisible ? "Hide password" : "Show password");
+        toggle.setAttribute("title", nextVisible ? "Hide password" : "Show password");
+      });
+    }
+
+    function resetViews() {
+      nodes.loginShellInner.classList.remove("centered");
+      nodes.logoContainer.classList.remove("hidden");
+      nodes.welcomeContainer.classList.remove("hidden");
+      nodes.authRegion.classList.remove("hidden");
+      nodes.supportContainer.classList.remove("hidden");
+      nodes.authRegion.classList.remove("centered");
+      nodes.authRegion.classList.add("sign-in-surface-active");
+      nodes.tenantSelectionStep.classList.remove("hidden");
+      nodes.tenantSelectionStepIndicator.textContent = "1";
+      nodes.authenticationMethodStepIndicator.textContent = "2";
+      setSignInSurfaceVisible(true);
+      nodes.notFoundView.classList.add("hidden");
+      nodes.mfaOverlay.classList.add("hidden");
+      nodes.providersView.classList.add("hidden");
+      nodes.noAuthContainer.classList.add("hidden");
+      nodes.noAuthPanel.classList.add("hidden");
+      nodes.identifierField.classList.add("hidden");
+      nodes.passwordField.classList.add("hidden");
+      nodes.providerFieldWrap.classList.add("hidden");
+      nodes.methodStatusContainer.classList.add("hidden");
+      nodes.methodStatePanel.classList.add("hidden");
+      nodes.mfaVerifyAction.classList.remove("hidden");
+      nodes.mfaBackAction.classList.remove("hidden");
+      nodes.mfaBackAction.textContent = "Back";
+      nodes.mfaVerifyAction.textContent = "Verify";
+      nodes.supportRow.classList.remove("hidden");
+      nodes.supportCopy.textContent = "Having trouble signing in?";
+      nodes.supportAction.textContent = "Contact support";
+      nodes.welcomeTitle.textContent = "Welcome to EMSIST";
+      nodes.welcomeSubtitle.textContent = "Empower. Transform. Succeed.";
+      nodes.authBanner.className = "auth-banner info hidden";
+      nodes.authBanner.textContent = "";
+      nodes.noAuthTitle.textContent = "No active providers";
+      nodes.noAuthText.textContent = "Support or tenant administration must activate an authentication integration before sign-in can proceed.";
+      nodes.mfaBanner.className = "auth-banner info hidden";
+      nodes.mfaBanner.textContent = "";
+      nodes.mfaTitle.textContent = "Verification required";
+      nodes.mfaDescription.textContent = "Enter the 6-digit verification code.";
+      nodes.tenantRegistryFilter.value = "";
+      renderTenantRegistryChips();
+      renderTenantRegistryOptions();
+      setTenantRegistryOpen(false);
+    }
+
+    function setBanner(type, text) {
+      nodes.authBanner.className = `auth-banner ${type}`;
+      nodes.authBanner.textContent = text;
+      nodes.authBanner.classList.remove("hidden");
+    }
+
+    function setMfaBanner(type, text) {
+      nodes.mfaBanner.className = `auth-banner ${type}`;
+      nodes.mfaBanner.textContent = text;
+      nodes.mfaBanner.classList.remove("hidden");
+    }
+
+    function renderProviders(variant) {
+      resetViews();
+      const effectiveTenantKey = selectedTenantKey || "master";
+      const sampleProviders = tenantAuthenticationMethods[effectiveTenantKey] || [
+        ["LDAP / AD", "", "active"]
+      ];
+      nodes.providersView.classList.remove("hidden");
+      nodes.noAuthContainer.classList.remove("hidden");
+      nodes.noAuthPanel.classList.remove("hidden");
+      nodes.noAuthTitle.textContent = "No auth provider message";
+      nodes.noAuthText.textContent = "Shown when backend returns no authentication methods for the selected tenant.";
+      setBanner("info", "Status message area for authentication-method validation and system feedback.");
+      renderProviderButtons(getRepresentativeProviderItems(sampleProviders));
+
+      updateSelectionStepper("Select Login Method", { forceStepTwoVisible: true });
+    }
+
+    function renderMethod(variant) {
+      resetViews();
+      updateSelectionStepper("Select Login Method", { forceStepTwoVisible: true });
+
+      setBanner("info", "Status message area for method-level validation and feedback.");
+      nodes.identifierField.classList.remove("hidden");
+      nodes.passwordField.classList.remove("hidden");
+      nodes.providerFieldWrap.classList.remove("hidden");
+      nodes.providerFieldInput.value = "Provider-specific context";
+      nodes.methodStatusContainer.classList.remove("hidden");
+      nodes.methodStatePanel.classList.remove("hidden");
+      nodes.methodStateTitle.textContent = "Validation message";
+      nodes.methodStateText.textContent = "Shows inline validation or provider response feedback for this sign-in method.";
+    }
+
+    function renderMfa(variant) {
+      resetViews();
+      nodes.logoContainer.classList.add("hidden");
+      nodes.welcomeContainer.classList.add("hidden");
+      nodes.authRegion.classList.add("hidden");
+      nodes.supportContainer.classList.add("hidden");
+      setSignInSurfaceVisible(false);
+      nodes.mfaOverlay.classList.remove("hidden");
+      setMfaBanner("info", "Status message area for MFA validation and verification feedback.");
+      nodes.mfaDescription.textContent = "Enter the 6-digit verification code or recovery code.";
+    }
+
+    function renderNotFound() {
+      resetViews();
+      nodes.loginShellInner.classList.remove("centered");
+      nodes.logoContainer.classList.remove("hidden");
+      nodes.welcomeContainer.classList.remove("hidden");
+      nodes.authRegion.classList.remove("centered");
+      nodes.authRegion.classList.remove("sign-in-surface-active");
+      setSignInSurfaceVisible(false);
+      nodes.notFoundView.classList.remove("hidden");
+    }
+
+    nodes.notFoundAction.addEventListener("click", () => {
+      state.shell = "login";
+      state.touchpoint = "providers";
+      state.variant = "active";
+      focusedTargetId = "login-shell-inner";
+      focusedTreeKey = null;
+      render();
+    });
+
+    nodes.mfaBackAction.addEventListener("click", () => {
+      state.shell = "login";
+      state.touchpoint = "method";
+      state.variant = "email-password";
+      focusedTargetId = "identifier-field";
+      focusedTreeKey = null;
+      render();
+    });
+
+    function render() {
+      renderSelectorTree();
+      nodes.screenTitle.textContent = "Preview";
+
+      if (state.touchpoint === "providers") {
+        renderProviders(state.variant);
+      } else if (state.touchpoint === "method") {
+        renderMethod(state.variant);
+      } else if (state.touchpoint === "mfa") {
+        renderMfa(state.variant);
+      } else {
+        renderNotFound();
+      }
+
+      applyFocusedElement();
+    }
+
+    initializeProviderOptionInteractions();
+    initializePasswordToggleInteractions();
+    initializeTenantRegistryControl();
+    initializeTreeControls();
+    render();
+  </script>
+</body>
+</html>

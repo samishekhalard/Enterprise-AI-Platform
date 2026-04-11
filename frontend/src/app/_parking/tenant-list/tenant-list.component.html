@@ -1,0 +1,235 @@
+<section class="tenant-list" data-testid="tenant-list">
+  <div class="list-page-card">
+    <!-- Card Header -->
+    <header class="list-page-card-header">
+      <h1 class="tenant-list-title">Tenant Manager</h1>
+    </header>
+
+    <!-- Toolbar: search + filter icon | spacer | toggle + action -->
+    <div class="toolbar" data-testid="filter-bar">
+      <div class="search-bar">
+        <span class="search-icon pi pi-search"></span>
+        <input
+          pInputText
+          type="text"
+          class="search-input"
+          placeholder="Search tenants..."
+          [value]="searchText()"
+          (input)="onSearchChange($any($event.target).value)"
+          data-testid="input-search-tenants"
+        />
+      </div>
+      <p-button
+        icon="pi pi-filter"
+        severity="secondary"
+        [outlined]="true"
+        [rounded]="true"
+        ariaLabel="Toggle filters"
+        (onClick)="toggleFilters()"
+        [styleClass]="filtersVisible() ? 'filter-icon-active' : ''"
+        data-testid="btn-toggle-filters"
+      />
+      <span class="toolbar-spacer"></span>
+      <p-toggleButton
+        [ngModel]="viewMode() === 'table'"
+        (ngModelChange)="viewMode.set($event ? 'table' : 'grid')"
+        onLabel="Table"
+        offLabel="Grid"
+        onIcon="pi pi-list"
+        offIcon="pi pi-objects-column"
+        ariaLabel="Toggle view mode"
+        data-testid="view-toggle"
+      />
+      <p-button
+        label="New Tenant"
+        icon="pi pi-plus"
+        data-testid="btn-create-tenant"
+        (onClick)="onCreateTenant()"
+      />
+    </div>
+
+    <!-- Filter row (collapsible) -->
+    @if (filtersVisible()) {
+      <div class="filter-row" data-testid="filter-row">
+        <p-select
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="activeTypeFilter()"
+          (ngModelChange)="onTypeFilterChange($event)"
+          placeholder="All Types"
+          styleClass="filter-select"
+          data-testid="filter-type-select"
+        />
+        <p-select
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="activeStatusFilter()"
+          (ngModelChange)="onStatusFilterChange($event)"
+          placeholder="All Statuses"
+          styleClass="filter-select"
+          data-testid="filter-status-select"
+        />
+        @if (hasActiveFilters()) {
+          <p-button
+            label="Clear"
+            icon="pi pi-filter-slash"
+            severity="secondary"
+            [text]="true"
+            size="small"
+            (onClick)="clearFilters()"
+            data-testid="btn-clear-filters"
+          />
+        }
+      </div>
+    }
+
+    <!-- Content -->
+    @if (isEmpty()) {
+      <div class="empty-state" role="status" data-testid="empty-state">
+        <i class="pi pi-inbox empty-state-icon"></i>
+        <h3 class="empty-state-title">No tenants found</h3>
+        <p class="empty-state-message">
+          @if (hasActiveFilters() || searchText()) {
+            No tenants match your current filters. Try adjusting your search or clearing filters.
+          } @else {
+            No tenants have been created yet. Click "New Tenant" to get started.
+          }
+        </p>
+        @if (hasActiveFilters() || searchText()) {
+          <p-button
+            label="Clear Filters"
+            severity="secondary"
+            icon="pi pi-filter-slash"
+            (onClick)="clearFilters()"
+            data-testid="btn-empty-clear-filters"
+          />
+        }
+      </div>
+    } @else {
+      <!-- Grid View -->
+      @if (viewMode() === 'grid') {
+        <div class="tenant-grid" data-testid="tenant-grid">
+          @for (tenant of paginatedTenants(); track tenant.shortName) {
+            <article
+              class="tenant-card"
+              tabindex="0"
+              role="button"
+              [attr.aria-label]="'View tenant ' + tenant.name"
+              (click)="onCardClick(tenant)"
+              (keydown.enter)="onCardClick(tenant)"
+              (keydown.space)="onCardClick(tenant)"
+              [attr.data-testid]="'tenant-card-' + tenant.shortName"
+            >
+              <div class="tenant-card-header">
+                <div class="tenant-avatar" [class]="getAvatarClass(tenant.type)">
+                  {{ getInitials(tenant.name) }}
+                </div>
+                <div class="tenant-info">
+                  <span class="tenant-name">{{ tenant.name }}</span>
+                  <span class="tenant-short-name">{{ tenant.shortName }}</span>
+                </div>
+              </div>
+
+              <div class="tenant-card-badges">
+                <p-tag [value]="tenant.type" [severity]="getTypeSeverity(tenant.type)" [rounded]="true" />
+                <span class="status-badge">
+                  <span class="status-dot" [class]="getStatusDotClass(tenant.status)"></span>
+                  {{ getStatusLabel(tenant.status) }}
+                </span>
+                @if (tenant.health) {
+                  <span class="health-badge" [class]="getHealthClass(tenant.health)" [title]="getHealthLabel(tenant.health)">
+                    <i [class]="getHealthIcon(tenant.health)"></i>
+                  </span>
+                }
+              </div>
+
+              <div class="tenant-card-stats">
+                <span class="stat">{{ tenant.stats.users }} Users</span>
+                <span class="stat-separator"></span>
+                <span class="stat">{{ tenant.stats.agents }} Agents</span>
+                <span class="stat-separator"></span>
+                <span class="stat">{{ tenant.stats.types }} Types</span>
+              </div>
+            </article>
+          }
+        </div>
+      }
+
+      <!-- Table View -->
+      @if (viewMode() === 'table') {
+        <p-table
+          [value]="[...paginatedTenants()]"
+          [rowHover]="true"
+          [tableStyle]="{ 'min-width': '50rem' }"
+          data-testid="tenant-table"
+          styleClass="tenant-data-table"
+        >
+          <ng-template #header>
+            <tr>
+              <th pSortableColumn="name">Tenant <p-sortIcon field="name" /></th>
+              <th pSortableColumn="type">Type <p-sortIcon field="type" /></th>
+              <th pSortableColumn="status">Status <p-sortIcon field="status" /></th>
+              <th>Health</th>
+              <th pSortableColumn="stats.users">Users <p-sortIcon field="stats.users" /></th>
+              <th pSortableColumn="stats.agents">Agents <p-sortIcon field="stats.agents" /></th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-tenant>
+            <tr
+              class="clickable-row"
+              (click)="onCardClick(tenant)"
+              [attr.data-testid]="'tenant-row-' + tenant.shortName"
+            >
+              <td>
+                <div class="table-tenant-cell">
+                  <div class="tenant-avatar tenant-avatar-sm" [class]="getAvatarClass(tenant.type)">
+                    {{ getInitials(tenant.name) }}
+                  </div>
+                  <div class="table-tenant-info">
+                    <span class="tenant-name">{{ tenant.name }}</span>
+                    <span class="tenant-short-name">{{ tenant.shortName }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p-tag [value]="tenant.type" [severity]="getTypeSeverity(tenant.type)" [rounded]="true" />
+              </td>
+              <td>
+                <span class="status-badge">
+                  <span class="status-dot" [class]="getStatusDotClass(tenant.status)"></span>
+                  {{ getStatusLabel(tenant.status) }}
+                </span>
+              </td>
+              <td>
+                @if (tenant.health) {
+                  <span class="health-badge-inline" [class]="getHealthClass(tenant.health)">
+                    <i [class]="getHealthIcon(tenant.health)"></i>
+                    {{ getHealthLabel(tenant.health) }}
+                  </span>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+              <td>{{ tenant.stats.users }}</td>
+              <td>{{ tenant.stats.agents }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      <!-- Paginator -->
+      @if (totalRecords() > 0) {
+        <p-paginator
+          [rows]="pageSize()"
+          [totalRecords]="totalRecords()"
+          [rowsPerPageOptions]="[10, 20, 50, 100]"
+          [first]="currentPage() * pageSize()"
+          (onPageChange)="onPageChange($event)"
+          data-testid="tenant-paginator"
+        />
+      }
+    }
+  </div>
+</section>

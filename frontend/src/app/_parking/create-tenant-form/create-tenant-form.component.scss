@@ -1,0 +1,295 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  font-family: var(--tp-font-family);
+}
+
+// ─── Form Layout ─────────────────────────────────────────────────────────────
+
+.create-tenant-form {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--tp-space-1);
+}
+
+.field-label {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+}
+
+.required {
+  color: var(--tp-error);
+}
+
+.field > input[type='text'],
+.field > input[type='email'] {
+  inline-size: 100%;
+}
+
+.field > p-select {
+  inline-size: 100%;
+}
+
+// ─── Tenant License Gate ────────────────────────────────────────────────────
+
+.tenant-license-gate {
+  margin-bottom: var(--tp-space-4);
+}
+
+// ─── License Allocation Section ─────────────────────────────────────────────
+
+.license-allocation {
+  h3 {
+    font-size: var(--tp-font-lg);
+    font-weight: 600;
+    margin-bottom: var(--tp-space-4);
+    color: var(--tp-text-dark);
+  }
+
+  .license-info {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text-secondary);
+    margin-bottom: var(--tp-space-4);
+  }
+}
+
+.license-slider-row {
+  margin-bottom: var(--tp-space-6);
+
+  .license-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--tp-space-2);
+
+    label {
+      font-weight: 600;
+      font-size: var(--tp-font-md);
+      color: var(--tp-text-dark);
+    }
+
+    .license-available {
+      font-size: var(--tp-font-sm);
+      color: var(--tp-text-muted);
+    }
+  }
+
+  .slider-with-value {
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-4);
+
+    p-slider {
+      flex: 1;
+    }
+
+    .slider-value {
+      min-inline-size: var(--tp-space-12);
+      text-align: center;
+      font-weight: 700;
+      font-size: var(--tp-font-lg);
+      color: var(--tp-primary);
+    }
+  }
+}
+
+// ─── Field Hint ──────────────────────────────────────────────────────────────
+
+.field-hint {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+  line-height: 1.4;
+}
+
+// ─── Tenant ID Display ──────────────────────────────────────────────────────
+
+.tenant-id-display {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+
+  code {
+
+    background: var(--tp-surface);
+    padding: var(--tp-space-1) var(--tp-space-2);
+    border-radius: var(--nm-radius-xs);
+    color: var(--tp-primary-dark);
+    font-size: var(--tp-font-xs);
+  }
+}
+
+// ─── Validating Hint ─────────────────────────────────────────────────────────
+
+.validating-hint {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+  font-style: italic;
+}
+
+// ─── Form Footer ─────────────────────────────────────────────────────────────
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+  padding-block-start: var(--tp-space-2);
+}
+
+// ─── Provisioning Phase ──────────────────────────────────────────────────────
+
+.provisioning-phase {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.provisioning-summary {
+  display: grid;
+  gap: var(--tp-space-3);
+}
+
+.provisioning-title {
+  margin: 0;
+  color: var(--tp-text-dark);
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+}
+
+// ─── Provisioning Steps ──────────────────────────────────────────────────────
+
+.provisioning-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.provisioning-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-3) var(--tp-space-3);
+  border-inline-start: var(--tp-space-1) solid var(--tp-border);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  inline-size: var(--icon-size-md);
+  block-size: var(--icon-size-md);
+  font-size: var(--tp-font-md);
+}
+
+.step-content {
+  display: grid;
+  gap: var(--tp-space-1);
+  min-inline-size: 0;
+}
+
+.step-label {
+  color: var(--tp-text-dark);
+  font-size: var(--tp-font-md);
+  font-weight: 600;
+}
+
+.step-description {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+}
+
+// ─── Step Status Variants ────────────────────────────────────────────────────
+
+.step-pending {
+  border-inline-start-color: var(--tp-border);
+
+  .step-icon {
+    color: var(--tp-grey-light);
+  }
+
+  .step-label {
+    color: var(--tp-text-muted);
+  }
+}
+
+.step-in-progress {
+  border-inline-start-color: var(--tp-primary);
+  background: color-mix(in srgb, var(--tp-primary) 6%, transparent);
+
+  .step-icon {
+    color: var(--tp-primary);
+  }
+
+  .step-label {
+    color: var(--tp-primary-dark);
+  }
+}
+
+.step-completed {
+  border-inline-start-color: var(--tp-primary);
+
+  .step-icon {
+    color: var(--tp-primary);
+  }
+
+  .step-label {
+    color: var(--tp-text-dark);
+  }
+}
+
+.step-failed {
+  border-inline-start-color: var(--tp-danger);
+  background: color-mix(in srgb, var(--tp-error) 6%, transparent);
+
+  .step-icon {
+    color: var(--tp-danger);
+  }
+
+  .step-label {
+    color: var(--tp-danger);
+  }
+}
+
+// ─── PrimeNG Message inline adjustments ──────────────────────────────────────
+
+:host ::ng-deep p-message {
+  .p-message {
+    padding: var(--tp-space-1) var(--tp-space-2);
+    font-size: var(--tp-font-xs);
+    border-radius: var(--nm-radius-xs);
+  }
+}
+
+// ─── PrimeNG ProgressBar tweaks ──────────────────────────────────────────────
+// Global tokens in styles.scss handle: --p-progressbar-*, --tp-progressbar-*
+// Only transition override is local (not tokenized globally).
+
+:host ::ng-deep p-progressbar .p-progressbar-value {
+  transition: width 0.3s ease;
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: bp.$bp-md) {
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+
+    p-button {
+      inline-size: 100%;
+    }
+  }
+
+  .provisioning-step {
+    padding: var(--tp-space-2);
+    gap: var(--tp-space-2);
+  }
+}

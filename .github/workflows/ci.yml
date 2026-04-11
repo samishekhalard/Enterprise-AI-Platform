@@ -1,0 +1,270 @@
+# ==============================================================================
+# EMSIST - Continuous Integration Pipeline
+#
+# Triggers: Pull requests and pushes to main/develop
+# Stages: Lint -> Build & Test -> Docker image verify
+# Does NOT push Docker images (see docker-publish.yml for that)
+# ==============================================================================
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "21"
+  NODE_VERSION: "22"
+
+jobs:
+  design-doc-governance:
+    name: Design Doc Governance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate design doc governance
+        run: ./scripts/check-design-doc-governance.sh
+
+      - name: Validate component showcase alignment
+        run: ./scripts/check-component-showcase-alignment.sh
+
+  # ──────────────────────────────────────────────────────────────
+  # Stage 1: Backend Build & Test
+  # ──────────────────────────────────────────────────────────────
+  backend-build-test:
+    name: Backend Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Build & Test (mvn verify)
+        working-directory: backend
+        run: mvn clean verify -B -q -Djava.version=21 -Dlombok.version=1.18.36
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: backend/**/target/surefire-reports/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────────────
+  # Stage 2: Frontend Build & Test
+  # ──────────────────────────────────────────────────────────────
+  frontend-build-test:
+    name: Frontend Build & Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Design system lint
+        run: npm run lint:design-system
+
+      - name: Design token contract
+        run: npm run check:design-tokens
+
+      - name: Component showcase alignment
+        run: npm run check:showcase-alignment
+
+      - name: Strict spacing drift on changed SCSS
+        working-directory: .
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            git fetch origin "${GITHUB_BASE_REF}" --depth=1
+            RANGE="origin/${GITHUB_BASE_REF}...HEAD"
+          elif git rev-parse HEAD^ >/dev/null 2>&1; then
+            RANGE="HEAD^...HEAD"
+          else
+            RANGE="HEAD"
+          fi
+          mapfile -t changed_scss < <(git diff --name-only --diff-filter=ACMR "$RANGE" | grep '^frontend/src/.*\.scss$' || true)
+          if [[ ${#changed_scss[@]} -eq 0 ]]; then
+            echo "No changed frontend SCSS files detected."
+            exit 0
+          fi
+          bash scripts/check-spacing-scale.sh --fail-on-warnings "${changed_scss[@]}"
+
+      - name: Admin style token contract
+        run: npm run check:admin-style-tokens
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Design system contract tests
+        run: npm run test:design-system
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build:prod
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 14
+
+  # ──────────────────────────────────────────────────────────────
+  # Stage 3: Docker Image Build Verification (no push)
+  # Verifies that all Dockerfiles build successfully.
+  # ──────────────────────────────────────────────────────────────
+  docker-verify-backend:
+    name: "Docker Verify: ${{ matrix.service }}"
+    needs: [backend-build-test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: api-gateway
+            context: backend
+            dockerfile: backend/api-gateway/Dockerfile
+          - service: auth-facade
+            context: backend
+            dockerfile: backend/auth-facade/Dockerfile
+          - service: tenant-service
+            context: backend
+            dockerfile: backend/tenant-service/Dockerfile
+          - service: user-service
+            context: backend
+            dockerfile: backend/user-service/Dockerfile
+          - service: license-service
+            context: backend
+            dockerfile: backend/license-service/Dockerfile
+          - service: notification-service
+            context: backend
+            dockerfile: backend/notification-service/Dockerfile
+          - service: audit-service
+            context: backend
+            dockerfile: backend/audit-service/Dockerfile
+          - service: ai-service
+            context: backend
+            dockerfile: backend/ai-service/Dockerfile
+          - service: process-service
+            context: backend
+            dockerfile: backend/process-service/Dockerfile
+          - service: definition-service
+            context: backend
+            dockerfile: backend/definition-service/Dockerfile
+          - service: eureka-server
+            context: backend/eureka-server
+            dockerfile: backend/eureka-server/Dockerfile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (no push)
+        run: |
+          docker build \
+            -t emsist/${{ matrix.service }}:ci-${{ github.sha }} \
+            -f ${{ matrix.dockerfile }} \
+            ${{ matrix.context }}/
+
+      - name: Verify image exists
+        run: docker image inspect emsist/${{ matrix.service }}:ci-${{ github.sha }} > /dev/null
+
+  docker-verify-frontend:
+    name: "Docker Verify: frontend"
+    needs: [frontend-build-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (no push)
+        run: |
+          docker build \
+            -t emsist/frontend:ci-${{ github.sha }} \
+            frontend/
+
+      - name: Verify image exists
+        run: docker image inspect emsist/frontend:ci-${{ github.sha }} > /dev/null
+
+  docker-verify-keycloak-init:
+    name: "Docker Verify: keycloak-init"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (no push)
+        run: |
+          docker build \
+            -t emsist/keycloak-init:ci-${{ github.sha }} \
+            infrastructure/keycloak/
+
+      - name: Verify image exists
+        run: docker image inspect emsist/keycloak-init:ci-${{ github.sha }} > /dev/null
+
+  # ──────────────────────────────────────────────────────────────
+  # Summary gate: all jobs must pass
+  # ──────────────────────────────────────────────────────────────
+  ci-gate:
+    name: CI Gate
+    needs:
+      - design-doc-governance
+      - backend-build-test
+      - frontend-build-test
+      - docker-verify-backend
+      - docker-verify-frontend
+      - docker-verify-keycloak-init
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.backend-build-test.result }}" != "success" ]] || \
+             [[ "${{ needs.design-doc-governance.result }}" != "success" ]] || \
+             [[ "${{ needs.frontend-build-test.result }}" != "success" ]] || \
+             [[ "${{ needs.docker-verify-backend.result }}" != "success" ]] || \
+             [[ "${{ needs.docker-verify-frontend.result }}" != "success" ]] || \
+             [[ "${{ needs.docker-verify-keycloak-init.result }}" != "success" ]]; then
+            echo "One or more CI stages failed."
+            exit 1
+          fi
+          echo "All CI stages passed."

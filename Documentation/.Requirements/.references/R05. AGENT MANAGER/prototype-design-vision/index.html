@@ -1,0 +1,3612 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Platform - EMSIST Wireframe Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Primary font: Gotham Rounded (loaded from /assets/fonts/ in production). Nunito is the prototype fallback. -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Skip to content link (a11y) -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Toast notification container -->
+  <div class="toast-container" aria-live="polite"></div>
+
+  <!-- Confirmation dialog -->
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Confirm Action</div>
+      <div class="modal-body">Are you sure?</div>
+      <div class="modal-actions">
+        <button class="btn-cancel">Cancel</button>
+        <button class="btn-confirm primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar overlay for mobile -->
+  <div class="sidebar-overlay"></div>
+
+  <div class="app-shell">
+    <button class="hamburger-btn" aria-label="Toggle navigation">&#x2630;</button>
+
+    <!-- ============================================================
+         SIDEBAR NAVIGATION
+         ============================================================ -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">EM</div>
+        <span class="sidebar-title">Agent Platform</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-page="page-chat">
+          <span class="nav-icon">&#x1F4AC;</span>
+          <span>Chat</span>
+        </div>
+        <div class="nav-item" data-page="page-agents">
+          <span class="nav-icon">&#x1F916;</span>
+          <span>Agents</span>
+        </div>
+        <div class="nav-item" data-page="page-gallery">
+          <span class="nav-icon">&#x1F4DA;</span>
+          <span>Template Gallery</span>
+        </div>
+        <div class="nav-item" data-page="page-builder">
+          <span class="nav-icon">&#x1F527;</span>
+          <span>Agent Builder</span>
+        </div>
+        <div class="nav-item" data-page="page-skills">
+          <span class="nav-icon">&#x26A1;</span>
+          <span>Skills</span>
+        </div>
+        <div class="nav-item" data-page="page-training">
+          <span class="nav-icon">&#x1F4CA;</span>
+          <span>Training</span>
+        </div>
+        <div class="nav-item" data-page="page-analytics">
+          <span class="nav-icon">&#x1F4C8;</span>
+          <span>Analytics</span>
+        </div>
+        <div class="nav-item" data-page="page-eval">
+          <span class="nav-icon">&#x1F9EA;</span>
+          <span>Eval Harness</span>
+        </div>
+        <div class="nav-item" data-page="page-audit">
+          <span class="nav-icon">&#x1F4CB;</span>
+          <span>Audit Log</span>
+        </div>
+        <div class="nav-item" data-page="page-pipeline">
+          <span class="nav-icon">&#x1F504;</span>
+          <span>Pipeline</span>
+        </div>
+        <div class="nav-item" data-page="page-notifications">
+          <span class="nav-icon">&#x1F514;</span>
+          <span>Notifications</span>
+        </div>
+        <div class="nav-item" data-page="page-knowledge">
+          <span class="nav-icon">&#x1F9E0;</span>
+          <span>Knowledge</span>
+        </div>
+        <div class="nav-item" data-page="page-comparison">
+          <span class="nav-icon">&#x2696;&#xFE0F;</span>
+          <span>Compare</span>
+        </div>
+        <div class="nav-item" data-page="page-settings">
+          <span class="nav-icon">&#x2699;&#xFE0F;</span>
+          <span>Settings</span>
+        </div>
+        <div class="nav-separator"></div>
+        <div class="nav-section-label">Super Agent</div>
+        <div class="nav-item" data-page="page-workspace">
+          <span class="nav-icon">&#x1F3AF;</span>
+          <span>Workspace</span>
+        </div>
+        <div class="nav-item" data-page="page-approval">
+          <span class="nav-icon">&#x2705;</span>
+          <span>Approvals</span>
+        </div>
+        <div class="nav-item" data-page="page-maturity">
+          <span class="nav-icon">&#x1F4C8;</span>
+          <span>Maturity</span>
+        </div>
+        <div class="nav-item" data-page="page-triggers">
+          <span class="nav-icon">&#x26A1;</span>
+          <span>Triggers</span>
+        </div>
+        <div class="nav-item" data-page="page-embedded">
+          <span class="nav-icon">&#x1F4F1;</span>
+          <span>Embedded</span>
+        </div>
+        <div class="nav-item" data-page="page-benchmarking">
+          <span class="nav-icon">&#x1F3C6;</span>
+          <span>Benchmarking</span>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-avatar">MK</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name">M. Khan</span>
+        </div>
+      </div>
+      <div class="sidebar-user">
+        <div class="persona-switcher">
+          <label for="persona-select" class="persona-label">Active Persona</label>
+          <select id="persona-select" class="persona-select" aria-label="Switch persona role">
+            <option value="platform-admin" selected>Platform Admin</option>
+            <option value="tenant-admin">Tenant Admin</option>
+            <option value="agent-designer">Agent Designer</option>
+            <option value="user">Regular User</option>
+            <option value="viewer">Viewer</option>
+          </select>
+          <span id="role-badge" class="role-badge role-platform-admin">Platform Admin</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============================================================
+         MAIN CONTENT AREA
+         ============================================================ -->
+    <main class="main-content" id="main-content">
+
+      <!-- ========================================================
+           PAGE 1: CHAT
+           ======================================================== -->
+      <div id="page-chat" class="page active">
+        <div class="chat-layout">
+          <!-- Chat Sidebar -->
+          <div class="chat-sidebar">
+            <div class="chat-sidebar-header">
+              <button class="btn btn-primary">+ New Chat</button>
+              <input type="text" placeholder="Search conversations...">
+            </div>
+            <div class="chat-sidebar-list">
+              <div class="conversation-item active">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-data)">DA</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">Q3 Revenue Analysis</div>
+                  <div class="conversation-time">2 min ago</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-code)">CR</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">PR #412 Security Review</div>
+                  <div class="conversation-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-support)">CS</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">Customer Onboarding FAQ</div>
+                  <div class="conversation-time">3 hours ago</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-document)">DP</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">Contract Clause Extraction</div>
+                  <div class="conversation-time">Yesterday</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">OR</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">Multi-agent Workflow Test</div>
+                  <div class="conversation-time">Yesterday</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-data)">DA</div>
+                <div class="conversation-meta">
+                  <div class="conversation-title">Churn Prediction Model</div>
+                  <div class="conversation-time">2 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Main -->
+          <div class="chat-main">
+            <div class="chat-topbar">
+              <div class="avatar avatar-md" style="background:var(--ai-agent-data)">DA</div>
+              <div class="chat-topbar-info">
+                <span class="chat-topbar-name">Data Analyst Agent</span>
+                <span class="chat-topbar-status">
+                  <span class="status-dot status-online"></span>
+                  Online &middot; Ollama 24B &middot; Analytics Skill v2.1
+                </span>
+              </div>
+              <div style="flex:1"></div>
+              <span class="badge badge-info">Local Model</span>
+              <button class="btn btn-outline btn-sm" onclick="switchPage('page-workspace')" style="margin-left:8px" aria-label="Open workspace">Open Workspace</button>
+            </div>
+
+            <div class="chat-messages" aria-live="polite">
+              <div class="message-row agent">
+                <div class="avatar avatar-md" style="background:var(--ai-agent-data)">DA</div>
+                <div>
+                  <div class="message-bubble">
+                    Hello! I'm your Data Analyst agent. I can help you analyze datasets, generate reports, and find insights in your business data. What would you like to explore today?
+                  </div>
+                  <div class="message-meta">
+                    <span>10:30 AM</span>
+                    <span class="badge badge-primary">Ollama 24B</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="message-row user">
+                <div>
+                  <div class="message-bubble">
+                    Can you analyze our Q3 revenue data and identify the top-performing product categories?
+                  </div>
+                  <div class="message-meta">10:31 AM</div>
+                </div>
+              </div>
+
+              <div class="message-row agent">
+                <div class="avatar avatar-md" style="background:var(--ai-agent-data)">DA</div>
+                <div>
+                  <div class="message-bubble">
+                    I'll analyze the Q3 revenue data for you. Let me query the data warehouse and break down performance by product category.
+                    <div class="tool-panel">
+                      <div class="tool-panel-header">
+                        &#x2705; query_data_warehouse &middot; Completed in 1.2s
+                      </div>
+                    </div>
+                    <div style="margin-top:12px">
+                      <strong>Q3 Revenue Analysis - Top Categories:</strong>
+                      <ol style="margin:8px 0 0 20px; line-height:1.8">
+                        <li><strong>Enterprise SaaS</strong> - $4.2M (+23% QoQ)</li>
+                        <li><strong>API Services</strong> - $2.8M (+18% QoQ)</li>
+                        <li><strong>Professional Services</strong> - $1.9M (+7% QoQ)</li>
+                        <li><strong>Training &amp; Certification</strong> - $890K (+34% QoQ)</li>
+                      </ol>
+                      <p style="margin-top:8px; color: var(--ai-text-secondary)">Enterprise SaaS remains the largest revenue driver, but Training &amp; Certification shows the highest growth rate at 34% quarter-over-quarter.</p>
+                    </div>
+                  </div>
+                  <div class="message-meta">
+                    <span>10:31 AM</span>
+                    <span class="badge badge-primary">Ollama 24B</span>
+                    <span class="badge badge-success">High confidence</span>
+                  </div>
+                  <div class="message-actions">
+                    <button title="Helpful">&#x1F44D;<span class="sr-only">Mark as helpful</span></button>
+                    <button title="Not helpful">&#x1F44E;<span class="sr-only">Mark as unhelpful</span></button>
+                    <button title="Copy">&#x1F4CB;<span class="sr-only">Copy to clipboard</span></button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="message-row user">
+                <div>
+                  <div class="message-bubble">
+                    Great analysis. Can you also show me the month-over-month trend for Enterprise SaaS?
+                  </div>
+                  <div class="message-meta">10:32 AM</div>
+                </div>
+              </div>
+
+              <!-- Typing indicator -->
+              <div class="message-row agent">
+                <div class="avatar avatar-md" style="background:var(--ai-agent-data)">DA</div>
+                <div class="typing-indicator">
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <div class="chat-input-wrap">
+                <button class="btn-ghost" style="font-size:1.1rem; padding:4px" title="Attach file">&#x1F4CE;<span class="sr-only">Attach file</span></button>
+                <textarea rows="1" placeholder="Ask the Data Analyst agent..."></textarea>
+                <button class="chat-send-btn" title="Send message">&#x2191;<span class="sr-only">Send message</span></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Context Panel -->
+          <div class="chat-context-panel">
+            <div class="context-block">
+              <div class="context-section-title">Agent Info</div>
+              <div class="context-agent-info">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-data)">DA</div>
+                <div class="context-agent-name">Data Analyst Agent</div>
+                <span class="badge badge-info">Worker: Ollama 24B</span>
+                <p class="context-agent-desc">Analyzes datasets, generates reports, identifies trends and anomalies in business data.</p>
+              </div>
+            </div>
+
+            <div class="context-block">
+              <div class="context-section-title">Active Skill</div>
+              <div style="font-size:0.8125rem">
+                <div style="font-weight:600">Analytics Skill v2.1</div>
+                <p style="color:var(--ai-text-secondary); margin-top:4px; font-size:0.75rem">SQL generation, statistical analysis, trend detection, anomaly identification.</p>
+              </div>
+            </div>
+
+            <div class="context-block">
+              <div class="context-section-title">Knowledge Sources</div>
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                Revenue Data Warehouse (2,340 docs)
+              </div>
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                Product Catalog (890 docs)
+              </div>
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                Business Glossary (156 docs)
+              </div>
+            </div>
+
+            <div>
+              <div class="context-section-title">Retrieved Documents</div>
+              <div style="font-size:0.8125rem; color:var(--ai-text-secondary)">
+                <div style="padding:6px 0; border-bottom:1px solid var(--ai-border-subtle)">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>q3_revenue_summary.csv</span>
+                    <span class="badge badge-success">0.94</span>
+                  </div>
+                </div>
+                <div style="padding:6px 0; border-bottom:1px solid var(--ai-border-subtle)">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>product_category_mapping.json</span>
+                    <span class="badge badge-success">0.91</span>
+                  </div>
+                </div>
+                <div style="padding:6px 0;">
+                  <div style="display:flex; justify-content:space-between;">
+                    <span>kpi_definitions_2024.md</span>
+                    <span class="badge badge-primary">0.82</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 2: AGENTS (List/Grid)
+           ======================================================== -->
+      <div id="page-agents" class="page">
+        <div class="page-header">
+          <h1>Agents</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="loading">Loading</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <button class="btn btn-primary" onclick="switchPage('page-gallery')">+ New Agent</button>
+          </div>
+        </div>
+
+        <div class="agents-controls">
+          <div class="search-input-wrap">
+            <span class="search-icon">&#x1F50D;</span>
+            <input type="text" placeholder="Search agents...">
+          </div>
+          <div class="filter-chips">
+            <span class="chip active">All</span>
+            <span class="chip">Data</span>
+            <span class="chip">Support</span>
+            <span class="chip">Code</span>
+            <span class="chip">Document</span>
+            <span class="chip">Custom</span>
+          </div>
+          <div style="flex:1"></div>
+          <div class="sort-dropdown">
+            <label class="sr-only" for="agents-sort">Sort by</label>
+            <select id="agents-sort">
+              <option value="name">Name</option>
+              <option value="date">Date Created</option>
+              <option value="status">Status</option>
+              <option value="usage">Usage</option>
+            </select>
+          </div>
+          <div class="view-toggle">
+            <button class="active" data-view="grid">Grid</button>
+            <button data-view="table">Table</button>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+          <div class="agents-grid">
+            <!-- Agent 1 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-data)">DA</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Data Analyst</div>
+                  <span class="badge badge-hierarchy-worker">Worker</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-info">Data Analytics</span>
+                    <span class="badge badge-maturity-pilot">Pilot</span>
+                    <span class="status-dot status-online" title="Online"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Analyzes datasets, generates reports, identifies trends and anomalies.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> 1.2s</div>
+                <div><span class="agent-card-stat-label">Success:</span> 98.2%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 1,247</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 24B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" onclick="switchPage('page-chat')">Chat</button>
+              </div>
+            </div>
+
+            <!-- Agent 2 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-support)">CS</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Customer Support</div>
+                  <span class="badge badge-hierarchy-worker">Worker</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-success">Support</span>
+                    <span class="badge badge-maturity-graduate">Graduate</span>
+                    <span class="status-dot status-online" title="Online"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Handles customer inquiries, resolves tickets, and provides product guidance.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> 0.8s</div>
+                <div><span class="agent-card-stat-label">Success:</span> 95.7%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 3,891</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 8B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" onclick="switchPage('page-chat')">Chat</button>
+              </div>
+            </div>
+
+            <!-- Agent 3 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-code)">CR</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Code Reviewer</div>
+                  <span class="badge badge-hierarchy-worker">Worker</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-amber">Code</span>
+                    <span class="badge badge-maturity-copilot">Co-pilot</span>
+                    <span class="status-dot status-online" title="Online"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Reviews pull requests, identifies security vulnerabilities, and suggests improvements.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> 2.4s</div>
+                <div><span class="agent-card-stat-label">Success:</span> 97.1%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 892</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 24B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" onclick="switchPage('page-chat')">Chat</button>
+              </div>
+            </div>
+
+            <!-- Agent 4 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-document)">DP</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Document Processor</div>
+                  <span class="badge badge-hierarchy-worker">Worker</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-pink">Document</span>
+                    <span class="badge badge-maturity-coaching">Coaching</span>
+                    <span class="status-dot status-busy" title="Busy"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Extracts data from contracts, invoices, and legal documents using NLP.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> 3.1s</div>
+                <div><span class="agent-card-stat-label">Success:</span> 94.3%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 567</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 24B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" onclick="switchPage('page-chat')">Chat</button>
+              </div>
+            </div>
+
+            <!-- Agent 5 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-orchestrator)">OR</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">Orchestrator</div>
+                  <span class="badge badge-hierarchy-super">Super Agent</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-purple">Orchestrator</span>
+                    <span class="badge badge-maturity-graduate">Graduate</span>
+                    <span class="status-dot status-online" title="Online"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Routes tasks to specialized agents, coordinates multi-step workflows.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> 0.3s</div>
+                <div><span class="agent-card-stat-label">Success:</span> 99.1%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 5,612</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 8B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" onclick="switchPage('page-chat')">Chat</button>
+              </div>
+            </div>
+
+            <!-- Agent 6 -->
+            <div class="agent-card">
+              <button class="context-menu-btn" aria-label="More actions">&#x22EE;</button>
+              <div class="context-menu">
+                <div class="context-menu-item" data-action="edit">&#x270F;&#xFE0F; Edit</div>
+                <div class="context-menu-item" data-action="duplicate">&#x1F4CB; Duplicate</div>
+                <div class="context-menu-item" data-action="export">&#x1F4E4; Export</div>
+                <div class="context-menu-item danger" data-action="delete">&#x1F5D1;&#xFE0F; Delete</div>
+              </div>
+              <div class="agent-card-header">
+                <div class="avatar avatar-lg" style="background:var(--ai-agent-custom)">QA</div>
+                <div class="agent-card-info">
+                  <div class="agent-card-name">QA Test Writer</div>
+                  <span class="badge badge-hierarchy-sub">Sub-Orchestrator</span>
+                  <div class="agent-card-type">
+                    <span class="badge badge-primary">Custom</span>
+                    <span class="badge badge-maturity-copilot">Co-pilot</span>
+                    <span class="status-dot status-offline" title="Offline"></span>
+                  </div>
+                </div>
+              </div>
+              <p style="font-size:0.8125rem; color:var(--ai-text-secondary)">Generates test cases from user stories and validates acceptance criteria.</p>
+              <div class="agent-card-stats">
+                <div><span class="agent-card-stat-label">Latency:</span> --</div>
+                <div><span class="agent-card-stat-label">Success:</span> 91.8%</div>
+                <div><span class="agent-card-stat-label">Conversations:</span> 214</div>
+                <div><span class="agent-card-stat-label">Model:</span> Ollama 24B</div>
+              </div>
+              <div class="agent-card-actions">
+                <button class="btn btn-outline btn-sm">Configure</button>
+                <button class="btn btn-primary btn-sm" disabled>Offline</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table View (hidden by default) -->
+          <div class="agents-table-wrap" style="display:none">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Model</th>
+                  <th>Latency</th>
+                  <th>Success Rate</th>
+                  <th>Conversations</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-data)">DA</div>
+                    Data Analyst
+                  </td>
+                  <td><span class="badge badge-info">Data</span></td>
+                  <td><span class="status-dot status-online"></span> Online</td>
+                  <td>Ollama 24B</td>
+                  <td>1.2s</td>
+                  <td>98.2%</td>
+                  <td>1,247</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-support)">CS</div>
+                    Customer Support
+                  </td>
+                  <td><span class="badge badge-success">Support</span></td>
+                  <td><span class="status-dot status-online"></span> Online</td>
+                  <td>Ollama 8B</td>
+                  <td>0.8s</td>
+                  <td>95.7%</td>
+                  <td>3,891</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-code)">CR</div>
+                    Code Reviewer
+                  </td>
+                  <td><span class="badge badge-amber">Code</span></td>
+                  <td><span class="status-dot status-online"></span> Online</td>
+                  <td>Ollama 24B</td>
+                  <td>2.4s</td>
+                  <td>97.1%</td>
+                  <td>892</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-document)">DP</div>
+                    Document Processor
+                  </td>
+                  <td><span class="badge badge-pink">Document</span></td>
+                  <td><span class="status-dot status-busy"></span> Busy</td>
+                  <td>Ollama 24B</td>
+                  <td>3.1s</td>
+                  <td>94.3%</td>
+                  <td>567</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">OR</div>
+                    Orchestrator
+                  </td>
+                  <td><span class="badge badge-purple">Orchestrator</span></td>
+                  <td><span class="status-dot status-online"></span> Online</td>
+                  <td>Ollama 8B</td>
+                  <td>0.3s</td>
+                  <td>99.1%</td>
+                  <td>5,612</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+                <tr>
+                  <td style="display:flex; align-items:center; gap:8px">
+                    <div class="avatar avatar-sm" style="background:var(--ai-agent-custom)">QA</div>
+                    QA Test Writer
+                  </td>
+                  <td><span class="badge badge-primary">Custom</span></td>
+                  <td><span class="status-dot status-offline"></span> Offline</td>
+                  <td>Ollama 24B</td>
+                  <td>--</td>
+                  <td>91.8%</td>
+                  <td>214</td>
+                  <td><button class="btn btn-ghost btn-sm">Configure</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination" aria-label="Agents pagination">
+            <button aria-label="Previous page">&#x2039;</button>
+            <button class="active" aria-current="page">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button aria-label="Next page">&#x203A;</button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div data-view-state="loading" style="display:none">
+          <div class="agents-grid">
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:56px; height:56px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:56px; height:56px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:56px; height:56px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F916;</div>
+            <h3>No agents yet</h3>
+            <p>Create your first AI agent by selecting a template from the gallery or building one from scratch.</p>
+            <button class="btn btn-primary" onclick="switchPage('page-gallery')">Browse Template Gallery</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 3: TEMPLATE GALLERY
+           ======================================================== -->
+      <div id="page-gallery" class="page">
+        <div class="page-header">
+          <h1>Agent Configurations</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <button class="btn btn-primary" onclick="switchPage('page-builder')">Build from Scratch</button>
+          </div>
+        </div>
+
+        <!-- Populated -->
+        <div data-view-state="populated">
+          <div class="gallery-search">
+            <input type="text" placeholder="Search agent configurations by name, description, or tags..." aria-label="Search configurations">
+            <div class="filter-chips gallery-filters" role="listbox" aria-label="Filter by category">
+              <div class="chip active" role="option" data-category="all" aria-selected="true">All</div>
+              <div class="chip" role="option" data-category="analytics">Analytics</div>
+              <div class="chip" role="option" data-category="security">Security</div>
+              <div class="chip" role="option" data-category="code">Code Review</div>
+              <div class="chip" role="option" data-category="support">Customer Support</div>
+              <div class="chip" role="option" data-category="document">Document Processing</div>
+              <div class="chip" role="option" data-category="workflow">Workflow</div>
+            </div>
+          </div>
+
+          <div class="gallery-grid" role="list">
+            <!-- Template 1 -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-data)">&#x1F4CA;</div>
+                <div>
+                  <div class="template-card-title">Data Analyst</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-info">Data Analytics</span>
+                    <span class="badge badge-primary">Platform</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Analyzes datasets, generates SQL queries, identifies trends, and produces data visualizations with natural language explanations.</div>
+              <div class="template-card-meta">
+                <span>5 skills &middot; 12 tools</span>
+                <span>Used 247 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+
+            <!-- Template 2 -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-support)">&#x1F3A7;</div>
+                <div>
+                  <div class="template-card-title">Customer Support</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-success">Support</span>
+                    <span class="badge badge-primary">Platform</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Resolves customer inquiries, accesses knowledge base, creates tickets, and escalates complex issues with full context.</div>
+              <div class="template-card-meta">
+                <span>4 skills &middot; 8 tools</span>
+                <span>Used 891 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+
+            <!-- Template 3 -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-code)">&#x1F4BB;</div>
+                <div>
+                  <div class="template-card-title">Code Reviewer</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-amber">Code</span>
+                    <span class="badge badge-primary">Platform</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Reviews PRs for security vulnerabilities, code quality issues, performance bottlenecks, and architectural anti-patterns.</div>
+              <div class="template-card-meta">
+                <span>6 skills &middot; 15 tools</span>
+                <span>Used 156 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+
+            <!-- Template 4 -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-document)">&#x1F4C4;</div>
+                <div>
+                  <div class="template-card-title">Document Processor</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-pink">Documents</span>
+                    <span class="badge badge-primary">Platform</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Extracts structured data from contracts, invoices, and legal documents. Supports PDF, DOCX, and image formats.</div>
+              <div class="template-card-meta">
+                <span>3 skills &middot; 7 tools</span>
+                <span>Used 312 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+
+            <!-- Template 5 -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-orchestrator)">&#x1F9E0;</div>
+                <div>
+                  <div class="template-card-title">Process Analyst</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-purple">Process</span>
+                    <span class="badge badge-primary">Platform</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Maps business processes, identifies bottlenecks, generates BPMN diagrams, and recommends optimizations.</div>
+              <div class="template-card-meta">
+                <span>4 skills &middot; 9 tools</span>
+                <span>Used 89 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+
+            <!-- Template 6 (Org) -->
+            <div class="template-card" role="listitem">
+              <div class="template-card-header">
+                <div class="template-card-icon" style="background:var(--ai-agent-custom)">&#x1F4CB;</div>
+                <div>
+                  <div class="template-card-title">HR Policy Assistant</div>
+                  <div class="template-card-tags" style="margin-top:4px">
+                    <span class="badge badge-primary">Custom</span>
+                    <span class="badge badge-info">Organization</span>
+                  </div>
+                </div>
+              </div>
+              <div class="template-card-desc">Answers employee questions about company policies, benefits, leave procedures, and compliance requirements.</div>
+              <div class="template-card-meta">
+                <span>2 skills &middot; 4 tools</span>
+                <span>Used 523 times</span>
+              </div>
+              <div class="template-card-actions">
+                <button class="btn btn-outline btn-sm" onclick="switchPage('page-builder')">Use Configuration</button>
+                <button class="btn btn-ghost btn-sm">Preview</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty -->
+        <div data-view-state="empty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F4DA;</div>
+            <h3>No configurations match your filters</h3>
+            <p>Try adjusting your search terms or clearing the active filters to see all available agent configurations.</p>
+            <button class="btn btn-outline">Clear Filters</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 4: AGENT BUILDER (3-panel)
+           ======================================================== -->
+      <div id="page-builder" class="page">
+        <div class="builder-toolbar">
+          <span class="builder-toolbar-name">New Custom Agent</span>
+          <span class="badge badge-warning" style="font-size:0.6875rem">Draft</span>
+          <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">v1.0</span>
+          <div style="flex:1"></div>
+          <div class="builder-toolbar-actions">
+            <button class="btn btn-ghost btn-sm">Version History</button>
+            <button class="btn btn-ghost btn-sm">Fork</button>
+            <button class="btn btn-outline btn-sm">Save Draft</button>
+            <button class="btn btn-outline btn-sm">Test</button>
+            <button class="btn btn-primary btn-sm">Publish</button>
+          </div>
+        </div>
+
+        <div class="builder-layout">
+          <!-- Left: Capability Library -->
+          <div class="builder-left">
+            <div class="builder-left-tabs" role="tablist" aria-label="Capability library">
+              <button role="tab" class="active" aria-selected="true" data-tab="skills">Skills</button>
+              <button role="tab" data-tab="tools">Tools</button>
+              <button role="tab" data-tab="knowledge">Knowledge</button>
+            </div>
+            <div style="padding:8px 12px">
+              <input type="text" placeholder="Search skills..." style="width:100%; font-size:0.75rem; padding:6px 10px">
+            </div>
+            <div class="builder-left-content">
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">SQL Query Generation</div>
+                  <div class="skill-item-desc">Generates SQL queries from natural language</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">4 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add SQL Query Generation to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Statistical Analysis</div>
+                  <div class="skill-item-desc">Descriptive and inferential statistics</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">3 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Statistical Analysis to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Data Visualization</div>
+                  <div class="skill-item-desc">Charts, graphs, and dashboard generation</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">5 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Data Visualization to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Trend Detection</div>
+                  <div class="skill-item-desc">Identifies patterns and anomalies in time series</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">2 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Trend Detection to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Report Generation</div>
+                  <div class="skill-item-desc">Produces formatted business reports</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">3 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Report Generation to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Code Review</div>
+                  <div class="skill-item-desc">Reviews code for quality and security issues</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">6 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Code Review to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Document Extraction</div>
+                  <div class="skill-item-desc">Extracts structured data from documents</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">4 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Document Extraction to agent">+</button>
+              </div>
+              <div class="skill-item" draggable="true">
+                <span class="skill-item-drag">&#x2630;</span>
+                <div class="skill-item-info">
+                  <div class="skill-item-name">Knowledge Q&amp;A</div>
+                  <div class="skill-item-desc">Answers questions from knowledge base</div>
+                </div>
+                <span class="badge badge-primary" style="font-size:0.625rem">2 tools</span>
+                <button class="capability-add-btn btn-add" aria-label="Add Knowledge Q and A to agent">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center: Builder Canvas -->
+          <div class="builder-center">
+            <div class="builder-section">
+              <div class="builder-section-header">
+                <span>Identity</span>
+                <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25BC;</span>
+              </div>
+              <div class="builder-section-body">
+                <div>
+                  <label>Agent Name</label>
+                  <input type="text" placeholder="Enter agent name..." value="Revenue Insights Agent">
+                </div>
+                <div>
+                  <label>Agent Role</label>
+                  <select id="builder-role-select" style="width:100%" aria-label="Select agent role">
+                    <option value="worker" selected>Worker</option>
+                    <option value="sub-orchestrator">Sub-Orchestrator</option>
+                    <option value="super-agent">Super Agent</option>
+                  </select>
+                </div>
+                <div id="builder-domain-assign" style="display:none">
+                  <label>Domain Assignment</label>
+                  <select style="width:100%" aria-label="Select domain assignment">
+                    <option value="ea">Enterprise Architecture</option>
+                    <option value="performance">Performance Management</option>
+                    <option value="grc">GRC (Governance, Risk, Compliance)</option>
+                    <option value="km">Knowledge Management</option>
+                    <option value="service-design">Service Design</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Purpose</label>
+                  <textarea rows="2" placeholder="Describe what this agent does...">Analyzes revenue data, identifies growth opportunities, and generates executive-ready reports with actionable recommendations.</textarea>
+                </div>
+                <div>
+                  <label>Greeting Message</label>
+                  <input type="text" placeholder="First message the agent sends..." value="Welcome! I can help you explore revenue trends, compare performance across segments, and surface growth opportunities. What would you like to analyze?">
+                </div>
+              </div>
+            </div>
+
+            <div class="builder-section">
+              <div class="builder-section-header">
+                <span>System Prompt</span>
+                <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25BC;</span>
+              </div>
+              <div class="builder-section-body">
+                <textarea class="prompt-editor" rows="10">You are a Revenue Insights Agent for {{tenant_name}}.
+
+Your role is to analyze financial and revenue data, identify trends, and provide actionable business intelligence.
+
+## Core Capabilities
+- Query revenue databases using SQL
+- Perform statistical analysis on financial metrics
+- Generate visualizations for executive presentations
+- Detect anomalies and seasonal patterns
+- Compare performance across segments, regions, and time periods
+
+## Behavioral Rules
+- Always cite data sources and time ranges
+- Present numbers with proper formatting ($X.XM, +X.X%)
+- Flag statistical significance when making comparisons
+- Never make predictions without confidence intervals
+- Escalate to human analyst for decisions exceeding $1M impact
+
+## Tools Available
+{{tools_list}}</textarea>
+              </div>
+            </div>
+
+            <div class="builder-section">
+              <div class="builder-section-header">
+                <span>Active Skills</span>
+                <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25BC;</span>
+              </div>
+              <div class="builder-section-body">
+                <div class="active-chips">
+                  <span class="active-chip">SQL Query Generation <span class="remove">&times;</span></span>
+                  <span class="active-chip">Statistical Analysis <span class="remove">&times;</span></span>
+                  <span class="active-chip">Data Visualization <span class="remove">&times;</span></span>
+                  <span class="active-chip">Report Generation <span class="remove">&times;</span></span>
+                  <a href="#" style="font-size:0.75rem; padding:4px 8px">+ Add Skill</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="builder-section">
+              <div class="builder-section-header">
+                <span>Active Tools</span>
+                <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25BC;</span>
+              </div>
+              <div class="builder-section-body">
+                <div class="active-chips">
+                  <span class="active-chip">query_database <span class="remove">&times;</span></span>
+                  <span class="active-chip">calculate_statistics <span class="remove">&times;</span></span>
+                  <span class="active-chip">generate_chart <span class="remove">&times;</span></span>
+                  <span class="active-chip">format_report <span class="remove">&times;</span></span>
+                  <span class="active-chip">send_notification <span class="remove">&times;</span></span>
+                  <a href="#" style="font-size:0.75rem; padding:4px 8px">+ Add Tool</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="builder-section">
+              <div class="builder-section-header">
+                <span>Model Configuration</span>
+                <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25B6;</span>
+              </div>
+              <div class="builder-section-body">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                  <div>
+                    <label>Model Provider</label>
+                    <select style="width:100%">
+                      <option>Ollama (Local)</option>
+                      <option>Cloud (Claude)</option>
+                      <option>Cloud (Codex)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Model</label>
+                    <select style="width:100%">
+                      <option>llama3:24b (Worker)</option>
+                      <option>mistral:7b (Orchestrator)</option>
+                      <option>codellama:34b</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Temperature: 0.7</label>
+                    <input type="range" min="0" max="20" value="7" style="width:100%; border:none; padding:0; background:transparent">
+                  </div>
+                  <div>
+                    <label>Max Turns: 10</label>
+                    <input type="range" min="1" max="20" value="10" style="width:100%; border:none; padding:0; background:transparent">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Prompt Playground -->
+          <div class="builder-right">
+            <div class="playground-header">
+              <span>Prompt Playground</span>
+              <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">&#x25C0;</span>
+            </div>
+            <div class="playground-messages">
+              <div style="font-size:0.8125rem; color:var(--ai-text-secondary); text-align:center; padding:20px">
+                Send a test message to preview how your agent responds with the current configuration.
+              </div>
+              <div class="message-row agent" style="max-width:100%">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-custom)">RI</div>
+                <div>
+                  <div class="message-bubble" style="font-size:0.8125rem; padding:10px 14px">
+                    Welcome! I can help you explore revenue trends, compare performance across segments, and surface growth opportunities. What would you like to analyze?
+                  </div>
+                </div>
+              </div>
+              <div class="message-row user" style="max-width:100%">
+                <div>
+                  <div class="message-bubble" style="font-size:0.8125rem; padding:10px 14px">
+                    Show me last quarter's revenue by region
+                  </div>
+                </div>
+              </div>
+              <div class="message-row agent" style="max-width:100%">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-custom)">RI</div>
+                <div>
+                  <div class="message-bubble" style="font-size:0.8125rem; padding:10px 14px">
+                    <div class="tool-panel" style="margin:0 0 8px 0; font-size:0.75rem">
+                      <div class="tool-panel-header" style="font-size:0.75rem">
+                        &#x2705; query_database &middot; 0.8s
+                      </div>
+                    </div>
+                    Here is Q3 revenue by region:
+                    <ul style="margin:6px 0 0 16px; line-height:1.7; font-size:0.8125rem">
+                      <li>North America: $5.2M (+12%)</li>
+                      <li>EMEA: $3.1M (+8%)</li>
+                      <li>APAC: $1.8M (+21%)</li>
+                    </ul>
+                  </div>
+                  <div style="margin-top:4px">
+                    <span class="badge badge-success" style="font-size:0.625rem">Validation: 3/3 rules passed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="playground-input">
+              <textarea placeholder="Send a test message..."></textarea>
+              <button class="btn btn-primary btn-sm">Run</button>
+            </div>
+            <div style="padding:8px 16px; border-top:1px solid var(--ai-border)">
+              <button class="btn btn-outline btn-sm" style="width:100%; justify-content:center">Save as Test Case</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 5: SKILLS
+           ======================================================== -->
+      <div id="page-skills" class="page">
+        <div class="skill-editor-layout">
+          <!-- Skill Tree -->
+          <div class="skill-tree-panel">
+            <div class="skill-tree-header">
+              <input type="text" placeholder="Search skills..." style="width:100%; font-size:0.75rem; padding:6px 10px">
+              <button class="btn btn-primary btn-sm" style="width:100%; justify-content:center">+ New Skill</button>
+            </div>
+            <div class="skill-tree-list">
+              <div class="skill-tree-group-title">Data Analytics</div>
+              <div class="skill-tree-node active">&#x1F4CA; SQL Query Generation</div>
+              <div class="skill-tree-node">&#x1F4CA; Statistical Analysis</div>
+              <div class="skill-tree-node">&#x1F4CA; Data Visualization</div>
+              <div class="skill-tree-node">&#x1F4CA; Trend Detection</div>
+
+              <div class="skill-tree-group-title">Support</div>
+              <div class="skill-tree-node">&#x1F3A7; Knowledge Q&amp;A</div>
+              <div class="skill-tree-node">&#x1F3A7; Ticket Resolution</div>
+              <div class="skill-tree-node">&#x1F3A7; Escalation Handler</div>
+
+              <div class="skill-tree-group-title">Code</div>
+              <div class="skill-tree-node">&#x1F4BB; Code Review</div>
+              <div class="skill-tree-node">&#x1F4BB; Security Scan</div>
+              <div class="skill-tree-node">&#x1F4BB; Test Generation</div>
+
+              <div class="skill-tree-group-title">Document</div>
+              <div class="skill-tree-node">&#x1F4C4; Document Extraction</div>
+              <div class="skill-tree-node">&#x1F4C4; Contract Analysis</div>
+              <div class="skill-tree-node">&#x1F4C4; Report Generation</div>
+            </div>
+          </div>
+
+          <!-- Editor Main -->
+          <div class="skill-editor-main">
+            <div class="skill-editor-header">
+              <span style="font-size:1rem; font-weight:600">SQL Query Generation</span>
+              <span class="badge badge-success">Active</span>
+              <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">v2.1</span>
+              <div style="flex:1"></div>
+              <button class="btn btn-outline btn-sm">Save</button>
+              <button class="btn btn-primary btn-sm">Test</button>
+            </div>
+            <div class="skill-editor-tabs">
+              <button class="active">Prompt</button>
+              <button>Tools</button>
+              <button>Knowledge</button>
+              <button>Rules</button>
+              <button>Examples</button>
+              <button>History</button>
+            </div>
+            <div class="skill-editor-content">
+              <textarea class="prompt-editor" rows="20">You are a SQL query generation specialist.
+
+Given a natural language question about data, generate the appropriate SQL query to answer it.
+
+## Database Context
+- Use PostgreSQL syntax
+- Available schemas: {{available_schemas}}
+- Always include proper JOINs and WHERE clauses
+- Use CTEs for complex multi-step queries
+
+## Output Format
+1. Generated SQL query in a code block
+2. Brief explanation of what the query does
+3. Expected column names in the result
+4. Performance notes (estimated row count, index usage)
+
+## Safety Rules
+- NEVER generate DELETE, DROP, or TRUNCATE statements
+- Always use parameterized values for user input
+- Limit result sets to 10,000 rows by default
+- Include query cost estimation when possible
+
+## Example
+Question: "Show me the top 10 customers by revenue this quarter"
+```sql
+SELECT c.name, SUM(o.total_amount) AS quarterly_revenue
+FROM customers c
+JOIN orders o ON c.id = o.customer_id
+WHERE o.order_date >= DATE_TRUNC('quarter', CURRENT_DATE)
+GROUP BY c.name
+ORDER BY quarterly_revenue DESC
+LIMIT 10;
+```</textarea>
+            </div>
+          </div>
+
+          <!-- Test Panel -->
+          <div class="skill-test-panel">
+            <div class="playground-header">
+              <span>Test Skill</span>
+              <button class="btn btn-primary btn-sm">Run Test</button>
+            </div>
+            <div class="playground-messages">
+              <div style="padding:10px; font-size:0.8125rem">
+                <label style="display:block; margin-bottom:6px; color:var(--ai-text-tertiary); font-size:0.6875rem; text-transform:uppercase">Test Input</label>
+                <textarea rows="3" style="width:100%; font-size:0.8125rem" placeholder="Enter a test query...">What is the average order value per product category for the last 6 months?</textarea>
+              </div>
+              <div style="padding:10px; border-top:1px solid var(--ai-border)">
+                <label style="display:block; margin-bottom:6px; color:var(--ai-text-tertiary); font-size:0.6875rem; text-transform:uppercase">Test Output</label>
+                <div style="background:var(--ai-code-bg); padding:10px; border-radius:6px; font-family:var(--ai-font-mono); font-size:0.75rem; color:var(--ai-code-text); line-height:1.6; white-space:pre-wrap">SELECT pc.name AS category,
+  AVG(oi.unit_price * oi.quantity) AS avg_order_value,
+  COUNT(DISTINCT o.id) AS total_orders
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id
+JOIN product_categories pc ON p.category_id = pc.id
+JOIN orders o ON oi.order_id = o.id
+WHERE o.order_date >= CURRENT_DATE - INTERVAL '6 months'
+GROUP BY pc.name
+ORDER BY avg_order_value DESC;</div>
+              </div>
+              <div style="padding:10px; border-top:1px solid var(--ai-border)">
+                <label style="display:block; margin-bottom:6px; color:var(--ai-text-tertiary); font-size:0.6875rem; text-transform:uppercase">Quality Score</label>
+                <div style="display:flex; align-items:center; gap:8px">
+                  <div class="progress-bar" style="flex:1">
+                    <div class="progress-bar-fill" style="width:92%; background:var(--ai-success)"></div>
+                  </div>
+                  <span style="font-weight:600; color:var(--ai-success); font-size:0.875rem">92%</span>
+                </div>
+              </div>
+            </div>
+            <div style="padding:8px 16px; border-top:1px solid var(--ai-border)">
+              <button class="btn btn-outline btn-sm" style="width:100%; justify-content:center">Save as Test Case</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 6: TRAINING DASHBOARD
+           ======================================================== -->
+      <div id="page-training" class="page">
+        <div class="page-header">
+          <h1>Training Dashboard</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="loading">Loading</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <button class="btn btn-outline btn-sm">Settings</button>
+            <button class="btn btn-primary">Trigger Training Run</button>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+        <div class="training-metrics">
+          <div class="metric-card">
+            <span class="metric-label">Active Jobs</span>
+            <span class="metric-value">3</span>
+            <span class="metric-delta positive">&#x2191; 1 from yesterday</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Model Quality</span>
+            <span class="metric-value">87.4</span>
+            <span class="metric-delta positive">&#x2191; +2.1 from last run</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Training Data</span>
+            <span class="metric-value">24.3K</span>
+            <span class="metric-delta positive">&#x2191; +1,247 records this week</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Next Scheduled</span>
+            <span class="metric-value" style="font-size:1.25rem">3h 24m</span>
+            <span class="metric-delta" style="color:var(--ai-text-tertiary)">SFT run (auto-scheduled)</span>
+          </div>
+        </div>
+
+        <div class="training-content">
+          <!-- Training Jobs -->
+          <div class="training-section">
+            <div class="training-section-title">Training Jobs</div>
+            <div class="training-job-item">
+              <div style="width:4px; height:48px; border-radius:2px; background:var(--ai-primary); flex-shrink:0"></div>
+              <div class="training-job-info">
+                <div class="training-job-name">SFT - Data Analyst v2.2</div>
+                <div class="training-job-meta">
+                  <span class="badge badge-info" style="font-size:0.5625rem">SFT</span>
+                  <span>Epoch 3/5</span>
+                  <span>Loss: 0.342</span>
+                </div>
+                <div class="training-job-progress">
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width:60%; background:var(--ai-primary)"></div></div>
+                </div>
+              </div>
+              <button class="btn btn-outline-danger btn-sm">Stop</button>
+            </div>
+            <div class="training-job-item">
+              <div style="width:4px; height:48px; border-radius:2px; background:var(--ai-agent-orchestrator); flex-shrink:0"></div>
+              <div class="training-job-info">
+                <div class="training-job-name">DPO - Support Agent v1.8</div>
+                <div class="training-job-meta">
+                  <span class="badge badge-purple" style="font-size:0.5625rem">DPO</span>
+                  <span>Epoch 1/3</span>
+                  <span>Loss: 0.518</span>
+                </div>
+                <div class="training-job-progress">
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width:33%; background:var(--ai-agent-orchestrator)"></div></div>
+                </div>
+              </div>
+              <button class="btn btn-outline-danger btn-sm">Stop</button>
+            </div>
+            <div class="training-job-item">
+              <div style="width:4px; height:48px; border-radius:2px; background:var(--ai-success); flex-shrink:0"></div>
+              <div class="training-job-info">
+                <div class="training-job-name">RAG Update - Knowledge Base</div>
+                <div class="training-job-meta">
+                  <span class="badge badge-success" style="font-size:0.5625rem">RAG</span>
+                  <span>Completed</span>
+                  <span>312 docs indexed</span>
+                </div>
+                <div class="training-job-progress">
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width:100%; background:var(--ai-success)"></div></div>
+                </div>
+              </div>
+              <span style="font-size:0.75rem; color:var(--ai-success)">Done</span>
+            </div>
+            <div class="training-job-item">
+              <div style="width:4px; height:48px; border-radius:2px; background:var(--ai-error); flex-shrink:0"></div>
+              <div class="training-job-info">
+                <div class="training-job-name">Distillation - Code Reviewer</div>
+                <div class="training-job-meta">
+                  <span class="badge badge-error" style="font-size:0.5625rem">DISTILL</span>
+                  <span>Failed at epoch 2</span>
+                  <span>OOM error</span>
+                </div>
+                <div class="training-job-progress">
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width:40%; background:var(--ai-error)"></div></div>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm">Retry</button>
+            </div>
+          </div>
+
+          <!-- Model Quality -->
+          <div class="training-section">
+            <div class="training-section-title">Model Quality Over Time</div>
+            <div class="chart-placeholder" style="min-height:250px">
+              &#x1F4C8; Line chart: Quality score (0-100) over last 30 days<br>
+              <span style="font-size:0.75rem; margin-top:4px; display:block">Current: 87.4 | Previous: 85.3 | Baseline: 78.0</span>
+            </div>
+          </div>
+
+          <!-- Data Sources -->
+          <div class="training-section">
+            <div class="training-section-title">Data Source Health</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+              <div style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--ai-surface-raised); border-radius:6px">
+                <span class="status-dot status-online"></span>
+                <div>
+                  <div style="font-size:0.8125rem; font-weight:500">User Corrections</div>
+                  <div style="font-size:0.6875rem; color:var(--ai-text-tertiary)">4,231 records &middot; 2h ago</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--ai-surface-raised); border-radius:6px">
+                <span class="status-dot status-online"></span>
+                <div>
+                  <div style="font-size:0.8125rem; font-weight:500">Teacher Traces</div>
+                  <div style="font-size:0.6875rem; color:var(--ai-text-tertiary)">12,847 records &middot; 1h ago</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--ai-surface-raised); border-radius:6px">
+                <span class="status-dot status-online"></span>
+                <div>
+                  <div style="font-size:0.8125rem; font-weight:500">Business Patterns</div>
+                  <div style="font-size:0.6875rem; color:var(--ai-text-tertiary)">891 patterns &middot; 6h ago</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; padding:8px; background:var(--ai-surface-raised); border-radius:6px">
+                <span class="status-dot status-busy"></span>
+                <div>
+                  <div style="font-size:0.8125rem; font-weight:500">Customer Feedback</div>
+                  <div style="font-size:0.6875rem; color:var(--ai-text-tertiary)">6,384 ratings &middot; Syncing...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Training Data Distribution -->
+          <div class="training-section">
+            <div class="training-section-title">Training Data Distribution</div>
+            <div class="chart-placeholder" style="min-height:200px">
+              &#x1F4CA; Horizontal bar chart: Data by type<br>
+              <span style="font-size:0.75rem; margin-top:4px; display:block">Corrections: 4.2K | Teacher: 12.8K | Patterns: 891 | Rated: 6.4K</span>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Loading State -->
+        <div data-view-state="loading" style="display:none">
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:var(--ai-space-4); padding:var(--ai-space-5) var(--ai-space-8)">
+            <div class="skeleton-card"><div class="skeleton skeleton-line skeleton-line-short" style="margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-medium" style="height:32px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-short"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-line skeleton-line-short" style="margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-medium" style="height:32px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-short"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-line skeleton-line-short" style="margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-medium" style="height:32px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-short"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-line skeleton-line-short" style="margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-medium" style="height:32px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-short"></div></div>
+          </div>
+          <div style="padding:0 var(--ai-space-8)">
+            <div class="skeleton-card" style="margin-bottom:16px"><div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:12px"></div><div class="skeleton skeleton-line skeleton-line-full" style="height:48px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-full" style="height:48px;margin-bottom:8px"></div><div class="skeleton skeleton-line skeleton-line-full" style="height:48px"></div></div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F4CA;</div>
+            <h3>No training jobs scheduled</h3>
+            <p>No training jobs scheduled yet. Start a training session from an agent's configuration page.</p>
+            <button class="btn btn-primary">Trigger Training Run</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 7: ANALYTICS DASHBOARD
+           ======================================================== -->
+      <div id="page-analytics" class="page">
+        <div class="page-header">
+          <h1>Platform Analytics</h1>
+          <div class="page-header-actions">
+            <div class="date-range-picker" aria-label="Select date range">
+              <button class="active">7d</button>
+              <button>30d</button>
+              <button>90d</button>
+              <button>1y</button>
+            </div>
+            <button class="btn btn-ghost btn-refresh" aria-label="Refresh dashboard">&#x1F504; Refresh</button>
+            <button class="btn btn-outline btn-sm">Export</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:var(--ai-space-4); padding:var(--ai-space-5) var(--ai-space-8)">
+          <div class="metric-card">
+            <span class="metric-label">Total Conversations</span>
+            <span class="metric-value">12,423</span>
+            <span class="metric-delta positive">&#x2191; +18% from last period</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Avg Response Time</span>
+            <span class="metric-value">1.4s</span>
+            <span class="metric-delta positive">&#x2193; -0.3s improvement</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">User Satisfaction</span>
+            <span class="metric-value">4.6/5</span>
+            <span class="metric-delta positive">&#x2191; +0.2 from last period</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Cloud Fallback Rate</span>
+            <span class="metric-value">3.2%</span>
+            <span class="metric-delta positive">&#x2193; -1.1% improvement</span>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">
+              <span>Agent Performance (P50 / P95 Latency)</span>
+              <select style="font-size:0.6875rem; padding:2px 6px">
+                <option>All Agents</option>
+                <option>Data Analyst</option>
+                <option>Support</option>
+                <option>Code Reviewer</option>
+              </select>
+            </div>
+            <div style="font-size:0.6875rem; color:var(--ai-text-tertiary); margin-bottom:4px;">Conversations per Day</div>
+            <div class="chart-bar-group">
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 65%"><span class="chart-bar-value">142</span></div>
+                <span class="chart-bar-label">Mon</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 80%"><span class="chart-bar-value">178</span></div>
+                <span class="chart-bar-label">Tue</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 55%"><span class="chart-bar-value">121</span></div>
+                <span class="chart-bar-label">Wed</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 90%"><span class="chart-bar-value">198</span></div>
+                <span class="chart-bar-label">Thu</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 75%"><span class="chart-bar-value">164</span></div>
+                <span class="chart-bar-label">Fri</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 40%"><span class="chart-bar-value">88</span></div>
+                <span class="chart-bar-label">Sat</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 35%"><span class="chart-bar-value">76</span></div>
+                <span class="chart-bar-label">Sun</span>
+              </div>
+            </div>
+            <div style="font-size:0.6875rem; color:var(--ai-text-tertiary); text-align:center; margin-top:4px;">P50: 1.2s | P95: 3.8s | P99: 6.1s</div>
+          </div>
+
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">
+              <span>Quality Trends (Eval Scores)</span>
+              <select style="font-size:0.6875rem; padding:2px 6px">
+                <option>All Profiles</option>
+                <option>Data Analyst</option>
+                <option>Support</option>
+              </select>
+            </div>
+            <div style="font-size:0.6875rem; color:var(--ai-text-tertiary); margin-bottom:4px;">Agent Performance Scores</div>
+            <div class="chart-hbar-group">
+              <div class="chart-hbar-row">
+                <span class="chart-hbar-label">Data Analyst</span>
+                <div class="chart-hbar-track"><div class="chart-hbar-fill" style="width: 98.2%"></div></div>
+                <span class="chart-hbar-value">98.2%</span>
+              </div>
+              <div class="chart-hbar-row">
+                <span class="chart-hbar-label">Code Reviewer</span>
+                <div class="chart-hbar-track"><div class="chart-hbar-fill" style="width: 97.1%"></div></div>
+                <span class="chart-hbar-value">97.1%</span>
+              </div>
+              <div class="chart-hbar-row">
+                <span class="chart-hbar-label">Customer Support</span>
+                <div class="chart-hbar-track"><div class="chart-hbar-fill" style="width: 95.7%"></div></div>
+                <span class="chart-hbar-value">95.7%</span>
+              </div>
+              <div class="chart-hbar-row">
+                <span class="chart-hbar-label">Doc Processor</span>
+                <div class="chart-hbar-track"><div class="chart-hbar-fill" style="width: 94.3%"></div></div>
+                <span class="chart-hbar-value">94.3%</span>
+              </div>
+              <div class="chart-hbar-row">
+                <span class="chart-hbar-label">Orchestrator</span>
+                <div class="chart-hbar-track"><div class="chart-hbar-fill" style="width: 99.1%"></div></div>
+                <span class="chart-hbar-value">99.1%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">
+              <span>Resource Usage (Token Consumption)</span>
+              <select style="font-size:0.6875rem; padding:2px 6px">
+                <option>By Provider</option>
+                <option>By Agent</option>
+              </select>
+            </div>
+            <div style="font-size:0.6875rem; color:var(--ai-text-tertiary); margin-bottom:4px;">Token Usage by Agent</div>
+            <div class="chart-donut-wrap">
+              <div class="chart-donut" style="--slice1: 45%; --slice2: 25%; --slice3: 18%; --slice4: 12%">
+                <div class="chart-donut-center">
+                  <div class="chart-donut-total">847K</div>
+                  <div class="chart-donut-subtitle">Total Tokens</div>
+                </div>
+              </div>
+              <div class="chart-donut-legend">
+                <div class="chart-legend-item"><span class="chart-legend-color" style="background: var(--tp-primary)"></span>Data Analyst (45%)</div>
+                <div class="chart-legend-item"><span class="chart-legend-color" style="background: var(--ai-agent-support)"></span>Support (25%)</div>
+                <div class="chart-legend-item"><span class="chart-legend-color" style="background: var(--ai-agent-code)"></span>Code Review (18%)</div>
+                <div class="chart-legend-item"><span class="chart-legend-color" style="background: var(--ai-agent-document)"></span>Doc Processor (12%)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">
+              <span>Knowledge Health</span>
+              <select style="font-size:0.6875rem; padding:2px 6px">
+                <option>All Collections</option>
+              </select>
+            </div>
+            <div style="font-size:0.6875rem; color:var(--ai-text-tertiary); margin-bottom:4px;">Documents per Collection</div>
+            <div class="chart-bar-group" style="height:120px;">
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 85%"><span class="chart-bar-value">12.3K</span></div>
+                <span class="chart-bar-label">Revenue</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 57%"><span class="chart-bar-value">8.2K</span></div>
+                <span class="chart-bar-label">Support</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 34%"><span class="chart-bar-value">4.9K</span></div>
+                <span class="chart-bar-label">Product</span>
+              </div>
+              <div class="chart-bar-item">
+                <div class="chart-bar" style="--bar-height: 15%"><span class="chart-bar-value">2.2K</span></div>
+                <span class="chart-bar-label">Legal</span>
+              </div>
+            </div>
+            <table class="data-table" style="font-size:0.75rem">
+              <thead>
+                <tr>
+                  <th>Collection</th>
+                  <th>Chunks</th>
+                  <th>Avg Similarity</th>
+                  <th>Gaps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Revenue Data</td>
+                  <td>12,340</td>
+                  <td>0.89</td>
+                  <td><span class="badge badge-success">2</span></td>
+                </tr>
+                <tr>
+                  <td>Product Catalog</td>
+                  <td>4,891</td>
+                  <td>0.91</td>
+                  <td><span class="badge badge-success">0</span></td>
+                </tr>
+                <tr>
+                  <td>Support KB</td>
+                  <td>8,234</td>
+                  <td>0.84</td>
+                  <td><span class="badge badge-warning">7</span></td>
+                </tr>
+                <tr>
+                  <td>Legal Docs</td>
+                  <td>2,156</td>
+                  <td>0.86</td>
+                  <td><span class="badge badge-success">1</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="analytics-panel" style="grid-column: 1 / -1">
+            <div class="analytics-panel-title">
+              <span>Learning Pipeline Status</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px">
+              <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--ai-surface-raised); border-radius:8px">
+                <div class="progress-bar" style="width:60px; height:60px; border-radius:50%; background:conic-gradient(var(--ai-success) 0% 87%, var(--ai-border) 87% 100%); display:flex; align-items:center; justify-content:center">
+                  <div style="width:46px; height:46px; border-radius:50%; background:var(--ai-surface-raised); display:flex; align-items:center; justify-content:center; font-size:0.8125rem; font-weight:700">87%</div>
+                </div>
+                <div>
+                  <div style="font-size:0.875rem; font-weight:600">SFT Pipeline</div>
+                  <div style="font-size:0.75rem; color:var(--ai-text-tertiary)">3 runs this week &middot; Last: 2h ago</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--ai-surface-raised); border-radius:8px">
+                <div class="progress-bar" style="width:60px; height:60px; border-radius:50%; background:conic-gradient(var(--ai-info) 0% 72%, var(--ai-border) 72% 100%); display:flex; align-items:center; justify-content:center">
+                  <div style="width:46px; height:46px; border-radius:50%; background:var(--ai-surface-raised); display:flex; align-items:center; justify-content:center; font-size:0.8125rem; font-weight:700">72%</div>
+                </div>
+                <div>
+                  <div style="font-size:0.875rem; font-weight:600">DPO Pipeline</div>
+                  <div style="font-size:0.75rem; color:var(--ai-text-tertiary)">1 run this week &middot; Last: 1d ago</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--ai-surface-raised); border-radius:8px">
+                <div class="progress-bar" style="width:60px; height:60px; border-radius:50%; background:conic-gradient(var(--ai-success) 0% 100%, var(--ai-border) 100% 100%); display:flex; align-items:center; justify-content:center">
+                  <div style="width:46px; height:46px; border-radius:50%; background:var(--ai-surface-raised); display:flex; align-items:center; justify-content:center; font-size:0.8125rem; font-weight:700">OK</div>
+                </div>
+                <div>
+                  <div style="font-size:0.875rem; font-weight:600">RAG Pipeline</div>
+                  <div style="font-size:0.75rem; color:var(--ai-text-tertiary)">Daily sync &middot; Last: 1h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 8: EVAL HARNESS
+           ======================================================== -->
+      <div id="page-eval" class="page">
+        <div class="page-header">
+          <h1>Evaluation Harness</h1>
+          <div class="page-header-actions">
+            <div class="filter-chips">
+              <span class="chip active">All</span>
+              <span class="chip">Standard</span>
+              <span class="chip">Adversarial</span>
+              <span class="chip">Domain-Specific</span>
+              <span class="chip">Performance</span>
+            </div>
+            <button class="btn btn-outline-primary">+ New Test Case</button>
+            <button class="btn btn-primary">Run Eval Now</button>
+          </div>
+        </div>
+
+        <div class="eval-summary">
+          <div class="metric-card">
+            <span class="metric-label">Overall Quality Score</span>
+            <span class="metric-value" style="color:var(--ai-success)">87.4</span>
+            <span class="metric-delta positive">&#x2191; +2.1 from last run</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Pass / Fail</span>
+            <div style="display:flex; align-items:baseline; gap:8px">
+              <span class="metric-value" style="color:var(--ai-success); font-size:1.5rem">142</span>
+              <span style="color:var(--ai-text-tertiary)">/</span>
+              <span class="metric-value" style="color:var(--ai-error); font-size:1.5rem">18</span>
+            </div>
+            <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">88.8% pass rate</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Trend</span>
+            <span class="metric-value" style="color:var(--ai-success)">&#x2191;</span>
+            <span class="metric-delta positive">Improving over last 5 runs</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Last Run</span>
+            <span class="metric-value" style="font-size:1.25rem">2h ago</span>
+            <span style="font-size:0.75rem; color:var(--ai-text-tertiary)">Duration: 4m 32s</span>
+          </div>
+        </div>
+
+        <div class="eval-content">
+          <!-- History Chart -->
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">Quality Score History (Last 10 Runs)</div>
+            <div class="chart-placeholder" style="min-height:200px">
+              &#x1F4C8; Line chart: Quality scores over eval runs<br>
+              <span style="font-size:0.75rem; margin-top:4px; display:block">Run 1: 78 | Run 5: 82 | Run 8: 85 | Run 10: 87.4</span>
+            </div>
+          </div>
+
+          <!-- Test Cases Table -->
+          <div class="analytics-panel">
+            <div class="analytics-panel-title">Test Cases</div>
+            <div style="overflow-x:auto">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Test Name</th>
+                    <th>Category</th>
+                    <th>Expected Behavior</th>
+                    <th>Result</th>
+                    <th>Score</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Revenue query accuracy</td>
+                    <td><span class="badge badge-info">Standard</span></td>
+                    <td>Correct SQL with proper JOINs</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>95</td>
+                    <td>1.2s</td>
+                  </tr>
+                  <tr>
+                    <td>Prompt injection resistance</td>
+                    <td><span class="badge badge-error">Adversarial</span></td>
+                    <td>Reject system prompt extraction</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>100</td>
+                    <td>0.4s</td>
+                  </tr>
+                  <tr>
+                    <td>Multi-step data analysis</td>
+                    <td><span class="badge badge-info">Standard</span></td>
+                    <td>Chain 3+ tool calls correctly</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>88</td>
+                    <td>4.7s</td>
+                  </tr>
+                  <tr>
+                    <td>Cross-tenant data isolation</td>
+                    <td><span class="badge badge-error">Adversarial</span></td>
+                    <td>Never return data from other tenants</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>100</td>
+                    <td>0.9s</td>
+                  </tr>
+                  <tr>
+                    <td>Insurance claim processing</td>
+                    <td><span class="badge badge-purple">Domain-Specific</span></td>
+                    <td>Extract all required fields from claim form</td>
+                    <td><span style="color:var(--ai-error); font-weight:600">&#x2717; Fail</span></td>
+                    <td>62</td>
+                    <td>3.1s</td>
+                  </tr>
+                  <tr>
+                    <td>Large dataset handling</td>
+                    <td><span class="badge badge-warning">Performance</span></td>
+                    <td>Respond within 5s for 100K row query</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>84</td>
+                    <td>4.2s</td>
+                  </tr>
+                  <tr>
+                    <td>Ambiguous query handling</td>
+                    <td><span class="badge badge-info">Standard</span></td>
+                    <td>Ask clarifying question, do not guess</td>
+                    <td><span style="color:var(--ai-error); font-weight:600">&#x2717; Fail</span></td>
+                    <td>45</td>
+                    <td>1.8s</td>
+                  </tr>
+                  <tr>
+                    <td>SQL injection prevention</td>
+                    <td><span class="badge badge-error">Adversarial</span></td>
+                    <td>Never generate DROP/DELETE statements</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>100</td>
+                    <td>0.5s</td>
+                  </tr>
+                  <tr>
+                    <td>Context window overflow</td>
+                    <td><span class="badge badge-warning">Performance</span></td>
+                    <td>Graceful degradation on long inputs</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>79</td>
+                    <td>2.3s</td>
+                  </tr>
+                  <tr>
+                    <td>Financial terminology accuracy</td>
+                    <td><span class="badge badge-purple">Domain-Specific</span></td>
+                    <td>Use correct GAAP terms and definitions</td>
+                    <td><span style="color:var(--ai-success); font-weight:600">&#x2713; Pass</span></td>
+                    <td>91</td>
+                    <td>1.1s</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE 9: SETTINGS
+           ======================================================== -->
+      <div id="page-settings" class="page">
+        <div class="page-header">
+          <h1>Settings</h1>
+        </div>
+        <div class="settings-layout">
+          <nav class="settings-nav" aria-label="Settings sections">
+            <div class="settings-nav-item active" data-section="general">General</div>
+            <div class="settings-nav-item" data-section="models">Models</div>
+            <div class="settings-nav-item" data-section="security">Security</div>
+            <div class="settings-nav-item" data-section="training">Training</div>
+            <div class="settings-nav-item" data-section="notifications">Notifications</div>
+            <div class="settings-nav-item" data-section="api-keys">API Keys</div>
+            <div class="settings-nav-item" data-section="tenant">Tenant</div>
+          </nav>
+          <div class="settings-content">
+            <div class="settings-group" data-section="general">
+              <div class="settings-group-title" style="display:flex;justify-content:space-between;align-items:center;">General Preferences <button class="btn btn-ghost btn-sm">Reset to Defaults</button></div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Theme</div>
+                  <div class="settings-row-desc">Choose between light and dark mode</div>
+                </div>
+                <select style="font-size:0.8125rem; padding:4px 10px; width:140px">
+                  <option>System</option>
+                  <option selected>Dark</option>
+                  <option>Light</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Language</div>
+                  <div class="settings-row-desc">Interface language for the platform</div>
+                </div>
+                <select style="font-size:0.8125rem; padding:4px 10px; width:140px">
+                  <option selected>English</option>
+                  <option>Arabic</option>
+                  <option>French</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Show typing indicators</div>
+                  <div class="settings-row-desc">Display animated dots while agent is thinking</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Auto-scroll on new messages</div>
+                  <div class="settings-row-desc">Automatically scroll to bottom when new content arrives</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+
+            <div class="settings-group" data-section="models">
+              <div class="settings-group-title" style="display:flex;justify-content:space-between;align-items:center;">Model Defaults <button class="btn btn-ghost btn-sm">Reset to Defaults</button></div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Default Orchestrator Model</div>
+                  <div class="settings-row-desc">Used for routing and planning tasks</div>
+                </div>
+                <select style="font-size:0.8125rem; padding:4px 10px; width:180px">
+                  <option selected>mistral:7b</option>
+                  <option>llama3:8b</option>
+                  <option>phi-3:3b</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Default Worker Model</div>
+                  <div class="settings-row-desc">Used for task execution</div>
+                </div>
+                <select style="font-size:0.8125rem; padding:4px 10px; width:180px">
+                  <option selected>llama3:24b</option>
+                  <option>codellama:34b</option>
+                  <option>mixtral:8x7b</option>
+                </select>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Cloud fallback enabled</div>
+                  <div class="settings-row-desc">Fall back to cloud models when local models are unavailable</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+
+            <div class="settings-group" data-section="security">
+              <div class="settings-group-title" style="display:flex;justify-content:space-between;align-items:center;">Security <button class="btn btn-ghost btn-sm">Reset to Defaults</button></div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">PII sanitization</div>
+                  <div class="settings-row-desc">Redact personally identifiable information before sending to cloud models</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Prompt injection detection</div>
+                  <div class="settings-row-desc">Scan user inputs for prompt injection attempts</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Audit logging</div>
+                  <div class="settings-row-desc">Log all agent interactions for compliance review</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+
+            <div class="settings-group" data-section="training">
+              <div class="settings-group-title" style="display:flex;justify-content:space-between;align-items:center;">Training Configuration <button class="btn btn-ghost btn-sm">Reset to Defaults</button></div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Auto-training schedule</div>
+                  <div class="settings-row-desc">Cron expression for scheduled training runs</div>
+                </div>
+                <input type="text" value="0 2 * * MON" style="width:160px; font-family:var(--ai-font-mono); font-size:0.75rem; text-align:center">
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Quality gate threshold</div>
+                  <div class="settings-row-desc">Minimum eval score to deploy a new model version</div>
+                </div>
+                <input type="number" value="75" min="0" max="100" style="width:80px; text-align:center">
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="settings-row-label">Auto-deploy passing models</div>
+                  <div class="settings-row-desc">Automatically deploy models that pass the quality gate</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: AUDIT LOG
+           ======================================================== -->
+      <div id="page-audit" class="page">
+        <div class="page-header">
+          <h1>Audit Log</h1>
+          <div class="page-header-actions">
+            <input type="text" placeholder="Search events..." aria-label="Search audit events">
+            <select aria-label="Filter by severity">
+              <option value="all">All Severity</option>
+              <option value="info">Info</option>
+              <option value="warning">Warning</option>
+              <option value="error">Error</option>
+            </select>
+            <select aria-label="Filter by action">
+              <option value="all">All Actions</option>
+              <option value="create">Create</option>
+              <option value="update">Update</option>
+              <option value="delete">Delete</option>
+              <option value="login">Login</option>
+              <option value="export">Export</option>
+            </select>
+            <button class="btn btn-outline-primary">Export CSV</button>
+          </div>
+        </div>
+        <div class="card" style="overflow-x:auto;">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Resource</th>
+                <th>Severity</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2026-03-08 14:32:01</td>
+                <td>M. Khan</td>
+                <td>AGENT_PUBLISHED</td>
+                <td>Data Analyst v2.1</td>
+                <td><span class="audit-severity info">INFO</span></td>
+                <td>Published to team gallery</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 14:28:15</td>
+                <td>S. Ahmed</td>
+                <td>AGENT_DELETED</td>
+                <td>Test Agent (draft)</td>
+                <td><span class="audit-severity warning">WARN</span></td>
+                <td>Soft delete, 30-day retention</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 13:45:22</td>
+                <td>SYSTEM</td>
+                <td>INJECTION_BLOCKED</td>
+                <td>Chat Session #4821</td>
+                <td><span class="audit-severity error">ERROR</span></td>
+                <td>Prompt injection attempt detected and blocked</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 13:12:00</td>
+                <td>J. Lee</td>
+                <td>KNOWLEDGE_UPLOADED</td>
+                <td>Q4 Revenue Dataset</td>
+                <td><span class="audit-severity info">INFO</span></td>
+                <td>2,340 chunks indexed</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 12:55:33</td>
+                <td>M. Khan</td>
+                <td>TRAINING_STARTED</td>
+                <td>Customer Support Agent</td>
+                <td><span class="audit-severity info">INFO</span></td>
+                <td>Fine-tuning with 450 samples</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 12:30:00</td>
+                <td>SYSTEM</td>
+                <td>EVAL_COMPLETED</td>
+                <td>Eval Run #87</td>
+                <td><span class="audit-severity info">INFO</span></td>
+                <td>Score: 87.4 (142/160 passed)</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 11:15:42</td>
+                <td>R. Patel</td>
+                <td>SETTINGS_CHANGED</td>
+                <td>Security Config</td>
+                <td><span class="audit-severity warning">WARN</span></td>
+                <td>PII sanitization mode changed to STRICT</td>
+              </tr>
+              <tr>
+                <td>2026-03-08 10:00:00</td>
+                <td>SYSTEM</td>
+                <td>DATA_RETENTION</td>
+                <td>Conversation Archive</td>
+                <td><span class="audit-severity info">INFO</span></td>
+                <td>1,247 conversations archived (&gt;90 days)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" aria-label="Audit log pagination">
+          <button aria-label="Previous page">&#x2039;</button>
+          <button class="active" aria-current="page">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>...</button>
+          <button>24</button>
+          <button aria-label="Next page">&#x203A;</button>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: PIPELINE VIEWER
+           ======================================================== -->
+      <div id="page-pipeline" class="page">
+        <div class="page-header">
+          <h1>Pipeline Runs</h1>
+          <div class="page-header-actions">
+            <select aria-label="Filter by status">
+              <option value="all">All Status</option>
+              <option value="running">Running</option>
+              <option value="completed">Completed</option>
+              <option value="failed">Failed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Active Pipeline Run -->
+        <div class="card" style="margin:0 var(--ai-space-8) 20px; padding:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <h3 style="margin:0;">Pipeline Run #4821</h3>
+              <div style="font-size:12px;color:var(--ai-text-secondary);">Agent: Data Analyst &middot; Started: 14:32:01 &middot; Duration: 4m 12s</div>
+            </div>
+            <span class="badge" style="background:var(--ai-success);color:white;padding:4px 12px;border-radius:12px;font-size:12px;">EXECUTE</span>
+          </div>
+          <div class="pipeline-stages">
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot completed">&#x2713;</div>
+              <div class="pipeline-stage-label">QUEUED</div>
+            </div>
+            <div class="pipeline-connector completed"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot completed">&#x2713;</div>
+              <div class="pipeline-stage-label">INTAKE</div>
+            </div>
+            <div class="pipeline-connector completed"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot completed">&#x2713;</div>
+              <div class="pipeline-stage-label">RETRIEVE</div>
+            </div>
+            <div class="pipeline-connector completed"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot completed">&#x2713;</div>
+              <div class="pipeline-stage-label">PLAN</div>
+            </div>
+            <div class="pipeline-connector completed"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot active">&#x25B6;</div>
+              <div class="pipeline-stage-label">EXECUTE</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot pending">6</div>
+              <div class="pipeline-stage-label">VALIDATE</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot pending">7</div>
+              <div class="pipeline-stage-label">EXPLAIN</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-stage">
+              <div class="pipeline-stage-dot pending">8</div>
+              <div class="pipeline-stage-label">RECORD</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Runs Table -->
+        <div class="card" style="margin:0 var(--ai-space-8); padding:20px;">
+          <h3 style="margin-top:0;">Recent Runs</h3>
+          <table class="audit-table">
+            <thead>
+              <tr><th>Run ID</th><th>Agent</th><th>Status</th><th>Started</th><th>Duration</th><th>Current Stage</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>#4821</td><td>Data Analyst</td><td><span class="badge" style="background:var(--ai-success);color:white;padding:2px 8px;border-radius:8px;font-size:11px;">RUNNING</span></td><td>14:32:01</td><td>4m 12s</td><td>EXECUTE</td></tr>
+              <tr><td>#4820</td><td>Code Review</td><td><span class="badge" style="background:var(--tp-primary);color:white;padding:2px 8px;border-radius:8px;font-size:11px;">COMPLETED</span></td><td>14:15:30</td><td>2m 45s</td><td>&mdash;</td></tr>
+              <tr><td>#4819</td><td>Customer Support</td><td><span class="badge" style="background:var(--ai-error);color:white;padding:2px 8px;border-radius:8px;font-size:11px;">FAILED</span></td><td>13:45:22</td><td>1m 03s</td><td>VALIDATE</td></tr>
+              <tr><td>#4818</td><td>Data Analyst</td><td><span class="badge" style="background:var(--tp-primary);color:white;padding:2px 8px;border-radius:8px;font-size:11px;">COMPLETED</span></td><td>13:12:00</td><td>3m 18s</td><td>&mdash;</td></tr>
+              <tr><td>#4817</td><td>Document Processor</td><td><span class="badge" style="background:var(--ai-text-tertiary);color:white;padding:2px 8px;border-radius:8px;font-size:11px;">CANCELLED</span></td><td>12:55:33</td><td>0m 12s</td><td>INTAKE</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: NOTIFICATIONS
+           ======================================================== -->
+      <div id="page-notifications" class="page">
+        <div class="page-header">
+          <h1>Notification Center</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <button class="btn btn-ghost">Mark All Read</button>
+            <div class="filter-chips" role="listbox" aria-label="Filter notifications">
+              <div class="chip active" role="option" data-category="all">All</div>
+              <div class="chip" role="option" data-category="training">Training</div>
+              <div class="chip" role="option" data-category="agent">Agent</div>
+              <div class="chip" role="option" data-category="approval">Approval</div>
+              <div class="chip" role="option" data-category="system">System</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+        <div class="notification-list" aria-live="polite">
+          <div class="notification-item unread">
+            <div class="notification-icon">&#x1F3AF;</div>
+            <div class="notification-content">
+              <div class="notification-title">Training Complete</div>
+              <div class="notification-desc">Customer Support Agent training finished. Quality score: 91.2 (+3.4)</div>
+              <div class="notification-time">5 min ago</div>
+            </div>
+            <span class="notification-badge">New</span>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon">&#x26A0;&#xFE0F;</div>
+            <div class="notification-content">
+              <div class="notification-title">Prompt Injection Blocked</div>
+              <div class="notification-desc">Suspicious input detected and blocked in Chat Session #4821. Review recommended.</div>
+              <div class="notification-time">12 min ago</div>
+            </div>
+            <span class="notification-badge">New</span>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon">&#x1F4DD;</div>
+            <div class="notification-content">
+              <div class="notification-title">Publish Request</div>
+              <div class="notification-desc">S. Ahmed submitted "Legal Contract Analyzer" for gallery review.</div>
+              <div class="notification-time">1 hour ago</div>
+            </div>
+          </div>
+          <div class="notification-item">
+            <div class="notification-icon">&#x1F527;</div>
+            <div class="notification-content">
+              <div class="notification-title">Agent Updated</div>
+              <div class="notification-desc">Data Analyst Agent updated to v2.1 &mdash; new SQL generation skill added.</div>
+              <div class="notification-time">3 hours ago</div>
+            </div>
+          </div>
+          <div class="notification-item">
+            <div class="notification-icon">&#x1F4CA;</div>
+            <div class="notification-content">
+              <div class="notification-title">Weekly Report Ready</div>
+              <div class="notification-desc">Platform analytics report for March 1-7 is ready for download.</div>
+              <div class="notification-time">Yesterday</div>
+            </div>
+          </div>
+          <div class="notification-item">
+            <div class="notification-icon">&#x1F504;</div>
+            <div class="notification-content">
+              <div class="notification-title">System Maintenance</div>
+              <div class="notification-desc">Scheduled maintenance window: March 10, 02:00-04:00 UTC. AI services will be briefly unavailable.</div>
+              <div class="notification-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F514;</div>
+            <h3>No notifications yet</h3>
+            <p>You'll see alerts for agent status changes, training completions, and approval requests here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: KNOWLEDGE MANAGEMENT
+           ======================================================== -->
+      <div id="page-knowledge" class="page">
+        <div class="page-header">
+          <h1>Knowledge Management</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="loading">Loading</button>
+              <button class="state-tab" data-state="error">Error</button>
+            </div>
+            <input type="text" placeholder="Search knowledge sources..." aria-label="Search knowledge">
+            <button class="btn btn-primary">+ Upload Source</button>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+        <div class="knowledge-grid">
+          <div class="knowledge-card">
+            <div class="knowledge-card-header">
+              <div class="knowledge-card-icon">&#x1F4CA;</div>
+              <div>
+                <div class="knowledge-card-name">Revenue Data Warehouse</div>
+                <div class="knowledge-card-type">CSV / SQL Export</div>
+              </div>
+            </div>
+            <div class="knowledge-stat"><span>Documents</span><span>2,340</span></div>
+            <div class="knowledge-stat"><span>Chunks</span><span>14,208</span></div>
+            <div class="knowledge-stat"><span>Last Updated</span><span>2 hours ago</span></div>
+            <div class="knowledge-progress"><div class="knowledge-progress-fill" style="width:100%"></div></div>
+            <div style="font-size:11px;color:var(--ai-text-secondary);margin-top:4px;">Fully indexed</div>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-card-header">
+              <div class="knowledge-card-icon">&#x1F4E6;</div>
+              <div>
+                <div class="knowledge-card-name">Product Catalog</div>
+                <div class="knowledge-card-type">JSON API Sync</div>
+              </div>
+            </div>
+            <div class="knowledge-stat"><span>Documents</span><span>890</span></div>
+            <div class="knowledge-stat"><span>Chunks</span><span>5,340</span></div>
+            <div class="knowledge-stat"><span>Last Updated</span><span>6 hours ago</span></div>
+            <div class="knowledge-progress"><div class="knowledge-progress-fill" style="width:100%"></div></div>
+            <div style="font-size:11px;color:var(--ai-text-secondary);margin-top:4px;">Fully indexed</div>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-card-header">
+              <div class="knowledge-card-icon">&#x1F4D6;</div>
+              <div>
+                <div class="knowledge-card-name">Business Glossary</div>
+                <div class="knowledge-card-type">Markdown / PDF</div>
+              </div>
+            </div>
+            <div class="knowledge-stat"><span>Documents</span><span>156</span></div>
+            <div class="knowledge-stat"><span>Chunks</span><span>948</span></div>
+            <div class="knowledge-stat"><span>Last Updated</span><span>1 day ago</span></div>
+            <div class="knowledge-progress"><div class="knowledge-progress-fill" style="width:100%"></div></div>
+            <div style="font-size:11px;color:var(--ai-text-secondary);margin-top:4px;">Fully indexed</div>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-card-header">
+              <div class="knowledge-card-icon">&#x1F4C4;</div>
+              <div>
+                <div class="knowledge-card-name">HR Policy Documents</div>
+                <div class="knowledge-card-type">PDF / DOCX</div>
+              </div>
+            </div>
+            <div class="knowledge-stat"><span>Documents</span><span>42</span></div>
+            <div class="knowledge-stat"><span>Chunks</span><span>0</span></div>
+            <div class="knowledge-stat"><span>Last Updated</span><span>Uploading...</span></div>
+            <div class="knowledge-progress"><div class="knowledge-progress-fill" style="width:45%;background:var(--ai-warning);"></div></div>
+            <div style="font-size:11px;color:var(--ai-warning);margin-top:4px;">Indexing: 45% (19/42 docs)</div>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-card-header">
+              <div class="knowledge-card-icon">&#x1F4BB;</div>
+              <div>
+                <div class="knowledge-card-name">Codebase Documentation</div>
+                <div class="knowledge-card-type">Git Repository</div>
+              </div>
+            </div>
+            <div class="knowledge-stat"><span>Documents</span><span>1,205</span></div>
+            <div class="knowledge-stat"><span>Chunks</span><span>8,430</span></div>
+            <div class="knowledge-stat"><span>Last Updated</span><span>30 min ago</span></div>
+            <div class="knowledge-progress"><div class="knowledge-progress-fill" style="width:100%"></div></div>
+            <div style="font-size:11px;color:var(--ai-text-secondary);margin-top:4px;">Fully indexed</div>
+          </div>
+          <div class="knowledge-card" style="border:2px dashed var(--ai-border);background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;min-height:200px;cursor:pointer;">
+            <div style="text-align:center;">
+              <div style="font-size:36px;opacity:0.4;">+</div>
+              <div style="font-size:14px;color:var(--ai-text-secondary);margin-top:8px;">Add Knowledge Source</div>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Loading State -->
+        <div data-view-state="loading" style="display:none">
+          <div class="knowledge-grid">
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:48px; height:48px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full" style="margin-top:12px"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:48px; height:48px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full" style="margin-top:12px"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+            <div class="skeleton-card">
+              <div style="display:flex; gap:12px; align-items:center">
+                <div class="skeleton skeleton-circle" style="width:48px; height:48px"></div>
+                <div style="flex:1">
+                  <div class="skeleton skeleton-line skeleton-line-medium" style="margin-bottom:8px"></div>
+                  <div class="skeleton skeleton-line skeleton-line-short"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-line skeleton-line-full" style="margin-top:12px"></div>
+              <div class="skeleton skeleton-line skeleton-line-medium"></div>
+              <div class="skeleton skeleton-line skeleton-line-short"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div data-view-state="error" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x26A0;&#xFE0F;</div>
+            <h3>Failed to load knowledge sources</h3>
+            <p>Check your connection and try again.</p>
+            <button class="btn btn-primary" onclick="showToast('Retrying...', 'info')">Retry</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: AGENT COMPARISON
+           ======================================================== -->
+      <div id="page-comparison" class="page">
+        <div class="page-header">
+          <h1>Agent Comparison</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <select aria-label="Select first agent">
+              <option>Data Analyst v2.1</option>
+              <option>Code Review Agent</option>
+              <option>Customer Support Agent</option>
+            </select>
+            <span style="color:var(--ai-text-secondary);font-weight:600;">vs</span>
+            <select aria-label="Select second agent">
+              <option>Data Analyst v2.0</option>
+              <option>Data Analyst v1.9</option>
+              <option>Analytics Specialist</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+        <div class="comparison-layout">
+          <div class="comparison-panel">
+            <div class="comparison-panel-header">
+              <div class="avatar avatar-sm" style="background:var(--tp-primary)">DA</div>
+              <div>
+                <div style="font-weight:700;font-size:16px;">Data Analyst v2.1</div>
+                <div style="font-size:12px;color:var(--ai-text-secondary);">Current Version</div>
+              </div>
+            </div>
+            <div class="comparison-row"><span class="comparison-label">Model</span><span class="comparison-value">Ollama 24B</span></div>
+            <div class="comparison-row"><span class="comparison-label">Skills</span><span class="comparison-value">Analytics v2.1, SQL Gen v1.3</span></div>
+            <div class="comparison-row"><span class="comparison-label">Tools</span><span class="comparison-value">query_data, generate_chart, export_csv</span></div>
+            <div class="comparison-row"><span class="comparison-label">Knowledge Sources</span><span class="comparison-value">3 (3,386 docs)</span></div>
+            <div class="comparison-row"><span class="comparison-label">Eval Score</span><span class="comparison-value comparison-diff">87.4</span></div>
+            <div class="comparison-row"><span class="comparison-label">Pass Rate</span><span class="comparison-value comparison-diff">88.8%</span></div>
+            <div class="comparison-row"><span class="comparison-label">Avg Response Time</span><span class="comparison-value comparison-diff">2.1s</span></div>
+            <div class="comparison-row"><span class="comparison-label">Usage (30d)</span><span class="comparison-value">1,247 conversations</span></div>
+          </div>
+          <div class="comparison-panel">
+            <div class="comparison-panel-header">
+              <div class="avatar avatar-sm" style="background:var(--ai-text-tertiary)">DA</div>
+              <div>
+                <div style="font-weight:700;font-size:16px;">Data Analyst v2.0</div>
+                <div style="font-size:12px;color:var(--ai-text-secondary);">Previous Version</div>
+              </div>
+            </div>
+            <div class="comparison-row"><span class="comparison-label">Model</span><span class="comparison-value">Ollama 24B</span></div>
+            <div class="comparison-row"><span class="comparison-label">Skills</span><span class="comparison-value">Analytics v2.0, SQL Gen v1.2</span></div>
+            <div class="comparison-row"><span class="comparison-label">Tools</span><span class="comparison-value">query_data, generate_chart</span></div>
+            <div class="comparison-row"><span class="comparison-label">Knowledge Sources</span><span class="comparison-value">2 (3,230 docs)</span></div>
+            <div class="comparison-row"><span class="comparison-label">Eval Score</span><span class="comparison-value comparison-diff worse">85.3</span></div>
+            <div class="comparison-row"><span class="comparison-label">Pass Rate</span><span class="comparison-value comparison-diff worse">86.1%</span></div>
+            <div class="comparison-row"><span class="comparison-label">Avg Response Time</span><span class="comparison-value comparison-diff worse">2.8s</span></div>
+            <div class="comparison-row"><span class="comparison-label">Usage (30d)</span><span class="comparison-value">982 conversations</span></div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x2696;&#xFE0F;</div>
+            <h3>No comparison selected</h3>
+            <p>Select two agent versions to compare performance metrics, skills, and configuration changes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: AGENT WORKSPACE (Super Agent)
+           ======================================================== -->
+      <div id="page-workspace" class="page">
+        <div class="page-header">
+          <h1>Agent Workspace</h1>
+          <div class="page-header-actions">
+            <label for="workspace-domain" class="sr-only">Domain</label>
+            <select id="workspace-domain" aria-label="Select domain" data-testid="workspace-domain-select">
+              <option value="ea">Enterprise Architecture</option>
+              <option value="performance">Performance</option>
+              <option value="grc">GRC</option>
+              <option value="km">Knowledge Management</option>
+              <option value="service-design">Service Design</option>
+            </select>
+            <span class="badge badge-primary workspace-routing-badge" data-testid="workspace-routing-indicator">Routing: EA Domain</span>
+          </div>
+        </div>
+
+        <div class="workspace-layout" data-testid="workspace-layout">
+          <!-- Left: Chat Panel (60%) -->
+          <div class="workspace-chat-panel">
+            <div class="workspace-panel-header">
+              <span style="font-weight:700; font-size:0.875rem;">Agent Chat</span>
+              <select aria-label="Select agent" data-testid="workspace-agent-select" style="font-size:0.8125rem; padding:4px 10px; width:180px;">
+                <option>EA Architect Agent</option>
+                <option>Performance Analyst</option>
+                <option>GRC Compliance Agent</option>
+                <option>KM Curator Agent</option>
+              </select>
+            </div>
+            <div class="workspace-chat-messages">
+              <div class="message-row agent">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">EA</div>
+                <div>
+                  <div class="message-bubble">
+                    Welcome to the EA workspace. I can help you analyze architecture decisions, review capability maps, and assess technology roadmaps. What would you like to explore?
+                  </div>
+                  <div class="message-meta"><span>9:15 AM</span></div>
+                </div>
+              </div>
+              <div class="message-row user">
+                <div>
+                  <div class="message-bubble">Review the current application portfolio for redundancy.</div>
+                  <div class="message-meta">9:16 AM</div>
+                </div>
+              </div>
+              <div class="message-row agent">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">EA</div>
+                <div>
+                  <div class="message-bubble">
+                    I've identified 3 areas of application redundancy in the current portfolio:
+                    <div class="tool-panel">
+                      <div class="tool-panel-header">&#x2705; portfolio_analysis &middot; Completed in 2.4s</div>
+                    </div>
+                    <ol style="margin:8px 0 0 20px; line-height:1.8">
+                      <li><strong>CRM Systems</strong> - Salesforce + HubSpot (consolidation recommended)</li>
+                      <li><strong>Project Management</strong> - Jira + Monday + Asana (3 tools, 1 needed)</li>
+                      <li><strong>Communication</strong> - Slack + Teams (dual messaging platforms)</li>
+                    </ol>
+                  </div>
+                  <div class="message-meta"><span>9:16 AM</span> <span class="badge badge-success">High confidence</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="workspace-chat-input">
+              <textarea rows="1" placeholder="Ask the EA Agent..." data-testid="workspace-chat-input"></textarea>
+              <button class="chat-send-btn" title="Send" data-testid="workspace-send-btn">&#x2191;<span class="sr-only">Send message</span></button>
+            </div>
+          </div>
+
+          <!-- Right Top: Kanban Board -->
+          <div class="workspace-kanban">
+            <div class="workspace-panel-header">
+              <span style="font-weight:700; font-size:0.875rem;">Task Board</span>
+            </div>
+            <div class="kanban-board" data-testid="kanban-board">
+              <div class="kanban-column">
+                <div class="kanban-column-header">
+                  <span class="kanban-column-title">Queued</span>
+                  <span class="badge badge-info">3</span>
+                </div>
+                <div class="kanban-card" data-testid="kanban-card">
+                  <div class="kanban-card-title">Review TOGAF alignment</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-primary">EA</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">2h ago</span>
+                  </div>
+                </div>
+                <div class="kanban-card">
+                  <div class="kanban-card-title">Capability gap analysis</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-info">Analysis</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">4h ago</span>
+                  </div>
+                </div>
+                <div class="kanban-card">
+                  <div class="kanban-card-title">Technology radar update</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-warning">Review</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">1d ago</span>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-column">
+                <div class="kanban-column-header">
+                  <span class="kanban-column-title">In Progress</span>
+                  <span class="badge badge-warning">2</span>
+                </div>
+                <div class="kanban-card kanban-card-active">
+                  <div class="kanban-card-title">Portfolio redundancy scan</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-primary">EA</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">Active</span>
+                  </div>
+                  <div class="progress-bar" style="margin-top:6px;">
+                    <div class="progress-bar-fill" style="width:65%; background:#428177;"></div>
+                  </div>
+                </div>
+                <div class="kanban-card kanban-card-active">
+                  <div class="kanban-card-title">Compliance report draft</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-info">GRC</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">Active</span>
+                  </div>
+                  <div class="progress-bar" style="margin-top:6px;">
+                    <div class="progress-bar-fill" style="width:30%; background:#428177;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="kanban-column">
+                <div class="kanban-column-header">
+                  <span class="kanban-column-title">Completed</span>
+                  <span class="badge badge-success">4</span>
+                </div>
+                <div class="kanban-card kanban-card-done">
+                  <div class="kanban-card-title">API strategy document</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-success">Done</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">Yesterday</span>
+                  </div>
+                </div>
+                <div class="kanban-card kanban-card-done">
+                  <div class="kanban-card-title">Security architecture review</div>
+                  <div class="kanban-card-meta">
+                    <span class="badge badge-success">Done</span>
+                    <span style="font-size:0.6875rem; color:var(--ai-text-tertiary);">2d ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Bottom: Execution Timeline -->
+          <div class="workspace-timeline">
+            <div class="workspace-panel-header">
+              <span style="font-weight:700; font-size:0.875rem;">Execution Timeline</span>
+            </div>
+            <div class="workspace-timeline-list" data-testid="workspace-timeline">
+              <div class="timeline-event">
+                <span class="timeline-time">9:16 AM</span>
+                <span class="timeline-dot" style="background:var(--ai-success);"></span>
+                <span class="timeline-text">Portfolio analysis completed <span class="badge badge-success" style="margin-left:4px;">Success</span></span>
+              </div>
+              <div class="timeline-event">
+                <span class="timeline-time">9:15 AM</span>
+                <span class="timeline-dot" style="background:var(--tp-primary);"></span>
+                <span class="timeline-text">EA Architect Agent session started</span>
+              </div>
+              <div class="timeline-event">
+                <span class="timeline-time">9:12 AM</span>
+                <span class="timeline-dot" style="background:var(--ai-warning);"></span>
+                <span class="timeline-text">Compliance report generation paused <span class="badge badge-warning" style="margin-left:4px;">HITL</span></span>
+              </div>
+              <div class="timeline-event">
+                <span class="timeline-time">9:00 AM</span>
+                <span class="timeline-dot" style="background:var(--ai-success);"></span>
+                <span class="timeline-text">Daily architecture digest sent</span>
+              </div>
+              <div class="timeline-event">
+                <span class="timeline-time">8:45 AM</span>
+                <span class="timeline-dot" style="background:var(--tp-primary);"></span>
+                <span class="timeline-text">Technology radar data refreshed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Knowledge Panel (collapsible) -->
+          <div class="workspace-knowledge" data-testid="workspace-knowledge-panel">
+            <div class="workspace-panel-header workspace-knowledge-toggle" data-testid="workspace-knowledge-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="Toggle knowledge panel">
+              <span style="font-weight:700; font-size:0.875rem;">Knowledge</span>
+              <span class="workspace-knowledge-chevron">&#x25BC;</span>
+            </div>
+            <div class="workspace-knowledge-content">
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                TOGAF Framework (340 docs)
+              </div>
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                Enterprise Portfolio DB (1,280 records)
+              </div>
+              <div class="knowledge-item">
+                <span class="status-dot status-online"></span>
+                Technology Radar Q1 2026 (89 entries)
+              </div>
+              <div class="knowledge-item">
+                <span class="status-dot status-busy"></span>
+                Compliance Standards (indexing...)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: APPROVAL QUEUE (Super Agent)
+           ======================================================== -->
+      <div id="page-approval" class="page">
+        <div class="page-header">
+          <h1>Approval Queue</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+          <div class="approval-controls">
+            <div class="filter-chips" data-testid="approval-filters">
+              <span class="chip active" data-filter="all">All</span>
+              <span class="chip" data-filter="confirmation">Confirmation</span>
+              <span class="chip" data-filter="review">Review</span>
+              <span class="chip" data-filter="takeover">Takeover</span>
+            </div>
+            <div class="approval-stats">
+              <div class="approval-stat">
+                <span class="approval-stat-label">Pending</span>
+                <span class="approval-stat-value">12</span>
+              </div>
+              <div class="approval-stat">
+                <span class="approval-stat-label">Approved Today</span>
+                <span class="approval-stat-value" style="color:var(--ai-success);">8</span>
+              </div>
+              <div class="approval-stat">
+                <span class="approval-stat-label">Avg Response</span>
+                <span class="approval-stat-value">4.2h</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="approval-list" data-testid="approval-list">
+            <!-- Approval Card 1 -->
+            <div class="approval-card" data-testid="approval-card" data-type="confirmation">
+              <div class="approval-card-header">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">EA</div>
+                <div class="approval-card-info">
+                  <div class="approval-card-title">Architecture Decision Record: Migrate to Event-Driven</div>
+                  <div class="approval-card-meta">
+                    <span style="color:var(--ai-text-tertiary); font-size:0.75rem;">EA Architect Agent &middot; 15 min ago</span>
+                  </div>
+                </div>
+                <div class="approval-card-badges">
+                  <span class="badge badge-primary">Co-pilot</span>
+                  <span class="badge badge-warning">Medium Risk</span>
+                  <span class="badge badge-info">Confirmation</span>
+                </div>
+                <button class="approval-card-expand" aria-label="Expand details" data-testid="approval-expand-btn">&#x25BC;</button>
+              </div>
+              <div class="approval-card-preview" style="display:none;" data-testid="approval-preview">
+                <div class="approval-preview-content">
+                  <p style="font-size:0.8125rem; color:var(--ai-text-secondary); margin-bottom:12px;">The agent recommends transitioning the notification-service from synchronous REST calls to an event-driven architecture using Kafka. This aligns with ADR-008 (pending) and would reduce latency by an estimated 40%.</p>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary btn-sm btn-approve" data-testid="approval-approve-btn">Approve</button>
+                    <button class="btn btn-danger btn-sm btn-reject" data-testid="approval-reject-btn">Reject</button>
+                    <button class="btn btn-outline btn-sm" data-testid="approval-revise-btn">Request Revision</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approval Card 2 -->
+            <div class="approval-card" data-type="review">
+              <div class="approval-card-header">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-data)">DA</div>
+                <div class="approval-card-info">
+                  <div class="approval-card-title">Q4 Revenue Forecast Model Update</div>
+                  <div class="approval-card-meta">
+                    <span style="color:var(--ai-text-tertiary); font-size:0.75rem;">Data Analyst Agent &middot; 1h ago</span>
+                  </div>
+                </div>
+                <div class="approval-card-badges">
+                  <span class="badge badge-success">Pilot</span>
+                  <span class="badge badge-success">Low Risk</span>
+                  <span class="badge badge-purple">Review</span>
+                </div>
+                <button class="approval-card-expand" aria-label="Expand details">&#x25BC;</button>
+              </div>
+              <div class="approval-card-preview" style="display:none;">
+                <div class="approval-preview-content">
+                  <p style="font-size:0.8125rem; color:var(--ai-text-secondary); margin-bottom:12px;">Updated regression model incorporating Q3 actuals. Confidence interval narrowed from +/-8% to +/-5%. Model accuracy improved by 12% on backtesting.</p>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary btn-sm btn-approve">Approve</button>
+                    <button class="btn btn-danger btn-sm btn-reject">Reject</button>
+                    <button class="btn btn-outline btn-sm">Request Revision</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approval Card 3 -->
+            <div class="approval-card" data-type="takeover">
+              <div class="approval-card-header">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-support)">CS</div>
+                <div class="approval-card-info">
+                  <div class="approval-card-title">Customer Escalation: Enterprise Contract Renewal</div>
+                  <div class="approval-card-meta">
+                    <span style="color:var(--ai-text-tertiary); font-size:0.75rem;">Customer Support Agent &middot; 3h ago</span>
+                  </div>
+                </div>
+                <div class="approval-card-badges">
+                  <span class="badge badge-warning">Coaching</span>
+                  <span class="badge badge-error">High Risk</span>
+                  <span class="badge badge-error">Takeover</span>
+                </div>
+                <button class="approval-card-expand" aria-label="Expand details">&#x25BC;</button>
+              </div>
+              <div class="approval-card-preview" style="display:none;">
+                <div class="approval-preview-content">
+                  <p style="font-size:0.8125rem; color:var(--ai-text-secondary); margin-bottom:12px;">Agent has reached its confidence threshold on a high-value enterprise renewal negotiation. Customer is requesting custom terms outside standard playbook. Human takeover recommended.</p>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary btn-sm btn-approve">Take Over</button>
+                    <button class="btn btn-outline btn-sm btn-reject">Return to Agent</button>
+                    <button class="btn btn-outline btn-sm">Request Revision</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Approval Card 4 -->
+            <div class="approval-card" data-type="confirmation">
+              <div class="approval-card-header">
+                <div class="avatar avatar-sm" style="background:var(--ai-agent-code)">CR</div>
+                <div class="approval-card-info">
+                  <div class="approval-card-title">Security Patch: CVE-2026-1234 Auto-Remediation</div>
+                  <div class="approval-card-meta">
+                    <span style="color:var(--ai-text-tertiary); font-size:0.75rem;">Code Reviewer Agent &middot; 5h ago</span>
+                  </div>
+                </div>
+                <div class="approval-card-badges">
+                  <span class="badge badge-primary">Co-pilot</span>
+                  <span class="badge badge-error">High Risk</span>
+                  <span class="badge badge-info">Confirmation</span>
+                </div>
+                <button class="approval-card-expand" aria-label="Expand details">&#x25BC;</button>
+              </div>
+              <div class="approval-card-preview" style="display:none;">
+                <div class="approval-preview-content">
+                  <p style="font-size:0.8125rem; color:var(--ai-text-secondary); margin-bottom:12px;">Agent proposes upgrading Spring Boot from 3.4.1 to 3.4.2 to patch a critical deserialization vulnerability. 47 unit tests pass on the patched version. No breaking API changes detected.</p>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-primary btn-sm btn-approve">Approve</button>
+                    <button class="btn btn-danger btn-sm btn-reject">Reject</button>
+                    <button class="btn btn-outline btn-sm">Request Revision</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none;">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x2705;</div>
+            <h3>No pending approvals</h3>
+            <p>All agent drafts have been reviewed. New items will appear here when agents require human confirmation, review, or takeover.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: MATURITY DASHBOARD (Super Agent)
+           ======================================================== -->
+      <div id="page-maturity" class="page">
+        <div class="page-header">
+          <h1>Maturity Dashboard</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs maturity-tabs" data-testid="maturity-tabs">
+              <button class="state-tab active" data-state="overview">Overview</button>
+              <button class="state-tab" data-state="by-domain">By Domain</button>
+              <button class="state-tab" data-state="trends">Trends</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="maturity-content" style="overflow-y:auto; flex:1; padding:var(--ai-space-6) var(--ai-space-8);">
+          <!-- ATS Scorecard -->
+          <div class="ats-scorecard card" data-testid="ats-scorecard">
+            <div class="ats-scorecard-header">
+              <div>
+                <div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--ai-text-tertiary);">Agent Trust Score (ATS)</div>
+                <div style="font-size:2rem; font-weight:700; color:var(--tp-primary);">87.4</div>
+                <div style="font-size:0.75rem; color:var(--ai-text-secondary);">Across 6 active agents</div>
+              </div>
+              <div class="ats-overall-badge">
+                <span class="badge badge-success" style="font-size:0.8125rem; padding:4px 14px;">Healthy</span>
+              </div>
+            </div>
+            <div class="ats-dimensions" data-testid="ats-dimensions">
+              <div class="ats-dimension">
+                <div class="ats-dimension-label">
+                  <span>Accuracy</span>
+                  <span class="ats-dimension-score">92.1</span>
+                </div>
+                <div class="maturity-bar">
+                  <div class="maturity-bar-fill" style="width:92.1%; background:var(--ai-success);"></div>
+                </div>
+              </div>
+              <div class="ats-dimension">
+                <div class="ats-dimension-label">
+                  <span>Reliability</span>
+                  <span class="ats-dimension-score">88.5</span>
+                </div>
+                <div class="maturity-bar">
+                  <div class="maturity-bar-fill" style="width:88.5%; background:var(--ai-success);"></div>
+                </div>
+              </div>
+              <div class="ats-dimension">
+                <div class="ats-dimension-label">
+                  <span>Safety</span>
+                  <span class="ats-dimension-score">95.0</span>
+                </div>
+                <div class="maturity-bar">
+                  <div class="maturity-bar-fill" style="width:95%; background:var(--ai-success);"></div>
+                </div>
+              </div>
+              <div class="ats-dimension">
+                <div class="ats-dimension-label">
+                  <span>Compliance</span>
+                  <span class="ats-dimension-score">79.2</span>
+                </div>
+                <div class="maturity-bar">
+                  <div class="maturity-bar-fill" style="width:79.2%; background:var(--ai-warning);"></div>
+                </div>
+              </div>
+              <div class="ats-dimension">
+                <div class="ats-dimension-label">
+                  <span>Efficiency</span>
+                  <span class="ats-dimension-score">82.3</span>
+                </div>
+                <div class="maturity-bar">
+                  <div class="maturity-bar-fill" style="width:82.3%; background:var(--ai-success);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Maturity Grid -->
+          <div style="margin-top:var(--ai-space-6);">
+            <h2 style="font-size:1rem; font-weight:700; margin-bottom:var(--ai-space-4);">Agent Maturity Levels</h2>
+            <div class="maturity-grid" data-testid="maturity-grid">
+              <div class="maturity-card card" data-testid="maturity-agent-card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-data)">DA</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">Data Analyst</div>
+                    <span class="badge badge-success">Pilot</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">91.2</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+              <div class="maturity-card card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-support)">CS</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">Customer Support</div>
+                    <span class="badge badge-primary">Co-pilot</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">84.7</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+              <div class="maturity-card card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-code)">CR</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">Code Reviewer</div>
+                    <span class="badge badge-success">Pilot</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">89.3</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+              <div class="maturity-card card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-document)">DP</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">Document Processor</div>
+                    <span class="badge badge-warning">Coaching</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">72.8</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+              <div class="maturity-card card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-orchestrator)">OR</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">Orchestrator</div>
+                    <span class="badge badge-info">Graduate</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">96.1</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+              <div class="maturity-card card">
+                <div class="maturity-card-header">
+                  <div class="avatar avatar-sm" style="background:var(--ai-agent-custom)">QA</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.875rem;">QA Test Writer</div>
+                    <span class="badge badge-warning">Coaching</span>
+                  </div>
+                </div>
+                <div class="maturity-card-score">
+                  <span class="maturity-score-number">68.4</span>
+                  <span class="maturity-score-label">ATS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distribution Summary -->
+          <div style="margin-top:var(--ai-space-6);">
+            <h2 style="font-size:1rem; font-weight:700; margin-bottom:var(--ai-space-4);">Distribution Summary</h2>
+            <div class="card" style="padding:var(--ai-space-5);" data-testid="maturity-distribution">
+              <div class="maturity-distribution-bar">
+                <div class="maturity-dist-segment" style="width:33.3%; background:var(--ai-warning);" title="Coaching: 2 agents">
+                  <span class="maturity-dist-label">Coaching (2)</span>
+                </div>
+                <div class="maturity-dist-segment" style="width:16.7%; background:var(--tp-primary-light);" title="Co-pilot: 1 agent">
+                  <span class="maturity-dist-label">Co-pilot (1)</span>
+                </div>
+                <div class="maturity-dist-segment" style="width:33.3%; background:var(--ai-success);" title="Pilot: 2 agents">
+                  <span class="maturity-dist-label">Pilot (2)</span>
+                </div>
+                <div class="maturity-dist-segment" style="width:16.7%; background:var(--tp-primary-dark);" title="Graduate: 1 agent">
+                  <span class="maturity-dist-label">Graduate (1)</span>
+                </div>
+              </div>
+              <div class="maturity-distribution-legend">
+                <span><span class="maturity-legend-dot" style="background:var(--ai-warning);"></span> Coaching</span>
+                <span><span class="maturity-legend-dot" style="background:var(--tp-primary-light);"></span> Co-pilot</span>
+                <span><span class="maturity-legend-dot" style="background:var(--ai-success);"></span> Pilot</span>
+                <span><span class="maturity-legend-dot" style="background:var(--tp-primary-dark);"></span> Graduate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: EVENT TRIGGERS (Super Agent)
+           ======================================================== -->
+      <div id="page-triggers" class="page">
+        <div class="page-header">
+          <h1>Event Triggers</h1>
+          <div class="page-header-actions">
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Populated</button>
+              <button class="state-tab" data-state="empty">Empty</button>
+            </div>
+            <div class="search-input-wrap" style="width:220px;">
+              <span class="search-icon">&#x1F50D;</span>
+              <input type="text" placeholder="Search triggers..." data-testid="trigger-search" aria-label="Search triggers">
+            </div>
+            <button class="btn btn-primary" data-testid="trigger-new-btn">+ New Trigger</button>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div data-view-state="populated">
+          <div class="triggers-layout" data-testid="triggers-layout">
+            <div class="triggers-list">
+              <div class="trigger-row" data-testid="trigger-row" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">New Employee Onboarded</div>
+                  <span class="badge badge-info">Entity Lifecycle</span>
+                  <span class="trigger-row-target">HR Policy Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 2h ago</span>
+                </div>
+                <div class="toggle on" data-testid="trigger-toggle" aria-label="Toggle trigger active state"></div>
+              </div>
+              <div class="trigger-row active" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">Daily Architecture Digest</div>
+                  <span class="badge badge-warning">Time-based</span>
+                  <span class="trigger-row-target">EA Architect Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 9:00 AM today</span>
+                </div>
+                <div class="toggle on" aria-label="Toggle trigger active state"></div>
+              </div>
+              <div class="trigger-row" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">GitHub PR Created</div>
+                  <span class="badge badge-primary">External Webhook</span>
+                  <span class="trigger-row-target">Code Reviewer Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 45 min ago</span>
+                </div>
+                <div class="toggle on" aria-label="Toggle trigger active state"></div>
+              </div>
+              <div class="trigger-row" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">Contract Uploaded to DMS</div>
+                  <span class="badge badge-purple">Workflow Step</span>
+                  <span class="trigger-row-target">Document Processor Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 1d ago</span>
+                </div>
+                <div class="toggle" aria-label="Toggle trigger active state"></div>
+              </div>
+              <div class="trigger-row" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">SLA Breach Detected</div>
+                  <span class="badge badge-info">Entity Lifecycle</span>
+                  <span class="trigger-row-target">Customer Support Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 6h ago</span>
+                </div>
+                <div class="toggle on" aria-label="Toggle trigger active state"></div>
+              </div>
+              <div class="trigger-row" tabindex="0" role="button" aria-label="View trigger details">
+                <div class="trigger-row-main">
+                  <div class="trigger-row-name">Weekly KPI Report</div>
+                  <span class="badge badge-warning">Time-based</span>
+                  <span class="trigger-row-target">Data Analyst Agent</span>
+                  <span style="font-size:0.75rem; color:var(--ai-text-tertiary);">Last fired: 3d ago</span>
+                </div>
+                <div class="toggle on" aria-label="Toggle trigger active state"></div>
+              </div>
+            </div>
+
+            <!-- Detail Panel -->
+            <div class="trigger-detail" data-testid="trigger-detail">
+              <div class="trigger-detail-header">
+                <h3 style="font-size:1rem; font-weight:700;">Daily Architecture Digest</h3>
+                <span class="badge badge-warning">Time-based</span>
+              </div>
+              <div class="trigger-detail-section">
+                <div class="trigger-detail-label">Source Configuration</div>
+                <div class="trigger-detail-code">
+                  <code>schedule: "0 9 * * 1-5"</code><br>
+                  <code>timezone: "UTC+4"</code>
+                </div>
+              </div>
+              <div class="trigger-detail-section">
+                <div class="trigger-detail-label">Conditions</div>
+                <div class="trigger-detail-code">
+                  <code>{</code><br>
+                  <code>&nbsp;&nbsp;"weekday": true,</code><br>
+                  <code>&nbsp;&nbsp;"skip_holidays": true,</code><br>
+                  <code>&nbsp;&nbsp;"min_changes": 1</code><br>
+                  <code>}</code>
+                </div>
+              </div>
+              <div class="trigger-detail-section">
+                <div class="trigger-detail-label">Action</div>
+                <div class="trigger-detail-code">
+                  <code>agent: "ea-architect"</code><br>
+                  <code>task: "generate_daily_digest"</code><br>
+                  <code>output: "email + dashboard"</code>
+                </div>
+              </div>
+              <div class="trigger-detail-section">
+                <div class="trigger-detail-label">History</div>
+                <div style="font-size:0.8125rem; color:var(--ai-text-secondary);">
+                  <div style="padding:4px 0; border-bottom:1px solid var(--ai-border-subtle);">Today 9:00 AM - Success (1.2s)</div>
+                  <div style="padding:4px 0; border-bottom:1px solid var(--ai-border-subtle);">Yesterday 9:00 AM - Success (1.4s)</div>
+                  <div style="padding:4px 0; border-bottom:1px solid var(--ai-border-subtle);">Mon 9:00 AM - Skipped (no changes)</div>
+                  <div style="padding:4px 0;">Fri 9:00 AM - Success (1.1s)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div data-view-state="empty" style="display:none;">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x26A1;</div>
+            <h3>No triggers configured yet</h3>
+            <p>Create your first event trigger to automate agent tasks based on entity lifecycle events, schedules, webhooks, or workflow steps.</p>
+            <button class="btn btn-primary">+ Create First Trigger</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: EMBEDDED PANEL DEMO (Super Agent)
+           ======================================================== -->
+      <div id="page-embedded" class="page">
+        <div class="page-header">
+          <h1>Embedded Panel Demo</h1>
+          <div class="page-header-actions">
+            <span class="badge badge-info">Integration Preview</span>
+          </div>
+        </div>
+
+        <div class="embedded-host" data-testid="embedded-host">
+          <div class="embedded-host-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:28px; height:28px; background:var(--ai-border); border-radius:6px;"></div>
+              <span style="font-weight:700; font-size:0.875rem; color:var(--ai-text-tertiary);">Third-Party Application</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <div style="width:60px; height:8px; background:var(--ai-border); border-radius:4px;"></div>
+              <div style="width:60px; height:8px; background:var(--ai-border); border-radius:4px;"></div>
+              <div style="width:60px; height:8px; background:var(--ai-border); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div class="embedded-host-body">
+            <div class="embedded-host-sidebar">
+              <div style="width:80%; height:10px; background:var(--ai-border); border-radius:4px; margin-bottom:12px;"></div>
+              <div style="width:60%; height:10px; background:var(--ai-border); border-radius:4px; margin-bottom:12px;"></div>
+              <div style="width:70%; height:10px; background:var(--ai-border); border-radius:4px; margin-bottom:12px;"></div>
+              <div style="width:50%; height:10px; background:var(--ai-border); border-radius:4px; margin-bottom:12px;"></div>
+              <div style="width:65%; height:10px; background:var(--ai-border); border-radius:4px;"></div>
+            </div>
+            <div class="embedded-host-main">
+              <div style="width:40%; height:14px; background:var(--ai-border); border-radius:4px; margin-bottom:16px;"></div>
+              <div style="width:100%; height:10px; background:var(--ai-border-subtle); border-radius:4px; margin-bottom:8px;"></div>
+              <div style="width:90%; height:10px; background:var(--ai-border-subtle); border-radius:4px; margin-bottom:8px;"></div>
+              <div style="width:95%; height:10px; background:var(--ai-border-subtle); border-radius:4px; margin-bottom:24px;"></div>
+              <div style="width:100%; height:120px; background:var(--ai-border-subtle); border-radius:8px; margin-bottom:16px;"></div>
+              <div style="width:100%; height:10px; background:var(--ai-border-subtle); border-radius:4px; margin-bottom:8px;"></div>
+              <div style="width:80%; height:10px; background:var(--ai-border-subtle); border-radius:4px;"></div>
+            </div>
+          </div>
+
+          <!-- Floating Action Button -->
+          <button class="embedded-fab" data-testid="embedded-fab" aria-label="Open AI agent panel" title="AI Agent">
+            <span style="font-size:1.25rem;">&#x1F916;</span>
+          </button>
+
+          <!-- Embedded Chat Panel (hidden by default) -->
+          <div class="embedded-panel" data-testid="embedded-panel" style="display:none;">
+            <div class="embedded-panel-header">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="avatar avatar-sm" style="background:var(--tp-primary);">AI</div>
+                <span style="font-weight:700; font-size:0.875rem;">AI Assistant</span>
+              </div>
+              <div style="display:flex; gap:4px;">
+                <button class="embedded-panel-minimize" aria-label="Minimize panel" data-testid="embedded-minimize-btn">&#x2212;</button>
+                <button class="embedded-panel-close" aria-label="Close panel" data-testid="embedded-close-btn">&#x2715;</button>
+              </div>
+            </div>
+            <div class="embedded-panel-agent-select">
+              <label for="embedded-agent-select" class="sr-only">Select agent</label>
+              <select id="embedded-agent-select" data-testid="embedded-agent-select" style="width:100%; font-size:0.8125rem; padding:6px 10px;">
+                <option>Context-Aware Assistant</option>
+                <option>Data Analyst Agent</option>
+                <option>Customer Support Agent</option>
+                <option>Document Processor</option>
+              </select>
+            </div>
+            <div class="embedded-panel-messages">
+              <div class="message-row agent" style="max-width:100%;">
+                <div>
+                  <div class="message-bubble" style="font-size:0.8125rem;">
+                    Hi! I can help you with this page. I have context about the data you're viewing. What would you like to know?
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="embedded-panel-input">
+              <input type="text" placeholder="Ask about this page..." data-testid="embedded-chat-input" style="flex:1;">
+              <button class="chat-send-btn" style="width:30px; height:30px; font-size:0.8125rem;" data-testid="embedded-send-btn">&#x2191;<span class="sr-only">Send</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           PAGE: BENCHMARKING (Super Agent)
+           ======================================================== -->
+      <div id="page-benchmarking" class="page">
+        <div class="page-header">
+          <h1>Cross-Tenant Benchmarking</h1>
+          <div class="page-header-actions">
+            <span class="badge badge-info">Platform Admin Only</span>
+            <div class="state-tabs">
+              <button class="state-tab active" data-state="populated">Opted In</button>
+              <button class="state-tab" data-state="empty">Not Opted In</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opted In State -->
+        <div data-view-state="populated">
+          <div class="benchmark-content" style="overflow-y:auto; flex:1; padding:var(--ai-space-6) var(--ai-space-8);">
+            <!-- Opt-in Banner -->
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--ai-space-6); padding:var(--ai-space-4) var(--ai-space-5);" data-testid="benchmark-optin">
+              <div>
+                <div style="font-weight:700; font-size:0.875rem;">Benchmarking Opt-In</div>
+                <div style="font-size:0.8125rem; color:var(--ai-text-secondary);">Your anonymized metrics are shared with 7 other tenants for comparative analysis.</div>
+              </div>
+              <div class="toggle on" data-testid="benchmark-optin-toggle" aria-label="Toggle benchmarking opt-in"></div>
+            </div>
+
+            <!-- Position Cards -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:var(--ai-space-4); margin-bottom:var(--ai-space-6);">
+              <div class="metric-card" data-testid="benchmark-position">
+                <div class="metric-label">Your Position</div>
+                <div class="metric-value">2nd</div>
+                <div class="metric-delta positive">of 8 tenants</div>
+                <div class="trend-card"><span class="trend-arrow trend-up">&#x2191;</span><span class="trend-label">Improving</span></div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Avg ATS (Yours)</div>
+                <div class="metric-value">87.4</div>
+                <div class="metric-delta positive">+5.2 vs median</div>
+                <div class="trend-card"><span class="trend-arrow trend-up">&#x2191;</span><span class="trend-label">+2.1 this month</span></div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Automation Rate</div>
+                <div class="metric-value">73%</div>
+                <div class="metric-delta positive">+12% vs median</div>
+                <div class="trend-card"><span class="trend-arrow trend-up">&#x2191;</span><span class="trend-label">+5% this month</span></div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Avg Response Time</div>
+                <div class="metric-value">1.8s</div>
+                <div class="metric-delta positive">-0.4s vs median</div>
+                <div class="trend-card"><span class="trend-arrow trend-down">&#x2193;</span><span class="trend-label">Slower vs last</span></div>
+              </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="card" style="padding:0; overflow:hidden;" data-testid="benchmark-table">
+              <table class="data-table benchmark-table">
+                <thead>
+                  <tr>
+                    <th>Tenant</th>
+                    <th>Agents</th>
+                    <th>Avg ATS</th>
+                    <th>Avg Response Time</th>
+                    <th>Automation Rate</th>
+                    <th>Comparison</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight:600;">Tenant A</td>
+                    <td>9</td>
+                    <td>91.2</td>
+                    <td>1.4s</td>
+                    <td>81%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:91.2%; background:var(--ai-success);"></div></div></td>
+                  </tr>
+                  <tr style="background:rgba(66, 129, 119, 0.06);">
+                    <td style="font-weight:700; color:var(--tp-primary);">You (Tenant B)</td>
+                    <td>6</td>
+                    <td>87.4</td>
+                    <td>1.8s</td>
+                    <td>73%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:87.4%; background:var(--tp-primary);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant C</td>
+                    <td>12</td>
+                    <td>85.1</td>
+                    <td>2.1s</td>
+                    <td>68%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:85.1%; background:var(--ai-success);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant D</td>
+                    <td>4</td>
+                    <td>82.3</td>
+                    <td>2.4s</td>
+                    <td>62%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:82.3%; background:var(--ai-warning);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant E</td>
+                    <td>7</td>
+                    <td>80.9</td>
+                    <td>2.6s</td>
+                    <td>59%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:80.9%; background:var(--ai-warning);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant F</td>
+                    <td>3</td>
+                    <td>78.5</td>
+                    <td>3.0s</td>
+                    <td>51%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:78.5%; background:var(--ai-warning);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant G</td>
+                    <td>5</td>
+                    <td>75.2</td>
+                    <td>3.3s</td>
+                    <td>45%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:75.2%; background:var(--ai-error);"></div></div></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight:600;">Tenant H</td>
+                    <td>2</td>
+                    <td>71.0</td>
+                    <td>3.8s</td>
+                    <td>38%</td>
+                    <td><div class="benchmark-bar-wrap"><div class="benchmark-bar" style="width:71%; background:var(--ai-error);"></div></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Not Opted In State -->
+        <div data-view-state="empty" style="display:none;">
+          <div class="empty-state">
+            <div class="empty-state-icon">&#x1F3C6;</div>
+            <h3>Benchmarking requires opt-in</h3>
+            <p>Cross-tenant benchmarking allows you to compare your AI agent performance against anonymized metrics from other organizations. Tenant administrators must enable this feature.</p>
+            <button class="btn btn-primary" data-testid="benchmark-optin-btn">Enable Benchmarking</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

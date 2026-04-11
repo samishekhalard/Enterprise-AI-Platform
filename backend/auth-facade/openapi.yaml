@@ -1,0 +1,1364 @@
+openapi: 3.1.0
+info:
+  title: Auth Facade API
+  description: |
+    Backend for Frontend (BFF) authentication service for the EMS platform.
+
+    ## Overview
+    The Auth Facade provides provider-agnostic authentication, abstracting identity providers
+    (Keycloak, Auth0, Okta, Azure AD) behind a unified API. This allows switching identity
+    providers via YAML configuration without code changes.
+
+    ## Architecture
+    - **Strategy Pattern**: Identity providers implement the `IdentityProvider` interface
+    - **Provider Selection**: Set `auth.facade.provider` in configuration (keycloak, auth0, okta, azure-ad)
+    - **Multi-tenancy**: Tenant ID passed via `X-Tenant-ID` header, maps to IdP realm/tenant
+
+    ## Authentication Flows
+    1. **Direct Login**: Email/password via Resource Owner Password Credentials
+    2. **Social Login**: Google One Tap, Microsoft MSAL token exchange
+    3. **Provider Redirect**: OAuth2/OIDC redirect via `kc_idp_hint` (dynamic provider selection)
+    4. **MFA**: TOTP-based two-factor authentication
+
+    ## Token Management
+    - Access tokens: Short-lived JWT (5-15 minutes)
+    - Refresh tokens: Longer-lived, with rotation on use
+    - Token blacklisting via Valkey for logout/revocation
+  version: 1.0.0
+  contact:
+    name: EMS Team
+    email: support@ems.com
+  license:
+    name: Proprietary
+    url: https://ems.com/license
+
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+  - url: https://auth.ems.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: Login, logout, and token management
+  - name: Social Login
+    description: Social identity provider authentication (Google, Microsoft)
+  - name: Dynamic Provider
+    description: Dynamic identity provider selection via kc_idp_hint
+  - name: MFA
+    description: Multi-factor authentication setup and verification
+  - name: User Profile
+    description: Current user information
+  - name: Admin Provider Management
+    description: Administrative endpoints for managing identity providers per tenant (requires ADMIN role)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login with email and password
+      description: |
+        Authenticate user using Direct Access Grant (Resource Owner Password Credentials).
+
+        **Flow:**
+        1. Client sends email/password
+        2. Auth Facade exchanges credentials with IdP for tokens
+        3. If MFA is enabled, returns `mfaRequired: true` with `mfaSessionToken`
+        4. If successful, returns access token, refresh token, and user info
+
+        **Rate Limiting:** 100 requests/minute per IP
+      operationId: login
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              standard:
+                summary: Standard login
+                value:
+                  email: "user@example.com"
+                  password: "securePassword123"
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              examples:
+                success:
+                  summary: Successful login
+                  value:
+                    accessToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    refreshToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    expiresIn: 300
+                    tokenType: "Bearer"
+                    user:
+                      id: "550e8400-e29b-41d4-a716-446655440000"
+                      email: "user@example.com"
+                      firstName: "John"
+                      lastName: "Doe"
+                      tenantId: "tenant-acme"
+                      roles: ["ROLE_USER", "ROLE_MANAGER"]
+                    mfaRequired: false
+                mfaRequired:
+                  summary: MFA required
+                  value:
+                    mfaRequired: true
+                    mfaSessionToken: "mfa_session_abc123..."
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "invalid_credentials"
+                message: "Invalid email or password"
+                timestamp: "2024-01-15T10:30:00Z"
+        '403':
+          description: Account locked or disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "rate_limit_exceeded"
+                message: "Too many login attempts. Please try again in 60 seconds."
+                timestamp: "2024-01-15T10:30:00Z"
+
+  /api/v1/auth/social/google:
+    post:
+      tags: [Social Login]
+      summary: Login with Google One Tap
+      description: |
+        Exchange Google ID token for application tokens using RFC 8693 Token Exchange.
+
+        **Frontend Integration:**
+        ```javascript
+        // Google One Tap callback
+        function handleCredentialResponse(response) {
+          fetch('/api/v1/auth/social/google', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Tenant-ID': tenantId
+            },
+            body: JSON.stringify({ idToken: response.credential })
+          });
+        }
+        ```
+
+        **Token Exchange Flow:**
+        1. Frontend obtains Google ID token via One Tap
+        2. Auth Facade validates token with Google
+        3. Token is exchanged with IdP (Keycloak) using `subject_issuer: google`
+        4. Application tokens are returned
+      operationId: loginWithGoogle
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleTokenRequest'
+            example:
+              idToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIi..."
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired Google token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "authentication_failed"
+                message: "Google authentication failed"
+                timestamp: "2024-01-15T10:30:00Z"
+        '403':
+          description: MFA required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /api/v1/auth/social/microsoft:
+    post:
+      tags: [Social Login]
+      summary: Login with Microsoft MSAL
+      description: |
+        Exchange Microsoft access token for application tokens.
+
+        **Frontend Integration (MSAL.js):**
+        ```javascript
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        const loginResponse = await msalInstance.loginPopup(loginRequest);
+
+        fetch('/api/v1/auth/social/microsoft', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Tenant-ID': tenantId
+          },
+          body: JSON.stringify({ accessToken: loginResponse.accessToken })
+        });
+        ```
+      operationId: loginWithMicrosoft
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MicrosoftTokenRequest'
+            example:
+              accessToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik5..."
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired Microsoft token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: MFA required
+
+  /api/v1/auth/login/{provider}:
+    get:
+      tags: [Dynamic Provider]
+      summary: Initiate login with specific identity provider
+      description: |
+        Initiates OAuth2/OIDC login flow with a specific identity provider using
+        Keycloak's `kc_idp_hint` mechanism (or equivalent for other providers).
+
+        **Use Cases:**
+        - Enterprise SSO (SAML/OIDC with corporate IdP)
+        - Social login buttons that redirect rather than use tokens
+        - B2B scenarios where tenants use their own IdP
+
+        **Flow:**
+        1. Client requests `/api/v1/auth/login/google?redirectUri=/administration`
+        2. Auth Facade builds authorization URL with `kc_idp_hint=google`
+        3. Returns HTTP 302 redirect to IdP login page
+        4. User authenticates with IdP
+        5. IdP redirects back to application with authorization code
+        6. Application exchanges code for tokens
+
+        **Supported Providers:**
+        - `google` - Google OAuth2/OIDC
+        - `microsoft` - Microsoft Azure AD
+        - `facebook` - Facebook OAuth2
+        - `github` - GitHub OAuth2
+        - `saml` - Enterprise SAML (generic)
+        - `okta` - Okta OIDC
+        - `azure-ad` - Azure Active Directory
+      operationId: initiateProviderLogin
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: provider
+          in: path
+          required: true
+          description: Identity provider alias (e.g., google, microsoft, saml)
+          schema:
+            type: string
+            enum: [google, microsoft, facebook, github, saml, okta, azure-ad]
+        - name: redirectUri
+          in: query
+          required: false
+          description: URL to redirect after successful authentication
+          schema:
+            type: string
+            default: "/"
+      responses:
+        '302':
+          description: Redirect to identity provider
+          headers:
+            Location:
+              description: IdP authorization URL
+              schema:
+                type: string
+              example: "https://keycloak.example.com/realms/tenant-acme/protocol/openid-connect/auth?client_id=ems-auth-facade&redirect_uri=/administration&response_type=code&scope=openid%20profile%20email&kc_idp_hint=google&state=abc123"
+        '200':
+          description: Inline authentication successful (rare, for direct grant providers)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid provider or configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "invalid_provider"
+                message: "Provider 'unknown' is not configured for this tenant"
+                timestamp: "2024-01-15T10:30:00Z"
+
+  /api/v1/auth/providers:
+    get:
+      tags: [Dynamic Provider]
+      summary: List available identity providers
+      description: |
+        Returns the list of configured identity providers for the tenant.
+        Used by frontend to display available login options.
+      operationId: getAvailableProviders
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: Provider list retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProvidersResponse'
+              example:
+                active: "keycloak"
+                tenant: "tenant-acme"
+                available:
+                  - alias: "google"
+                    name: "Google"
+                    type: "oidc"
+                  - alias: "microsoft"
+                    name: "Microsoft"
+                    type: "oidc"
+                  - alias: "saml"
+                    name: "Enterprise SAML"
+                    type: "saml"
+
+  /api/v1/auth/login/{tenantId}/{providerName}:
+    get:
+      tags: [Dynamic Provider]
+      summary: Initiate dynamic provider login by tenant and provider
+      description: |
+        Initiates authentication flow with a specific provider for a tenant.
+        This endpoint supports dynamic identity broker functionality where
+        tenants can have multiple identity providers configured.
+
+        **Flow:**
+        1. Client calls `/api/v1/auth/login/{tenantId}/{providerName}`
+        2. Auth Facade resolves provider configuration from storage
+        3. Returns redirect URL or inline authentication based on provider type
+
+        **Use Cases:**
+        - Multi-tenant SaaS with per-tenant identity providers
+        - Enterprise SSO with different IdPs per organization
+        - B2B scenarios with federated identity
+      operationId: initiateDynamicProviderLogin
+      security: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          description: Tenant identifier
+          schema:
+            type: string
+          example: "tenant-acme"
+        - name: providerName
+          in: path
+          required: true
+          description: Provider name as configured for the tenant
+          schema:
+            type: string
+          example: "KEYCLOAK"
+        - name: redirectUri
+          in: query
+          required: false
+          description: URL to redirect after successful authentication
+          schema:
+            type: string
+            default: "/"
+      responses:
+        '302':
+          description: Redirect to identity provider
+          headers:
+            Location:
+              description: IdP authorization URL
+              schema:
+                type: string
+        '200':
+          description: Inline authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '404':
+          description: Provider not found for tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "provider_not_found"
+                message: "Provider 'UNKNOWN' not found for tenant 'tenant-acme'"
+                timestamp: "2024-01-15T10:30:00Z"
+
+  # =========================================================================
+  # Admin Provider Management Endpoints
+  # =========================================================================
+
+  /api/v1/admin/tenants/{tenantId}/providers:
+    get:
+      tags: [Admin Provider Management]
+      summary: List identity providers for tenant
+      description: |
+        Returns all configured identity providers for the specified tenant.
+        Each provider includes its configuration details (excluding sensitive data).
+
+        **Requires:** ADMIN role
+      operationId: listProviders
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      responses:
+        '200':
+          description: Provider list retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderConfigResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions (requires ADMIN role)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags: [Admin Provider Management]
+      summary: Register new identity provider
+      description: |
+        Registers a new identity provider for the specified tenant.
+
+        **Supported Protocols:**
+        - `OIDC` - OpenID Connect (Keycloak, Auth0, Okta, Azure AD)
+        - `SAML` - Security Assertion Markup Language
+        - `LDAP` - Lightweight Directory Access Protocol
+        - `OAUTH2` - Generic OAuth2 providers
+
+        **Requires:** ADMIN role
+      operationId: registerProvider
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderConfigRequest'
+            examples:
+              keycloak:
+                summary: Keycloak OIDC Provider
+                value:
+                  providerName: "KEYCLOAK"
+                  displayName: "Company SSO"
+                  protocol: "OIDC"
+                  clientId: "ems-auth-client"
+                  clientSecret: "secret-value"
+                  discoveryUrl: "https://keycloak.example.com/realms/tenant-acme/.well-known/openid-configuration"
+                  scopes: ["openid", "profile", "email"]
+                  enabled: true
+              ldap:
+                summary: LDAP Provider
+                value:
+                  providerName: "LDAP"
+                  displayName: "Active Directory"
+                  protocol: "LDAP"
+                  serverUrl: "ldap://ldap.example.com"
+                  port: 389
+                  bindDn: "cn=admin,dc=example,dc=com"
+                  bindPassword: "admin-password"
+                  userSearchBase: "ou=users,dc=example,dc=com"
+                  userSearchFilter: "(uid={0})"
+                  enabled: true
+      responses:
+        '201':
+          description: Provider registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderConfigResponse'
+        '400':
+          description: Invalid provider configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Not authenticated
+        '403':
+          description: Insufficient permissions
+        '409':
+          description: Provider with same name already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "provider_exists"
+                message: "Provider 'KEYCLOAK' already exists for tenant 'tenant-acme'"
+                timestamp: "2024-01-15T10:30:00Z"
+
+  /api/v1/admin/tenants/{tenantId}/providers/{providerId}:
+    get:
+      tags: [Admin Provider Management]
+      summary: Get identity provider by ID
+      description: |
+        Returns the configuration for a specific identity provider.
+        Sensitive data like secrets are masked.
+
+        **Requires:** ADMIN role
+      operationId: getProvider
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      responses:
+        '200':
+          description: Provider retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderConfigResponse'
+        '401':
+          description: Not authenticated
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Provider not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Admin Provider Management]
+      summary: Update identity provider
+      description: |
+        Updates an existing identity provider configuration.
+
+        **Note:** Changing the provider name or protocol may affect existing user sessions.
+
+        **Requires:** ADMIN role
+      operationId: updateProvider
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderConfigRequest'
+      responses:
+        '200':
+          description: Provider updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderConfigResponse'
+        '400':
+          description: Invalid provider configuration
+        '401':
+          description: Not authenticated
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Provider not found
+
+    delete:
+      tags: [Admin Provider Management]
+      summary: Delete identity provider
+      description: |
+        Deletes an identity provider from the tenant.
+
+        **Warning:** This operation is irreversible. Users authenticated via
+        this provider will need to re-authenticate using a different provider.
+
+        **Requires:** ADMIN role
+      operationId: deleteProvider
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+        - $ref: '#/components/parameters/ProviderIdPath'
+      responses:
+        '204':
+          description: Provider deleted successfully
+        '401':
+          description: Not authenticated
+        '403':
+          description: Insufficient permissions
+        '404':
+          description: Provider not found
+
+  /api/v1/admin/tenants/{tenantId}/providers/cache/invalidate:
+    post:
+      tags: [Admin Provider Management]
+      summary: Invalidate provider cache
+      description: |
+        Forces invalidation of the provider cache for the specified tenant.
+        Use this after making direct database changes.
+
+        **Requires:** ADMIN role
+      operationId: invalidateProviderCache
+      parameters:
+        - $ref: '#/components/parameters/TenantIdPath'
+      responses:
+        '204':
+          description: Cache invalidated successfully
+        '401':
+          description: Not authenticated
+        '403':
+          description: Insufficient permissions
+
+  /api/v1/auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh access token
+      description: |
+        Exchange refresh token for new access token with token rotation.
+
+        **Token Rotation:**
+        Each refresh request returns a new refresh token, invalidating the old one.
+        This provides better security by limiting the window of opportunity for
+        stolen tokens.
+
+        **Best Practices:**
+        - Store refresh token securely (httpOnly cookie or secure storage)
+        - Refresh proactively before access token expires
+        - Handle 401 by clearing tokens and redirecting to login
+      operationId: refreshToken
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            example:
+              refreshToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "invalid_token"
+                message: "Invalid or expired refresh token"
+                timestamp: "2024-01-15T10:30:00Z"
+
+  /api/v1/auth/logout:
+    post:
+      tags: [Authentication]
+      summary: Logout
+      description: |
+        Invalidate refresh token and end the session.
+
+        **What happens:**
+        1. Refresh token is revoked at the IdP
+        2. Token JTI is added to Valkey blacklist (TTL = token remaining lifetime)
+        3. Client should clear local token storage
+
+        **Note:** This is idempotent - calling logout with an already-revoked
+        token returns success.
+      operationId: logout
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+            example:
+              refreshToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '204':
+          description: Logout successful
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/mfa/setup:
+    post:
+      tags: [MFA]
+      summary: Setup MFA
+      description: |
+        Initialize TOTP MFA setup for the authenticated user.
+
+        **Setup Flow:**
+        1. User requests MFA setup (this endpoint)
+        2. Server generates TOTP secret and QR code
+        3. User scans QR code with authenticator app
+        4. User verifies setup with `/mfa/verify` endpoint
+        5. MFA is confirmed and enabled
+
+        **Response includes:**
+        - `secret`: Base32-encoded TOTP secret (for manual entry)
+        - `qrCodeUri`: Data URI for QR code image
+        - `recoveryCodes`: One-time backup codes (store securely!)
+      operationId: setupMfa
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaSetupRequest'
+            example:
+              method: "TOTP"
+      responses:
+        '200':
+          description: MFA setup initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponse'
+              example:
+                method: "TOTP"
+                secret: "JBSWY3DPEHPK3PXP"
+                qrCodeUri: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+                recoveryCodes:
+                  - "abc123-def456"
+                  - "ghi789-jkl012"
+                  - "mno345-pqr678"
+                  - "stu901-vwx234"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth/mfa/verify:
+    post:
+      tags: [MFA]
+      summary: Verify MFA code
+      description: |
+        Verify TOTP code to complete MFA authentication or setup.
+
+        **Two use cases:**
+
+        1. **During Login (MFA Challenge):**
+           - After login returns `mfaRequired: true`
+           - User enters TOTP code from authenticator
+           - On success, returns full auth tokens
+
+        2. **During MFA Setup:**
+           - After `/mfa/setup` returns secret and QR code
+           - User enters code to confirm setup
+           - On success, MFA is permanently enabled
+
+        **Code Validation:**
+        - 6-digit TOTP code
+        - 30-second time window with 1-step tolerance
+        - SHA1 hash algorithm (standard)
+      operationId: verifyMfa
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+            example:
+              mfaSessionToken: "mfa_session_abc123..."
+              code: "123456"
+      responses:
+        '200':
+          description: MFA verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid MFA code or session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "invalid_mfa_code"
+                message: "Invalid MFA code"
+                timestamp: "2024-01-15T10:30:00Z"
+
+  /api/v1/auth/me:
+    get:
+      tags: [User Profile]
+      summary: Get current user profile
+      description: |
+        Get profile information for the authenticated user.
+
+        User information is extracted from the JWT claims using the
+        provider-agnostic claim mapping configured in `auth.facade.user-claim-mappings`.
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+              example:
+                id: "550e8400-e29b-41d4-a716-446655440000"
+                email: "user@example.com"
+                firstName: "John"
+                lastName: "Doe"
+                tenantId: "tenant-acme"
+                roles:
+                  - "ROLE_USER"
+                  - "ROLE_MANAGER"
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "unauthorized"
+                message: "Not authenticated"
+                timestamp: "2024-01-15T10:30:00Z"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT access token obtained from login endpoints.
+
+        **Header format:** `Authorization: Bearer <token>`
+
+        **Token structure:**
+        - `sub`: User ID
+        - `email`: User email
+        - `tenant_id`: Tenant identifier
+        - `realm_access.roles`: User roles (Keycloak)
+        - `exp`: Expiration timestamp
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      description: |
+        Tenant identifier. Maps to IdP realm/organization.
+
+        **Format:** `tenant-{name}` or `master` for platform admin
+
+        **Examples:**
+        - `tenant-acme` - ACME Corporation tenant
+        - `tenant-globex` - Globex tenant
+        - `master` - Platform administration
+      schema:
+        type: string
+        pattern: '^(master|tenant-[a-z0-9-]+)$'
+      example: "tenant-acme"
+
+    TenantIdPath:
+      name: tenantId
+      in: path
+      required: true
+      description: Tenant identifier
+      schema:
+        type: string
+        pattern: '^(master|tenant-[a-z0-9-]+)$'
+      example: "tenant-acme"
+
+    ProviderIdPath:
+      name: providerId
+      in: path
+      required: true
+      description: Provider identifier (name or UUID)
+      schema:
+        type: string
+      example: "KEYCLOAK"
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: User's password
+          minLength: 8
+          example: "securePassword123"
+      description: Credentials for email/password authentication
+
+    GoogleTokenRequest:
+      type: object
+      required:
+        - idToken
+      properties:
+        idToken:
+          type: string
+          description: Google ID token from One Tap or Sign-In
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    MicrosoftTokenRequest:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+          description: Microsoft access token from MSAL
+          example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Ik5..."
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token from previous authentication
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token to invalidate
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    MfaSetupRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          enum: [TOTP, SMS, EMAIL]
+          default: TOTP
+          description: |
+            MFA method to set up.
+            Currently only TOTP is fully supported.
+          example: "TOTP"
+
+    MfaVerifyRequest:
+      type: object
+      required:
+        - mfaSessionToken
+        - code
+      properties:
+        mfaSessionToken:
+          type: string
+          description: Session token from login response (when MFA required)
+          example: "mfa_session_abc123..."
+        code:
+          type: string
+          pattern: '^\d{6}$'
+          description: 6-digit TOTP code from authenticator app
+          example: "123456"
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token for API authentication
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: Refresh token for obtaining new access tokens
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        expiresIn:
+          type: integer
+          description: Access token lifetime in seconds
+          example: 300
+        tokenType:
+          type: string
+          default: "Bearer"
+          description: Token type (always "Bearer")
+          example: "Bearer"
+        user:
+          $ref: '#/components/schemas/UserInfo'
+        mfaRequired:
+          type: boolean
+          description: True if MFA verification is needed before tokens are issued
+          example: false
+        mfaSessionToken:
+          type: string
+          description: |
+            Session token for MFA verification.
+            Only present when `mfaRequired` is true.
+            Valid for 5 minutes.
+          example: "mfa_session_abc123..."
+
+    MfaSetupResponse:
+      type: object
+      properties:
+        method:
+          type: string
+          enum: [TOTP, SMS, EMAIL]
+          description: MFA method being set up
+          example: "TOTP"
+        secret:
+          type: string
+          description: |
+            Base32-encoded TOTP secret for manual entry.
+            Show this if user cannot scan QR code.
+          example: "JBSWY3DPEHPK3PXP"
+        qrCodeUri:
+          type: string
+          description: |
+            Data URI containing PNG QR code image.
+            Can be used directly in `<img src="...">` tag.
+          example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+        recoveryCodes:
+          type: array
+          items:
+            type: string
+          description: |
+            One-time backup codes. Each can be used once instead of TOTP.
+            User should store these securely offline.
+          example:
+            - "abc123-def456"
+            - "ghi789-jkl012"
+
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier (from IdP `sub` claim)
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "user@example.com"
+        firstName:
+          type: string
+          description: User's first name (given_name claim)
+          example: "John"
+        lastName:
+          type: string
+          description: User's last name (family_name claim)
+          example: "Doe"
+        tenantId:
+          type: string
+          description: Tenant identifier the user belongs to
+          example: "tenant-acme"
+        roles:
+          type: array
+          items:
+            type: string
+          description: |
+            User's roles/authorities. Extracted from IdP using
+            configured role claim paths.
+          example:
+            - "ROLE_USER"
+            - "ROLE_MANAGER"
+
+    ProvidersResponse:
+      type: object
+      properties:
+        active:
+          type: string
+          description: Currently active identity provider type
+          example: "keycloak"
+        tenant:
+          type: string
+          description: Current tenant identifier
+          example: "tenant-acme"
+        available:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProviderInfo'
+          description: List of available identity providers
+
+    ProviderInfo:
+      type: object
+      properties:
+        alias:
+          type: string
+          description: Provider alias for API calls
+          example: "google"
+        name:
+          type: string
+          description: Human-readable provider name
+          example: "Google"
+        type:
+          type: string
+          enum: [oidc, saml]
+          description: Protocol type
+          example: "oidc"
+
+    ProviderConfigRequest:
+      type: object
+      required:
+        - providerName
+        - protocol
+      properties:
+        providerName:
+          type: string
+          description: Provider name/type identifier
+          enum: [KEYCLOAK, UAE_PASS, AUTH0, OKTA, AZURE_AD, GOOGLE, MICROSOFT, GITHUB, LDAP, SAML, CUSTOM]
+          example: "KEYCLOAK"
+        displayName:
+          type: string
+          description: Display name for the provider (shown in UI)
+          example: "Company SSO"
+        protocol:
+          type: string
+          description: Authentication protocol
+          enum: [OIDC, SAML, LDAP, OAUTH2]
+          example: "OIDC"
+        clientId:
+          type: string
+          description: OAuth2/OIDC client ID
+          example: "ems-auth-client"
+        clientSecret:
+          type: string
+          description: OAuth2/OIDC client secret
+          format: password
+          example: "client-secret-value"
+        discoveryUrl:
+          type: string
+          description: OIDC discovery URL (/.well-known/openid-configuration)
+          format: uri
+          example: "https://keycloak.example.com/realms/tenant-acme/.well-known/openid-configuration"
+        metadataUrl:
+          type: string
+          description: SAML metadata URL
+          format: uri
+          example: "https://idp.example.com/saml/metadata"
+        serverUrl:
+          type: string
+          description: LDAP server URL
+          example: "ldap://ldap.example.com"
+        port:
+          type: integer
+          description: LDAP server port
+          default: 389
+          example: 389
+        bindDn:
+          type: string
+          description: LDAP bind DN (distinguished name for authentication)
+          example: "cn=admin,dc=example,dc=com"
+        bindPassword:
+          type: string
+          description: LDAP bind password
+          format: password
+        userSearchBase:
+          type: string
+          description: LDAP user search base
+          example: "ou=users,dc=example,dc=com"
+        userSearchFilter:
+          type: string
+          description: LDAP user search filter
+          example: "(uid={0})"
+        idpHint:
+          type: string
+          description: Identity provider hint (for Keycloak kc_idp_hint or similar)
+          example: "google"
+        scopes:
+          type: array
+          items:
+            type: string
+          description: OAuth2/OIDC scopes to request
+          default: ["openid", "profile", "email"]
+          example: ["openid", "profile", "email"]
+        authorizationUrl:
+          type: string
+          description: Authorization endpoint URL (for OAuth2 providers without discovery)
+          format: uri
+        tokenUrl:
+          type: string
+          description: Token endpoint URL (for OAuth2 providers without discovery)
+          format: uri
+        userInfoUrl:
+          type: string
+          description: User info endpoint URL (for OAuth2 providers without discovery)
+          format: uri
+        jwksUrl:
+          type: string
+          description: JWKS URL for token validation
+          format: uri
+        issuerUrl:
+          type: string
+          description: Issuer URL for token validation
+          format: uri
+        enabled:
+          type: boolean
+          description: Whether this provider is enabled for authentication
+          default: true
+          example: true
+        priority:
+          type: integer
+          description: Priority order for provider display (lower = higher priority)
+          default: 100
+          example: 1
+        trustEmail:
+          type: boolean
+          description: Whether to trust email addresses from this provider
+          default: true
+        storeToken:
+          type: boolean
+          description: Whether to store tokens from this provider
+          default: false
+        linkExistingAccounts:
+          type: boolean
+          description: Whether to link existing accounts by email
+          default: true
+
+    ProviderConfigResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique provider identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        providerName:
+          type: string
+          description: Provider name/type identifier
+          example: "KEYCLOAK"
+        displayName:
+          type: string
+          description: Display name for the provider
+          example: "Company SSO"
+        protocol:
+          type: string
+          description: Authentication protocol
+          enum: [OIDC, SAML, LDAP, OAUTH2]
+          example: "OIDC"
+        clientId:
+          type: string
+          description: OAuth2/OIDC client ID
+          example: "ems-auth-client"
+        clientSecret:
+          type: string
+          description: OAuth2/OIDC client secret (masked)
+          example: "cl****et"
+        discoveryUrl:
+          type: string
+          description: OIDC discovery URL
+          example: "https://keycloak.example.com/realms/tenant-acme/.well-known/openid-configuration"
+        metadataUrl:
+          type: string
+          description: SAML metadata URL
+        serverUrl:
+          type: string
+          description: LDAP server URL
+        port:
+          type: integer
+          description: LDAP server port
+        bindDn:
+          type: string
+          description: LDAP bind DN (masked)
+        userSearchBase:
+          type: string
+          description: LDAP user search base
+        idpHint:
+          type: string
+          description: Identity provider hint
+        scopes:
+          type: array
+          items:
+            type: string
+          description: OAuth2/OIDC scopes
+        enabled:
+          type: boolean
+          description: Whether this provider is enabled
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the provider was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the provider was last updated
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - timestamp
+      properties:
+        error:
+          type: string
+          description: Error code for programmatic handling
+          example: "invalid_credentials"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid email or password"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the error occurred
+          example: "2024-01-15T10:30:00Z"
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error details (optional)

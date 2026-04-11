@@ -1,0 +1,85 @@
+<div class="icon-picker" data-testid="icon-picker">
+  <!-- Search -->
+  @if (showSearch()) {
+    <div class="picker-search">
+      <ng-icon name="phosphorMagnifyingGlassThin" class="search-icon" aria-hidden="true" />
+      <input
+        type="search"
+        pInputText
+        class="picker-search-input"
+        [ngModel]="search()"
+        (ngModelChange)="onSearchInput($event)"
+        placeholder="Search icons..."
+        aria-label="Search icons"
+        data-testid="icon-picker-search"
+      />
+      <span class="result-count" aria-live="polite">{{ resultCount() }} icons</span>
+    </div>
+  }
+
+  <!-- Category tabs -->
+  <div class="picker-categories" role="tablist" aria-label="Icon categories">
+    @for (cat of categories(); track cat.id) {
+      <button
+        type="button"
+        pButton
+        [text]="true"
+        class="category-tab"
+        [class.active]="activeCategory() === cat.id"
+        role="tab"
+        [attr.aria-selected]="activeCategory() === cat.id"
+        [attr.data-testid]="'icon-picker-cat-' + cat.id"
+        (click)="onCategoryChange(cat.id)"
+      >
+        {{ cat.label }}
+        <span class="cat-count">{{ cat.iconCount }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Icon grid with virtual scroll -->
+  <cdk-virtual-scroll-viewport
+    [itemSize]="48"
+    class="picker-viewport"
+    data-testid="icon-picker-grid"
+  >
+    <div *cdkVirtualFor="let row of iconRows()" class="icon-row">
+      @for (icon of row; track icon.name) {
+        <button
+          type="button"
+          pButton
+          [text]="true"
+          class="icon-cell"
+          [class.selected]="isSelected(icon.name)"
+          [attr.aria-label]="icon.displayName"
+          [attr.data-testid]="'icon-cell-' + icon.name"
+          (click)="onIconClick(icon)"
+        >
+          <ng-icon [name]="icon.name" size="20" />
+        </button>
+      }
+    </div>
+  </cdk-virtual-scroll-viewport>
+
+  <!-- Empty state -->
+  @if (resultCount() === 0) {
+    <div class="picker-empty" data-testid="icon-picker-empty">
+      <ng-icon name="phosphorMagnifyingGlassThin" size="32" />
+      <p>No icons found for "{{ search() }}"</p>
+    </div>
+  }
+
+  <!-- Preview panel -->
+  @if (previewIcon()) {
+    <div class="picker-preview" data-testid="icon-picker-preview">
+      <div class="preview-sizes">
+        <ng-icon [name]="previewIcon()!" size="16" />
+        <ng-icon [name]="previewIcon()!" size="20" />
+        <ng-icon [name]="previewIcon()!" size="24" />
+        <ng-icon [name]="previewIcon()!" size="32" />
+        <ng-icon [name]="previewIcon()!" size="48" />
+      </div>
+      <span class="preview-name">{{ previewIcon() }}</span>
+    </div>
+  }
+</div>

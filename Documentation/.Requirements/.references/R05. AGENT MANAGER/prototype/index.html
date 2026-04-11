@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThinkPLUS Agent Platform — Prototype</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!-- LOGIN VIEW                                                         -->
+<!-- ================================================================== -->
+<div id="login-view" class="login-page">
+  <div class="background-pattern" aria-hidden="true"></div>
+
+  <main class="login-content">
+    <a href="#" class="welcome-logo-link" aria-label="ThinkPLUS Home">
+      <span class="welcome-logo-fallback" aria-label="ThinkPLUS">think+</span>
+    </a>
+
+    <h1 class="welcome-title">Welcome to Agent Platform</h1>
+    <p class="welcome-subtitle">Empower. Transform. Succeed.</p>
+
+    <div id="error-banner" class="error-banner" role="alert" style="display:none"></div>
+
+    <div class="signin-section" id="signin-section">
+      <button type="button" class="signin-btn" id="signin-btn" aria-label="Sign in with Email">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+          <polyline points="3,7 12,13 21,7"></polyline>
+        </svg>
+        Sign in with Email
+      </button>
+
+      <p class="help-text">
+        Having trouble signing in?
+        <a href="mailto:support@thinkplus.ae">Contact support</a>
+      </p>
+    </div>
+
+    <div class="signin-card-stage" id="signin-card-stage" style="display:none">
+      <form class="login-form" id="login-form" novalidate>
+        <div class="neo-field">
+          <label class="neo-field-label" for="identifier">Email or Username</label>
+          <div class="neo-input-wrap">
+            <input
+              id="identifier"
+              class="neo-input"
+              type="text"
+              name="identifier"
+              autocomplete="username"
+              required
+              placeholder="Enter your username"
+            />
+            <span class="neo-icon" aria-hidden="true">
+              <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="neo-field">
+          <label class="neo-field-label" for="password">Password</label>
+          <div class="neo-input-wrap">
+            <input
+              id="password"
+              class="neo-input neo-input-password"
+              type="password"
+              name="password"
+              autocomplete="current-password"
+              required
+              placeholder="Enter your password"
+            />
+            <span class="neo-icon" aria-hidden="true">
+              <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                <path d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z"/>
+              </svg>
+            </span>
+            <button
+              type="button"
+              class="password-toggle"
+              id="password-toggle"
+              aria-label="Show password"
+              title="Show password"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="eye-open">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" id="eye-closed" style="display:none">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+                <path d="M9.9 5.1A10.7 10.7 0 0 1 12 5c5 0 9 3.7 10 7-0.4 1.4-1.4 3-2.9 4.3"></path>
+                <path d="M6.3 6.3C4.6 7.5 3.4 9.2 2 12c1 3.3 5 7 10 7 1.7 0 3.2-0.4 4.6-1.1"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="neo-field">
+          <label class="neo-field-label" for="tenant-id">Tenant ID</label>
+          <div class="neo-input-wrap">
+            <input
+              id="tenant-id"
+              class="neo-input"
+              type="text"
+              name="tenantId"
+              required
+              placeholder="Enter tenant ID"
+            />
+            <span class="neo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="neo-field neo-field-row">
+          <label class="neo-checkbox-label">
+            <input type="checkbox" id="remember-me" class="neo-checkbox" />
+            <span class="neo-checkbox-mark"></span>
+            Remember me
+          </label>
+        </div>
+
+        <div class="neo-field">
+          <label class="neo-field-label" for="persona-select">Demo Role</label>
+          <div class="neo-input-wrap">
+            <select id="persona-select" class="neo-input neo-select" aria-label="Select demo persona">
+              <option value="platform-admin">Platform Admin</option>
+              <option value="tenant-admin">Tenant Admin</option>
+              <option value="agent-designer">Agent Designer</option>
+              <option value="user">Regular User</option>
+              <option value="viewer">Viewer</option>
+            </select>
+            <span class="neo-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <line x1="20" y1="8" x2="20" y2="14"></line>
+                <line x1="23" y1="11" x2="17" y2="11"></line>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Sign In</button>
+
+        <button type="button" class="back-btn" id="back-btn">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+          Back
+        </button>
+      </form>
+
+      <p class="help-text help-text-below-card">
+        Having trouble signing in?
+        <a href="mailto:support@thinkplus.ae">Contact support</a>
+      </p>
+    </div>
+  </main>
+</div>
+
+<!-- ================================================================== -->
+<!-- APP SHELL                                                          -->
+<!-- ================================================================== -->
+<div id="app-shell" class="administration-page" style="display:none">
+
+  <!-- ---- Header ---- -->
+  <header class="app-header">
+    <div class="header-island header-island-left">
+      <button class="island-btn" id="hamburger-btn" type="button" aria-label="Toggle navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="hamburger-open">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="hamburger-close" style="display:none">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+
+      <div class="island-logo" aria-label="ThinkPLUS">
+        <span class="island-logo-text">think+</span>
+      </div>
+
+      <span class="island-divider" aria-hidden="true"></span>
+
+      <span class="page-indicator">
+        <span class="page-indicator-icon" id="section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </span>
+        <span id="section-name">Tenant Manager</span>
+      </span>
+    </div>
+
+    <div class="header-island header-island-right" style="position:relative">
+      <button class="island-btn" type="button" aria-label="Notifications" id="notification-bell" style="position:relative">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="notification-badge-count" id="notif-badge-count">5</span>
+      </button>
+      <!-- Notification Dropdown -->
+      <div class="notification-dropdown" id="notification-dropdown">
+        <div class="notification-dropdown-header">
+          <strong>Notifications</strong>
+          <button class="nm-btn nm-btn-sm" id="notif-mark-all" style="font-size:0.72rem;padding:2px 8px">Mark all read</button>
+        </div>
+        <div class="notification-list">
+          <div class="notification-item unread">
+            <div class="notification-icon" style="color:#6b1f2a">&#9888;</div>
+            <div class="notification-body">
+              <div class="notification-title">Agent Offline</div>
+              <div class="notification-desc">Data Analyst Agent went offline unexpectedly</div>
+              <div class="notification-time">2 min ago</div>
+            </div>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon" style="color:#b9a779">&#128274;</div>
+            <div class="notification-body">
+              <div class="notification-title">License Expiring</div>
+              <div class="notification-desc">Initech LLC trial license expires in 23 days</div>
+              <div class="notification-time">15 min ago</div>
+            </div>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon" style="color:#428177">&#9989;</div>
+            <div class="notification-body">
+              <div class="notification-title">Approval Required</div>
+              <div class="notification-desc">Customer Support Agent requests refund approval</div>
+              <div class="notification-time">22 min ago</div>
+            </div>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon" style="color:#6b1f2a">&#128721;</div>
+            <div class="notification-body">
+              <div class="notification-title">Policy Violation</div>
+              <div class="notification-desc">PII detected in agent response — auto-masked</div>
+              <div class="notification-time">1 hr ago</div>
+            </div>
+          </div>
+          <div class="notification-item unread">
+            <div class="notification-icon" style="color:#054239">&#128640;</div>
+            <div class="notification-body">
+              <div class="notification-title">System Update</div>
+              <div class="notification-desc">Platform v2.4.1 deployed — 3 new features</div>
+              <div class="notification-time">3 hrs ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="notification-dropdown-footer">
+          <button class="nm-btn nm-btn-sm" style="width:100%;font-size:0.78rem">View all notifications</button>
+        </div>
+      </div>
+
+      <button class="island-btn" type="button" aria-label="Help">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </button>
+
+      <span class="island-divider" aria-hidden="true"></span>
+
+      <button class="persona-badge" id="persona-badge" type="button" aria-label="Switch persona" title="Platform Admin">
+        <span id="persona-badge-label">PA</span>
+      </button>
+
+      <button class="sign-out-btn" id="signout-btn" type="button" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+        <span class="sign-out-label">Sign out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ---- Drawer Backdrop ---- -->
+  <div class="drawer-backdrop" id="drawer-backdrop" role="presentation"></div>
+
+  <!-- ---- Dock Sidebar ---- -->
+  <aside class="admin-dock" id="admin-dock" aria-label="Administration sections">
+    <div class="dock-card">
+      <ul>
+        <li class="dock-item active" data-section="tenant-manager" data-roles="platform-admin">
+          <button type="button" class="dock-link active" aria-label="Tenant Manager">
+            <span class="dock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </span>
+            <span class="dock-label">Tenant Manager</span>
+          </button>
+        </li>
+        <li class="dock-item" data-section="agent-manager" data-roles="platform-admin,tenant-admin,agent-designer,viewer">
+          <button type="button" class="dock-link" aria-label="Agent Manager">
+            <span class="dock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="11"></line><circle cx="8" cy="16" r="1" fill="currentColor"></circle><circle cx="16" cy="16" r="1" fill="currentColor"></circle></svg>
+            </span>
+            <span class="dock-label">Agent Manager</span>
+          </button>
+        </li>
+        <li class="dock-item" data-section="license-manager" data-roles="platform-admin">
+          <button type="button" class="dock-link" aria-label="License Manager">
+            <span class="dock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+            </span>
+            <span class="dock-label">License Manager</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="dock-footer">
+      <button class="sign-out-btn dock-signout" type="button" aria-label="Sign out" id="dock-signout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+        <span class="sign-out-label">Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ---- Content Area ---- -->
+  <section class="admin-content" id="admin-content">
+    <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+      <span>Administration</span>
+      <span class="crumb-sep" aria-hidden="true">&gt;</span>
+      <span id="breadcrumb-section">Tenant Manager</span>
+    </nav>
+
+    <!-- Section 1: Tenant Manager -->
+    <div class="section-panel" id="section-tenant-manager" data-testid="section-tenant-manager">
+      <div class="section-header">
+        <h2>Tenant Manager</h2>
+        <div class="state-tabs">
+          <button class="state-tab active" data-state="populated">Populated</button>
+          <button class="state-tab" data-state="loading">Loading</button>
+          <button class="state-tab" data-state="empty">Empty</button>
+        </div>
+      </div>
+      <div data-view-state="populated">
+        <!-- Tenant List View -->
+        <div id="tenant-list-view">
+          <div class="stat-cards-row">
+            <div class="stat-mini-card"><div class="stat-value">3</div><div class="stat-label">Total Tenants</div></div>
+            <div class="stat-mini-card"><div class="stat-value">2</div><div class="stat-label">Active</div></div>
+            <div class="stat-mini-card"><div class="stat-value">1</div><div class="stat-label">Trial</div></div>
+            <div class="stat-mini-card"><div class="stat-value">243</div><div class="stat-label">Total Users</div></div>
+          </div>
+          <div class="demo-card-grid">
+            <div class="demo-card">
+              <div class="demo-card-header"><span class="demo-card-badge" style="background:#428177;color:#fff">Active</span></div>
+              <h3 class="demo-card-title">Acme Corp</h3>
+              <p class="demo-card-meta">Tenant ID: acme-corp-001</p>
+              <p class="demo-card-meta">Users: 142 / 200</p>
+              <div class="demo-card-actions">
+                <button class="nm-btn nm-btn-sm" data-open-factsheet="tenant-factsheet" data-list-id="tenant-list-view" data-testid="tenant-view-acme">View</button>
+                <button class="nm-btn nm-btn-sm nm-btn-primary" data-testid="tenant-manage-acme">Manage</button>
+              </div>
+            </div>
+            <div class="demo-card">
+              <div class="demo-card-header"><span class="demo-card-badge" style="background:#428177;color:#fff">Active</span></div>
+              <h3 class="demo-card-title">Globex Industries</h3>
+              <p class="demo-card-meta">Tenant ID: globex-ind-002</p>
+              <p class="demo-card-meta">Users: 89 / 150</p>
+              <div class="demo-card-actions">
+                <button class="nm-btn nm-btn-sm" data-open-factsheet="tenant-factsheet" data-list-id="tenant-list-view" data-testid="tenant-view-globex">View</button>
+                <button class="nm-btn nm-btn-sm nm-btn-primary" data-testid="tenant-manage-globex">Manage</button>
+              </div>
+            </div>
+            <div class="demo-card">
+              <div class="demo-card-header"><span class="demo-card-badge" style="background:#b9a779;color:#3d3a3b">Trial</span></div>
+              <h3 class="demo-card-title">Initech LLC</h3>
+              <p class="demo-card-meta">Tenant ID: initech-003</p>
+              <p class="demo-card-meta">Users: 12 / 25</p>
+              <div class="demo-card-actions">
+                <button class="nm-btn nm-btn-sm" data-open-factsheet="tenant-factsheet" data-list-id="tenant-list-view" data-testid="tenant-view-initech">View</button>
+                <button class="nm-btn nm-btn-sm nm-btn-primary" data-testid="tenant-manage-initech">Manage</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tenant Factsheet -->
+        <div class="factsheet" id="tenant-factsheet">
+          <button class="factsheet-back-btn" data-list-id="tenant-list-view" data-sheet-id="tenant-factsheet">&larr; Back to Tenants</button>
+          <div class="factsheet-header">
+            <div class="factsheet-header-top">
+              <div class="factsheet-icon">&#127970;</div>
+              <div class="factsheet-identity">
+                <h3>Acme Corp</h3>
+                <div class="factsheet-badges">
+                  <span class="factsheet-badge status-online">Active</span>
+                  <span class="factsheet-badge" style="background:rgba(66,129,119,0.15);color:#054239">Enterprise</span>
+                </div>
+              </div>
+              <div class="factsheet-actions">
+                <button class="nm-btn nm-btn-sm nm-btn-primary">Edit</button>
+                <button class="nm-btn nm-btn-sm">Suspend</button>
+                <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+              </div>
+            </div>
+            <div class="factsheet-kpis">
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">142</div><div class="factsheet-kpi-label">Users</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">8</div><div class="factsheet-kpi-label">Active Agents</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">Enterprise</div><div class="factsheet-kpi-label">License Type</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">2027-03-01</div><div class="factsheet-kpi-label">License Expiry</div></div>
+            </div>
+          </div>
+
+          <div class="section-tabs" data-tabgroup="tenant-factsheet">
+            <button class="section-tab active" data-tab="tf-overview">Overview</button>
+            <button class="section-tab" data-tab="tf-users">Users</button>
+            <button class="section-tab" data-tab="tf-branding">Branding</button>
+            <button class="section-tab" data-tab="tf-licenses">Licenses</button>
+          </div>
+          <div class="tab-content">
+            <!-- Tenant Overview Tab -->
+            <div class="tab-panel active" data-tab-panel="tf-overview">
+              <div class="factsheet-content-card">
+                <div class="info-rows">
+                  <div class="info-row"><span class="info-label">Tenant Name</span><span class="info-value">Acme Corp</span></div>
+                  <div class="info-row"><span class="info-label">Tenant ID</span><span class="info-value"><code>acme-corp-001</code></span></div>
+                  <div class="info-row"><span class="info-label">Status</span><span class="info-value"><span class="demo-status-badge active">Active</span></span></div>
+                  <div class="info-row"><span class="info-label">Created</span><span class="info-value">2025-11-15</span></div>
+                  <div class="info-row"><span class="info-label">Region</span><span class="info-value">ME (UAE)</span></div>
+                  <div class="info-row"><span class="info-label">Admin Contact</span><span class="info-value">sarah.j@acme.com</span></div>
+                  <div class="info-row"><span class="info-label">Data Isolation</span><span class="info-value">Graph-per-Tenant</span></div>
+                </div>
+              </div>
+            </div>
+            <!-- Tenant Users Tab -->
+            <div class="tab-panel" data-tab-panel="tf-users" style="display:none">
+              <div id="tenant-users-list">
+                <div class="factsheet-content-card">
+                  <div class="demo-table-wrap">
+                    <table class="demo-table" data-testid="tenant-users-table">
+                      <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th style="width:80px">Action</th></tr></thead>
+                      <tbody>
+                        <tr><td>Sarah Johnson</td><td>sarah.j@acme.com</td><td>Admin</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="user-factsheet" data-list-id="tenant-users-list">View</button></td></tr>
+                        <tr><td>Mike Chen</td><td>m.chen@acme.com</td><td>Agent Designer</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="user-factsheet" data-list-id="tenant-users-list">View</button></td></tr>
+                        <tr><td>Lisa Park</td><td>l.park@acme.com</td><td>Business User</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="user-factsheet" data-list-id="tenant-users-list">View</button></td></tr>
+                        <tr><td>James Wilson</td><td>j.wilson@acme.com</td><td>Viewer</td><td><span class="demo-status-badge warning">Invited</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="user-factsheet" data-list-id="tenant-users-list">View</button></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- User Factsheet (nested) -->
+              <div class="factsheet" id="user-factsheet">
+                <button class="factsheet-back-btn" data-list-id="tenant-users-list" data-sheet-id="user-factsheet">&larr; Back to Users</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon">&#128100;</div>
+                    <div class="factsheet-identity">
+                      <h3>Sarah Johnson</h3>
+                      <div class="factsheet-badges">
+                        <span class="factsheet-badge" style="background:rgba(66,129,119,0.15);color:#054239">Admin</span>
+                        <span class="factsheet-badge status-online">Active</span>
+                      </div>
+                    </div>
+                    <div class="factsheet-actions">
+                      <button class="nm-btn nm-btn-sm">Edit Role</button>
+                      <button class="nm-btn nm-btn-sm">Reset Password</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Deactivate</button>
+                    </div>
+                  </div>
+                  <div class="factsheet-kpis">
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">142</div><div class="factsheet-kpi-label">Sessions 30d</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">Today</div><div class="factsheet-kpi-label">Last Login</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">Admin</div><div class="factsheet-kpi-label">Role</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">Acme Corp</div><div class="factsheet-kpi-label">Tenant</div></div>
+                  </div>
+                </div>
+                <div class="factsheet-content-card">
+                  <div class="info-rows">
+                    <div class="info-row"><span class="info-label">Full Name</span><span class="info-value">Sarah Johnson</span></div>
+                    <div class="info-row"><span class="info-label">Email</span><span class="info-value">sarah.j@acme.com</span></div>
+                    <div class="info-row"><span class="info-label">Role</span><span class="info-value">Admin</span></div>
+                    <div class="info-row"><span class="info-label">Tenant</span><span class="info-value">Acme Corp</span></div>
+                    <div class="info-row"><span class="info-label">Created</span><span class="info-value">2025-11-15</span></div>
+                    <div class="info-row"><span class="info-label">Last Login</span><span class="info-value">2026-03-09 10:24 AM</span></div>
+                    <div class="info-row"><span class="info-label">MFA Enabled</span><span class="info-value">Yes (TOTP)</span></div>
+                    <div class="info-row"><span class="info-label">Permissions</span><span class="info-value">Full Access (Admin)</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tenant Branding Tab -->
+            <div class="tab-panel" data-tab-panel="tf-branding" style="display:none">
+              <div class="factsheet-content-card">
+                <div class="demo-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));">
+                  <div class="theme-card">
+                    <h4>Acme Corp Theme</h4>
+                    <div class="swatch-row">
+                      <span class="swatch-label">Primary:</span>
+                      <span class="color-swatch" style="background:#2196F3"></span>
+                      <code>#2196F3</code>
+                    </div>
+                    <div class="swatch-row">
+                      <span class="swatch-label">Secondary:</span>
+                      <span class="color-swatch" style="background:#1565C0"></span>
+                      <code>#1565C0</code>
+                    </div>
+                    <div class="theme-logo-placeholder">Logo preview placeholder</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tenant Licenses Tab -->
+            <div class="tab-panel" data-tab-panel="tf-licenses" style="display:none">
+              <div id="tenant-licenses-list">
+                <div class="factsheet-content-card">
+                  <div class="demo-table-wrap">
+                    <table class="demo-table" data-testid="tenant-licenses-table">
+                      <thead><tr><th>License Key</th><th>Type</th><th>Seats Used/Total</th><th>Expiry</th><th>Status</th><th style="width:80px">Action</th></tr></thead>
+                      <tbody>
+                        <tr><td><code>LIC-2026-A1B2</code></td><td>Enterprise</td><td>142 / 200</td><td>2027-03-01</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="license-factsheet" data-list-id="tenant-licenses-list">View</button></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <!-- License Factsheet (nested) -->
+              <div class="factsheet" id="license-factsheet">
+                <button class="factsheet-back-btn" data-list-id="tenant-licenses-list" data-sheet-id="license-factsheet">&larr; Back to Licenses</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon">&#128273;</div>
+                    <div class="factsheet-identity">
+                      <h3>Enterprise License</h3>
+                      <div class="factsheet-badges">
+                        <span class="factsheet-badge status-online">Active</span>
+                        <span class="factsheet-badge" style="background:rgba(66,129,119,0.15);color:#054239">Enterprise</span>
+                      </div>
+                    </div>
+                    <div class="factsheet-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary">Renew</button>
+                      <button class="nm-btn nm-btn-sm">Add Seats</button>
+                    </div>
+                  </div>
+                  <div class="factsheet-kpis">
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">142/200</div><div class="factsheet-kpi-label">Seats Used</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">71%</div><div class="factsheet-kpi-label">Utilization</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">2027-03-01</div><div class="factsheet-kpi-label">Expires</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">357 days</div><div class="factsheet-kpi-label">Remaining</div></div>
+                  </div>
+                </div>
+                <div class="factsheet-content-card">
+                  <div class="info-rows">
+                    <div class="info-row"><span class="info-label">License Key</span><span class="info-value"><code>LIC-2026-A1B2</code></span></div>
+                    <div class="info-row"><span class="info-label">Type</span><span class="info-value">Enterprise</span></div>
+                    <div class="info-row"><span class="info-label">Tenant</span><span class="info-value">Acme Corp</span></div>
+                    <div class="info-row"><span class="info-label">Total Seats</span><span class="info-value">200</span></div>
+                    <div class="info-row"><span class="info-label">Used Seats</span><span class="info-value">142</span></div>
+                    <div class="info-row"><span class="info-label">Issued</span><span class="info-value">2026-03-01</span></div>
+                    <div class="info-row"><span class="info-label">Expires</span><span class="info-value">2027-03-01</span></div>
+                    <div class="info-row"><span class="info-label">Features</span><span class="info-value">All modules, Priority support, Custom branding, SSO</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-view-state="loading" style="display:none">
+        <div class="skeleton-loader">
+          <div class="skeleton-line w-60"></div>
+          <div class="skeleton-line w-80"></div>
+          <div class="skeleton-line w-40"></div>
+          <div class="skeleton-line w-70"></div>
+          <div class="skeleton-line w-50"></div>
+        </div>
+      </div>
+      <div data-view-state="empty" style="display:none">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </div>
+          <h3>No tenants configured</h3>
+          <p>Create your first tenant to get started.</p>
+          <button class="nm-btn nm-btn-primary">+ Create Tenant</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: License Manager -->
+    <div class="section-panel" id="section-license-manager" style="display:none" data-testid="section-license-manager">
+      <div class="section-header">
+        <h2>License Manager</h2>
+        <div class="state-tabs">
+          <button class="state-tab active" data-state="populated">Populated</button>
+          <button class="state-tab" data-state="loading">Loading</button>
+          <button class="state-tab" data-state="empty">Empty</button>
+        </div>
+      </div>
+      <div data-view-state="populated">
+        <div class="stat-cards-row">
+          <div class="stat-mini-card"><div class="stat-value">3</div><div class="stat-label">Total Licenses</div></div>
+          <div class="stat-mini-card"><div class="stat-value">2</div><div class="stat-label">Active</div></div>
+          <div class="stat-mini-card"><div class="stat-value" style="color:#b9a779">1</div><div class="stat-label">Expiring Soon</div></div>
+          <div class="stat-mini-card"><div class="stat-value">375</div><div class="stat-label">Total Seats</div></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+          <div class="view-toggle" data-testid="license-view-toggle">
+            <button class="view-toggle-btn" data-view="grid" data-testid="license-grid-btn" aria-label="Grid view">Grid</button>
+            <button class="view-toggle-btn active" data-view="table" data-testid="license-table-btn" aria-label="Table view">Table</button>
+          </div>
+        </div>
+        <div id="license-mgr-list-view">
+          <!-- Table View (default) -->
+          <div class="license-view" data-license-view="table">
+            <div class="demo-table-wrap">
+              <table class="demo-table" data-testid="license-table">
+                <thead><tr><th>License Key</th><th>Tenant</th><th>Type</th><th>Seats</th><th>Expires</th><th>Status</th><th style="width:80px">Action</th></tr></thead>
+                <tbody>
+                  <tr><td><code>LIC-2026-A1B2</code></td><td>Acme Corp</td><td>Enterprise</td><td>142 / 200</td><td>2027-03-01</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></td></tr>
+                  <tr><td><code>LIC-2026-C3D4</code></td><td>Globex</td><td>Professional</td><td>89 / 150</td><td>2026-12-15</td><td><span class="demo-status-badge active">Active</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></td></tr>
+                  <tr><td><code>LIC-2025-E5F6</code></td><td>Initech</td><td>Trial</td><td>12 / 25</td><td>2026-04-01</td><td><span class="demo-status-badge warning">Expiring</span></td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Grid View -->
+          <div class="license-view" data-license-view="grid" style="display:none">
+            <div class="demo-card-grid">
+              <div class="license-card">
+                <div class="demo-card-header"><span class="demo-card-badge" style="background:#428177;color:#fff">Active</span></div>
+                <h3 class="demo-card-title">Enterprise License</h3>
+                <p class="demo-card-meta">Acme Corp</p>
+                <p class="demo-card-meta"><code>LIC-2026-A1B2</code></p>
+                <p class="demo-card-meta">Seats: 142 / 200</p>
+                <p class="demo-card-meta">Expires: 2027-03-01</p>
+                <div class="demo-card-actions"><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></div>
+              </div>
+              <div class="license-card">
+                <div class="demo-card-header"><span class="demo-card-badge" style="background:#428177;color:#fff">Active</span></div>
+                <h3 class="demo-card-title">Professional License</h3>
+                <p class="demo-card-meta">Globex Industries</p>
+                <p class="demo-card-meta"><code>LIC-2026-C3D4</code></p>
+                <p class="demo-card-meta">Seats: 89 / 150</p>
+                <p class="demo-card-meta">Expires: 2026-12-15</p>
+                <div class="demo-card-actions"><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></div>
+              </div>
+              <div class="license-card">
+                <div class="demo-card-header"><span class="demo-card-badge" style="background:#b9a779;color:#3d3a3b">Expiring</span></div>
+                <h3 class="demo-card-title">Trial License</h3>
+                <p class="demo-card-meta">Initech LLC</p>
+                <p class="demo-card-meta"><code>LIC-2025-E5F6</code></p>
+                <p class="demo-card-meta">Seats: 12 / 25</p>
+                <p class="demo-card-meta">Expires: 2026-04-01</p>
+                <div class="demo-card-actions"><button class="nm-btn nm-btn-sm" data-open-factsheet="license-mgr-factsheet" data-list-id="license-mgr-list-view">View</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- License Manager Factsheet -->
+        <div class="factsheet" id="license-mgr-factsheet">
+          <button class="factsheet-back-btn" data-list-id="license-mgr-list-view" data-sheet-id="license-mgr-factsheet">&larr; Back to Licenses</button>
+          <div class="factsheet-header">
+            <div class="factsheet-header-top">
+              <div class="factsheet-icon">&#128273;</div>
+              <div class="factsheet-identity">
+                <h3>Enterprise License</h3>
+                <div class="factsheet-badges">
+                  <span class="factsheet-badge status-online">Active</span>
+                  <span class="factsheet-badge" style="background:rgba(66,129,119,0.15);color:#054239">Enterprise</span>
+                </div>
+              </div>
+              <div class="factsheet-actions">
+                <button class="nm-btn nm-btn-sm nm-btn-primary">Renew</button>
+                <button class="nm-btn nm-btn-sm">Add Seats</button>
+                <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Revoke</button>
+              </div>
+            </div>
+            <div class="factsheet-kpis">
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">142/200</div><div class="factsheet-kpi-label">Seats Used</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">71%</div><div class="factsheet-kpi-label">Utilization</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">2027-03-01</div><div class="factsheet-kpi-label">Expires</div></div>
+              <div class="factsheet-kpi"><div class="factsheet-kpi-value">Acme Corp</div><div class="factsheet-kpi-label">Tenant</div></div>
+            </div>
+          </div>
+          <div class="factsheet-content-card">
+            <div class="info-rows">
+              <div class="info-row"><span class="info-label">License Key</span><span class="info-value"><code>LIC-2026-A1B2</code></span></div>
+              <div class="info-row"><span class="info-label">Type</span><span class="info-value">Enterprise</span></div>
+              <div class="info-row"><span class="info-label">Tenant</span><span class="info-value">Acme Corp</span></div>
+              <div class="info-row"><span class="info-label">Total Seats</span><span class="info-value">200</span></div>
+              <div class="info-row"><span class="info-label">Used Seats</span><span class="info-value">142</span></div>
+              <div class="info-row"><span class="info-label">Issued</span><span class="info-value">2026-03-01</span></div>
+              <div class="info-row"><span class="info-label">Expires</span><span class="info-value">2027-03-01</span></div>
+              <div class="info-row"><span class="info-label">Features</span><span class="info-value">All modules, Priority support, Custom branding, SSO</span></div>
+              <div class="info-row"><span class="info-label">Auto-Renew</span><span class="info-value">Enabled</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-view-state="loading" style="display:none">
+        <div class="skeleton-loader"><div class="skeleton-line w-80"></div><div class="skeleton-line w-60"></div><div class="skeleton-line w-70"></div></div>
+      </div>
+      <div data-view-state="empty" style="display:none">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+          </div>
+          <h3>No licenses found</h3>
+          <p>Add a license key to activate your platform.</p>
+          <button class="nm-btn nm-btn-primary">+ Add License</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Agent Manager (All-in-One) -->
+    <div class="section-panel" id="section-agent-manager" style="display:none" data-testid="section-agent-manager">
+      <div class="section-header">
+        <h2>Agent Manager</h2>
+        <div class="state-tabs">
+          <button class="state-tab active" data-state="populated">Populated</button>
+          <button class="state-tab" data-state="loading">Loading</button>
+          <button class="state-tab" data-state="empty">Empty</button>
+        </div>
+      </div>
+      <div data-view-state="populated">
+        <div class="agent-manager-layout">
+          <nav class="am-sidemenu" aria-label="Agent Manager sections">
+            <button class="am-sidemenu-item active" data-am-section="am-insights" aria-label="Insights">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Insights</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-agent-list" aria-label="Agent List">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="11"></line></svg>
+              <span>Agent List</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-skills" aria-label="Skills">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Skills</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-tools" aria-label="Tools">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              <span>Tools</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-templates" aria-label="Templates">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              <span>Templates</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-governance" aria-label="Governance">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>Governance</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-triggers" aria-label="Event Triggers">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Triggers</span>
+            </button>
+            <button class="am-sidemenu-item" data-am-section="am-settings" aria-label="Settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+              <span>Settings</span>
+            </button>
+          </nav>
+          <div class="am-content">
+
+            <!-- AM Panel: Insights (unified Dashboard + Analytics + Maturity) -->
+            <div class="am-panel active" id="am-insights">
+              <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Insights</h3>
+
+              <!-- KPI Summary Row -->
+              <div class="stat-cards-row" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr));">
+                <div class="stat-mini-card"><div class="stat-value">3</div><div class="stat-label">Total Agents</div></div>
+                <div class="stat-mini-card"><div class="stat-value">2</div><div class="stat-label">Active</div></div>
+                <div class="stat-mini-card"><div class="stat-value">1.2s</div><div class="stat-label">Avg Response</div></div>
+                <div class="stat-mini-card"><div class="stat-value">94.2%</div><div class="stat-label">Success Rate</div></div>
+                <div class="stat-mini-card"><div class="stat-value">12,847</div><div class="stat-label">Total Conversations</div></div>
+                <div class="stat-mini-card"><div class="stat-value" style="color:#b9a779">5</div><div class="stat-label">HITL Pending</div></div>
+              </div>
+
+              <!-- Charts Row -->
+              <div class="demo-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                <div class="demo-card">
+                  <h4 class="demo-card-title">Conversations (This Week)</h4>
+                  <div class="bar-chart">
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:60%"></div><span class="bar-chart-label">Mon</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:75%"></div><span class="bar-chart-label">Tue</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:45%"></div><span class="bar-chart-label">Wed</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:90%"></div><span class="bar-chart-label">Thu</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:80%"></div><span class="bar-chart-label">Fri</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:40%"></div><span class="bar-chart-label">Sat</span></div>
+                    <div class="bar-chart-col"><div class="bar-chart-bar" style="height:65%"></div><span class="bar-chart-label">Sun</span></div>
+                  </div>
+                </div>
+                <div class="demo-card">
+                  <h4 class="demo-card-title">Agent Performance</h4>
+                  <div class="horizontal-bars" style="margin-top:0.75rem;">
+                    <div class="horizontal-bar-row"><span class="horizontal-bar-label">Data Analyst</span><div class="horizontal-bar-track"><div class="horizontal-bar-fill" style="width:78%;background:linear-gradient(90deg,#428177,#5ba89d)"></div></div><span class="horizontal-bar-value">78%</span></div>
+                    <div class="horizontal-bar-row"><span class="horizontal-bar-label">Customer Support</span><div class="horizontal-bar-track"><div class="horizontal-bar-fill" style="width:92%;background:linear-gradient(90deg,#054239,#428177)"></div></div><span class="horizontal-bar-value">92%</span></div>
+                    <div class="horizontal-bar-row"><span class="horizontal-bar-label">Code Reviewer</span><div class="horizontal-bar-track"><div class="horizontal-bar-fill" style="width:65%;background:linear-gradient(90deg,#b9a779,#d4c99a)"></div></div><span class="horizontal-bar-value">65%</span></div>
+                  </div>
+                </div>
+                <div class="demo-card" style="text-align:center;">
+                  <h4 class="demo-card-title">Token Usage</h4>
+                  <div class="donut-chart" style="background:conic-gradient(#428177 0% 45%, #054239 45% 80%, #b9a779 80% 100%);margin-top:0.75rem;"></div>
+                  <div class="donut-legend" style="align-items:center;">
+                    <div class="donut-legend-item"><span class="donut-legend-dot" style="background:#428177"></span>Claude 45%</div>
+                    <div class="donut-legend-item"><span class="donut-legend-dot" style="background:#054239"></span>GPT 35%</div>
+                    <div class="donut-legend-item"><span class="donut-legend-dot" style="background:#b9a779"></span>Other 20%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ATS Trust Dimensions -->
+              <div class="demo-card" style="margin-top:1.25rem;">
+                <h4 class="demo-card-title">Agent Trust Score (ATS) Dimensions</h4>
+                <div class="ats-dimensions">
+                  <div class="ats-bar-row"><span class="ats-bar-label">Accuracy</span><div class="ats-bar-track"><div class="ats-bar-fill" style="width:92%;background:linear-gradient(90deg,#428177,#5ba89d)"></div></div><span class="ats-bar-value" style="color:#428177">92%</span></div>
+                  <div class="ats-bar-row"><span class="ats-bar-label">Reliability</span><div class="ats-bar-track"><div class="ats-bar-fill" style="width:88%;background:linear-gradient(90deg,#428177,#5ba89d)"></div></div><span class="ats-bar-value" style="color:#428177">88%</span></div>
+                  <div class="ats-bar-row"><span class="ats-bar-label">Safety</span><div class="ats-bar-track"><div class="ats-bar-fill" style="width:95%;background:linear-gradient(90deg,#054239,#428177)"></div></div><span class="ats-bar-value" style="color:#054239">95%</span></div>
+                  <div class="ats-bar-row"><span class="ats-bar-label">Compliance</span><div class="ats-bar-track"><div class="ats-bar-fill" style="width:91%;background:linear-gradient(90deg,#428177,#5ba89d)"></div></div><span class="ats-bar-value" style="color:#428177">91%</span></div>
+                  <div class="ats-bar-row"><span class="ats-bar-label">Efficiency</span><div class="ats-bar-track"><div class="ats-bar-fill" style="width:85%;background:linear-gradient(90deg,#b9a779,#d4c99a)"></div></div><span class="ats-bar-value" style="color:#b9a779">85%</span></div>
+                </div>
+                <div style="text-align:center;margin-top:1rem;"><p class="demo-card-meta" style="margin-bottom:0.5rem;">Overall ATS Score</p><div class="ats-score-badge">90.2</div></div>
+              </div>
+
+              <!-- Agent Maturity Grid -->
+              <div class="demo-card-grid" style="margin-top:1.25rem;">
+                <div class="demo-card"><div class="demo-card-header" style="justify-content:space-between;"><span class="maturity-badge l3">Level 3</span><span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:600;"><span class="status-dot online"></span>Online</span></div><h3 class="demo-card-title">Data Analyst Agent</h3><p class="demo-card-meta">ATS: <strong style="color:#428177">88.5</strong> &bull; Hallucination: 2.1%</p></div>
+                <div class="demo-card"><div class="demo-card-header" style="justify-content:space-between;"><span class="maturity-badge l4">Level 4</span><span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:600;"><span class="status-dot online"></span>Online</span></div><h3 class="demo-card-title">Customer Support Agent</h3><p class="demo-card-meta">ATS: <strong style="color:#428177">93.1</strong> &bull; Hallucination: 0.9%</p></div>
+                <div class="demo-card"><div class="demo-card-header" style="justify-content:space-between;"><span class="maturity-badge l2">Level 2</span><span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:600;color:var(--tp-text);opacity:0.5;"><span class="status-dot" style="background:#95a5a6;"></span>Offline</span></div><h3 class="demo-card-title">Code Reviewer Agent</h3><p class="demo-card-meta">ATS: <strong style="color:#b9a779">76.8</strong> &bull; Hallucination: 3.4%</p></div>
+              </div>
+
+              <!-- Trends Row -->
+              <div class="demo-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-top:1.25rem;">
+                <div class="demo-card">
+                  <h4 class="demo-card-title">Maturity Distribution</h4>
+                  <div class="stacked-bar"><div class="stacked-bar-segment" style="flex:5;background:#6b1f2a;">L1</div><div class="stacked-bar-segment" style="flex:15;background:#b9a779;">L2</div><div class="stacked-bar-segment" style="flex:35;background:#428177;">L3</div><div class="stacked-bar-segment" style="flex:30;background:#054239;">L4</div><div class="stacked-bar-segment" style="flex:15;background:#022a23;">L5</div></div>
+                  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.5rem;"><span class="demo-card-meta" style="display:flex;align-items:center;gap:4px;"><span class="donut-legend-dot" style="background:#6b1f2a"></span>L1: 5%</span><span class="demo-card-meta" style="display:flex;align-items:center;gap:4px;"><span class="donut-legend-dot" style="background:#b9a779"></span>L2: 15%</span><span class="demo-card-meta" style="display:flex;align-items:center;gap:4px;"><span class="donut-legend-dot" style="background:#428177"></span>L3: 35%</span><span class="demo-card-meta" style="display:flex;align-items:center;gap:4px;"><span class="donut-legend-dot" style="background:#054239"></span>L4: 30%</span><span class="demo-card-meta" style="display:flex;align-items:center;gap:4px;"><span class="donut-legend-dot" style="background:#022a23"></span>L5: 15%</span></div>
+                </div>
+                <div class="demo-card">
+                  <h4 class="demo-card-title">Trend Indicators</h4>
+                  <div class="trend-rows" style="margin-top:0.75rem;">
+                    <div class="trend-row"><span class="trend-metric">Average ATS Score</span><span class="trend-value">90.2</span><span class="trend-arrow up">&#9650;</span><span class="trend-change positive">+2.4%</span></div>
+                    <div class="trend-row"><span class="trend-metric">Hallucination Rate</span><span class="trend-value" style="color:#6b1f2a">1.8%</span><span class="trend-arrow down">&#9660;</span><span class="trend-change positive">-1.4%</span></div>
+                    <div class="trend-row"><span class="trend-metric">Trust Score Avg</span><span class="trend-value">8.4</span><span class="trend-arrow up">&#9650;</span><span class="trend-change positive">+0.6</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Activity -->
+              <div class="demo-card" style="margin-top:1.25rem;">
+                <h4 style="font-size:0.92rem;font-weight:700;margin-bottom:0.75rem;">Recent Activity</h4>
+                <div class="activity-feed">
+                  <div class="activity-item"><span class="activity-dot" style="background:#428177"></span><span>Customer Support Agent handled 247 conversations</span><span class="activity-time">2h ago</span></div>
+                  <div class="activity-item"><span class="activity-dot" style="background:#95a5a6"></span><span>Code Reviewer Agent went offline</span><span class="activity-time">4h ago</span></div>
+                  <div class="activity-item"><span class="activity-dot" style="background:#6b1f2a"></span><span>Policy violation detected: PII in response</span><span class="activity-time">6h ago</span></div>
+                  <div class="activity-item"><span class="activity-dot" style="background:#b9a779"></span><span>Data Analyst Agent promoted to Level 4</span><span class="activity-time">1d ago</span></div>
+                  <div class="activity-item"><span class="activity-dot" style="background:#428177"></span><span>New trigger created: PR Opened &rarr; Code Review</span><span class="activity-time">2d ago</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AM Panel 2: Agent List -->
+            <!-- AM Panel: Agent List + Agent Factsheet -->
+            <div class="am-panel" id="am-agent-list" style="display:none">
+              <!-- Agent List View -->
+              <div id="agent-list-view">
+                <div class="toolbar-row">
+                  <div class="search-bar"><input type="text" placeholder="Search agents..." aria-label="Search agents"></div>
+                  <div class="filter-chips" style="margin-bottom:0;">
+                    <button class="filter-chip active">All</button>
+                    <button class="filter-chip">Orchestrator</button>
+                    <button class="filter-chip">Sub-Orchestrator</button>
+                    <button class="filter-chip">Worker</button>
+                    <button class="filter-chip">Online</button>
+                    <button class="filter-chip">Offline</button>
+                  </div>
+                  <button class="nm-btn nm-btn-sm nm-btn-primary">+ New Agent</button>
+                </div>
+                <div class="demo-card-grid">
+                  <div class="demo-card">
+                    <div class="demo-card-header"><span class="demo-card-badge" style="background:rgba(185,167,121,0.3);color:#7a6520">Orchestrator</span><span class="demo-card-badge" style="background:#428177;color:#fff;margin-left:0.35rem;">Online</span><span class="maturity-badge l4" style="margin-left:0.35rem;">L4</span></div>
+                    <h3 class="demo-card-title">Enterprise AI Orchestrator</h3>
+                    <p class="demo-card-meta">Model: Claude 3.5 Sonnet &middot; ATS: 87/100</p>
+                    <p class="demo-card-meta">Children: 3 sub-orchestrators &middot; 24h convs: 2,341</p>
+                    <div class="demo-card-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="agent-factsheet" data-list-id="agent-list-view">View</button>
+                      <button class="nm-btn nm-btn-sm">Chat</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                  <div class="demo-card">
+                    <div class="demo-card-header"><span class="demo-card-badge" style="background:rgba(66,129,119,0.2);color:#428177">Sub-Orchestrator</span><span class="demo-card-badge" style="background:#428177;color:#fff;margin-left:0.35rem;">Online</span><span class="maturity-badge l3" style="margin-left:0.35rem;">L3</span></div>
+                    <h3 class="demo-card-title">Customer Support Hub</h3>
+                    <p class="demo-card-meta">Model: Claude 3.5 &middot; ATS: 82/100</p>
+                    <p class="demo-card-meta">Parent: Enterprise AI &middot; Workers: 4 &middot; 24h: 1,204</p>
+                    <div class="demo-card-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="agent-factsheet" data-list-id="agent-list-view">View</button>
+                      <button class="nm-btn nm-btn-sm">Chat</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                  <div class="demo-card">
+                    <div class="demo-card-header"><span class="demo-card-badge" style="background:rgba(152,133,97,0.2);color:#5a5040">Worker</span><span class="demo-card-badge" style="background:#428177;color:#fff;margin-left:0.35rem;">Online</span><span class="maturity-badge l3" style="margin-left:0.35rem;">L3</span></div>
+                    <h3 class="demo-card-title">Data Analyst Agent</h3>
+                    <p class="demo-card-meta">Model: GPT-4o &middot; ATS: 79/100</p>
+                    <p class="demo-card-meta">Parent: Customer Support Hub &middot; 24h: 847</p>
+                    <div class="demo-card-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="agent-factsheet" data-list-id="agent-list-view">View</button>
+                      <button class="nm-btn nm-btn-sm">Chat</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                  <div class="demo-card">
+                    <div class="demo-card-header"><span class="demo-card-badge" style="background:rgba(152,133,97,0.2);color:#5a5040">Worker</span><span class="demo-card-badge" style="background:#95a5a6;color:#fff;margin-left:0.35rem;">Offline</span><span class="maturity-badge l2" style="margin-left:0.35rem;">L2</span></div>
+                    <h3 class="demo-card-title">Code Reviewer Agent</h3>
+                    <p class="demo-card-meta">Model: Claude 3 Opus &middot; ATS: 65/100</p>
+                    <p class="demo-card-meta">Parent: Enterprise AI &middot; 24h: 0</p>
+                    <div class="demo-card-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="agent-factsheet" data-list-id="agent-list-view">View</button>
+                      <button class="nm-btn nm-btn-sm" disabled>Offline</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Agent Factsheet (hidden until View clicked) -->
+              <div class="factsheet" id="agent-factsheet">
+                <button class="factsheet-back-btn" data-list-id="agent-list-view" data-sheet-id="agent-factsheet">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg>
+                  Back to Agent List
+                </button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="11"></line></svg></div>
+                    <div class="factsheet-identity">
+                      <h3>Customer Support Hub</h3>
+                      <p class="factsheet-identity-meta">ID: agent-cs-hub-001 &middot; Created: Jan 15, 2026</p>
+                      <div class="factsheet-badges">
+                        <span class="factsheet-badge role-sub-orchestrator">Sub-Orchestrator</span>
+                        <span class="factsheet-badge status-online">Online</span>
+                        <span class="maturity-badge l3">Level 3</span>
+                      </div>
+                    </div>
+                    <div class="factsheet-actions">
+                      <button class="nm-btn nm-btn-sm nm-btn-primary">Edit</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                  <div class="factsheet-kpis">
+                    <div class="factsheet-kpi"><div class="kpi-value">82</div><div class="kpi-label">ATS Score</div></div>
+                    <div class="factsheet-kpi"><div class="kpi-value">1,204</div><div class="kpi-label">Convs 24h</div></div>
+                    <div class="factsheet-kpi"><div class="kpi-value">1.2s</div><div class="kpi-label">Avg Response</div></div>
+                    <div class="factsheet-kpi"><div class="kpi-value">96.3%</div><div class="kpi-label">Success Rate</div></div>
+                  </div>
+                </div>
+                <!-- Factsheet Tabs -->
+                <div class="section-tabs" data-tabgroup="agent-factsheet">
+                  <button class="section-tab active" data-tab="af-overview">Overview</button>
+                  <button class="section-tab" data-tab="af-config">Configuration</button>
+                  <button class="section-tab" data-tab="af-skills">Skills</button>
+                  <button class="section-tab" data-tab="af-tools">Tools</button>
+                  <button class="section-tab" data-tab="af-training">Training</button>
+                  <button class="section-tab" data-tab="af-performance">Performance</button>
+                  <button class="section-tab" data-tab="af-history">History</button>
+                </div>
+                <!-- Tab: Overview -->
+                <div class="tab-panel active" data-tab-panel="af-overview">
+                  <div class="factsheet-content-card"><h4>Description</h4><p style="font-size:0.88rem;color:var(--tp-text);opacity:0.8;">Coordinates all customer-facing support agents. Routes queries to specialized workers based on topic classification. Handles escalation flows and quality monitoring.</p></div>
+                  <div class="factsheet-content-card">
+                    <h4>Hierarchy Position</h4>
+                    <ul class="hierarchy-tree">
+                      <li><span class="tree-node"><span class="factsheet-badge role-orchestrator" style="font-size:0.62rem;">ORCH</span> Enterprise AI Orchestrator</span>
+                        <ul class="hierarchy-tree">
+                          <li><span class="tree-node current"><span class="factsheet-badge role-sub-orchestrator" style="font-size:0.62rem;">SUB</span> Customer Support Hub (this agent)</span>
+                            <ul class="hierarchy-tree">
+                              <li><span class="tree-node"><span class="factsheet-badge role-worker" style="font-size:0.62rem;">WRK</span> FAQ Bot</span></li>
+                              <li><span class="tree-node"><span class="factsheet-badge role-worker" style="font-size:0.62rem;">WRK</span> Ticket Classifier</span></li>
+                              <li><span class="tree-node"><span class="factsheet-badge role-worker" style="font-size:0.62rem;">WRK</span> Sentiment Analyzer</span></li>
+                              <li><span class="tree-node"><span class="factsheet-badge role-worker" style="font-size:0.62rem;">WRK</span> Response Drafter</span></li>
+                            </ul>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="factsheet-content-card"><h4>Current Skills</h4><div class="assign-list"><div class="assign-item"><span class="assign-item-name">Query Classification</span><span class="assign-item-meta">Domain</span></div><div class="assign-item"><span class="assign-item-name">Escalation Routing</span><span class="assign-item-meta">Utility</span></div><div class="assign-item"><span class="assign-item-name">Response Generation</span><span class="assign-item-meta">Domain</span></div></div></div>
+                </div>
+                <!-- Tab: Configuration (embedded Builder) -->
+                <div class="tab-panel" data-tab-panel="af-config" style="display:none">
+                  <div class="builder-3col">
+                    <div class="demo-builder-sidebar"><h4>Components</h4><div class="demo-builder-item">LLM Provider</div><div class="demo-builder-item">Prompt Template</div><div class="demo-builder-item">Knowledge Base</div><div class="demo-builder-item">Tool Integration</div><div class="demo-builder-item">Guard Rails</div><div class="demo-builder-item">Output Parser</div></div>
+                    <div class="builder-center">
+                      <div class="demo-builder-canvas"><div class="demo-builder-node" style="top:20px;left:40px"><div class="demo-node-dot" style="background:#428177"></div><span>LLM: Claude 3.5</span></div><div class="demo-builder-node" style="top:100px;left:180px"><div class="demo-node-dot" style="background:#b9a779"></div><span>Prompt: Support v2</span></div><div class="demo-builder-node" style="top:180px;left:60px"><div class="demo-node-dot" style="background:#6b1f2a"></div><span>Guard: PII Filter</span></div></div>
+                      <div class="config-section" style="margin-top:1rem;"><div class="config-section-header">Identity <span class="config-chevron">&#9660;</span></div><div class="config-section-body"><div class="config-field"><label>Agent Name</label><input type="text" value="Customer Support Hub"></div><div class="config-field"><label>Role</label><select><option>Worker</option><option selected>Sub-Orchestrator</option><option>Orchestrator</option></select></div><div class="config-field"><label>Domain</label><input type="text" value="Customer Service"></div></div></div>
+                      <div class="config-section"><div class="config-section-header">Model Config <span class="config-chevron">&#9660;</span></div><div class="config-section-body"><div class="config-field"><label>Provider</label><select><option>Anthropic</option><option>OpenAI</option><option>Google</option></select></div><div class="config-field"><label>Model</label><select><option selected>Claude 3.5 Sonnet</option><option>Claude 3 Opus</option></select></div><div class="config-field"><label>Temperature: 0.7</label><div class="horizontal-bar-track" style="height:8px;cursor:pointer;"><div class="horizontal-bar-fill" style="width:70%;background:var(--tp-primary);border-radius:4px;"></div></div></div></div></div>
+                      <div class="config-section"><div class="config-section-header">Guardrails <span class="config-chevron">&#9660;</span></div><div class="config-section-body"><div class="config-toggle-row"><span class="config-toggle-label">PII Detection</span><div class="toggle-switch on" role="switch" aria-checked="true"></div></div><div class="config-toggle-row"><span class="config-toggle-label">Content Filtering</span><div class="toggle-switch on" role="switch" aria-checked="true"></div></div><div class="config-toggle-row"><span class="config-toggle-label">Rate Limiting</span><div class="toggle-switch" role="switch" aria-checked="false"></div></div></div></div>
+                    </div>
+                    <div class="builder-test-chat"><div class="builder-test-header">Test Playground</div><div class="builder-test-prompt"><label>System Prompt</label><textarea rows="3">You are a helpful customer support assistant.</textarea></div><div class="builder-test-messages"><div class="playground-message agent-msg"><div class="msg-bubble">Hello! How can I help?</div></div><div class="playground-message user-msg"><div class="msg-bubble">How do I reset my password?</div></div><div class="playground-message agent-msg"><div class="msg-bubble">Go to Settings > Security > Change Password.</div></div></div><div class="builder-test-input"><input type="text" placeholder="Test message..."><button class="nm-btn nm-btn-primary nm-btn-sm">Run</button></div></div>
+                  </div>
+                </div>
+                <!-- Tab: Skills -->
+                <div class="tab-panel" data-tab-panel="af-skills" style="display:none">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h4 style="margin:0;font-size:0.92rem;">Assigned Skills (3)</h4><button class="nm-btn nm-btn-sm nm-btn-primary">+ Add Skill</button></div>
+                  <div class="assign-list"><div class="assign-item"><span class="assign-item-name">Query Classification</span><span class="factsheet-badge category-domain">Domain</span><span class="assign-item-meta">v2.1</span><button class="nm-btn nm-btn-sm" style="margin-left:auto;color:var(--tp-danger)">Remove</button></div><div class="assign-item"><span class="assign-item-name">Escalation Routing</span><span class="factsheet-badge category-utility">Utility</span><span class="assign-item-meta">v1.4</span><button class="nm-btn nm-btn-sm" style="margin-left:auto;color:var(--tp-danger)">Remove</button></div><div class="assign-item"><span class="assign-item-name">Response Generation</span><span class="factsheet-badge category-domain">Domain</span><span class="assign-item-meta">v3.0</span><button class="nm-btn nm-btn-sm" style="margin-left:auto;color:var(--tp-danger)">Remove</button></div></div>
+                </div>
+                <!-- Tab: Tools -->
+                <div class="tab-panel" data-tab-panel="af-tools" style="display:none">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;"><h4 style="margin:0;font-size:0.92rem;">Bound Tools (2)</h4><button class="nm-btn nm-btn-sm nm-btn-primary">+ Bind Tool</button></div>
+                  <div class="assign-list"><div class="assign-item"><span class="assign-item-name">CRM API</span><span class="factsheet-badge type-external">External</span><span class="assign-item-meta">42 calls/24h</span><button class="nm-btn nm-btn-sm" style="margin-left:auto;color:var(--tp-danger)">Unbind</button></div><div class="assign-item"><span class="assign-item-name">Knowledge Search</span><span class="factsheet-badge type-internal">Internal</span><span class="assign-item-meta">189 calls/24h</span><button class="nm-btn nm-btn-sm" style="margin-left:auto;color:var(--tp-danger)">Unbind</button></div></div>
+                </div>
+                <!-- Tab: Training -->
+                <div class="tab-panel" data-tab-panel="af-training" style="display:none">
+                  <div class="factsheet-content-card"><h4>Training Data Sources</h4><div class="assign-list"><div class="assign-item"><span class="assign-item-name">knowledge-base-v3.json</span><span class="assign-item-meta">1.2 MB</span></div><div class="assign-item"><span class="assign-item-name">FAQ-2026.csv</span><span class="assign-item-meta">340 KB</span></div><div class="assign-item"><span class="assign-item-name">product-catalog.json</span><span class="assign-item-meta">2.8 MB</span></div></div></div>
+                  <div class="factsheet-content-card"><h4>Fine-tuning Progress</h4><div class="progress-bar-track"><div class="progress-bar-fill" style="width:68%"></div></div><p style="font-size:0.82rem;color:var(--tp-text);opacity:0.7;">68% complete &middot; Est. 45 min remaining</p><div style="display:flex;gap:0.5rem;margin-top:0.75rem;"><button class="nm-btn nm-btn-sm nm-btn-primary">Pause Training</button><button class="nm-btn nm-btn-sm">Cancel</button></div></div>
+                  <div class="factsheet-content-card"><h4>Evaluation Metrics</h4><div class="stat-cards-row" style="grid-template-columns:repeat(3,1fr);"><div class="stat-mini-card"><div class="stat-value" style="color:#2ecc71">94.2%</div><div class="stat-label">Accuracy</div></div><div class="stat-mini-card"><div class="stat-value">0.91</div><div class="stat-label">F1 Score</div></div><div class="stat-mini-card"><div class="stat-value" style="color:var(--tp-danger)">1.8%</div><div class="stat-label">Hallucination</div></div></div></div>
+                </div>
+                <!-- Tab: Performance -->
+                <div class="tab-panel" data-tab-panel="af-performance" style="display:none">
+                  <div class="factsheet-content-card"><h4>Conversations (7 days)</h4><div class="bar-chart"><div class="bar-chart-col"><div class="bar-chart-bar" style="height:45%"></div><span class="bar-chart-label">Mon</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:72%"></div><span class="bar-chart-label">Tue</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:60%"></div><span class="bar-chart-label">Wed</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:85%"></div><span class="bar-chart-label">Thu</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:90%"></div><span class="bar-chart-label">Fri</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:30%"></div><span class="bar-chart-label">Sat</span></div><div class="bar-chart-col"><div class="bar-chart-bar" style="height:25%"></div><span class="bar-chart-label">Sun</span></div></div></div>
+                  <div class="factsheet-content-card"><h4>Performance Trends</h4><div class="trend-rows"><div class="trend-row"><span class="trend-metric">Avg Response Time</span><span class="trend-value">1.2s</span><span class="trend-arrow down">&#9660;</span><span class="trend-change positive">-8%</span></div><div class="trend-row"><span class="trend-metric">Success Rate</span><span class="trend-value">96.3%</span><span class="trend-arrow up">&#9650;</span><span class="trend-change positive">+2.1%</span></div><div class="trend-row"><span class="trend-metric">Token Usage</span><span class="trend-value">142K</span><span class="trend-arrow up">&#9650;</span><span class="trend-change negative">+12%</span></div></div></div>
+                </div>
+                <!-- Tab: History -->
+                <div class="tab-panel" data-tab-panel="af-history" style="display:none">
+                  <div class="factsheet-content-card"><h4>Version History</h4><div class="demo-table-wrap"><table class="demo-table"><thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th><th>Action</th></tr></thead><tbody><tr><td>v3.2</td><td>Mar 8, 2026</td><td>Sarah J.</td><td>Updated guardrails</td><td><button class="nm-btn nm-btn-sm">Rollback</button></td></tr><tr><td>v3.1</td><td>Mar 1, 2026</td><td>Mike C.</td><td>Added escalation skill</td><td><button class="nm-btn nm-btn-sm">Rollback</button></td></tr><tr><td>v3.0</td><td>Feb 20, 2026</td><td>Sarah J.</td><td>Upgraded to Claude 3.5</td><td><button class="nm-btn nm-btn-sm">Rollback</button></td></tr></tbody></table></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AM Panel: Skills Registry -->
+            <div class="am-panel" id="am-skills" style="display:none">
+              <div id="skills-list-view">
+                <div class="toolbar-row">
+                  <div class="search-bar"><input type="text" placeholder="Search skills..." aria-label="Search skills"></div>
+                  <div class="filter-chips" style="margin-bottom:0;"><button class="filter-chip active">All</button><button class="filter-chip">Domain</button><button class="filter-chip">Utility</button><button class="filter-chip">System</button></div>
+                  <button class="nm-btn nm-btn-sm nm-btn-primary">+ New Skill</button>
+                </div>
+                <div class="demo-card-grid">
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge category-domain">Domain</span></div><h3 class="demo-card-title">Query Classification</h3><p class="demo-card-meta">Classifies incoming customer queries into categories for routing.</p><p class="demo-card-meta">v2.1 &middot; Used by 3 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="skill-factsheet" data-list-id="skills-list-view">View</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge category-utility">Utility</span></div><h3 class="demo-card-title">Escalation Routing</h3><p class="demo-card-meta">Routes complex queries to human agents with context summary.</p><p class="demo-card-meta">v1.4 &middot; Used by 5 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="skill-factsheet" data-list-id="skills-list-view">View</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge category-domain">Domain</span></div><h3 class="demo-card-title">Response Generation</h3><p class="demo-card-meta">Generates context-aware responses using knowledge base.</p><p class="demo-card-meta">v3.0 &middot; Used by 4 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="skill-factsheet" data-list-id="skills-list-view">View</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge category-system">System</span></div><h3 class="demo-card-title">Rate Limiting</h3><p class="demo-card-meta">Enforces API rate limits and throttling policies.</p><p class="demo-card-meta">v1.0 &middot; Used by 8 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="skill-factsheet" data-list-id="skills-list-view">View</button></div></div>
+                </div>
+              </div>
+              <!-- Skill Factsheet -->
+              <div class="factsheet" id="skill-factsheet">
+                <button class="factsheet-back-btn" data-list-id="skills-list-view" data-sheet-id="skill-factsheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg> Back to Skills</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+                    <div class="factsheet-identity"><h3>Query Classification</h3><p class="factsheet-identity-meta">Category: Domain &middot; Created: Nov 10, 2025</p><div class="factsheet-badges"><span class="factsheet-badge category-domain">Domain</span></div></div>
+                    <div class="factsheet-actions"><button class="nm-btn nm-btn-sm nm-btn-primary">Edit</button><button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button></div>
+                  </div>
+                  <div class="factsheet-kpis"><div class="factsheet-kpi"><div class="kpi-value">v2.1</div><div class="kpi-label">Version</div></div><div class="factsheet-kpi"><div class="kpi-value">3</div><div class="kpi-label">Agents Using</div></div><div class="factsheet-kpi"><div class="kpi-value">Mar 1</div><div class="kpi-label">Last Updated</div></div><div class="factsheet-kpi"><div class="kpi-value">97.8%</div><div class="kpi-label">Success Rate</div></div></div>
+                </div>
+                <div class="section-tabs"><button class="section-tab active" data-tab="sk-definition">Definition</button><button class="section-tab" data-tab="sk-versions">Versions</button><button class="section-tab" data-tab="sk-agents">Agents Using</button><button class="section-tab" data-tab="sk-test">Test</button></div>
+                <div class="tab-panel active" data-tab-panel="sk-definition">
+                  <div class="factsheet-content-card"><h4>Description</h4><p style="font-size:0.88rem;color:var(--tp-text);opacity:0.8;">Classifies incoming customer queries into predefined categories (Billing, Technical, General, Escalation) using few-shot prompting.</p></div>
+                  <div class="factsheet-content-card"><h4>Prompt Template</h4><div class="code-block">Given the following customer query, classify it into one of these categories: [Billing, Technical, General, Escalation].
+
+Query: {{input}}
+
+Respond with ONLY the category name.</div></div>
+                </div>
+                <div class="tab-panel" data-tab-panel="sk-versions" style="display:none"><div class="demo-table-wrap"><table class="demo-table"><thead><tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr></thead><tbody><tr><td>v2.1</td><td>Mar 1, 2026</td><td>Sarah J.</td><td>Added Escalation category</td></tr><tr><td>v2.0</td><td>Jan 15, 2026</td><td>Mike C.</td><td>Rewrote prompt template</td></tr><tr><td>v1.0</td><td>Nov 10, 2025</td><td>Sarah J.</td><td>Initial version</td></tr></tbody></table></div></div>
+                <div class="tab-panel" data-tab-panel="sk-agents" style="display:none"><div class="assign-list"><div class="assign-item"><span class="assign-item-name">Customer Support Hub</span><span class="factsheet-badge role-sub-orchestrator">Sub-Orch</span></div><div class="assign-item"><span class="assign-item-name">FAQ Bot</span><span class="factsheet-badge role-worker">Worker</span></div><div class="assign-item"><span class="assign-item-name">Ticket Classifier</span><span class="factsheet-badge role-worker">Worker</span></div></div></div>
+                <div class="tab-panel" data-tab-panel="sk-test" style="display:none"><div class="test-panel"><div class="test-panel-input"><label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;opacity:0.6;">Input Query</label><textarea style="width:100%;min-height:60px;border:1px solid rgba(66,129,119,0.15);border-radius:8px;padding:0.5rem;font-family:inherit;font-size:0.84rem;resize:vertical;">My internet connection keeps dropping every few hours</textarea><button class="nm-btn nm-btn-sm nm-btn-primary" style="align-self:flex-start;">Run Test</button></div><label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;opacity:0.6;">Output</label><div class="test-panel-output">Technical</div></div></div>
+              </div>
+            </div>
+
+            <!-- AM Panel: Tools Registry -->
+            <div class="am-panel" id="am-tools" style="display:none">
+              <div id="tools-list-view">
+                <div class="toolbar-row">
+                  <div class="search-bar"><input type="text" placeholder="Search tools..." aria-label="Search tools"></div>
+                  <div class="filter-chips" style="margin-bottom:0;"><button class="filter-chip active">All</button><button class="filter-chip">Internal</button><button class="filter-chip">External</button><button class="filter-chip">Knowledge</button></div>
+                  <button class="nm-btn nm-btn-sm nm-btn-primary">+ Register Tool</button>
+                </div>
+                <div class="demo-card-grid">
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge type-external">External</span><span class="status-dot online" style="width:8px;height:8px;margin-left:auto;"></span></div><h3 class="demo-card-title">CRM API</h3><p class="demo-card-meta">Salesforce REST API for customer data lookup.</p><p class="demo-card-meta">42 calls/24h &middot; Avg: 320ms &middot; 3 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="tool-factsheet" data-list-id="tools-list-view">View</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge type-internal">Internal</span><span class="status-dot online" style="width:8px;height:8px;margin-left:auto;"></span></div><h3 class="demo-card-title">Knowledge Search</h3><p class="demo-card-meta">Vector search over company knowledge base.</p><p class="demo-card-meta">189 calls/24h &middot; Avg: 45ms &middot; 6 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="tool-factsheet" data-list-id="tools-list-view">View</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge type-external">External</span><span class="status-dot online" style="width:8px;height:8px;margin-left:auto;"></span></div><h3 class="demo-card-title">Email Sender</h3><p class="demo-card-meta">SendGrid API for transactional emails.</p><p class="demo-card-meta">28 calls/24h &middot; Avg: 890ms &middot; 2 agents</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="tool-factsheet" data-list-id="tools-list-view">View</button></div></div>
+                </div>
+              </div>
+              <!-- Tool Factsheet -->
+              <div class="factsheet" id="tool-factsheet">
+                <button class="factsheet-back-btn" data-list-id="tools-list-view" data-sheet-id="tool-factsheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg> Back to Tools</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
+                    <div class="factsheet-identity"><h3>CRM API</h3><p class="factsheet-identity-meta">Type: External &middot; Salesforce REST</p><div class="factsheet-badges"><span class="factsheet-badge type-external">External</span><span class="factsheet-badge status-online">Connected</span></div></div>
+                    <div class="factsheet-actions"><button class="nm-btn nm-btn-sm nm-btn-primary">Edit</button><button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button></div>
+                  </div>
+                  <div class="factsheet-kpis"><div class="factsheet-kpi"><div class="kpi-value">42</div><div class="kpi-label">Calls 24h</div></div><div class="factsheet-kpi"><div class="kpi-value">320ms</div><div class="kpi-label">Avg Latency</div></div><div class="factsheet-kpi"><div class="kpi-value">99.2%</div><div class="kpi-label">Uptime</div></div><div class="factsheet-kpi"><div class="kpi-value">3</div><div class="kpi-label">Agents Using</div></div></div>
+                </div>
+                <div class="section-tabs"><button class="section-tab active" data-tab="tl-config">Configuration</button><button class="section-tab" data-tab="tl-schema">Schema</button><button class="section-tab" data-tab="tl-logs">Logs</button><button class="section-tab" data-tab="tl-test">Test</button></div>
+                <div class="tab-panel active" data-tab-panel="tl-config"><div class="factsheet-content-card"><h4>Connection Details</h4><div class="info-rows"><div class="info-row"><span class="info-row-label">Endpoint</span><span class="info-row-value">https://api.salesforce.com/v58.0/</span></div><div class="info-row"><span class="info-row-label">Auth Method</span><span class="info-row-value">OAuth 2.0 (Client Credentials)</span></div><div class="info-row"><span class="info-row-label">Timeout</span><span class="info-row-value">5000ms</span></div><div class="info-row"><span class="info-row-label">Rate Limit</span><span class="info-row-value">100 req/min</span></div></div></div></div>
+                <div class="tab-panel" data-tab-panel="tl-schema" style="display:none"><div class="factsheet-content-card"><h4>Input Schema</h4><div class="code-block">{
+  "type": "object",
+  "properties": {
+    "customerId": { "type": "string" },
+    "fields": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["customerId"]
+}</div></div><div class="factsheet-content-card"><h4>Output Schema</h4><div class="code-block">{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "email": { "type": "string" },
+    "plan": { "type": "string" },
+    "status": { "type": "string" }
+  }
+}</div></div></div>
+                <div class="tab-panel" data-tab-panel="tl-logs" style="display:none"><div class="demo-table-wrap"><table class="demo-table"><thead><tr><th>Time</th><th>Agent</th><th>Status</th><th>Duration</th></tr></thead><tbody><tr><td>14:32:01</td><td>Customer Support Hub</td><td><span class="demo-status-badge active">200</span></td><td>280ms</td></tr><tr><td>14:28:45</td><td>FAQ Bot</td><td><span class="demo-status-badge active">200</span></td><td>310ms</td></tr><tr><td>14:15:12</td><td>Customer Support Hub</td><td><span class="demo-status-badge inactive">500</span></td><td>5001ms</td></tr><tr><td>14:02:33</td><td>Data Analyst</td><td><span class="demo-status-badge active">200</span></td><td>245ms</td></tr></tbody></table></div></div>
+                <div class="tab-panel" data-tab-panel="tl-test" style="display:none"><div class="test-panel"><div class="test-panel-input"><label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;opacity:0.6;">Input Parameters</label><div class="code-block" contenteditable="true" style="min-height:60px;">{ "customerId": "CUST-001", "fields": ["name", "email"] }</div><button class="nm-btn nm-btn-sm nm-btn-primary" style="align-self:flex-start;margin-top:0.5rem;">Execute</button></div><label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;opacity:0.6;">Response</label><div class="test-panel-output">{ "name": "John Smith", "email": "john@acme.com", "plan": "Enterprise", "status": "active" }</div></div></div>
+              </div>
+            </div>
+
+            <!-- AM Panel: Template Gallery -->
+            <div class="am-panel" id="am-templates" style="display:none">
+              <div id="templates-list-view">
+                <div class="toolbar-row">
+                  <div class="search-bar"><input type="text" placeholder="Search templates..." aria-label="Search templates"></div>
+                  <div class="filter-chips" style="margin-bottom:0;"><button class="filter-chip active">All</button><button class="filter-chip">Official</button><button class="filter-chip">Community</button><button class="filter-chip">Custom</button></div>
+                </div>
+                <div class="demo-card-grid">
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge origin-official">Official</span></div><h3 class="demo-card-title">Customer Support Bot</h3><p class="demo-card-meta">Pre-configured support agent with FAQ, escalation, and sentiment analysis skills.</p><p class="demo-card-meta">Used 142 times &middot; 4.8 rating</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="template-factsheet" data-list-id="templates-list-view">View</button><button class="nm-btn nm-btn-sm">Use Template</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge origin-official">Official</span></div><h3 class="demo-card-title">Data Analysis Pipeline</h3><p class="demo-card-meta">Analytics agent with data extraction, visualization, and reporting skills.</p><p class="demo-card-meta">Used 89 times &middot; 4.6 rating</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="template-factsheet" data-list-id="templates-list-view">View</button><button class="nm-btn nm-btn-sm">Use Template</button></div></div>
+                  <div class="demo-card"><div class="demo-card-header"><span class="factsheet-badge origin-community">Community</span></div><h3 class="demo-card-title">Code Review Assistant</h3><p class="demo-card-meta">Automated code review with best practice checks and security scanning.</p><p class="demo-card-meta">Used 67 times &middot; 4.3 rating</p><div class="demo-card-actions"><button class="nm-btn nm-btn-sm nm-btn-primary" data-open-factsheet="template-factsheet" data-list-id="templates-list-view">View</button><button class="nm-btn nm-btn-sm">Use Template</button><button class="nm-btn nm-btn-sm">Fork</button></div></div>
+                </div>
+              </div>
+              <!-- Template Preview/Factsheet -->
+              <div class="factsheet" id="template-factsheet">
+                <button class="factsheet-back-btn" data-list-id="templates-list-view" data-sheet-id="template-factsheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg> Back to Templates</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                    <div class="factsheet-identity"><h3>Customer Support Bot</h3><p class="factsheet-identity-meta">Author: ThinkPLUS Team &middot; Last updated: Feb 28, 2026</p><div class="factsheet-badges"><span class="factsheet-badge origin-official">Official</span></div></div>
+                    <div class="factsheet-actions"><button class="nm-btn nm-btn-sm nm-btn-primary">Use Template</button><button class="nm-btn nm-btn-sm">Fork</button></div>
+                  </div>
+                  <div class="factsheet-kpis"><div class="factsheet-kpi"><div class="kpi-value">142</div><div class="kpi-label">Times Used</div></div><div class="factsheet-kpi"><div class="kpi-value">23</div><div class="kpi-label">Forks</div></div><div class="factsheet-kpi"><div class="kpi-value">4.8</div><div class="kpi-label">Rating</div></div><div class="factsheet-kpi"><div class="kpi-value">Feb 28</div><div class="kpi-label">Last Updated</div></div></div>
+                </div>
+                <div class="section-tabs"><button class="section-tab active" data-tab="tp-preview">Preview</button><button class="section-tab" data-tab="tp-config">Configuration</button><button class="section-tab" data-tab="tp-forks">Fork History</button></div>
+                <div class="tab-panel active" data-tab-panel="tp-preview">
+                  <div class="factsheet-content-card"><h4>Included Skills</h4><div class="assign-list"><div class="assign-item"><span class="assign-item-name">Query Classification</span><span class="factsheet-badge category-domain">Domain</span></div><div class="assign-item"><span class="assign-item-name">Escalation Routing</span><span class="factsheet-badge category-utility">Utility</span></div><div class="assign-item"><span class="assign-item-name">Sentiment Analysis</span><span class="factsheet-badge category-domain">Domain</span></div><div class="assign-item"><span class="assign-item-name">FAQ Lookup</span><span class="factsheet-badge category-domain">Domain</span></div></div></div>
+                  <div class="factsheet-content-card"><h4>Included Tools</h4><div class="assign-list"><div class="assign-item"><span class="assign-item-name">Knowledge Search</span><span class="factsheet-badge type-internal">Internal</span></div><div class="assign-item"><span class="assign-item-name">CRM API</span><span class="factsheet-badge type-external">External</span></div></div></div>
+                  <div class="factsheet-content-card"><h4>System Prompt Preview</h4><div class="code-block">You are a helpful customer support assistant for {{company_name}}. Your goal is to resolve customer queries efficiently while maintaining a friendly tone. Always check the knowledge base before responding. Escalate to human support when confidence is below 80%.</div></div>
+                </div>
+                <div class="tab-panel" data-tab-panel="tp-config" style="display:none"><div class="factsheet-content-card"><h4>Model Configuration</h4><div class="info-rows"><div class="info-row"><span class="info-row-label">Model</span><span class="info-row-value">Claude 3.5 Sonnet</span></div><div class="info-row"><span class="info-row-label">Temperature</span><span class="info-row-value">0.7</span></div><div class="info-row"><span class="info-row-label">Max Tokens</span><span class="info-row-value">2048</span></div><div class="info-row"><span class="info-row-label">Max Turns</span><span class="info-row-value">25</span></div></div></div><div class="factsheet-content-card"><h4>Guardrails</h4><div class="info-rows"><div class="info-row"><span class="info-row-label">PII Detection</span><span class="info-row-value" style="color:#2ecc71;">Enabled</span></div><div class="info-row"><span class="info-row-label">Content Filter</span><span class="info-row-value" style="color:#2ecc71;">Enabled</span></div><div class="info-row"><span class="info-row-label">Rate Limiting</span><span class="info-row-value" style="color:var(--tp-danger);">Disabled</span></div></div></div></div>
+                <div class="tab-panel" data-tab-panel="tp-forks" style="display:none"><div class="demo-table-wrap"><table class="demo-table"><thead><tr><th>Agent</th><th>Tenant</th><th>Created</th><th>Modified</th></tr></thead><tbody><tr><td>Acme Support Bot</td><td>Acme Corp</td><td>Jan 20, 2026</td><td>Yes (custom prompt)</td></tr><tr><td>Globex Helper</td><td>Globex Ind.</td><td>Feb 5, 2026</td><td>Yes (added tools)</td></tr><tr><td>Initech Assistant</td><td>Initech LLC</td><td>Mar 1, 2026</td><td>No (vanilla)</td></tr></tbody></table></div></div>
+              </div>
+            </div>
+
+            <!-- AM Panel: Governance (with horizontal tabs inside) -->
+            <div class="am-panel" id="am-governance" style="display:none">
+              <div class="section-tabs" data-tabgroup="am-governance">
+                <button class="section-tab active" data-tab="audit-log" data-testid="gov-tab-audit" aria-label="Audit Log tab">Audit Log</button>
+                <button class="section-tab" data-tab="compliance" data-testid="gov-tab-compliance" aria-label="Compliance tab">Compliance</button>
+                <button class="section-tab" data-tab="approvals" data-testid="gov-tab-approvals" aria-label="Approvals tab">Approvals</button>
+                <button class="section-tab" data-tab="policies" data-testid="gov-tab-policies" aria-label="Policies tab">Policies</button>
+              </div>
+              <div class="tab-content">
+                <!-- Audit Log Tab -->
+                <div class="tab-panel active" data-tab-panel="audit-log">
+                  <div class="toolbar-row">
+                    <div class="config-field" style="min-width:120px;"><input type="date" aria-label="Filter by date" data-testid="audit-date-filter" style="height:36px;"></div>
+                    <select class="sort-select" aria-label="Filter by action" data-testid="audit-action-filter"><option>All Actions</option><option>Create</option><option>Update</option><option>Delete</option><option>Login</option></select>
+                    <div class="search-bar"><input type="text" placeholder="Search audit log..." aria-label="Search audit log" data-testid="audit-search"></div>
+                    <button class="nm-btn nm-btn-sm" data-testid="audit-export" aria-label="Export audit log">Export</button>
+                  </div>
+                  <div class="demo-table-wrap">
+                    <table class="demo-table" data-testid="audit-table">
+                      <thead><tr><th>Date</th><th>User</th><th>Action</th><th>Resource</th><th>Tenant</th></tr></thead>
+                      <tbody>
+                        <tr><td>2026-03-09 10:24</td><td>sarah.j@acme.com</td><td>Update</td><td>Agent Config</td><td>Acme Corp</td></tr>
+                        <tr><td>2026-03-09 09:15</td><td>m.chen@acme.com</td><td>Create</td><td>Trigger Rule</td><td>Acme Corp</td></tr>
+                        <tr><td>2026-03-09 08:42</td><td>l.park@globex.io</td><td>Login</td><td>Session</td><td>Globex</td></tr>
+                        <tr><td>2026-03-08 17:30</td><td>admin@thinkplus.ae</td><td>Update</td><td>Policy: PII</td><td>Platform</td></tr>
+                        <tr><td>2026-03-08 16:05</td><td>j.wilson@globex.io</td><td>Delete</td><td>Draft Agent</td><td>Globex</td></tr>
+                        <tr><td>2026-03-08 14:20</td><td>a.torres@initech.co</td><td>Create</td><td>License Key</td><td>Initech</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <!-- Compliance Tab -->
+                <div class="tab-panel" data-tab-panel="compliance" style="display:none">
+                  <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;">Generate Compliance Report</h3>
+                  <div class="compliance-form">
+                    <div class="config-field"><label>Start Date</label><input type="date" value="2026-03-01" aria-label="Report start date" data-testid="compliance-start"></div>
+                    <div class="config-field"><label>End Date</label><input type="date" value="2026-03-09" aria-label="Report end date" data-testid="compliance-end"></div>
+                    <div class="config-field"><label>Format</label><div class="radio-group" style="height:36px;"><label><input type="radio" name="report-format" value="pdf" checked> PDF</label><label><input type="radio" name="report-format" value="csv"> CSV</label></div></div>
+                    <button class="nm-btn nm-btn-primary nm-btn-sm" data-testid="compliance-generate" aria-label="Generate report">Generate</button>
+                  </div>
+                  <h4 style="font-size:0.92rem;font-weight:700;margin-bottom:0.5rem;">Recent Reports</h4>
+                  <div class="report-list">
+                    <div class="report-item"><span class="report-item-icon">&#128196;</span><div class="report-item-info"><strong>March 2026 Compliance Report</strong><span>Generated Mar 8, 2026 -- PDF, 2.4 MB</span></div><button class="nm-btn nm-btn-sm" data-testid="report-download-1" aria-label="Download March report">Download</button></div>
+                    <div class="report-item"><span class="report-item-icon">&#128196;</span><div class="report-item-info"><strong>February 2026 Compliance Report</strong><span>Generated Mar 1, 2026 -- PDF, 3.1 MB</span></div><button class="nm-btn nm-btn-sm" data-testid="report-download-2" aria-label="Download February report">Download</button></div>
+                    <div class="report-item"><span class="report-item-icon">&#128196;</span><div class="report-item-info"><strong>Q4 2025 Annual Summary</strong><span>Generated Jan 5, 2026 -- PDF, 5.8 MB</span></div><button class="nm-btn nm-btn-sm" data-testid="report-download-3" aria-label="Download Q4 report">Download</button></div>
+                  </div>
+                </div>
+                <!-- Approvals Tab -->
+                <div class="tab-panel" data-tab-panel="approvals" style="display:none">
+                  <div class="filter-chips" style="margin-bottom:0.75rem;">
+                    <button class="filter-chip active" aria-label="All approvals">All: 5</button>
+                    <button class="filter-chip" aria-label="Confirmation approvals">Confirmation: 2</button>
+                    <button class="filter-chip" aria-label="Review approvals">Review: 2</button>
+                    <button class="filter-chip" aria-label="Takeover approvals">Takeover: 1</button>
+                  </div>
+                  <div class="stats-bar">
+                    <div class="stats-bar-item"><span class="stats-bar-value">5</span><span class="stats-bar-label">Pending</span></div>
+                    <div class="stats-bar-item"><span class="stats-bar-value">12</span><span class="stats-bar-label">Approved Today</span></div>
+                    <div class="stats-bar-item"><span class="stats-bar-value">4.2min</span><span class="stats-bar-label">Avg Response</span></div>
+                  </div>
+                  <div class="approval-card"><div class="approval-card-header"><span class="approval-card-title">Customer Support Agent</span><span class="approval-card-badge" style="background:rgba(66,129,119,0.15);color:#054239;">Confirmation</span></div><p class="approval-card-meta">Wants to issue a refund of $234.50 to customer #4821 -- 3 min ago</p><div class="approval-card-actions"><button class="nm-btn nm-btn-sm" data-testid="approval-view-1" aria-label="View details">View</button><button class="btn-approve" data-testid="approval-approve-1" aria-label="Approve refund">Approve</button><button class="btn-reject" data-testid="approval-reject-1" aria-label="Reject refund">Reject</button></div></div>
+                  <div class="approval-card"><div class="approval-card-header"><span class="approval-card-title">Data Analyst Agent</span><span class="approval-card-badge" style="background:rgba(185,167,121,0.2);color:#8a7540;">Review</span></div><p class="approval-card-meta">Generated revenue forecast report requiring sign-off -- 12 min ago</p><div class="approval-card-actions"><button class="nm-btn nm-btn-sm" data-testid="approval-view-2" aria-label="View details">View</button><button class="btn-approve" data-testid="approval-approve-2" aria-label="Approve report">Approve</button><button class="btn-reject" data-testid="approval-reject-2" aria-label="Reject report">Reject</button></div></div>
+                  <div class="approval-card"><div class="approval-card-header"><span class="approval-card-title">Code Reviewer Agent</span><span class="approval-card-badge" style="background:rgba(107,31,42,0.1);color:#6b1f2a;">Takeover</span></div><p class="approval-card-meta">Requesting human takeover for security-critical PR review -- 28 min ago</p><div class="approval-card-actions"><button class="nm-btn nm-btn-sm" data-testid="approval-view-3" aria-label="View details">View</button><button class="btn-approve" data-testid="approval-approve-3" aria-label="Accept takeover">Accept</button><button class="btn-reject" data-testid="approval-reject-3" aria-label="Decline takeover">Decline</button></div></div>
+                </div>
+                <!-- Policies Tab -->
+                <div class="tab-panel" data-tab-panel="policies" style="display:none">
+                  <div class="demo-settings-list">
+                    <div class="policy-row"><div class="policy-info"><strong>PII Detection Policy</strong><span>Automatically detects and masks personal data in agent responses</span></div><div class="policy-actions"><span class="policy-modified">Modified 2d ago</span><button class="nm-btn nm-btn-sm" data-testid="policy-view-pii" aria-label="View PII policy">View</button><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="PII policy toggle" data-testid="policy-toggle-pii"></div><button class="nm-btn nm-btn-sm" data-testid="policy-edit-pii" aria-label="Edit PII policy">Edit Rules</button></div></div>
+                    <div class="policy-row"><div class="policy-info"><strong>Content Safety</strong><span>Prevents generation of harmful, offensive, or inappropriate content</span></div><div class="policy-actions"><span class="policy-modified">Modified 5d ago</span><button class="nm-btn nm-btn-sm" data-testid="policy-view-safety" aria-label="View Content Safety policy">View</button><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Content Safety toggle" data-testid="policy-toggle-safety"></div><button class="nm-btn nm-btn-sm" data-testid="policy-edit-safety" aria-label="Edit Content Safety policy">Edit Rules</button></div></div>
+                    <div class="policy-row"><div class="policy-info"><strong>Data Residency</strong><span>Ensures all data processing stays within designated geographic regions</span></div><div class="policy-actions"><span class="policy-modified">Modified 2w ago</span><button class="nm-btn nm-btn-sm" data-testid="policy-view-residency" aria-label="View Data Residency policy">View</button><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Data Residency toggle" data-testid="policy-toggle-residency"></div><button class="nm-btn nm-btn-sm" data-testid="policy-edit-residency" aria-label="Edit Data Residency policy">Edit Rules</button></div></div>
+                    <div class="policy-row"><div class="policy-info"><strong>Rate Limiting</strong><span>Controls API call frequency per tenant to prevent abuse</span></div><div class="policy-actions"><span class="policy-modified">Modified 1mo ago</span><button class="nm-btn nm-btn-sm" data-testid="policy-view-rate" aria-label="View Rate Limiting policy">View</button><div class="toggle-switch" role="switch" aria-checked="false" aria-label="Rate Limiting toggle" data-testid="policy-toggle-rate"></div><button class="nm-btn nm-btn-sm" data-testid="policy-edit-rate" aria-label="Edit Rate Limiting policy">Edit Rules</button></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AM Panel: Event Triggers -->
+            <div class="am-panel" id="am-triggers" style="display:none">
+              <!-- Trigger List View -->
+              <div id="trigger-list-view">
+                <div class="toolbar-row" style="margin-bottom:1rem;">
+                  <button class="nm-btn nm-btn-sm nm-btn-primary" data-testid="trigger-new" aria-label="New trigger">+ New Trigger</button>
+                  <div class="search-bar"><input type="text" placeholder="Search triggers..." aria-label="Search triggers" data-testid="trigger-search"></div>
+                </div>
+                <div class="demo-table-wrap">
+                  <table class="demo-table" data-testid="trigger-table">
+                    <thead><tr><th>Trigger</th><th>Event</th><th>Status</th><th>Last Run</th><th style="width:80px">Action</th></tr></thead>
+                    <tbody>
+                      <tr data-testid="trigger-row-1"><td>New Ticket Created</td><td><code>ticket.created</code></td><td><span class="demo-status-badge active">Active</span></td><td>10:24 AM</td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="trigger-factsheet" data-list-id="trigger-list-view">View</button></td></tr>
+                      <tr data-testid="trigger-row-2"><td>PR Opened</td><td><code>github.pr.opened</code></td><td><span class="demo-status-badge active">Active</span></td><td>09:45 AM</td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="trigger-factsheet" data-list-id="trigger-list-view">View</button></td></tr>
+                      <tr data-testid="trigger-row-3"><td>Daily Report</td><td><code>cron.daily.09:00</code></td><td><span class="demo-status-badge active">Active</span></td><td>09:00 AM</td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="trigger-factsheet" data-list-id="trigger-list-view">View</button></td></tr>
+                      <tr data-testid="trigger-row-4"><td>Anomaly Detected</td><td><code>metrics.anomaly</code></td><td><span class="demo-status-badge inactive">Paused</span></td><td>--</td><td><button class="nm-btn nm-btn-sm" data-open-factsheet="trigger-factsheet" data-list-id="trigger-list-view">View</button></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Trigger Factsheet -->
+              <div class="factsheet" id="trigger-factsheet">
+                <button class="factsheet-back-btn" data-list-id="trigger-list-view" data-sheet-id="trigger-factsheet">&larr; Back to Triggers</button>
+                <div class="factsheet-header">
+                  <div class="factsheet-header-top">
+                    <div class="factsheet-icon">&#9889;</div>
+                    <div class="factsheet-identity">
+                      <h3>New Ticket Created</h3>
+                      <div class="factsheet-badges">
+                        <span class="factsheet-badge" style="background:rgba(66,129,119,0.15);color:#054239">Webhook</span>
+                        <span class="factsheet-badge status-online">Active</span>
+                      </div>
+                    </div>
+                    <div class="factsheet-actions">
+                      <button class="nm-btn nm-btn-sm">Pause</button>
+                      <button class="nm-btn nm-btn-sm">Edit</button>
+                      <button class="nm-btn nm-btn-sm" style="color:var(--tp-danger)">Delete</button>
+                    </div>
+                  </div>
+                  <div class="factsheet-kpis">
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">247</div><div class="factsheet-kpi-label">Executions 24h</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">98.4%</div><div class="factsheet-kpi-label">Success Rate</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">1.2s</div><div class="factsheet-kpi-label">Avg Duration</div></div>
+                    <div class="factsheet-kpi"><div class="factsheet-kpi-value">10:24 AM</div><div class="factsheet-kpi-label">Last Fired</div></div>
+                  </div>
+                </div>
+
+                <div class="section-tabs" data-tabgroup="trigger-factsheet">
+                  <button class="section-tab active" data-tab="tr-config">Configuration</button>
+                  <button class="section-tab" data-tab="tr-conditions">Conditions</button>
+                  <button class="section-tab" data-tab="tr-history">Execution History</button>
+                </div>
+                <div class="tab-content">
+                  <!-- Configuration Tab -->
+                  <div class="tab-panel active" data-tab-panel="tr-config">
+                    <div class="factsheet-content-card">
+                      <div class="info-rows">
+                        <div class="info-row"><span class="info-label">Trigger Name</span><span class="info-value">New Ticket Created</span></div>
+                        <div class="info-row"><span class="info-label">Event Type</span><span class="info-value"><code>ticket.created</code></span></div>
+                        <div class="info-row"><span class="info-label">Source</span><span class="info-value">Zendesk</span></div>
+                        <div class="info-row"><span class="info-label">Channel</span><span class="info-value">Webhook</span></div>
+                        <div class="info-row"><span class="info-label">Target Agent</span><span class="info-value">Customer Support Hub</span></div>
+                        <div class="info-row"><span class="info-label">Action</span><span class="info-value">auto_respond</span></div>
+                        <div class="info-row"><span class="info-label">Escalation</span><span class="info-value">After 5 minutes</span></div>
+                        <div class="info-row"><span class="info-label">Created</span><span class="info-value">2026-02-15</span></div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Conditions Tab -->
+                  <div class="tab-panel" data-tab-panel="tr-conditions" style="display:none">
+                    <div class="factsheet-content-card">
+                      <h4 style="font-size:0.95rem;font-weight:700;margin-bottom:0.75rem;">Trigger Conditions</h4>
+                      <div class="code-block" style="font-size:0.82rem;line-height:1.6">if event.type === 'ticket.created'
+  && event.priority >= 'high'
+  && !event.assignee
+then:
+  route_to: Customer Support Hub
+  action: auto_respond
+  escalate_after: 5min
+  notify: [admin@acme.com]</div>
+                      <h4 style="font-size:0.95rem;font-weight:700;margin:1rem 0 0.75rem;">Payload Schema</h4>
+                      <div class="code-block" style="font-size:0.82rem;line-height:1.6">{
+  "event": {
+    "type": "string",
+    "priority": "low | medium | high | critical",
+    "assignee": "string | null",
+    "subject": "string",
+    "customer_id": "string"
+  }
+}</div>
+                    </div>
+                  </div>
+                  <!-- Execution History Tab -->
+                  <div class="tab-panel" data-tab-panel="tr-history" style="display:none">
+                    <div class="factsheet-content-card">
+                      <div class="demo-table-wrap">
+                        <table class="demo-table">
+                          <thead><tr><th>Time</th><th>Status</th><th>Duration</th><th>Agent</th><th>Details</th></tr></thead>
+                          <tbody>
+                            <tr><td>10:24 AM</td><td><span class="demo-status-badge active">Success</span></td><td>1.2s</td><td>Customer Support Hub</td><td>Ticket #4821 auto-responded</td></tr>
+                            <tr><td>10:18 AM</td><td><span class="demo-status-badge active">Success</span></td><td>0.9s</td><td>Customer Support Hub</td><td>Ticket #4820 auto-responded</td></tr>
+                            <tr><td>09:55 AM</td><td><span class="demo-status-badge active">Success</span></td><td>1.4s</td><td>Customer Support Hub</td><td>Ticket #4819 escalated</td></tr>
+                            <tr><td>09:30 AM</td><td><span class="demo-status-badge warning">Timeout</span></td><td>5.0s</td><td>Customer Support Hub</td><td>Agent response timeout</td></tr>
+                            <tr><td>09:12 AM</td><td><span class="demo-status-badge active">Success</span></td><td>1.1s</td><td>Customer Support Hub</td><td>Ticket #4817 auto-responded</td></tr>
+                            <tr><td>08:45 AM</td><td><span class="demo-status-badge active">Success</span></td><td>0.8s</td><td>Customer Support Hub</td><td>Ticket #4816 auto-responded</td></tr>
+                            <tr><td>08:20 AM</td><td><span class="demo-status-badge active">Success</span></td><td>1.3s</td><td>Customer Support Hub</td><td>Ticket #4815 escalated</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AM Panel 8: Settings -->
+            <div class="am-panel" id="am-settings" style="display:none">
+              <h3 style="font-size:1.15rem;font-weight:700;margin-bottom:1rem;">Settings</h3>
+              <div class="section-tabs" data-tabgroup="am-settings">
+                <button class="section-tab active" data-tab="general" data-testid="am-settings-tab-general" aria-label="General tab">General</button>
+                <button class="section-tab" data-tab="notifications" data-testid="am-settings-tab-notifications" aria-label="Notifications tab">Notifications</button>
+                <button class="section-tab" data-tab="integrations" data-testid="am-settings-tab-integrations" aria-label="Integrations tab">Integrations</button>
+              </div>
+              <div class="tab-content">
+                <!-- General Tab -->
+                <div class="tab-panel active" data-tab-panel="general">
+                  <div class="demo-settings-list">
+                    <div class="demo-settings-row">
+                      <div><strong>Platform Name</strong><p class="demo-card-meta">Display name for the platform</p></div>
+                      <span class="demo-settings-value">ThinkPLUS Agent Platform</span>
+                    </div>
+                    <div class="demo-settings-row">
+                      <div><strong>Default LLM Provider</strong><p class="demo-card-meta">Primary model provider for new agents</p></div>
+                      <span class="demo-settings-value">Anthropic (Claude)</span>
+                    </div>
+                    <div class="demo-settings-row">
+                      <div><strong>Data Retention</strong><p class="demo-card-meta">How long conversation data is stored</p></div>
+                      <span class="demo-settings-value">90 days</span>
+                    </div>
+                    <div class="demo-settings-row">
+                      <div><strong>Max Concurrent Sessions</strong><p class="demo-card-meta">Per-tenant session limit</p></div>
+                      <span class="demo-settings-value">50</span>
+                    </div>
+                    <div class="demo-settings-row">
+                      <div><strong>Tenant Isolation Mode</strong><p class="demo-card-meta">Enforce strict graph-per-tenant data isolation</p></div>
+                      <div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Tenant Isolation toggle" data-testid="am-settings-toggle-isolation"></div>
+                    </div>
+                    <div class="demo-settings-row">
+                      <div><strong>API Rate Limit</strong><p class="demo-card-meta">Maximum API requests per minute per tenant</p></div>
+                      <span class="demo-settings-value">1000 req/min</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Notifications Tab -->
+                <div class="tab-panel" data-tab-panel="notifications" style="display:none">
+                  <div class="demo-settings-list">
+                    <div class="notif-pref-row">
+                      <div class="notif-pref-info"><strong>Agent Offline</strong><span>Alert when an agent goes offline unexpectedly</span></div>
+                      <div class="notif-pref-toggles">
+                        <div class="toggle-col"><span class="toggle-label">Email</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Agent Offline email"></div></div>
+                        <div class="toggle-col"><span class="toggle-label">In-App</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Agent Offline in-app"></div></div>
+                      </div>
+                    </div>
+                    <div class="notif-pref-row">
+                      <div class="notif-pref-info"><strong>License Expiring</strong><span>Warn before a license expires</span></div>
+                      <div class="notif-pref-toggles">
+                        <div class="toggle-col"><span class="toggle-label">Email</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="License Expiring email"></div></div>
+                        <div class="toggle-col"><span class="toggle-label">In-App</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="License Expiring in-app"></div></div>
+                      </div>
+                    </div>
+                    <div class="notif-pref-row">
+                      <div class="notif-pref-info"><strong>Policy Violation</strong><span>Immediate alert on governance policy violation</span></div>
+                      <div class="notif-pref-toggles">
+                        <div class="toggle-col"><span class="toggle-label">Email</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Policy Violation email"></div></div>
+                        <div class="toggle-col"><span class="toggle-label">In-App</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Policy Violation in-app"></div></div>
+                      </div>
+                    </div>
+                    <div class="notif-pref-row">
+                      <div class="notif-pref-info"><strong>New User Signup</strong><span>Notification when a new user joins your tenant</span></div>
+                      <div class="notif-pref-toggles">
+                        <div class="toggle-col"><span class="toggle-label">Email</span><div class="toggle-switch" role="switch" aria-checked="false" aria-label="New User email"></div></div>
+                        <div class="toggle-col"><span class="toggle-label">In-App</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="New User in-app"></div></div>
+                      </div>
+                    </div>
+                    <div class="notif-pref-row">
+                      <div class="notif-pref-info"><strong>System Update</strong><span>Platform version updates and maintenance windows</span></div>
+                      <div class="notif-pref-toggles">
+                        <div class="toggle-col"><span class="toggle-label">Email</span><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="System Update email"></div></div>
+                        <div class="toggle-col"><span class="toggle-label">In-App</span><div class="toggle-switch" role="switch" aria-checked="false" aria-label="System Update in-app"></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Integrations Tab -->
+                <div class="tab-panel" data-tab-panel="integrations" style="display:none">
+                  <div class="demo-card-grid">
+                    <div class="integration-card">
+                      <div class="integration-card-header"><span class="status-dot connected"></span><h4>Slack</h4></div>
+                      <span class="integration-status">Connected -- #agent-alerts channel</span>
+                      <div style="display:flex;gap:6px"><button class="nm-btn nm-btn-sm" aria-label="View Slack">View</button><button class="nm-btn nm-btn-sm" aria-label="Configure Slack">Configure</button></div>
+                    </div>
+                    <div class="integration-card">
+                      <div class="integration-card-header"><span class="status-dot connected"></span><h4>Jira</h4></div>
+                      <span class="integration-status">Connected -- project THINK</span>
+                      <div style="display:flex;gap:6px"><button class="nm-btn nm-btn-sm" aria-label="View Jira">View</button><button class="nm-btn nm-btn-sm" aria-label="Configure Jira">Configure</button></div>
+                    </div>
+                    <div class="integration-card">
+                      <div class="integration-card-header"><span class="status-dot disconnected"></span><h4>GitHub</h4></div>
+                      <span class="integration-status">Not Connected</span>
+                      <div style="display:flex;gap:6px"><button class="nm-btn nm-btn-sm" aria-label="View GitHub">View</button><button class="nm-btn nm-btn-sm nm-btn-primary" aria-label="Connect GitHub">Connect</button></div>
+                    </div>
+                    <div class="integration-card">
+                      <div class="integration-card-header"><span class="status-dot disconnected"></span><h4>Custom Webhook</h4></div>
+                      <span class="integration-status">Not Configured</span>
+                      <input type="text" placeholder="https://your-webhook-url.com" aria-label="Webhook URL">
+                      <div style="display:flex;gap:6px"><button class="nm-btn nm-btn-sm" aria-label="View Webhook">View</button><button class="nm-btn nm-btn-sm nm-btn-primary" aria-label="Save webhook">Save</button></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /.am-content -->
+        </div><!-- /.agent-manager-layout -->
+      </div><!-- /populated -->
+      <div data-view-state="loading" style="display:none">
+        <div class="skeleton-loader"><div class="skeleton-line w-60"></div><div class="skeleton-line w-80"></div><div class="skeleton-line w-40"></div><div class="skeleton-line w-70"></div></div>
+      </div>
+      <div data-view-state="empty" style="display:none">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="11"></line></svg>
+          </div>
+          <h3>No agents deployed</h3>
+          <p>Deploy your first AI agent to begin.</p>
+          <button class="nm-btn nm-btn-primary">+ Deploy Agent</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Full-page Chat -->
+    <div class="section-panel" id="section-fullpage-chat" style="display:none" data-testid="section-fullpage-chat">
+      <div class="chat-fullpage">
+        <div class="chat-fullpage-header">
+          <button class="nm-btn" id="back-to-admin" type="button" aria-label="Back to administration">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:6px"><path d="M15 18l-6-6 6-6"></path></svg>
+            Back to Admin
+          </button>
+          <span class="chat-fullpage-title">Full Page Chat</span>
+        </div>
+        <div class="chat-layout">
+          <div class="chat-sidebar">
+            <button class="nm-btn nm-btn-primary" style="width:100%;margin-bottom:12px">+ New Chat</button>
+            <div class="conversation-list">
+              <div class="conversation-item active">
+                <div class="conv-avatar" style="background:#428177">DA</div>
+                <div class="conv-meta">
+                  <div class="conv-title">Q3 Revenue Analysis</div>
+                  <div class="conv-time">2 min ago</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="conv-avatar" style="background:#c0392b">CS</div>
+                <div class="conv-meta">
+                  <div class="conv-title">Customer Onboarding</div>
+                  <div class="conv-time">1 hour ago</div>
+                </div>
+              </div>
+              <div class="conversation-item">
+                <div class="conv-avatar" style="background:#8e44ad">CR</div>
+                <div class="conv-meta">
+                  <div class="conv-title">PR Security Review</div>
+                  <div class="conv-time">Yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-main">
+            <div class="chat-topbar">
+              <div class="conv-avatar sm" style="background:#428177">DA</div>
+              <span class="chat-agent-name">Data Analyst Agent</span>
+              <span class="chat-agent-status"><span class="status-dot online"></span>Online</span>
+            </div>
+            <div class="chat-messages" id="fullpage-chat-messages">
+              <div class="message agent">
+                <div class="conv-avatar sm" style="background:#428177">DA</div>
+                <div class="message-bubble">Hello! I can help you analyze datasets and generate reports. What would you like to explore?</div>
+              </div>
+              <div class="message user">
+                <div class="message-bubble">Show me Q3 revenue trends by region</div>
+              </div>
+              <div class="message agent">
+                <div class="conv-avatar sm" style="background:#428177">DA</div>
+                <div class="message-bubble">
+                  I'll analyze the Q3 revenue data. Let me query the database...<br><br>
+                  <strong>Key findings:</strong><br>
+                  &bull; North America: $12.4M (+8.2%)<br>
+                  &bull; EMEA: $8.7M (+3.1%)<br>
+                  &bull; APAC: $5.2M (+12.4%)
+                </div>
+              </div>
+            </div>
+            <div class="chat-input">
+              <input type="text" placeholder="Type a message..." aria-label="Chat message" data-testid="fullpage-chat-input">
+              <button class="nm-btn nm-btn-primary" data-testid="fullpage-chat-send">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---- User Landing Page ---- -->
+  <div id="user-landing" style="display:none">
+    <div class="landing-welcome">
+      <h1>Welcome back, M. Khan</h1>
+      <p class="landing-date">Sunday, March 9, 2026</p>
+    </div>
+    <div class="landing-cards">
+      <div class="landing-card" id="landing-chat-card" data-testid="landing-start-chat">
+        <div class="landing-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <h3>Start New Chat</h3>
+        <p>Begin a conversation with an AI agent</p>
+      </div>
+      <div class="landing-card" data-testid="landing-recent">
+        <div class="landing-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
+        <h3>Recent Conversations</h3>
+        <p>3 conversations in the last 24 hours</p>
+      </div>
+      <div class="landing-card" data-testid="landing-agents">
+        <div class="landing-card-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="3"></circle><line x1="12" y1="8" x2="12" y2="11"></line></svg>
+        </div>
+        <h3>Browse Agents</h3>
+        <p>5 agents available in your workspace</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- Chatbot FAB ---- -->
+  <button class="chatbot-fab" id="chatbot-fab" type="button" aria-label="Open chat" data-testid="chatbot-fab">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </button>
+
+  <!-- ---- Chatbot Mini Panel ---- -->
+  <div class="chatbot-panel" id="chatbot-panel" style="display:none" data-testid="chatbot-panel">
+    <div class="chatbot-panel-header">
+      <select class="chatbot-agent-select" aria-label="Select agent" data-testid="chatbot-agent-select">
+        <option>Data Analyst</option>
+        <option>Customer Support</option>
+        <option>Code Reviewer</option>
+      </select>
+      <div class="chatbot-panel-actions">
+        <button class="chatbot-action" id="chatbot-popout" type="button" aria-label="Pop out to full page" title="Pop out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </button>
+        <button class="chatbot-action" id="chatbot-minimize" type="button" aria-label="Minimize" title="Minimize">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <button class="chatbot-action" id="chatbot-close" type="button" aria-label="Close" title="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+    <div class="chatbot-messages" id="chatbot-messages">
+      <div class="message agent">
+        <div class="message-bubble">Hello! How can I help you today?</div>
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" placeholder="Ask anything..." aria-label="Chat message" data-testid="chatbot-input">
+      <button class="nm-btn nm-btn-primary nm-btn-sm" data-testid="chatbot-send">Send</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

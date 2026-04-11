@@ -1,0 +1,225 @@
+<div class="global-form" data-testid="global-branding-form">
+  <section class="foundation-card">
+    <div class="card-head">
+      <h4>Foundation Overrides</h4>
+      <p>
+        Adjust the governed token layer on top of the selected starter kit and palette pack.
+      </p>
+    </div>
+
+    <div class="policy-palette-groups">
+      @for (group of policyPaletteGroups; track group.label) {
+        <div class="policy-group">
+          <span class="policy-group-label">{{ group.label }}</span>
+          <div class="policy-swatch-row">
+            @for (swatch of group.options; track swatch.value) {
+              <div class="policy-swatch">
+                <span class="policy-swatch-chip" [style.background-color]="swatch.value"></span>
+                <code>{{ swatch.value }}</code>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="foundation-layout">
+    <section class="foundation-card foundation-card-wide">
+      <div class="card-head">
+        <h4>Colour Tokens</h4>
+        <p>Select from approved semantic swatches only.</p>
+      </div>
+
+      <div class="palette-grid">
+        @for (field of colorFieldConfigs; track field.key) {
+          <div class="field palette-field" [attr.data-testid]="field.testId">
+            <span class="field-title">{{ field.label }}</span>
+            <div
+              class="palette-options"
+              role="radiogroup"
+              [attr.aria-label]="field.label + ' color options'"
+            >
+              @for (option of field.options; track option.value) {
+                <button
+                  type="button"
+                  pButton
+                  class="palette-option"
+                  [class.selected]="isPaletteColorSelected(field.key, option.value)"
+                  [attr.aria-checked]="isPaletteColorSelected(field.key, option.value)"
+                  role="radio"
+                  (click)="selectPaletteColor(field.key, option.value)"
+                >
+                  <span class="palette-chip" [style.background-color]="option.value"></span>
+                  <span class="palette-meta">
+                    <strong>{{ option.label }}</strong>
+                    <code>{{ option.value }}</code>
+                  </span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="foundation-card">
+      <div class="card-head">
+        <h4>Shape and Depth</h4>
+        <p>Control radius, elevation, and the overall softness of the shell.</p>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span class="field-title">Corner Radius</span>
+          <strong>{{ brandingForm().cornerRadius }}px</strong>
+          <input
+            type="range"
+            min="0"
+            max="40"
+            [ngModel]="brandingForm().cornerRadius"
+            (ngModelChange)="updateField('cornerRadius', +$event)"
+            data-testid="branding-corner-radius"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field-title">Button Depth</span>
+          <strong>{{ brandingForm().buttonDepth }}px</strong>
+          <input
+            type="range"
+            min="0"
+            max="30"
+            [ngModel]="brandingForm().buttonDepth"
+            (ngModelChange)="updateField('buttonDepth', +$event)"
+            data-testid="branding-button-depth"
+          />
+        </label>
+
+        <label class="field">
+          <span class="field-title">Shadow Intensity</span>
+          <strong>{{ brandingForm().shadowIntensity }}%</strong>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            [ngModel]="brandingForm().shadowIntensity"
+            (ngModelChange)="updateField('shadowIntensity', +$event)"
+            data-testid="branding-shadow-intensity"
+          />
+        </label>
+      </div>
+
+      <div class="form-toggles">
+        <label class="toggle-field" for="branding-soft-shadows">
+          <p-toggleSwitch
+            inputId="branding-soft-shadows"
+            [ngModel]="brandingForm().softShadows"
+            (ngModelChange)="updateField('softShadows', $event)"
+            data-testid="branding-soft-shadows"
+          />
+          <span>Soft Shadows</span>
+        </label>
+        <label class="toggle-field" for="branding-compact-nav">
+          <p-toggleSwitch
+            inputId="branding-compact-nav"
+            [ngModel]="brandingForm().compactNav"
+            (ngModelChange)="updateField('compactNav', $event)"
+            data-testid="branding-compact-nav"
+          />
+          <span>Compact Navigation</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="foundation-card">
+      <div class="card-head">
+        <h4>Interaction Behaviour</h4>
+        <p>Keep hover states consistent across buttons, cards, inputs, nav, and table rows.</p>
+      </div>
+
+      <div class="hover-grid">
+        <div class="hover-field">
+          <span class="hover-label">Button Hover</span>
+          <p-selectbutton
+            [options]="buttonHoverOptions"
+            [ngModel]="brandingForm().hoverButton"
+            (ngModelChange)="updateField('hoverButton', $event)"
+            optionLabel="label"
+            optionValue="value"
+            aria-label="Button hover behaviour"
+            data-testid="branding-hover-button"
+          />
+        </div>
+
+        <div class="hover-field">
+          <span class="hover-label">Card Hover</span>
+          <p-selectbutton
+            [options]="cardHoverOptions"
+            [ngModel]="brandingForm().hoverCard"
+            (ngModelChange)="updateField('hoverCard', $event)"
+            optionLabel="label"
+            optionValue="value"
+            aria-label="Card hover behaviour"
+            data-testid="branding-hover-card"
+          />
+        </div>
+
+        <div class="hover-field">
+          <span class="hover-label">Input Hover</span>
+          <p-selectbutton
+            [options]="inputHoverOptions"
+            [ngModel]="brandingForm().hoverInput"
+            (ngModelChange)="updateField('hoverInput', $event)"
+            optionLabel="label"
+            optionValue="value"
+            aria-label="Input hover behaviour"
+            data-testid="branding-hover-input"
+          />
+        </div>
+
+        <div class="hover-field">
+          <span class="hover-label">Nav Hover</span>
+          <p-selectbutton
+            [options]="navHoverOptions"
+            [ngModel]="brandingForm().hoverNav"
+            (ngModelChange)="updateField('hoverNav', $event)"
+            optionLabel="label"
+            optionValue="value"
+            aria-label="Navigation hover behaviour"
+            data-testid="branding-hover-nav"
+          />
+        </div>
+
+        <div class="hover-field">
+          <span class="hover-label">Table Row Hover</span>
+          <p-selectbutton
+            [options]="tableRowHoverOptions"
+            [ngModel]="brandingForm().hoverTableRow"
+            (ngModelChange)="updateField('hoverTableRow', $event)"
+            optionLabel="label"
+            optionValue="value"
+            aria-label="Table row hover behaviour"
+            data-testid="branding-hover-table-row"
+          />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="foundation-card foundation-footnote">
+    <div class="card-head">
+      <h4>Typography Lock</h4>
+      <p>
+        Typography selection happens in the dedicated Typography section. The currently resolved
+        pack is shown here for reference only.
+      </p>
+    </div>
+
+    <div class="typography-lock-card">
+      <span class="field-title">Resolved Typography Stack</span>
+      <input pInputText [value]="brandFontLabel" readonly data-testid="branding-font-family" />
+      <small>Custom CSS is disabled by policy v1.</small>
+    </div>
+  </section>
+</div>

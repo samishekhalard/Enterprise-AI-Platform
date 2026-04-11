@@ -1,0 +1,185 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+}
+
+.icon-picker {
+  display: grid;
+  gap: var(--tp-space-3, 0.75rem);
+}
+
+// ── Search ────────────────────────────────────────────────────────────────────
+.picker-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  color: var(--tp-text-muted);
+  pointer-events: none;
+}
+
+.picker-search-input {
+  width: 100%;
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius-pill);
+  padding-block: var(--tp-space-2, 0.5rem);
+  padding-inline-start: calc(var(--tp-space-6) + var(--tp-space-3));
+  padding-inline-end: calc(var(--tp-space-16) + var(--tp-space-4));
+  background: transparent;
+  color: var(--tp-text);
+  font: inherit;
+  font-size: var(--tp-font-sm);
+  box-shadow: none;
+
+  &:focus {
+    border-color: var(--tp-primary);
+    box-shadow: var(--tp-focus-ring);
+    outline: none;
+  }
+}
+
+.result-count {
+  position: absolute;
+  inset-inline-end: 0.75rem;
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-muted);
+  pointer-events: none;
+}
+
+// ── Category tabs ─────────────────────────────────────────────────────────────
+.picker-categories {
+  display: flex;
+  gap: var(--tp-space-1, 0.25rem);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  padding-block-end: var(--tp-space-1, 0.25rem);
+}
+
+.category-tab {
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--nm-radius-pill);
+  padding: var(--tp-space-1, 0.25rem) var(--tp-space-3, 0.75rem);
+  background: transparent;
+  color: var(--tp-grey);
+  font: inherit;
+  font-size: var(--tp-font-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 0.14s ease,
+    background-color 0.14s ease;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--tp-primary-dark);
+  }
+
+  &.active {
+    background: var(--tp-primary-bg);
+    color: var(--tp-primary-dark);
+  }
+}
+
+.cat-count {
+  font-size: var(--tp-font-xs);
+  opacity: 0.7;
+  margin-inline-start: var(--tp-space-1);
+}
+
+// ── Virtual scroll viewport ───────────────────────────────────────────────────
+.picker-viewport {
+  height: 240px;
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  padding: var(--tp-space-2, 0.5rem);
+}
+
+.icon-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: var(--tp-space-1, 0.25rem);
+}
+
+.icon-cell {
+  width: 38px;
+  height: 38px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--nm-radius-sm);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--tp-text-muted);
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease;
+
+  &:hover {
+    background: var(--tp-primary-bg);
+    color: var(--tp-primary-dark);
+  }
+
+  &.selected {
+    border-color: var(--tp-primary);
+    background: var(--tp-primary-bg);
+    color: var(--tp-primary-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--tp-primary);
+    outline-offset: 2px;
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.picker-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--tp-space-2, 0.5rem);
+  padding: var(--tp-space-6, 1.5rem) var(--tp-space-4, 1rem);
+  text-align: center;
+  color: var(--tp-text-muted);
+  opacity: 0.6;
+
+  p {
+    font-size: var(--tp-font-sm);
+  }
+}
+
+// ── Preview panel ─────────────────────────────────────────────────────────────
+.picker-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3, 0.75rem);
+  padding: var(--tp-space-2, 0.5rem) var(--tp-space-3, 0.75rem);
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+}
+
+.preview-sizes {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3, 0.75rem);
+  color: var(--tp-text);
+}
+
+.preview-name {
+  font-family: var(--tp-font-family-code);
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-muted);
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: bp.$bp-sm) {
+  .icon-row {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

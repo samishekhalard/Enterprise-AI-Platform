@@ -1,0 +1,920 @@
+<app-page-frame
+  [title]="'Design Studio'"
+  [subtitle]="'Govern brand surfaces across typography, color system, and iconography.'"
+  data-testid="brand-studio-preview-page"
+>
+  <section page-content class="studio-page">
+    <aside class="studio-sidebar app-panel" aria-label="Design Studio sections">
+      <nav class="studio-nav">
+        @for (section of studioSections; track section.id) {
+          <button
+            type="button"
+            class="studio-nav-item"
+            [class.is-active]="isSectionActive(section.id)"
+            (click)="setActiveSection(section.id)"
+          >
+            {{ section.label }}
+          </button>
+        }
+      </nav>
+    </aside>
+
+    <section class="studio-content app-panel">
+      @if (activeSection() === 'typography') {
+        <header class="studio-section-head">
+          <h2>Typography</h2>
+          <p>
+            Control font face and semantic text colour. Text sizing stays fixed to the active
+            system typography scale.
+          </p>
+          <p class="studio-section-meta">
+            Current active body font: <strong>{{ defaultFontFace() }}</strong>
+          </p>
+        </header>
+
+        <div class="typography-table-wrap" data-testid="brand-studio-typography-stage">
+          <p-table
+            [value]="typographyRows()"
+            [pt]="typographyTablePt"
+            styleClass="tenant-data-table typography-design-table"
+            ariaLabel="Typography management matrix"
+            data-testid="brand-studio-typography-table"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="typography-col-item">Item</th>
+                <th class="typography-col-font">Font</th>
+                <th class="typography-col-color">Font Color</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-row>
+              <tr>
+                <td class="typography-col-item">
+                  <div
+                    class="typography-role-stack"
+                    tabindex="0"
+                    (mouseenter)="showPreview(row.id)"
+                    (mouseleave)="hidePreview(row.id)"
+                    (focusin)="showPreview(row.id)"
+                    (focusout)="hidePreview(row.id)"
+                  >
+                    <strong class="typography-role-label">{{ row.label }}</strong>
+
+                    <p
+                      class="typography-role-preview"
+                      [class.is-visible]="hoveredRoleId() === row.id"
+                      [style.font-family]="resolveFontFamily(row.fontId)"
+                      [style.color]="row.colorCssValue"
+                      [style.font-size]="row.previewFontSize"
+                      [style.font-weight]="row.previewWeight"
+                    >
+                      Visit the UAE's unified digital platform
+                    </p>
+                  </div>
+                </td>
+                <td class="typography-col-font">
+                  <p-select
+                    [pt]="selectPt"
+                    [options]="approvedFonts"
+                    optionLabel="label"
+                    optionValue="id"
+                    [filter]="true"
+                    filterBy="label"
+                    [showClear]="true"
+                    placeholder="Select font"
+                    [ngModel]="row.fontId"
+                    (ngModelChange)="updateTypographyRow(row.id, 'fontId', $event)"
+                    appendTo="body"
+                  />
+                </td>
+                <td class="typography-col-color">
+                  <p-select
+                    [pt]="selectPt"
+                    [options]="colorOptions"
+                    optionLabel="label"
+                    optionValue="cssValue"
+                    [filter]="true"
+                    filterBy="label"
+                    [showClear]="true"
+                    placeholder="Select font color"
+                    [ngModel]="row.colorCssValue"
+                    (ngModelChange)="updateTypographyRow(row.id, 'color', $event)"
+                    appendTo="body"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="3">
+                  <p class="typography-empty-state">
+                    No typography roles are available for this brand.
+                  </p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      } @else if (activeSection() === 'color-system') {
+        <header class="studio-section-head">
+          <h2>Color System</h2>
+          <p>
+            Choose from the official UAE colour families and keep the current house palette as the
+            default tenant baseline.
+          </p>
+          <p class="studio-section-meta">
+            Default palette: <strong>{{ defaultPaletteName() }}</strong>
+          </p>
+        </header>
+
+        <div class="palette-panel-stack" data-testid="brand-studio-color-system-stage">
+          @for (pack of palettePacks; track pack.palettePackId) {
+            <p-panel
+              [toggleable]="true"
+              [collapsed]="isPalettePackCollapsed(pack.palettePackId)"
+              (collapsedChange)="setPalettePackCollapsed(pack.palettePackId, $event)"
+              [pt]="palettePanelPt(pack)"
+              styleClass="palette-selection-panel"
+              [class.is-selected]="isPalettePackSelected(pack.palettePackId)"
+            >
+              <ng-template #header>
+                <div class="palette-panel-summary">
+                  <div class="palette-panel-summary-head">
+                    <span class="palette-pack-card-title">
+                      {{ pack.name }}
+                      @if (pack.isDefault) {
+                        <span class="palette-pack-badge">Default</span>
+                      }
+                    </span>
+                    <span class="palette-pack-meta palette-pack-meta-inline palette-pack-meta-summary">
+                      @for (token of colorSummaryTokens(pack); track token.label) {
+                        <button
+                          type="button"
+                          class="palette-summary-token"
+                          [pTooltip]="colorTooltip(token.label, token.hex)"
+                          tooltipPosition="top"
+                          (click)="copyColorHex($event, token.label, token.hex)"
+                        >
+                          <span class="palette-summary-token-label">{{ token.label }}</span>
+                          <span class="palette-summary-token-swatch" [style.background]="token.hex"></span>
+                        </button>
+                      }
+                    </span>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template #icons>
+                <div class="palette-panel-checkbox" (click)="$event.stopPropagation()">
+                  <p-checkbox
+                    [binary]="true"
+                    [ngModel]="isPalettePackSelected(pack.palettePackId)"
+                    [inputId]="'palette-pack-' + pack.palettePackId"
+                    (ngModelChange)="selectPalettePack(pack.palettePackId)"
+                  />
+                </div>
+              </ng-template>
+
+              <div class="palette-panel-body">
+                <span class="palette-pack-swatches" aria-hidden="true">
+                  @for (swatch of paletteSwatches(pack); track swatch) {
+                    <span class="palette-pack-swatch" [style.background]="swatch"></span>
+                  }
+                </span>
+
+                <div class="palette-color-sections">
+                  <section class="palette-color-section">
+                    <h4>Core colors</h4>
+                    <div class="palette-color-grid">
+                      @for (color of [
+                        { label: 'Primary', hex: pack.primary },
+                        { label: 'Secondary', hex: pack.secondary },
+                        { label: 'Accent', hex: pack.accent },
+                        { label: 'Warm Lift', hex: pack.surfaceRaised },
+                      ]; track color.label) {
+                        <button
+                          type="button"
+                          class="palette-color-token"
+                          [pTooltip]="colorTooltip(color.label, color.hex)"
+                          tooltipPosition="top"
+                          (click)="copyColorHex($event, color.label, color.hex)"
+                        >
+                          <span class="palette-detail-chip" [style.background]="color.hex"></span>
+                          <span class="palette-color-token-meta">
+                            <span class="palette-detail-label">{{ color.label }}</span>
+                            <code>{{ color.hex }}</code>
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  </section>
+
+                  <section class="palette-color-section">
+                    <h4>System roles</h4>
+                    <div class="palette-color-grid">
+                      @for (color of [
+                        { label: 'Surface', hex: pack.surface },
+                        { label: 'Surface Raised', hex: pack.surfaceRaised },
+                        { label: 'Text on Light', hex: textOnLight(pack) },
+                        { label: 'Text Muted', hex: pack.textMuted },
+                        { label: 'Text on Dark', hex: textOnDark },
+                        { label: 'Border', hex: pack.border },
+                      ]; track color.label) {
+                        <button
+                          type="button"
+                          class="palette-color-token"
+                          [pTooltip]="colorTooltip(color.label, color.hex)"
+                          tooltipPosition="top"
+                          (click)="copyColorHex($event, color.label, color.hex)"
+                        >
+                          <span class="palette-detail-chip" [style.background]="color.hex"></span>
+                          <span class="palette-color-token-meta">
+                            <span class="palette-detail-label">{{ color.label }}</span>
+                            <code>{{ color.hex }}</code>
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  </section>
+
+                  <section class="palette-color-section">
+                    <h4>Status colors</h4>
+                    <div class="palette-color-grid">
+                      @for (color of [
+                        { label: 'Success', hex: pack.success },
+                        { label: 'Warning', hex: pack.warning },
+                        { label: 'Error', hex: pack.error },
+                        { label: 'Info', hex: pack.info },
+                      ]; track color.label) {
+                        <button
+                          type="button"
+                          class="palette-color-token"
+                          [pTooltip]="colorTooltip(color.label, color.hex)"
+                          tooltipPosition="top"
+                          (click)="copyColorHex($event, color.label, color.hex)"
+                        >
+                          <span class="palette-detail-chip" [style.background]="color.hex"></span>
+                          <span class="palette-color-token-meta">
+                            <span class="palette-detail-label">{{ color.label }}</span>
+                            <code>{{ color.hex }}</code>
+                          </span>
+                        </button>
+                      }
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </p-panel>
+          }
+        </div>
+      } @else if (activeSection() === 'imagery') {
+        <header class="studio-section-head">
+          <h2>Logos & Imagery</h2>
+          <p>
+            Manage the tenant logos. Login background is handled in the Login Screen section.
+          </p>
+        </header>
+
+        <section class="imagery-stack" data-testid="brand-studio-imagery-stage">
+          <div class="imagery-panel-stack">
+            @for (panel of assetPanels(); track panel.id) {
+              <p-panel
+                [toggleable]="true"
+                [collapsed]="false"
+                [pt]="assetPanelPt"
+                styleClass="imagery-selection-panel"
+              >
+                <ng-template #header>
+                  <div class="imagery-panel-title">{{ panel.label }}</div>
+                </ng-template>
+
+                <div class="imagery-panel-body">
+                  <div class="imagery-preview-frame">
+                    <img [src]="panel.previewUrl" [alt]="panel.label" class="imagery-preview-image" />
+                  </div>
+
+                  <div class="imagery-panel-actions">
+                    <button
+                      type="button"
+                      pButton
+                      severity="secondary"
+                      (click)="openAddAssetDialog(panel.kind, panel.label)"
+                    >
+                      Update Logo
+                    </button>
+                    <button
+                      type="button"
+                      pButton
+                      severity="secondary"
+                      (click)="resetAsset(panel.kind)"
+                    >
+                      Reset Logo
+                    </button>
+                  </div>
+                </div>
+              </p-panel>
+            }
+          </div>
+        </section>
+
+        <p-dialog
+          [(visible)]="isAddAssetDialogOpen"
+          [modal]="true"
+          [draggable]="false"
+          [resizable]="false"
+          [appendTo]="'body'"
+          [baseZIndex]="1200"
+          [style]="{ width: '38rem', maxWidth: '96vw' }"
+          [header]="assetUploadDialogTitle()"
+        >
+          <div class="iconography-dialog-body">
+            <div class="iconography-form-control">
+              <label>Upload Asset</label>
+              <div
+                class="iconography-dropbox"
+                [class.is-drag-active]="isAssetDropActive()"
+                (dragover)="onAssetDragOver($event)"
+                (dragleave)="onAssetDragLeave($event)"
+                (drop)="onAssetDrop($event)"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zm1.5 10.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <input
+                  #assetUpload
+                  id="assetUpload"
+                  type="file"
+                  class="sr-only"
+                  [attr.accept]="assetUploadAccept()"
+                  (change)="onAssetImportSelected($event)"
+                />
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  class="iconography-upload-button"
+                  (click)="openIconLibraryFileDialog(assetUpload)"
+                >
+                  {{ assetUploadButtonLabel() }}
+                </button>
+                <span class="iconography-dropbox-copy">or drag and drop</span>
+                <p>{{ assetUploadHint() }}</p>
+              </div>
+            </div>
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="iconography-dialog-actions">
+              <button type="button" pButton severity="secondary" (click)="closeAddAssetDialog()">
+                Cancel
+              </button>
+              <button type="button" pButton (click)="submitImportedAsset()">Submit</button>
+            </div>
+          </ng-template>
+        </p-dialog>
+      } @else if (activeSection() === 'iconography') {
+        <header class="studio-section-head">
+          <h2>Iconography</h2>
+          <p>
+            Govern the object-definition icon library used by this tenant. This does not change the
+            general system chrome.
+          </p>
+        </header>
+
+        <section class="iconography-stack" data-testid="brand-studio-iconography-stage">
+          <div class="iconography-actions">
+            <button type="button" pButton class="iconography-action-button" (click)="openAddLibraryDialog()">
+              Add Library
+            </button>
+          </div>
+
+          @if (iconLibraries().length > 0) {
+            <div class="iconography-panel-stack">
+              @for (library of iconLibraries(); track library.iconLibraryId) {
+                <p-panel
+                  [toggleable]="true"
+                  [collapsed]="isIconLibraryCollapsed(library.iconLibraryId)"
+                  (collapsedChange)="setIconLibraryCollapsed(library.iconLibraryId, $event)"
+                  [pt]="iconLibraryPanelPt(library)"
+                  styleClass="iconography-selection-panel"
+                  [class.is-selected]="isIconLibrarySelected(library.iconLibraryId)"
+                >
+                  <ng-template #header>
+                    <div class="iconography-panel-title">
+                      {{ library.name }}
+                    </div>
+                  </ng-template>
+
+                  <ng-template #icons>
+                    <div class="palette-panel-checkbox" (click)="$event.stopPropagation()">
+                      <p-checkbox
+                        [binary]="true"
+                        [ngModel]="isIconLibrarySelected(library.iconLibraryId)"
+                        [inputId]="'icon-library-' + library.iconLibraryId"
+                        (ngModelChange)="selectIconLibrary(library.iconLibraryId)"
+                      />
+                    </div>
+                  </ng-template>
+
+                  <div class="iconography-panel-body">
+                    <app-icon-picker
+                      [selectedIcon]="selectedPreviewIcon()"
+                      [selectedColor]="'var(--tp-primary)'"
+                      [showSearch]="false"
+                      (iconSelected)="onPreviewIconSelected($event)"
+                    />
+                  </div>
+                </p-panel>
+              }
+            </div>
+          } @else {
+            <p class="iconography-empty-state">
+              No tenant icon library uploaded yet. The platform-seeded library remains active.
+            </p>
+          }
+        </section>
+
+        <p-dialog
+          [(visible)]="isAddLibraryDialogOpen"
+          [modal]="true"
+          [draggable]="false"
+          [resizable]="false"
+          [appendTo]="'body'"
+          [baseZIndex]="1200"
+          [style]="{ width: '38rem', maxWidth: '96vw' }"
+          header="Add Library"
+        >
+          <div class="iconography-dialog-body">
+            <div class="iconography-form-control">
+              <label for="icon-library-name">Library Name</label>
+              <input
+                id="icon-library-name"
+                type="text"
+                pInputText
+                [ngModel]="draftIconLibraryName()"
+                (ngModelChange)="draftIconLibraryName.set($event)"
+                placeholder="Icon Library"
+              />
+            </div>
+
+            <div class="iconography-form-control">
+              <label>Upload Library Package</label>
+              <div
+                class="iconography-dropbox"
+                [class.is-drag-active]="isImportDropActive()"
+                (dragover)="onImportDragOver($event)"
+                (dragleave)="onImportDragLeave($event)"
+                (drop)="onImportDrop($event)"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path
+                    fill-rule="evenodd"
+                    d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zm1.5 10.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <input
+                  #iconLibraryUpload
+                  id="iconLibraryUpload"
+                  type="file"
+                  class="sr-only"
+                  accept=".zip,.json"
+                  (change)="onIconLibraryImportSelected($event)"
+                />
+                <button
+                  type="button"
+                  pButton
+                  severity="secondary"
+                  class="iconography-upload-button"
+                  (click)="openIconLibraryFileDialog(iconLibraryUpload)"
+                >
+                  Upload a file
+                </button>
+                <span class="iconography-dropbox-copy">or drag and drop</span>
+                <p>ZIP, JSON up to 10MB</p>
+              </div>
+            </div>
+
+            @if (selectedImportedIconLibraryFile()) {
+              <div class="iconography-upload-preview">
+                <strong>{{ draftIconLibraryName().trim() || nextIconLibraryDefaultName() }}</strong>
+                <span>{{ selectedImportedIconLibraryFile() }}</span>
+              </div>
+            }
+          </div>
+
+          <ng-template pTemplate="footer">
+            <div class="iconography-dialog-actions">
+              <button type="button" pButton severity="secondary" (click)="closeAddLibraryDialog()">
+                Cancel
+              </button>
+              <button type="button" pButton (click)="submitImportedIconLibrary()">
+                Submit
+              </button>
+            </div>
+          </ng-template>
+        </p-dialog>
+      } @else {
+        <header class="studio-section-head">
+          <h2>Login Screen</h2>
+          <p>
+            Control only the login-brand surfaces that are safe to change while keeping the system
+            login structure fixed.
+          </p>
+        </header>
+
+        <section class="login-screen-stage" data-testid="brand-studio-login-stage">
+          <div class="login-editor-sections">
+            <section class="login-editor-panel app-panel">
+              <h3>Background</h3>
+
+              <div class="login-editor-control">
+                <label>Background Color</label>
+                <div class="login-color-picker">
+                  <input
+                    type="color"
+                    [ngModel]="loginBackgroundColor()"
+                    (ngModelChange)="loginBackgroundColor.set($event)"
+                  />
+                  <code>{{ loginBackgroundColor() }}</code>
+                </div>
+              </div>
+
+              <div class="login-editor-control">
+                <label>Background Type</label>
+                <div class="login-mode-grid" role="group" aria-label="Background type">
+                  @for (mode of loginBackgroundModeOptions; track mode.value) {
+                    <button
+                      type="button"
+                      class="login-mode-card"
+                      [class.is-active]="loginBackgroundMode() === mode.value"
+                      (click)="setLoginBackgroundMode(mode.value)"
+                    >
+                      <span class="login-mode-card-preview" [class]="'is-' + mode.value"></span>
+                      <span class="login-mode-card-label">{{ mode.label }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              @if (loginBackgroundMode() === 'pattern') {
+                <div class="login-editor-control">
+                  <label>Pattern</label>
+                  <div class="login-pattern-grid">
+                    @for (pattern of loginPatternOptions; track pattern.value) {
+                      <button
+                        type="button"
+                        class="login-pattern-card"
+                        [class.is-active]="loginSelectedPattern() === pattern.value"
+                        (click)="loginSelectedPattern.set(pattern.value)"
+                      >
+                        <span
+                          class="login-pattern-card-preview"
+                          [style.background-image]="pattern.cssValue"
+                        ></span>
+                        <span class="login-pattern-card-label">{{ pattern.label }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (loginBackgroundMode() === 'photo') {
+                <div class="login-editor-background-actions">
+                  <button
+                    type="button"
+                    pButton
+                    severity="secondary"
+                    (click)="openLoginBackgroundDialog()"
+                  >
+                    Upload Photo
+                  </button>
+                  <button
+                    type="button"
+                    pButton
+                    severity="secondary"
+                    (click)="resetLoginBackground()"
+                  >
+                    Reset Photo
+                  </button>
+                </div>
+              }
+            </section>
+
+            <section class="login-editor-panel app-panel">
+              <h3>Welcome Section</h3>
+
+              <div class="login-editor-control">
+                <label>Card Color</label>
+                <div class="login-color-picker">
+                  <input
+                    type="color"
+                    [ngModel]="loginCardColor()"
+                    (ngModelChange)="loginCardColor.set($event)"
+                  />
+                  <code>{{ loginCardColor() }}</code>
+                </div>
+              </div>
+
+              <div class="login-editor-control">
+                <label>Text on Background</label>
+                <div class="login-color-picker">
+                  <input
+                    type="color"
+                    [ngModel]="loginTextOnBackgroundColor()"
+                    (ngModelChange)="loginTextOnBackgroundColor.set($event)"
+                  />
+                  <code>{{ loginTextOnBackgroundColor() }}</code>
+                </div>
+              </div>
+
+              <div class="login-editor-control">
+                <label>Text on Card</label>
+                <div class="login-color-picker">
+                  <input
+                    type="color"
+                    [ngModel]="loginTextOnCardColor()"
+                    (ngModelChange)="loginTextOnCardColor.set($event)"
+                  />
+                  <code>{{ loginTextOnCardColor() }}</code>
+                </div>
+              </div>
+            </section>
+
+            <section class="login-editor-panel app-panel">
+              <h3>Logo Section</h3>
+
+              <div class="login-logo-grid">
+                @for (option of loginLogoVariantOptions; track option.value) {
+                  <button
+                    type="button"
+                    class="login-logo-card"
+                    [class.is-active]="loginLogoVariant() === option.value"
+                    (click)="setLoginLogoVariant(option.value)"
+                  >
+                    <div class="login-logo-card-head">
+                      <span>{{ option.label }}</span>
+                      <p-checkbox
+                        [binary]="true"
+                        [ngModel]="loginLogoVariant() === option.value"
+                        [inputId]="'login-logo-' + option.value"
+                      />
+                    </div>
+                    <div
+                      class="login-logo-card-preview"
+                      [class.is-dark-surface]="option.value === 'light'"
+                    >
+                      <img
+                        [src]="option.value === 'dark' ? currentLogoDarkUrl() : currentLogoLightUrl()"
+                        [alt]="option.label"
+                        [class.is-light-wordmark]="option.value === 'light'"
+                      />
+                    </div>
+                  </button>
+                }
+              </div>
+            </section>
+          </div>
+
+          <section class="login-preview-panel app-panel">
+            <header class="login-preview-toolbar">
+              <div class="login-preview-device-switcher" role="group" aria-label="Preview device">
+                @for (device of loginPreviewDeviceOptions; track device.id) {
+                  <button
+                    type="button"
+                    class="login-preview-device-button"
+                    [class.is-active]="selectedLoginPreviewDevice() === device.id"
+                    (click)="setLoginPreviewDevice(device.id)"
+                    [attr.aria-label]="device.label"
+                    [attr.title]="device.label"
+                  >
+                    @if (device.id === 'web') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="12" rx="2"></rect>
+                        <path d="M8 20h8"></path>
+                        <path d="M12 16v4"></path>
+                      </svg>
+                    } @else if (device.id === 'tablet') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="6" y="2.5" width="12" height="19" rx="2"></rect>
+                        <path d="M11 18.5h2"></path>
+                      </svg>
+                    } @else {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <rect x="7" y="2.5" width="10" height="19" rx="2"></rect>
+                        <path d="M11 18.5h2"></path>
+                      </svg>
+                    }
+                  </button>
+                }
+              </div>
+            </header>
+
+            <div
+              class="system-login-preview"
+              [style]="loginPreviewStyles()"
+              [class.is-web]="selectedLoginPreviewDevice() === 'web'"
+              [class.is-tablet]="selectedLoginPreviewDevice() === 'tablet'"
+              [class.is-mobile]="selectedLoginPreviewDevice() === 'mobile'"
+            >
+              <div class="login-page">
+                <div
+                  class="background-brand-image"
+                  aria-hidden="true"
+                  [style.background-image]="
+                    loginBackgroundMode() === 'photo' && currentLoginBackgroundUrl()
+                      ? 'url(' + currentLoginBackgroundUrl() + ')'
+                      : 'none'
+                  "
+                ></div>
+                <div
+                  class="background-pattern"
+                  aria-hidden="true"
+                  [style.background-image]="activeLoginPatternCss()"
+                  [style.background-size]="activeLoginPatternSize()"
+                  [class.is-hidden]="loginBackgroundMode() !== 'pattern'"
+                ></div>
+
+                <main class="login-content">
+                  <app-page-frame
+                    class="login-shell"
+                    [title]="'Welcome to ' + brandRuntime.appTitle()"
+                    [subtitle]="'Empower. Transform. Succeed.'"
+                  >
+                    <section page-content class="login-stage">
+                      <a class="welcome-logo-link" aria-label="Brand home">
+                        <img
+                          [src]="activeLoginLogoUrl()"
+                          [alt]="brandRuntime.appTitle()"
+                          class="welcome-logo"
+                          [class.is-light-wordmark]="loginLogoVariant() === 'light'"
+                        />
+                      </a>
+
+                      <div class="signin-card-stage">
+                        <form class="login-form" novalidate>
+                          <div class="neo-field">
+                            <label class="neo-field-label">Email or Username</label>
+                            <div class="neo-input-wrap">
+                              <input
+                                pInputText
+                                class="neo-input"
+                                type="text"
+                                placeholder="Enter your username"
+                                readonly
+                              />
+                              <span class="neo-icon" aria-hidden="true">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z"
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div class="neo-field">
+                            <label class="neo-field-label">Password</label>
+                            <div class="neo-input-wrap">
+                              <input
+                                pInputText
+                                class="neo-input neo-input-password"
+                                type="password"
+                                placeholder="Enter your password"
+                                readonly
+                              />
+                              <span class="neo-icon" aria-hidden="true">
+                                <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                                  <path
+                                    d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z"
+                                  />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+
+                          <div class="neo-field">
+                            <label class="neo-field-label">Tenant ID</label>
+                            <div class="neo-input-wrap">
+                              <input
+                                pInputText
+                                class="neo-input"
+                                type="text"
+                                [value]="previewWorkspace.tenantId"
+                                readonly
+                              />
+                              <span class="neo-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z" />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+
+                          <button type="button" pButton class="auth-button auth-button--submit">
+                            Sign in
+                          </button>
+
+                          <button type="button" pButton class="auth-button auth-button--back">
+                            <svg
+                              class="btn-icon"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              aria-hidden="true"
+                            >
+                              <path d="M15 18l-6-6 6-6"></path>
+                            </svg>
+                            Back
+                          </button>
+                        </form>
+                      </div>
+                    </section>
+
+                    <p page-footer class="help-text">
+                      Having trouble signing in?
+                      <a href="mailto:support@thinkplus.ae">Contact support</a>
+                    </p>
+                  </app-page-frame>
+                </main>
+              </div>
+            </div>
+          </section>
+
+          <p-dialog
+            [(visible)]="isLoginBackgroundDialogOpen"
+            [modal]="true"
+            [draggable]="false"
+            [resizable]="false"
+            [appendTo]="'body'"
+            [baseZIndex]="1200"
+            [style]="{ width: '38rem', maxWidth: '96vw' }"
+            header="Update Background Photo"
+          >
+            <div class="iconography-dialog-body">
+              <div class="iconography-form-control">
+                <label>Upload Photo</label>
+                <div
+                  class="iconography-dropbox"
+                  [class.is-drag-active]="isLoginBackgroundDropActive()"
+                  (dragover)="onLoginBackgroundDragOver($event)"
+                  (dragleave)="onLoginBackgroundDragLeave($event)"
+                  (drop)="onLoginBackgroundDrop($event)"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path
+                      fill-rule="evenodd"
+                      d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zm1.5 10.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <input
+                    #loginBackgroundUpload
+                    id="loginBackgroundUpload"
+                    type="file"
+                    class="sr-only"
+                    accept=".png,.jpg,.jpeg,.gif"
+                    (change)="onLoginBackgroundSelected($event)"
+                  />
+                  <button
+                    type="button"
+                    pButton
+                    severity="secondary"
+                    class="iconography-upload-button"
+                    (click)="openIconLibraryFileDialog(loginBackgroundUpload)"
+                  >
+                    Upload photo
+                  </button>
+                  <span class="iconography-dropbox-copy">or drag and drop</span>
+                  <p>PNG, JPG, JPEG, GIF up to 5MB</p>
+                </div>
+              </div>
+
+              @if (selectedLoginBackgroundFileName()) {
+                <div class="iconography-upload-preview">
+                  <strong>{{ selectedLoginBackgroundFileName() }}</strong>
+                </div>
+              }
+            </div>
+
+            <ng-template pTemplate="footer">
+              <div class="iconography-dialog-actions">
+                <button type="button" pButton severity="secondary" (click)="closeLoginBackgroundDialog()">
+                  Cancel
+                </button>
+                <button type="button" pButton (click)="submitLoginBackground()">Submit</button>
+              </div>
+            </ng-template>
+          </p-dialog>
+        </section>
+      }
+    </section>
+  </section>
+</app-page-frame>

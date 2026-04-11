@@ -1,0 +1,569 @@
+<app-auth-source-wizard
+  [tenantId]="tenantId"
+  [visible]="wizardVisible()"
+  (closed)="onWizardClosed()"
+  (created)="onWizardCreated()"
+/>
+
+<app-auth-source-detail
+  [visible]="detailVisible()"
+  [provider]="detailProvider()"
+  [tenantId]="tenantId"
+  (closed)="onDetailClosed()"
+  (testConnection)="testProvider($event)"
+  (syncNow)="onSyncNow()"
+  (editConfig)="openEdit($event)"
+  (toggleActive)="toggleEnabled($event)"
+  (removeSource)="onOpenRemoveDialog($event)"
+/>
+
+<app-remove-source-dialog
+  [visible]="removeDialogVisible()"
+  [provider]="removeDialogProvider()"
+  [userCount]="removeDialogUserCount()"
+  [tenantCount]="1"
+  [isLastActive]="isLastActiveSource()"
+  [removing]="removing()"
+  (closed)="onRemoveDialogClosed()"
+  (confirmed)="onRemoveConfirmed($event)"
+/>
+
+<section class="embedded-block">
+  <div class="header-row">
+    <div>
+      <h3>Identity Providers</h3>
+      <p class="muted">Authentication providers configured for {{ tenantName }}.</p>
+    </div>
+    <div class="head-controls">
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="contrast"
+        [disabled]="loading() || formSubmitting()"
+        (click)="openCreate()"
+        data-testid="btn-add-source"
+      >
+        <ng-icon name="phosphorPlusThin" size="16" />
+        Add Source
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        [loading]="loading()"
+        [disabled]="loading() || formSubmitting()"
+        (click)="loadProviders()"
+        data-testid="btn-refresh-sources"
+      >
+        <ng-icon name="phosphorArrowsClockwiseThin" size="16" />
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Metric Cards (US-AC-01 AC-1) -->
+  @if (!loading() && providers().length > 0) {
+    <div class="metric-cards" data-testid="source-metric-cards">
+      <div class="metric-card" data-testid="metric-total-sources">
+        <span class="metric-value">{{ providers().length }}</span>
+        <span class="metric-label">Total Sources</span>
+        <span class="metric-subtitle">{{ activeSourceCount() }} active</span>
+      </div>
+      <div class="metric-card" data-testid="metric-total-users">
+        <span class="metric-value">{{ totalProvisionedUsers() }}</span>
+        <span class="metric-label">Provisioned Users</span>
+      </div>
+      <div class="metric-card" data-testid="metric-last-sync">
+        <span class="metric-value metric-value-sm">2h ago</span>
+        <span class="metric-label">Last Sync</span>
+        <span class="metric-subtitle">{{ providers()[0]?.displayName }}</span>
+      </div>
+      <div
+        class="metric-card"
+        [class.metric-error]="errorSourceCount() > 0"
+        data-testid="metric-error-count"
+      >
+        <span class="metric-value">{{ errorSourceCount() }}</span>
+        <span class="metric-label">Errors</span>
+      </div>
+    </div>
+  }
+
+  @if (successMessage()) {
+    <p-message severity="success">{{ successMessage() }}</p-message>
+  }
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  @if (formError()) {
+    <p-message severity="warn">{{ formError() }}</p-message>
+  }
+
+  @if (testResult(); as test) {
+    <p-message [severity]="test.success ? 'success' : 'error'">
+      {{ test.message || test.error || 'Test completed.' }}
+    </p-message>
+  }
+
+  @if (mode() !== 'list') {
+    <p-card styleClass="form-card">
+      <div class="form-head">
+        <h4>{{ isEditMode() ? 'Edit Provider' : 'Create Provider' }}</h4>
+        @if (loadingDetails()) {
+          <small class="muted">Loading provider details...</small>
+        }
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span>Provider Name</span>
+          <input
+            pInputText
+            type="text"
+            [ngModel]="form().providerName"
+            (ngModelChange)="updateForm('providerName', $event)"
+            [disabled]="isEditMode()"
+            placeholder="KEYCLOAK / AUTH0 / CUSTOM"
+          />
+        </label>
+
+        <label class="field">
+          <span>Display Name</span>
+          <input
+            pInputText
+            type="text"
+            [ngModel]="form().displayName"
+            (ngModelChange)="updateForm('displayName', $event)"
+            placeholder="Corporate SSO"
+          />
+        </label>
+
+        <div class="field">
+          <label class="field-label" for="provider-protocol">Protocol</label>
+          <p-select
+            inputId="provider-protocol"
+            [options]="protocolOptions"
+            [ngModel]="form().protocol"
+            (ngModelChange)="updateForm('protocol', $event)"
+            [disabled]="isEditMode()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="provider-priority">Priority</label>
+          <p-inputNumber
+            inputId="provider-priority"
+            [ngModel]="form().priority"
+            (ngModelChange)="updateForm('priority', $event ?? 1)"
+            [min]="1"
+            [useGrouping]="false"
+          />
+        </div>
+      </div>
+
+      <div class="form-check">
+        <div>
+          <label class="field-label" for="provider-enabled">Enabled</label>
+          <p class="muted">
+            Disable the provider to stop new sign-ins without deleting the configuration.
+          </p>
+        </div>
+        <p-toggleSwitch
+          inputId="provider-enabled"
+          [ngModel]="form().enabled"
+          (ngModelChange)="updateForm('enabled', $event)"
+        />
+      </div>
+
+      @if (protocolFieldsVisible(form().protocol).oidc) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Discovery URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().discoveryUrl"
+              (ngModelChange)="updateForm('discoveryUrl', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client ID</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().clientId"
+              (ngModelChange)="updateForm('clientId', $event)"
+            />
+          </label>
+          <label class="field">
+            <span>Client Secret</span>
+            <input
+              pInputText
+              type="password"
+              [ngModel]="form().clientSecret"
+              (ngModelChange)="updateForm('clientSecret', $event)"
+              placeholder="Leave empty to keep current secret"
+            />
+          </label>
+          <label class="field">
+            <span>Scopes (comma separated)</span>
+            <input
+              pInputText
+              type="text"
+              [ngModel]="form().scopesCsv"
+              (ngModelChange)="updateForm('scopesCsv', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).saml) {
+        <div class="form-grid protocol-grid">
+          <label class="field">
+            <span>Metadata URL</span>
+            <input
+              pInputText
+              type="url"
+              [ngModel]="form().metadataUrl"
+              (ngModelChange)="updateForm('metadataUrl', $event)"
+            />
+          </label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).ldap) {
+        <div class="form-grid protocol-grid">
+          <label class="field"
+            ><span>Server URL</span
+            ><input
+              pInputText
+              type="text"
+              [ngModel]="form().serverUrl"
+              (ngModelChange)="updateForm('serverUrl', $event)"
+          /></label>
+          <div class="field">
+            <label class="field-label" for="provider-ldap-port">Port</label>
+            <p-inputNumber
+              inputId="provider-ldap-port"
+              [ngModel]="form().port"
+              (ngModelChange)="updateForm('port', $event)"
+              [min]="1"
+              [max]="65535"
+              [useGrouping]="false"
+            />
+          </div>
+          <label class="field"
+            ><span>Bind DN</span
+            ><input
+              pInputText
+              type="text"
+              [ngModel]="form().bindDn"
+              (ngModelChange)="updateForm('bindDn', $event)"
+          /></label>
+          <label class="field"
+            ><span>Bind Password</span
+            ><input
+              pInputText
+              type="password"
+              [ngModel]="form().bindPassword"
+              (ngModelChange)="updateForm('bindPassword', $event)"
+              placeholder="Leave empty to keep current password"
+          /></label>
+          <label class="field"
+            ><span>User Search Base</span
+            ><input
+              pInputText
+              type="text"
+              [ngModel]="form().userSearchBase"
+              (ngModelChange)="updateForm('userSearchBase', $event)"
+          /></label>
+          <label class="field"
+            ><span>User Search Filter</span
+            ><input
+              pInputText
+              type="text"
+              [ngModel]="form().userSearchFilter"
+              (ngModelChange)="updateForm('userSearchFilter', $event)"
+          /></label>
+        </div>
+      }
+
+      @if (protocolFieldsVisible(form().protocol).oauth2) {
+        <div class="form-grid protocol-grid">
+          <label class="field"
+            ><span>Authorization URL</span
+            ><input
+              pInputText
+              type="url"
+              [ngModel]="form().authorizationUrl"
+              (ngModelChange)="updateForm('authorizationUrl', $event)"
+          /></label>
+          <label class="field"
+            ><span>Token URL</span
+            ><input
+              pInputText
+              type="url"
+              [ngModel]="form().tokenUrl"
+              (ngModelChange)="updateForm('tokenUrl', $event)"
+          /></label>
+          <label class="field"
+            ><span>User Info URL</span
+            ><input
+              pInputText
+              type="url"
+              [ngModel]="form().userInfoUrl"
+              (ngModelChange)="updateForm('userInfoUrl', $event)"
+          /></label>
+          <label class="field"
+            ><span>Client ID</span
+            ><input
+              pInputText
+              type="text"
+              [ngModel]="form().clientId"
+              (ngModelChange)="updateForm('clientId', $event)"
+          /></label>
+          <label class="field"
+            ><span>Client Secret</span
+            ><input
+              pInputText
+              type="password"
+              [ngModel]="form().clientSecret"
+              (ngModelChange)="updateForm('clientSecret', $event)"
+          /></label>
+        </div>
+      }
+
+      <div class="form-grid protocol-grid">
+        <label class="field"
+          ><span>IdP Hint</span
+          ><input
+            pInputText
+            type="text"
+            [ngModel]="form().idpHint"
+            (ngModelChange)="updateForm('idpHint', $event)"
+        /></label>
+        <label class="field"
+          ><span>JWKS URL</span
+          ><input
+            pInputText
+            type="url"
+            [ngModel]="form().jwksUrl"
+            (ngModelChange)="updateForm('jwksUrl', $event)"
+        /></label>
+        <label class="field"
+          ><span>Issuer URL</span
+          ><input
+            pInputText
+            type="url"
+            [ngModel]="form().issuerUrl"
+            (ngModelChange)="updateForm('issuerUrl', $event)"
+        /></label>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          pButton
+          severity="secondary"
+          [disabled]="formSubmitting()"
+          (click)="cancelForm()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          pButton
+          [loading]="formSubmitting()"
+          [disabled]="formSubmitting() || loadingDetails()"
+          (click)="submitForm()"
+        >
+          {{ isEditMode() ? 'Save Changes' : 'Create Provider' }}
+        </button>
+      </div>
+    </p-card>
+  }
+
+  @if (loading()) {
+    <div class="loading-row">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Loading authentication providers...</span>
+    </div>
+  }
+
+  <!-- Source Table (US-AC-01 AC-2) -->
+  @if (!loading()) {
+    @if (providers().length > 0) {
+      <p-table
+        [value]="providerRows()"
+        size="small"
+        [pt]="providerTablePt"
+        [tableStyle]="{ 'min-width': '72rem' }"
+        data-testid="source-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Source</th>
+            <th>Protocol</th>
+            <th>Status</th>
+            <th>Users</th>
+            <th>Tenants</th>
+            <th>Schedule / Last Sync</th>
+            <th>Uptime</th>
+            <th></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-provider>
+          <tr
+            class="source-row"
+            [class.error-source]="provider.testResult === 'failure'"
+            [attr.data-testid]="'source-row-' + provider.id"
+            (click)="onSourceRowClick(provider)"
+            tabindex="0"
+            (keydown.enter)="onSourceRowClick(provider)"
+          >
+            <td class="source-cell">
+              <span class="source-icon">
+                @switch (provider.protocol.toUpperCase()) {
+                  @case ('LDAP') {
+                    <ng-icon name="phosphorDesktopThin" />
+                  }
+                  @case ('SAML') {
+                    <ng-icon name="phosphorShieldThin" />
+                  }
+                  @case ('OIDC') {
+                    <ng-icon name="phosphorIdentificationCardThin" />
+                  }
+                  @case ('OAUTH2') {
+                    <ng-icon name="phosphorKeyThin" />
+                  }
+                  @default {
+                    <ng-icon name="phosphorGearThin" />
+                  }
+                }
+              </span>
+              <div class="source-name-col">
+                <span class="source-name">{{ provider.displayName }}</span>
+                <span class="source-url">{{
+                  provider.discoveryUrl || provider.serverUrl || provider.metadataUrl || ''
+                }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="protocol-badge" [attr.data-testid]="'protocol-badge-' + provider.id">
+                {{ provider.protocol }}
+              </span>
+            </td>
+            <td>
+              <p-tag
+                [value]="provider.status === 'active' ? 'Active' : 'Inactive'"
+                [severity]="statusSeverity(provider.status)"
+                [attr.data-testid]="'status-badge-' + provider.id"
+              />
+            </td>
+            <td class="users-cell" [attr.data-testid]="'users-count-' + provider.id">142</td>
+            <td><span class="tenant-chip-sm">Master</span></td>
+            <td class="sync-cell">
+              <span>Every 4h</span>
+              <span class="sync-ago">2h ago</span>
+            </td>
+            <td class="uptime-cell">
+              <span class="uptime-bar-sm" [attr.data-testid]="'uptime-bar-' + provider.id">
+                <span
+                  class="uptime-fill-sm"
+                  [style.width.%]="mockUptime(provider)"
+                  [class.uptime-green]="mockUptime(provider) > 95"
+                  [class.uptime-amber]="mockUptime(provider) >= 80 && mockUptime(provider) <= 95"
+                  [class.uptime-red]="mockUptime(provider) < 80"
+                ></span>
+              </span>
+              <span class="uptime-pct">{{ mockUptime(provider) }}%</span>
+            </td>
+            <td class="action-cell">
+              <button
+                pButton
+                type="button"
+                size="small"
+                severity="secondary"
+                [text]="true"
+                [attr.data-testid]="'source-action-' + provider.id"
+                (click)="$event.stopPropagation(); onSourceRowClick(provider)"
+              >
+                <ng-icon name="phosphorDotsThreeVerticalThin" size="16" />
+              </button>
+            </td>
+          </tr>
+          @if (provider.testResult === 'failure') {
+            <tr class="error-sub-row" [attr.data-testid]="'error-row-' + provider.id">
+              <td colspan="8">
+                <div class="error-message">
+                  <ng-icon name="phosphorWarningThin" />
+                  Connection test failed. Last error at
+                  {{ provider.lastTestedAt || 'unknown time' }}.
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">
+              <div class="empty-state" data-testid="source-empty-state">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <h4>No Authentication Sources</h4>
+                <p>
+                  No identity providers configured for this tenant. Click "Add Source" to configure
+                  one.
+                </p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    } @else {
+      <div class="empty-state" data-testid="source-empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <h4>No Authentication Sources</h4>
+        <p>
+          No identity providers configured for this tenant. Click "Add Source" to configure one.
+        </p>
+      </div>
+    }
+  }
+
+  <!-- Certificate Expiry Section (US-AC-01 AC-5) -->
+  @if (!loading() && providers().length > 0) {
+    <div class="cert-expiry-section" data-testid="cert-expiry-section">
+      <h4>Certificate Expiry</h4>
+      <div class="cert-list">
+        @for (provider of providers(); track provider.id) {
+          <div
+            class="cert-item"
+            [class.cert-red]="mockCertDays(provider) < 60"
+            [class.cert-amber]="mockCertDays(provider) >= 60 && mockCertDays(provider) < 180"
+            [attr.data-testid]="'cert-expiry-' + provider.id"
+          >
+            <span class="cert-name">{{ provider.displayName }}</span>
+            <span class="cert-days">{{ mockCertDays(provider) }} days</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,230 @@
+:host {
+  display: block;
+}
+
+// ─── Form Layout ─────────────────────────────────────────────────────────────
+
+.create-tenant-form {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.field {
+  display: grid;
+  gap: var(--tp-space-1);
+}
+
+.field-label {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+}
+
+.required {
+  color: var(--tp-error-text);
+}
+
+.field > input[type='text'],
+.field > input[type='email'] {
+  inline-size: 100%;
+}
+
+.field > p-select {
+  inline-size: 100%;
+}
+
+// ─── Slug Helper ─────────────────────────────────────────────────────────────
+
+.slug-helper {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+
+  code {
+    font-family: var(--tp-font-family-code);
+    background: var(--tp-surface-muted);
+    padding: var(--tp-space-1) var(--tp-space-1);
+    border-radius: var(--nm-radius-xs);
+    color: var(--tp-primary-dark);
+    font-size: var(--tp-font-xs);
+  }
+}
+
+// ─── Validating Hint ─────────────────────────────────────────────────────────
+
+.validating-hint {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+  font-style: italic;
+}
+
+// ─── Form Footer ─────────────────────────────────────────────────────────────
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+  padding-block-start: var(--tp-space-2);
+}
+
+// ─── Provisioning Phase ──────────────────────────────────────────────────────
+
+.provisioning-phase {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.provisioning-summary {
+  display: grid;
+  gap: var(--tp-space-3);
+}
+
+.provisioning-title {
+  margin: 0;
+  color: var(--tp-text-dark);
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+}
+
+// ─── Provisioning Steps ──────────────────────────────────────────────────────
+
+.provisioning-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.provisioning-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-3) var(--tp-space-3);
+  border-inline-start: 3px solid var(--tp-border);
+  transition:
+    border-color var(--tp-transition-normal) var(--tp-ease-default),
+    background var(--tp-transition-normal) var(--tp-ease-default);
+}
+
+.step-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  inline-size: var(--icon-size-md);
+  block-size: var(--icon-size-md);
+  font-size: var(--tp-font-md);
+}
+
+.step-content {
+  display: grid;
+  gap: var(--tp-space-1);
+  min-inline-size: 0;
+}
+
+.step-label {
+  color: var(--tp-text-dark);
+  font-size: var(--tp-font-md);
+  font-weight: 600;
+}
+
+.step-description {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-xs);
+}
+
+// ─── Step Status Variants ────────────────────────────────────────────────────
+
+.step-pending {
+  border-inline-start-color: var(--tp-border);
+
+  .step-icon {
+    color: var(--tp-grey-light);
+  }
+
+  .step-label {
+    color: var(--tp-text-muted);
+  }
+}
+
+.step-in-progress {
+  border-inline-start-color: var(--tp-primary);
+  background: var(--tp-primary-bg);
+
+  .step-icon {
+    color: var(--tp-primary);
+  }
+
+  .step-label {
+    color: var(--tp-primary-dark);
+  }
+}
+
+.step-completed {
+  border-inline-start-color: var(--tp-success);
+
+  .step-icon {
+    color: var(--tp-success);
+  }
+
+  .step-label {
+    color: var(--tp-text-dark);
+  }
+}
+
+.step-failed {
+  border-inline-start-color: var(--tp-danger);
+  background: var(--tp-danger-bg);
+
+  .step-icon {
+    color: var(--tp-danger);
+  }
+
+  .step-label {
+    color: var(--tp-danger);
+  }
+}
+
+// ─── PrimeNG Message inline adjustments ──────────────────────────────────────
+
+:host ::ng-deep p-message {
+  .p-message {
+    padding: var(--tp-space-1) var(--tp-space-2);
+    font-size: var(--tp-font-xs);
+    border-radius: var(--nm-radius-xs);
+  }
+}
+
+// ─── PrimeNG ProgressBar tweaks ──────────────────────────────────────────────
+
+:host ::ng-deep p-progressbar {
+  .p-progressbar {
+    border-radius: var(--nm-radius-pill);
+    background: var(--tp-surface-muted);
+  }
+
+  .p-progressbar-value {
+    border-radius: var(--nm-radius-pill);
+    background: var(--tp-primary);
+    transition: width var(--tp-transition-slow) var(--tp-ease-in-out);
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .form-footer {
+    flex-direction: column;
+    align-items: stretch;
+
+    p-button {
+      inline-size: 100%;
+    }
+  }
+
+  .provisioning-step {
+    padding: var(--tp-space-2);
+    gap: var(--tp-space-2);
+  }
+}

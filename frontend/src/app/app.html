@@ -1,0 +1,26 @@
+<p-toast position="top-right" />
+@if (!appReady()) {
+  <section class="app-splash" role="status" aria-live="polite" aria-label="Loading application">
+    <img [src]="brandRuntime.splashLogoUrl()" alt="" class="app-splash-logo" />
+    <p class="app-splash-text">{{ splashText() }}</p>
+  </section>
+} @else if (useShellLayout()) {
+  <app-shell-layout
+    [title]="shellTitle()"
+    [subtitle]="shellSubtitle()"
+    [navItems]="navItems"
+    [authenticated]="isAuthenticated()"
+    [footerText]="'Container governance enabled: header, content, and footer layout contract active.'"
+    (logout)="onLogout()"
+  >
+    <section shell-content>
+      <router-outlet />
+    </section>
+
+    <div shell-footer>
+      <small>Versioned module migration in progress.</small>
+    </div>
+  </app-shell-layout>
+} @else {
+  <router-outlet />
+}

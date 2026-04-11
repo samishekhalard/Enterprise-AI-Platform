@@ -1,0 +1,204 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  application:
+    name: auth-facade
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://localhost:8180/realms/master/protocol/openid-connect/certs}
+
+  data:
+    redis:
+      host: ${VALKEY_HOST:localhost}
+      port: ${VALKEY_PORT:6379}
+      password: ${VALKEY_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
+
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    authentication:
+      username: ${NEO4J_USER:neo4j}
+      password: ${NEO4J_PASSWORD:}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+# Jasypt Encryption Configuration
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+    algorithm: PBEWITHHMACSHA512ANDAES_256
+    key-obtention-iterations: 1000
+    pool-size: 1
+    salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
+    iv-generator-classname: org.jasypt.iv.RandomIvGenerator
+    string-output-type: base64
+
+# Auth Facade - Provider-Agnostic Configuration
+# See: AuthProperties.java for all options
+auth:
+  graph-per-tenant:
+    enabled: ${AUTH_GRAPH_PER_TENANT_ENABLED:false}
+    routing-cache-prefix: ${AUTH_ROUTING_CACHE_PREFIX:tenant:routing:}
+    routing-cache-ttl-minutes: ${AUTH_ROUTING_CACHE_TTL_MINUTES:5}
+    system-database: ${AUTH_NEO4J_SYSTEM_DATABASE:system}
+
+  # Dynamic Identity Broker Configuration
+  dynamic-broker:
+    enabled: true
+    # Storage backend: 'neo4j' (default) or 'memory' (for testing/fallback)
+    storage: ${AUTH_BROKER_STORAGE:neo4j}
+    # Cache TTL for provider configurations
+    cache-ttl-minutes: 5
+
+  facade:
+    # Active identity provider: keycloak, auth0, okta, azure-ad, fusionauth
+    provider: ${AUTH_PROVIDER:keycloak}
+
+    # JWT claim paths to extract roles/authorities (evaluated in order)
+    # Keycloak uses realm_access.roles and resource_access
+    # Auth0 uses permissions
+    # Azure AD / Okta use groups
+    role-claim-paths:
+      - realm_access.roles     # Keycloak Realm Roles
+      - resource_access        # Keycloak Client Roles
+      - roles                  # Standard OIDC / Azure AD
+      - groups                 # Azure AD / Okta
+      - permissions            # Auth0
+
+    # User claim mappings (standard OIDC claims)
+    user-claim-mappings:
+      user-id: sub
+      email: email
+      first-name: given_name
+      last-name: family_name
+      tenant-id: tenant_id
+      identity-provider: identity_provider
+
+    # Tenant resolution
+    tenant-resolution: header
+    tenant-header: X-Tenant-ID
+
+    # Token configuration
+    token:
+      mfa-session-expiration-minutes: 5
+      mfa-pending-prefix: "auth:mfa:pending:"
+
+# Keycloak (only used when auth.facade.provider=keycloak)
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8180}
+  master-realm: master
+  admin:
+    username: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:}
+    client-id: admin-cli
+  client:
+    client-id: ${KEYCLOAK_CLIENT_ID:ems-auth-facade}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET:}
+
+# Rate Limiting
+rate-limit:
+  requests-per-minute: 100
+  cache-prefix: "auth:rate:"
+
+# Token Settings
+token:
+  blacklist:
+    prefix: "auth:blacklist:"
+    ttl-hours: 24
+  mfa-session:
+    prefix: "auth:mfa:"
+    ttl-minutes: 5
+  mfa-signing-key: ${MFA_SIGNING_KEY:ems-dev-mfa-signing-key-min32chars!}
+
+# Social Auth
+social:
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+  microsoft:
+    tenant-id: ${MICROSOFT_TENANT_ID:common}
+    graph-url: https://graph.microsoft.com/v1.0/me
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Resilience4j Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      licenseService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 30s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  timelimiter:
+    instances:
+      licenseService:
+        timeoutDuration: 3s
+
+# Feign Client Configuration
+spring.cloud:
+  openfeign:
+    circuitbreaker:
+      enabled: true
+    client:
+      config:
+        default:
+          connectTimeout: 5000
+          readTimeout: 5000
+          loggerLevel: basic
+        license-service:
+          connectTimeout: 3000
+          readTimeout: 3000
+
+service-auth:
+  token-url: ${SERVICE_TOKEN_URL:${KEYCLOAK_URL:http://localhost:8180}/realms/master/protocol/openid-connect/token}
+  client-id: ${SERVICE_CLIENT_ID:${KEYCLOAK_CLIENT_ID:ems-auth-facade}}
+  client-secret: ${SERVICE_CLIENT_SECRET:${KEYCLOAK_CLIENT_SECRET:}}
+  scope: ${SERVICE_TOKEN_SCOPE:internal.service}
+
+# Logging
+logging:
+  level:
+    com.ems: DEBUG
+    org.springframework.security: DEBUG
+    io.github.resilience4j: DEBUG

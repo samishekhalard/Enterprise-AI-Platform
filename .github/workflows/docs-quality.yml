@@ -1,0 +1,59 @@
+name: Docs Quality
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "Documentation/design-system/**"
+      - "Documentation/.Requirements/**/Design/*.md"
+      - "scripts/check-design-doc-governance.sh"
+      - "scripts/check-component-showcase-alignment.sh"
+      - "scripts/validate-docs-consistency.sh"
+      - ".markdownlint.yml"
+      - ".github/workflows/docs-quality.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "Documentation/design-system/**"
+      - "Documentation/.Requirements/**/Design/*.md"
+      - "scripts/check-design-doc-governance.sh"
+      - "scripts/check-component-showcase-alignment.sh"
+      - "scripts/validate-docs-consistency.sh"
+      - ".markdownlint.yml"
+      - ".github/workflows/docs-quality.yml"
+
+jobs:
+  docs-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Markdown Lint
+        run: |
+          npx --yes markdownlint-cli@0.39.0 --config .markdownlint.yml \
+            docs/arc42/*.md \
+            docs/README.md \
+            docs/DOCUMENTATION-GOVERNANCE.md
+
+      - name: Validate Arc42 Consistency
+        run: ./scripts/validate-docs-consistency.sh
+
+  design-doc-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate design doc governance
+        run: ./scripts/check-design-doc-governance.sh
+
+      - name: Validate component showcase alignment
+        run: ./scripts/check-component-showcase-alignment.sh

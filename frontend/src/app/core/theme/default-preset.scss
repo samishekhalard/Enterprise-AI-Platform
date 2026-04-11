@@ -1,0 +1,180 @@
+/* ==========================================================================
+   Default Preset — Neumorphic Design System Composites
+   ==========================================================================
+   Single source of truth for ALL neumorphic composite tokens.
+   Every composite uses rgba(var(--nm-*-rgb), opacity) so that when
+   TenantThemeService sets the RGB channels, ALL composites cascade.
+
+   Primitives (--tp-*, --nm-bg, --nm-radius, --nm-depth) live in styles.scss.
+   This file defines composites that DERIVE from those primitives.
+   ========================================================================== */
+
+:root {
+  /* === RGB Channel Tokens (for rgba() composition) ====================== */
+  --nm-shadow-dark-rgb: 152, 133, 97;
+  --nm-shadow-light-rgb: 245, 230, 208;
+  --nm-warning-rgb: 185, 167, 121;
+  --nm-danger-rgb: 107, 31, 42;
+  --nm-text-deep-rgb: 42, 36, 28;
+
+  /* === Shadow Base (redefined from RGB channels for proper opacity) ===== */
+  --nm-shadow-dark: rgba(0, 0, 0, 0.06);
+  --nm-shadow-light: rgba(255, 255, 255, 0.7);
+
+  /* === Fonts ============================================================ */
+  --nm-font-brand: var(--tp-font-family);
+
+
+  /* === Island & Divider ================================================= */
+  --nm-shadow-island: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  --nm-island-border: 1px solid color-mix(in srgb, var(--tp-border) 60%, transparent);
+  --nm-divider-soft: 1px solid rgba(var(--nm-black-rgb), 0.09);
+
+  /* === Elevation (flat cards — no raised shadows) ======================== */
+  --nm-elevation-default: none;
+  --nm-elevation-hover: none;
+  --nm-elevation-pressed: none;
+  --nm-elevation-subtle: none;
+
+  /* === Action Button Composites ========================================= */
+  --nm-action-primary-border: 1px solid color-mix(in srgb, var(--tp-primary-dark) 60%, transparent);
+  --nm-action-secondary-bg: color-mix(in srgb, var(--tp-surface) 86%, transparent);
+  --nm-action-secondary-border: 1px solid rgba(var(--nm-black-rgb), 0.2);
+  --nm-action-danger-bg: color-mix(in srgb, var(--tp-surface) 92%, transparent);
+  --nm-action-danger-border: 1px solid color-mix(in srgb, var(--tp-danger) 46%, transparent);
+
+  /* === Dialog Shadow ==================================================== */
+  --nm-shadow-dialog: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  /* === Neumorphic Bezel Button ========================================== */
+  --nm-btn-bezel-gradient: linear-gradient(145deg, var(--tp-primary), var(--tp-primary-dark));
+  --nm-btn-face-gradient: linear-gradient(145deg, var(--tp-surface), var(--tp-surface));
+  --nm-btn-face-border: 2px solid var(--tp-primary);
+  --nm-btn-shadow-before:
+    6px 6px 14px rgba(var(--nm-black-rgb), 0.38),
+    -3px -3px 8px rgba(var(--nm-shadow-light-rgb), 0.22);
+  --nm-btn-shadow-before-hover:
+    8px 8px 18px rgba(var(--nm-black-rgb), 0.45),
+    -4px -4px 10px rgba(var(--nm-shadow-light-rgb), 0.26);
+  --nm-btn-shadow-before-active:
+    3px 3px 8px rgba(var(--nm-black-rgb), 0.3), -2px -2px 5px rgba(var(--nm-shadow-light-rgb), 0.18);
+  --nm-btn-shadow-after:
+    inset 1px 1px 3px rgba(var(--nm-shadow-light-rgb), 0.16),
+    inset -2px -2px 5px rgba(var(--nm-black-rgb), 0.2);
+  --nm-btn-shadow-after-hover:
+    inset 1px 1px 3px rgba(var(--nm-shadow-light-rgb), 0.18),
+    inset -2px -2px 5px rgba(var(--nm-black-rgb), 0.24);
+  --nm-btn-shadow-after-active:
+    inset 3px 3px 6px rgba(var(--nm-black-rgb), 0.24),
+    inset -1px -1px 3px rgba(var(--nm-shadow-light-rgb), 0.14);
+
+  /* === Dock Composites ================================================== */
+  --nm-dock-glass-bg: rgba(var(--nm-shadow-light-rgb), 0.12);
+  --nm-dock-glass-border: 1px solid rgba(var(--nm-shadow-light-rgb), 0.18);
+  --nm-dock-card-shadow:
+    10px 10px 20px rgba(var(--nm-shadow-dark-rgb), 0.3),
+    -6px -6px 12px rgba(var(--nm-shadow-light-rgb), 0.28);
+  --nm-dock-item-border: 1px solid color-mix(in srgb, var(--tp-primary) 28%, transparent);
+  --nm-dock-item-shadow:
+    inset 0 0 12px rgba(var(--nm-shadow-light-rgb), 0.1),
+    inset 0 0 3px rgba(var(--nm-shadow-light-rgb), 0.14),
+    0 6px 12px rgba(var(--nm-text-deep-rgb), 0.24);
+  --nm-dock-item-shadow-active:
+    inset 0 0 12px rgba(var(--nm-shadow-light-rgb), 0.12),
+    inset 0 0 3px rgba(var(--nm-shadow-light-rgb), 0.16),
+    0 8px 14px rgba(var(--nm-text-deep-rgb), 0.3),
+    0 0 0 2px color-mix(in srgb, var(--tp-primary) 25%, transparent);
+
+  /* === Help Dialog Composites =========================================== */
+  --nm-help-dialog-shadow:
+    8px 8px 16px rgba(var(--nm-shadow-dark-rgb), 0.32),
+    -5px -5px 10px rgba(var(--nm-shadow-light-rgb), 0.28);
+  --nm-help-close-shadow:
+    3px 3px 6px rgba(var(--nm-shadow-dark-rgb), 0.32),
+    -2px -2px 5px rgba(var(--nm-shadow-light-rgb), 0.28);
+  --nm-help-close-shadow-active:
+    inset 2px 2px 5px rgba(var(--nm-shadow-dark-rgb), 0.32),
+    inset -2px -2px 4px rgba(var(--nm-shadow-light-rgb), 0.28);
+  --nm-help-kbd-shadow:
+    inset 2px 2px 4px rgba(var(--nm-shadow-dark-rgb), 0.32),
+    inset -2px -2px 4px rgba(var(--nm-shadow-light-rgb), 0.28);
+
+  /* === Mobile / Drawer Composites ======================================= */
+  --nm-overlay: rgba(var(--nm-text-deep-rgb), 0.32);
+  --nm-overlay-strong: rgba(var(--nm-black-rgb), 0.36);
+  --nm-overlay-mobile: rgba(var(--nm-text-deep-rgb), 0.28);
+  --nm-drawer-shadow: 4px 0 20px rgba(var(--nm-text-deep-rgb), 0.18);
+  --nm-mobile-link-hover-bg: rgba(var(--nm-black-rgb), 0.04);
+  --nm-mobile-link-active-bg: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --nm-mobile-footer-border: 1px solid rgba(var(--nm-black-rgb), 0.06);
+
+  /* === Panel Shadow ===================================================== */
+  --nm-panel-shadow: -8px 0 32px rgba(var(--nm-black-rgb), 0.12);
+
+  /* === Card / Panel Shadows (flat design — all inset/neumorphic → none) == */
+  --nm-shadow-card: none;
+  --nm-shadow-search-inset: none;
+  --nm-shadow-item: none;
+  --nm-shadow-item-active: none;
+  --nm-shadow-tablist: none;
+  --nm-shadow-tab-active: none;
+  --nm-shadow-overview-inset: none;
+  --nm-shadow-input-inset: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  --nm-shadow-modal: var(--nm-shadow-dialog);
+  --nm-shadow-close: none;
+  --nm-shadow-panel-inset: none;
+  --nm-shadow-pill: none;
+  --nm-shadow-logo: none;
+
+  /* === Accent & Hover =================================================== */
+  --nm-accent-soft: color-mix(in srgb, var(--tp-primary) 17%, transparent);
+  --nm-bg-hover-highlight: rgba(var(--nm-accent-rgb, 66, 129, 119), 0.08);
+  --nm-overlay-bg: color-mix(in srgb, var(--tp-text-dark) 24%, transparent);
+
+  /* === Background Tokens ================================================= */
+  --nm-bg-card-base: var(--tp-surface-raised);
+  --nm-bg-card-strong: var(--tp-surface-raised);
+  --nm-bg-card-gradient: var(--tp-surface-raised);
+  --nm-bg-accent-soft: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --nm-bg-panel-soft: color-mix(in srgb, var(--tp-surface) 80%, var(--tp-surface-raised));
+  --nm-bg-palette-gradient: var(--tp-surface-raised);
+  --nm-bg-scrollbar-thumb: rgba(var(--nm-black-rgb), 0.15);
+  --nm-bg-danger-soft: color-mix(in srgb, var(--tp-danger) 6%, transparent);
+  --nm-bg-danger-soft-strong: color-mix(in srgb, var(--tp-danger) 10%, transparent);
+  --nm-bg-warning-soft: color-mix(in srgb, var(--tp-warning) 8%, transparent);
+
+  /* === Border Tokens ===================================================== */
+  --nm-border-accent: 1px solid color-mix(in srgb, var(--tp-primary) 20%, transparent);
+  --nm-border-accent-soft: 1px solid color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --nm-border-accent-hover: 1px solid color-mix(in srgb, var(--tp-primary) 35%, transparent);
+  --nm-border-danger: 1px solid color-mix(in srgb, var(--tp-danger) 20%, transparent);
+  --nm-border-warning: 1px solid color-mix(in srgb, var(--tp-warning) 20%, transparent);
+  --nm-border-strong: 1px solid rgba(var(--nm-black-rgb), 0.12);
+  --nm-border-divider: 1px solid rgba(var(--nm-black-rgb), 0.08);
+  --nm-border-swatch: 1px solid rgba(var(--nm-black-rgb), 0.1);
+  --nm-border-swatch-strong: 1px solid rgba(var(--nm-black-rgb), 0.18);
+
+  /* === Color Preset Tokens (Branding Studio) ============================= */
+  --nm-color-preset-neumorph-bg: color-mix(in srgb, var(--tp-primary) 12%, var(--tp-surface));
+  --nm-color-preset-aqua-text: #0369a1;
+  --nm-color-preset-aqua-bg: color-mix(in srgb, #0ea5e9 12%, var(--tp-surface));
+  --nm-color-preset-sand-text: #78350f;
+  --nm-color-preset-sand-bg: color-mix(in srgb, var(--tp-warning) 18%, var(--tp-surface));
+  --nm-color-preset-slate-text: #334155;
+  --nm-color-preset-slate-bg: color-mix(in srgb, #64748b 12%, var(--tp-surface));
+
+  /* === Shadow Aliases (Branding Studio) ================================== */
+  --nm-shadow-bs-search-inset: var(--nm-shadow-search-inset);
+  --nm-shadow-catalog-active: var(--nm-shadow-tab-active);
+  --nm-shadow-preview-inset: var(--nm-shadow-overview-inset);
+  --nm-shadow-preset-pill: var(--nm-shadow-pill);
+  --nm-shadow-palette-field: var(--nm-shadow-input-inset);
+  --nm-shadow-bs-input-inset: var(--nm-shadow-input-inset);
+
+  /* === Button Shadow Aliases (flat — no depth) ============================ */
+  --nm-shadow-btn-primary: none;
+  --nm-shadow-btn-ghost: none;
+  --nm-shadow-btn-control: none;
+  --nm-shadow-btn-control-hover: none;
+  --nm-shadow-btn-control-press: none;
+}

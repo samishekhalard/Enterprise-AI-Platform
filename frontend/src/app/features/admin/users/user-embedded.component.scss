@@ -1,0 +1,148 @@
+.embedded-block {
+  display: grid;
+  gap: var(--tp-space-3);
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+
+  h3 {
+    margin: 0;
+  }
+
+  .muted {
+    margin-block-start: var(--tp-space-1);
+    color: var(--tp-text-muted);
+  }
+}
+
+.head-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+}
+
+.user-search {
+  min-width: 240px;
+}
+
+.user-filter {
+  min-width: 11rem;
+}
+
+.loading-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  color: var(--tp-text);
+}
+
+.table-card {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+}
+
+.table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--tp-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sort-indicator {
+  min-width: 0.7rem;
+  color: var(--tp-text);
+  font-size: var(--tp-font-xs);
+}
+
+.muted {
+  color: var(--tp-text);
+}
+
+// ── Sessions dialog ───────────────────────────────────────────────────────
+.sessions-dialog-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tp-space-1);
+
+  .sessions-dialog-title {
+    font-weight: 600;
+    font-size: var(--tp-font-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-2);
+
+    ng-icon {
+      color: var(--tp-primary);
+    }
+  }
+
+  .sessions-dialog-subtitle {
+    font-size: var(--tp-font-sm);
+  }
+}
+
+.sessions-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--tp-space-8) 0;
+}
+
+.tp-banner {
+  margin-block-end: var(--tp-space-2);
+}
+
+.session-current {
+  background: var(--tp-primary-bg);
+}
+
+.current-badge {
+  display: inline-block;
+  margin-inline-start: var(--tp-space-1);
+  font-size: var(--tp-font-xs);
+  font-weight: 600;
+  color: var(--tp-primary);
+  background: var(--tp-primary-bg-hover);
+  padding: 0 var(--tp-space-2);
+  border-radius: var(--nm-radius-xs);
+}
+
+.device-name {
+  font-weight: 500;
+}
+
+.flags-cell {
+  display: flex;
+  gap: var(--tp-space-1);
+  flex-wrap: wrap;
+}
+
+.sessions-count {
+  margin-block-start: var(--tp-space-2);
+  font-size: var(--tp-font-sm);
+  text-align: end;
+}
+
+.empty-sessions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tp-space-2);
+  padding: var(--tp-space-12) 0;
+  color: var(--tp-grey);
+
+  ng-icon {
+    font-size: var(--icon-size-lg);
+  }
+}

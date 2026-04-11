@@ -1,0 +1,305 @@
+<section class="license-manager">
+  <header class="head-row">
+    <div>
+      <h3>License Management</h3>
+      <p class="muted">Manage system entitlements and tenant capacity from license-service.</p>
+    </div>
+
+    <div class="head-actions">
+      <div class="view-toggle" aria-label="License view mode">
+        <p-button
+          label="Grid"
+          size="small"
+          [severity]="licenseView() === 'grid' ? 'primary' : 'secondary'"
+          [outlined]="licenseView() !== 'grid'"
+          (onClick)="licenseView.set('grid')"
+        />
+        <p-button
+          label="Table"
+          size="small"
+          [severity]="licenseView() === 'table' ? 'primary' : 'secondary'"
+          [outlined]="licenseView() !== 'table'"
+          (onClick)="licenseView.set('table')"
+        />
+      </div>
+
+      <p-button
+        label="Refresh"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="isLoading()"
+        (onClick)="refresh()"
+      />
+
+      <p-button label="Import License" severity="primary" (onClick)="openImportModal()" />
+    </div>
+  </header>
+
+  @if (error()) {
+    <div class="error-row">
+      <p-message severity="error">{{ error() }}</p-message>
+      <div class="error-actions">
+        <p-button label="Retry" severity="secondary" [outlined]="true" (onClick)="refresh()" />
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Dismiss error"
+          (onClick)="clearError()"
+        >
+          <img src="assets/icons/times.svg" alt="" aria-hidden="true" />
+        </p-button>
+      </div>
+    </div>
+  }
+
+  <div class="stat-grid">
+    @for (card of statCards(); track card.label) {
+      <article class="stat-card">
+        <div class="stat-icon">
+          <img [src]="card.icon" alt="" aria-hidden="true" />
+        </div>
+        <div class="stat-content">
+          <span class="label">{{ card.label }}</span>
+          <strong>{{ card.value }}</strong>
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <section class="loading-state" aria-label="Loading license information">
+      <div class="loading-skeleton">
+        @for (row of [1, 2, 3, 4]; track row) {
+          <div class="skeleton-row">
+            <p-skeleton shape="circle" width="2.5rem" height="2.5rem" />
+            <div class="skeleton-text">
+              <p-skeleton width="40%" height="0.875rem" />
+              <p-skeleton width="65%" height="1.125rem" />
+            </div>
+          </div>
+        }
+      </div>
+      <p>Loading license information...</p>
+    </section>
+  } @else if (!hasLicense()) {
+    <section class="empty-state">
+      <img src="assets/icons/briefcase.svg" alt="" aria-hidden="true" />
+      <h4>No Licenses Configured</h4>
+      <p>Add a `.lic` file to activate tenant licensing and entitlement checks.</p>
+      <p-button label="Add First License" severity="primary" (onClick)="openImportModal()" />
+    </section>
+  } @else if (licenseView() === 'grid') {
+    <article class="detail-card">
+      <header class="detail-header">
+        <div>
+          <h4>{{ status()?.product ?? 'License' }}</h4>
+          @if (currentLicense()?.versionRange; as versionRange) {
+            <p>Version {{ versionRange }}</p>
+          }
+        </div>
+        <span class="state-pill" [class]="'state-pill state-' + state().toLowerCase()">
+          {{ stateLabel() }}
+        </span>
+      </header>
+
+      <div class="detail-grid">
+        @if (status()?.licenseId; as licenseId) {
+          <div class="detail-field">
+            <span class="label">License ID</span>
+            <strong class="mono">{{ licenseId }}</strong>
+          </div>
+        }
+
+        @if (status()?.expiresAt; as expiresAt) {
+          <div class="detail-field">
+            <span class="label">Expiry</span>
+            <strong>
+              {{ expiresAt | date: 'dd MMM y, HH:mm' }}
+              <span class="days-chip" [class]="daysBadgeClass()">{{ daysText() }}</span>
+            </strong>
+          </div>
+        }
+
+        @if (state() === 'GRACE') {
+          <div class="detail-field">
+            <span class="label">Grace Period</span>
+            <strong>
+              {{ status()?.gracePeriodDays ?? 0 }} days
+              @if (status()?.graceExpiresAt; as graceExpiry) {
+                <span class="muted-inline">(ends {{ graceExpiry | date: 'dd MMM y, HH:mm' }})</span>
+              }
+            </strong>
+          </div>
+        }
+
+        <div class="detail-field">
+          <span class="label">Tenants</span>
+          <strong>{{ status()?.activeTenantCount ?? 0 }} / {{ status()?.maxTenants ?? 0 }}</strong>
+        </div>
+
+        @if (status()?.issuer; as issuer) {
+          <div class="detail-field">
+            <span class="label">Issuer</span>
+            <strong>{{ issuer }}</strong>
+          </div>
+        }
+
+        @if (status()?.customerName; as customerName) {
+          <div class="detail-field">
+            <span class="label">Customer</span>
+            <strong>{{ customerName }}</strong>
+          </div>
+        }
+
+        @if (status()?.importedAt; as importedAt) {
+          <div class="detail-field">
+            <span class="label">Imported</span>
+            <strong>{{ importedAt | date: 'dd MMM y, HH:mm' }}</strong>
+          </div>
+        }
+      </div>
+
+      @if (features().length > 0) {
+        <section class="features-block">
+          <span class="label">Features</span>
+          <div class="feature-grid">
+            @for (feature of features(); track feature) {
+              <span class="feature-chip" [class.degraded]="isDegraded(feature)">{{ feature }}</span>
+            }
+          </div>
+        </section>
+      } @else {
+        <p class="muted">No feature metadata available.</p>
+      }
+
+      @if (degradedFeatures().length > 0) {
+        <div class="degraded-banner" role="alert">
+          <img src="assets/icons/alert-triangle.svg" alt="" aria-hidden="true" />
+          <span>Some features are degraded while the license is in grace.</span>
+        </div>
+      }
+    </article>
+  } @else if (status(); as licenseStatus) {
+    <section class="table-wrap">
+      <p-table [value]="[licenseStatus]" [pt]="licenseTablePt" data-testid="license-table">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>State</th>
+            <th>Product</th>
+            <th>Version</th>
+            <th>Expiry</th>
+            <th>Grace</th>
+            <th>Tenants</th>
+            <th>Features</th>
+            <th>Imported</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>
+              <span class="state-pill" [class]="'state-pill state-' + state().toLowerCase()">
+                {{ stateLabel() }}
+              </span>
+            </td>
+            <td>{{ row.product ?? '-' }}</td>
+            <td>{{ currentLicense()?.versionRange ?? '-' }}</td>
+            <td>{{ row.expiresAt ? (row.expiresAt | date: 'dd MMM y, HH:mm') : '-' }}</td>
+            <td>
+              {{ row.gracePeriodDays ?? 0 }} days
+              @if (row.graceExpiresAt) {
+                <span class="muted-inline"
+                  >until {{ row.graceExpiresAt | date: 'dd MMM y, HH:mm' }}</span
+                >
+              }
+            </td>
+            <td>{{ row.activeTenantCount ?? 0 }} / {{ row.maxTenants ?? 0 }}</td>
+            <td>{{ features().length }}</td>
+            <td>{{ row.importedAt ? (row.importedAt | date: 'dd MMM y, HH:mm') : '-' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+  }
+</section>
+
+<p-dialog
+  [visible]="showImportModal()"
+  (visibleChange)="onImportModalVisibleChange($event)"
+  header="Import License File"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '34rem', maxWidth: '92vw' }"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+>
+  <div
+    class="drop-zone"
+    [class.dragging]="isDragging()"
+    [class.has-file]="selectedFile() !== null"
+    role="button"
+    tabindex="0"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+    (keydown.enter)="fileInput.click(); $event.preventDefault()"
+    (keydown.space)="fileInput.click(); $event.preventDefault()"
+  >
+    <input
+      #fileInput
+      class="file-input-hidden"
+      type="file"
+      accept=".lic"
+      (change)="onFileSelected($event)"
+    />
+
+    @if (selectedFile(); as file) {
+      <div class="file-preview">
+        <img src="assets/icons/folder.svg" alt="" aria-hidden="true" />
+        <div>
+          <strong>{{ file.name }}</strong>
+          <span>{{ formatFileSize(file.size) }}</span>
+        </div>
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Remove selected file"
+          (onClick)="removeFile($event)"
+        >
+          <img src="assets/icons/times.svg" alt="" aria-hidden="true" />
+        </p-button>
+      </div>
+    } @else {
+      <div class="drop-zone-empty">
+        <img src="assets/icons/upload.svg" alt="" aria-hidden="true" />
+        <p><strong>Drop your `.lic` file here</strong> or click to browse.</p>
+        <span>Only `.lic` files accepted (max 10 MB)</span>
+      </div>
+    }
+  </div>
+
+  @if (importError()) {
+    <p-message severity="error">{{ importError() }}</p-message>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="closeImportModal()"
+    />
+    <p-button
+      label="Import License"
+      severity="primary"
+      [loading]="isImporting()"
+      [disabled]="!selectedFile() || isImporting()"
+      (onClick)="importSelected()"
+    />
+  </ng-template>
+</p-dialog>

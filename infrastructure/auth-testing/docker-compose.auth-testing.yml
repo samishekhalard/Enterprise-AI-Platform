@@ -1,0 +1,84 @@
+# ==============================================================================
+# EMSIST Auth Testing Stack: OpenLDAP + phpLDAPadmin
+#
+# Provides an LDAP directory pre-seeded with EMS test users/groups
+# for testing LDAP federation, OAuth2, and OIDC flows with Keycloak.
+#
+# Usage:
+#   # Start (assumes Keycloak is already running on ems-dev-backend network):
+#   docker compose -f docker-compose.auth-testing.yml up -d
+#
+#   # Seed Keycloak LDAP federation:
+#   ./scripts/configure-keycloak-ldap-federation.sh
+#
+#   # Run all auth protocol tests:
+#   ./scripts/test-all-protocols.sh
+#
+#   # Tear down:
+#   docker compose -f docker-compose.auth-testing.yml down -v
+# ==============================================================================
+name: emsist-auth-testing
+
+services:
+  # ============================================================================
+  # OpenLDAP — Test Directory Server
+  # ============================================================================
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: ems-openldap
+    hostname: openldap
+    ports:
+      - "1389:389"     # LDAP
+      - "1636:636"     # LDAPS
+    environment:
+      LDAP_ORGANISATION: "EMSIST Test Organisation"
+      LDAP_DOMAIN: "ems.test"
+      LDAP_BASE_DN: "dc=ems,dc=test"
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_CONFIG_PASSWORD: "config"
+      LDAP_READONLY_USER: "true"
+      LDAP_READONLY_USER_USERNAME: "readonly"
+      LDAP_READONLY_USER_PASSWORD: "readonly"
+      LDAP_TLS_VERIFY_CLIENT: "never"
+    volumes:
+      - ./ldap/seed.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-seed.ldif:ro
+      - openldap_data:/var/lib/ldap
+      - openldap_config:/etc/ldap/slapd.d
+    command: --copy-service
+    healthcheck:
+      test: ["CMD", "ldapsearch", "-x", "-H", "ldap://localhost", "-b", "dc=ems,dc=test", "-D", "cn=admin,dc=ems,dc=test", "-w", "admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - ems-auth-testing
+      - ems-dev-backend
+
+  # ============================================================================
+  # phpLDAPadmin — Web UI for browsing/managing LDAP
+  # ============================================================================
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: ems-phpldapadmin
+    ports:
+      - "6443:443"
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+      PHPLDAPADMIN_HTTPS: "true"
+    depends_on:
+      openldap:
+        condition: service_healthy
+    networks:
+      - ems-auth-testing
+
+networks:
+  ems-auth-testing:
+    driver: bridge
+  ems-dev-backend:
+    name: ems-dev-backend
+    external: true
+
+volumes:
+  openldap_data:
+  openldap_config:

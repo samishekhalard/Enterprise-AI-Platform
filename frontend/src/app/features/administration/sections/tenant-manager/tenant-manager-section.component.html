@@ -1,0 +1,1422 @@
+<section class="tenant-manager" data-testid="tenant-manager">
+  @if (stats(); as st) {
+    <div class="stats-bar" data-testid="stats-bar">
+      <div class="stat-item" data-testid="stat-total">
+        <span class="stat-value">{{ st.totalTenants }}</span>
+        <span class="stat-label">Total Tenants</span>
+      </div>
+      <div class="stat-item stat-active" data-testid="stat-active">
+        <span class="stat-value">{{ st.activeTenants }}</span>
+        <span class="stat-label">Active</span>
+      </div>
+      <div class="stat-item stat-pending" data-testid="stat-pending">
+        <span class="stat-value">{{ st.pendingTenants }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+      <div class="stat-item stat-suspended" data-testid="stat-suspended">
+        <span class="stat-value">{{ st.suspendedTenants }}</span>
+        <span class="stat-label">Suspended</span>
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <p-message severity="error" data-testid="error-message">{{ error() }}</p-message>
+  }
+  @if (actionError()) {
+    <p-message severity="error" data-testid="action-error">{{ actionError() }}</p-message>
+  }
+  @if (actionInfo()) {
+    <p-message severity="success" data-testid="action-info">{{ actionInfo() }}</p-message>
+  }
+
+  <div class="toolbar" data-testid="toolbar">
+    <div class="toolbar-left">
+      <div class="search-stack">
+        <label class="field-label" for="tenant-search-input">Search</label>
+        <input
+          id="tenant-search-input"
+          type="search"
+          pInputText
+          class="tenant-search"
+          [ngModel]="searchInput()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Search tenants by name, short code, or UUID"
+          aria-label="Search tenants"
+          data-testid="search-input"
+        />
+      </div>
+
+      <div class="filter-stack">
+        <label class="field-label" for="tenant-status-filter">Status</label>
+        <p-select
+          inputId="tenant-status-filter"
+          class="tenant-filter"
+          [options]="statusFilterOptions"
+          [ngModel]="statusFilter()"
+          (ngModelChange)="setStatusFilter($event)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All statuses"
+          appendTo="body"
+          [showClear]="true"
+          ariaLabel="Filter tenants by status"
+          data-testid="status-filter"
+        />
+      </div>
+
+      <p-button
+        label="Clear"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="resetFilters()"
+        data-testid="reset-filters-btn"
+      />
+    </div>
+
+    <div class="toolbar-right">
+      @if (!isMobileViewport()) {
+        <div class="view-toggle" data-testid="view-toggle">
+          <p-button
+            label="Table"
+            size="small"
+            [severity]="effectiveViewMode() === 'table' ? 'primary' : 'secondary'"
+            [outlined]="effectiveViewMode() !== 'table'"
+            (onClick)="setViewMode('table')"
+            data-testid="view-table-btn"
+          />
+          <p-button
+            label="Cards"
+            size="small"
+            [severity]="effectiveViewMode() === 'card' ? 'primary' : 'secondary'"
+            [outlined]="effectiveViewMode() !== 'card'"
+            (onClick)="setViewMode('card')"
+            data-testid="view-card-btn"
+          />
+        </div>
+      }
+
+      <p-button
+        label="Add Tenant"
+        size="small"
+        severity="primary"
+        [disabled]="actionLoading()"
+        (onClick)="openWizard()"
+        data-testid="add-tenant-btn"
+      >
+        <ng-icon name="phosphorPlusThin" size="16" />
+      </p-button>
+
+      <p-button
+        label="Refresh"
+        size="small"
+        severity="secondary"
+        [loading]="loading()"
+        [disabled]="loading() || actionLoading()"
+        (onClick)="loadTenants(); loadStats()"
+        data-testid="refresh-btn"
+      >
+        <ng-icon name="phosphorArrowsClockwiseThin" size="16" />
+      </p-button>
+    </div>
+  </div>
+
+  @if (searchNeedsMoreChars()) {
+    <p-message severity="info" data-testid="search-min-length">
+      Enter at least 3 characters before search is applied.
+    </p-message>
+  }
+
+  @if (showWizard()) {
+    <p-dialog
+      [visible]="showWizard()"
+      (visibleChange)="onWizardVisibleChange($event)"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [dismissableMask]="true"
+      [closeOnEscape]="true"
+      [closable]="false"
+      [style]="wizardDialogStyle"
+      [breakpoints]="mobileDialogBreakpoints"
+      [pt]="tenantWizardDialogPt"
+      aria-label="Provision tenant"
+      data-testid="tenant-wizard-dialog"
+    >
+      <ng-template pTemplate="header">
+        <div class="provisioning-header">
+          <div>
+            <h3>Provision Tenant</h3>
+            <p class="muted">
+              Create a tenant with governed licensing defaults, date controls, and review before
+              provisioning.
+            </p>
+          </div>
+
+          <p-button
+            label="Close"
+            severity="secondary"
+            [text]="true"
+            (onClick)="requestWizardClose()"
+            data-testid="wizard-close"
+          />
+        </div>
+      </ng-template>
+
+      <div class="provisioning-shell" data-testid="wizard-panel">
+        @if (showWizardDiscardPrompt()) {
+          <div class="tp-banner tp-banner-warn" data-testid="wizard-discard-banner">
+            <ng-icon name="phosphorWarningThin" />
+            <div class="discard-banner-copy">
+              <span>Discard tenant provisioning changes?</span>
+              <div class="discard-banner-actions">
+                <p-button
+                  label="Continue Editing"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (onClick)="dismissWizardDiscardPrompt()"
+                  data-testid="wizard-discard-cancel"
+                />
+                <p-button
+                  label="Discard"
+                  severity="danger"
+                  size="small"
+                  (onClick)="confirmWizardClose()"
+                  data-testid="wizard-discard-confirm"
+                />
+              </div>
+            </div>
+          </div>
+        }
+
+        <p-stepper
+          class="provision-stepper"
+          [value]="wizardIndex()"
+          (valueChange)="onWizardStepChange($any($event))"
+          [linear]="true"
+        >
+          <p-step-list>
+            <p-step [value]="1">Basic Info</p-step>
+            <p-step [value]="2">License</p-step>
+            <p-step [value]="3">Review</p-step>
+          </p-step-list>
+
+          <p-step-panels>
+            <p-step-panel [value]="1">
+              <ng-template #content>
+                <div class="provision-body" data-testid="wizard-step-1">
+                  <label class="field">
+                    <span class="field-label">Tenant Name</span>
+                    <input
+                      pInputText
+                      [ngModel]="wizardStep1().fullName"
+                      (ngModelChange)="onTenantNameChange($event)"
+                      placeholder="Enter tenant full name"
+                      data-testid="wizard-fullname"
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span class="field-label">Short Code</span>
+                    <div class="short-code-row">
+                      <input
+                        pInputText
+                        [ngModel]="wizardStep1().shortCode"
+                        [disabled]="true"
+                        class="short-code-input"
+                        data-testid="wizard-shortcode"
+                      />
+
+                      @if (shortCodeChecking()) {
+                        <p-progressSpinner
+                          strokeWidth="6"
+                          [style]="{ width: '1rem', height: '1rem' }"
+                        />
+                      }
+                      @if (shortCodeAvailable() === true) {
+                        <ng-icon
+                          name="phosphorCheckCircleThin"
+                          class="status-icon status-icon-success"
+                          data-testid="shortcode-available"
+                        />
+                      }
+                      @if (shortCodeAvailable() === false) {
+                        <ng-icon
+                          name="phosphorXCircleThin"
+                          class="status-icon status-icon-danger"
+                          data-testid="shortcode-taken"
+                        />
+                      }
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field-label">Description</span>
+                    <textarea
+                      pTextarea
+                      [rows]="4"
+                      [ngModel]="wizardStep1().description"
+                      (ngModelChange)="updateDescription($event)"
+                      placeholder="Optional tenant description"
+                      data-testid="wizard-description"
+                    ></textarea>
+                  </label>
+                </div>
+
+                <footer class="panel-footer">
+                  <p-button
+                    label="Cancel"
+                    severity="secondary"
+                    [outlined]="true"
+                    [disabled]="actionLoading()"
+                    (onClick)="requestWizardClose()"
+                    data-testid="wizard-cancel"
+                  />
+                  <p-button
+                    label="Next"
+                    severity="primary"
+                    [disabled]="!canAdvanceStep1()"
+                    (onClick)="wizardNext()"
+                    data-testid="wizard-next"
+                  />
+                </footer>
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="2">
+              <ng-template #content>
+                <div class="provision-body" data-testid="wizard-step-2">
+                  <div class="field">
+                    <label class="field-label" for="wizard-tier">Tier</label>
+                    <p-select
+                      inputId="wizard-tier"
+                      [options]="tierSelectOptions"
+                      [ngModel]="wizardStep2().tier"
+                      (ngModelChange)="updateTier($event)"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Select tier"
+                      appendTo="body"
+                      data-testid="wizard-tier"
+                    />
+                  </div>
+
+                  <div class="provision-grid">
+                    <div class="field">
+                      <label class="field-label" for="wizard-seats">User Seats</label>
+                      <p-inputNumber
+                        inputId="wizard-seats"
+                        [ngModel]="wizardStep2().userSeats"
+                        (ngModelChange)="updateUserSeats($event)"
+                        [min]="1"
+                        [useGrouping]="false"
+                        inputStyleClass="numeric-input"
+                        data-testid="wizard-seats"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="wizard-storage">Storage Quota (GB)</label>
+                      <p-inputNumber
+                        inputId="wizard-storage"
+                        [ngModel]="wizardStep2().storageQuotaGb"
+                        (ngModelChange)="updateStorageQuota($event)"
+                        [min]="1"
+                        [useGrouping]="false"
+                        inputStyleClass="numeric-input"
+                        data-testid="wizard-storage"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="wizard-ratelimit"
+                        >API Rate Limit (req/min)</label
+                      >
+                      <p-inputNumber
+                        inputId="wizard-ratelimit"
+                        [ngModel]="wizardStep2().apiRateLimit"
+                        (ngModelChange)="updateApiRateLimit($event)"
+                        [min]="0"
+                        [useGrouping]="false"
+                        inputStyleClass="numeric-input"
+                        data-testid="wizard-ratelimit"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="provision-grid">
+                    <div class="field">
+                      <label class="field-label" for="wizard-start-date">Start Date</label>
+                      <p-datepicker
+                        inputId="wizard-start-date"
+                        [ngModel]="wizardStep2().startDate"
+                        (ngModelChange)="updateStartDate($event)"
+                        [showIcon]="true"
+                        [showButtonBar]="true"
+                        appendTo="body"
+                        data-testid="wizard-start-date"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="wizard-expiry-date">Expiry Date</label>
+                      <p-datepicker
+                        inputId="wizard-expiry-date"
+                        [ngModel]="wizardStep2().expiryDate"
+                        (ngModelChange)="updateExpiryDate($event)"
+                        [showIcon]="true"
+                        [showButtonBar]="true"
+                        appendTo="body"
+                        data-testid="wizard-expiry-date"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="panel-footer">
+                  <p-button
+                    label="Back"
+                    severity="secondary"
+                    [outlined]="true"
+                    [disabled]="actionLoading()"
+                    (onClick)="wizardPrev()"
+                    data-testid="wizard-back"
+                  />
+                  <p-button
+                    label="Next"
+                    severity="primary"
+                    [disabled]="!canAdvanceStep2()"
+                    (onClick)="wizardNext()"
+                    data-testid="wizard-next-license"
+                  />
+                </footer>
+              </ng-template>
+            </p-step-panel>
+
+            <p-step-panel [value]="3">
+              <ng-template #content>
+                <div class="provision-body provision-review" data-testid="wizard-step-3">
+                  <h4>Review Tenant Configuration</h4>
+
+                  <div class="review-grid">
+                    <div class="review-section">
+                      <h5>Basic Information</h5>
+                      <div class="overview-grid">
+                        <div>
+                          <span class="label">Name</span>
+                          <strong>{{ wizardStep1().fullName }}</strong>
+                        </div>
+                        <div>
+                          <span class="label">Short Code</span>
+                          <strong>{{ wizardStep1().shortCode }}</strong>
+                        </div>
+                      </div>
+
+                      @if (wizardStep1().description) {
+                        <div class="review-desc">
+                          <span class="label">Description</span>
+                          <p>{{ wizardStep1().description }}</p>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="review-section">
+                      <h5>License Configuration</h5>
+                      <div class="overview-grid">
+                        <div>
+                          <span class="label">Tier</span>
+                          <strong>{{ wizardStep2().tier }}</strong>
+                        </div>
+                        <div>
+                          <span class="label">User Seats</span>
+                          <strong>{{ wizardStep2().userSeats }}</strong>
+                        </div>
+                        <div>
+                          <span class="label">Storage</span>
+                          <strong>{{ wizardStep2().storageQuotaGb }} GB</strong>
+                        </div>
+                        <div>
+                          <span class="label">API Rate Limit</span>
+                          <strong>{{ wizardStep2().apiRateLimit }} req/min</strong>
+                        </div>
+                        <div>
+                          <span class="label">Start Date</span>
+                          <strong>{{
+                            wizardStep2().startDate
+                              ? (wizardStep2().startDate | date: 'dd MMM y')
+                              : 'n/a'
+                          }}</strong>
+                        </div>
+                        @if (wizardStep2().expiryDate) {
+                          <div>
+                            <span class="label">Expiry Date</span>
+                            <strong>{{ wizardStep2().expiryDate | date: 'dd MMM y' }}</strong>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <footer class="panel-footer">
+                  <p-button
+                    label="Back"
+                    severity="secondary"
+                    [outlined]="true"
+                    [disabled]="actionLoading()"
+                    (onClick)="wizardPrev()"
+                    data-testid="wizard-back-review"
+                  />
+                  <p-button
+                    label="Provision Tenant"
+                    severity="primary"
+                    [loading]="actionLoading()"
+                    [disabled]="actionLoading()"
+                    (onClick)="provisionTenant()"
+                    data-testid="wizard-provision"
+                  />
+                </footer>
+              </ng-template>
+            </p-step-panel>
+          </p-step-panels>
+        </p-stepper>
+      </div>
+    </p-dialog>
+  }
+
+  @if (loading() && tenants().length === 0) {
+    <div class="loading-skeleton" aria-busy="true" aria-label="Loading tenants">
+      @for (row of [1, 2, 3, 4, 5]; track row) {
+        <div class="skeleton-row">
+          <p-skeleton width="18%" height="1rem" />
+          <p-skeleton width="12%" height="1rem" />
+          <p-skeleton width="10%" height="1rem" />
+          <p-skeleton width="14%" height="1rem" />
+          <p-skeleton width="16%" height="2.5rem" />
+        </div>
+      }
+    </div>
+  }
+
+  @if (loading() && tenants().length > 0) {
+    <div class="loading-row" data-testid="loading-indicator">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Refreshing tenants...</span>
+    </div>
+  }
+
+  @if (effectiveViewMode() === 'table' && tenants().length > 0) {
+    <div class="table-surface" data-testid="table-view" aria-busy="{{ loading() }}">
+      <p-table
+        [value]="pagedTenants()"
+        [customSort]="true"
+        [sortField]="sortColumn()"
+        [sortOrder]="sortDirection() === 'asc' ? 1 : -1"
+        (sortFunction)="onTableSort($any($event))"
+        [rowHover]="true"
+        dataKey="id"
+        [pt]="tenantTablePt"
+        data-testid="tenant-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="name">
+              Name
+              <p-sortIcon field="name" />
+            </th>
+            <th pSortableColumn="status">
+              Status
+              <p-sortIcon field="status" />
+            </th>
+            <th pSortableColumn="tier">
+              Tier
+              <p-sortIcon field="tier" />
+            </th>
+            <th pSortableColumn="createdAt">
+              Created
+              <p-sortIcon field="createdAt" />
+            </th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-tenant>
+          <tr [attr.data-testid]="'tenant-row-' + tenant.id">
+            <td>
+              <a
+                href=""
+                class="tenant-link"
+                (click)="openFactSheet(tenant); $event.preventDefault()"
+                [attr.data-testid]="'tenant-link-' + tenant.id"
+              >
+                <strong>{{ tenant.name }}</strong>
+                @if (tenant.fullName && tenant.fullName !== tenant.name) {
+                  <small class="muted">{{ tenant.fullName }}</small>
+                }
+              </a>
+            </td>
+            <td>
+              <p-tag
+                [value]="tenant.status"
+                [severity]="statusSeverity(tenant.status)"
+                [rounded]="true"
+              />
+            </td>
+            <td>{{ tenant.tier ?? 'n/a' }}</td>
+            <td>{{ tenant.createdAt ? (tenant.createdAt | date: 'dd MMM y, HH:mm') : 'n/a' }}</td>
+            <td class="actions-col">
+              <div class="row-actions">
+                @if (canEdit(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Edit tenant"
+                    (onClick)="openEditModal(tenant)"
+                    [attr.data-testid]="'edit-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorPencilSimpleThin" size="16" />
+                  </p-button>
+                }
+                @if (canActivate(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="success"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Activate tenant"
+                    (onClick)="openActivateDialog(tenant)"
+                    [attr.data-testid]="'activate-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorCheckCircleThin" size="16" />
+                  </p-button>
+                }
+                @if (canSuspend(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="warn"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Suspend tenant"
+                    (onClick)="openSuspendDialog(tenant)"
+                    [attr.data-testid]="'suspend-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorPauseCircleThin" size="16" />
+                  </p-button>
+                }
+                @if (canReactivate(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="info"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Reactivate tenant"
+                    (onClick)="openReactivateDialog(tenant)"
+                    [attr.data-testid]="'reactivate-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorPlayCircleThin" size="16" />
+                  </p-button>
+                }
+                @if (canDecommission(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="danger"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Decommission tenant"
+                    (onClick)="openDecommissionDialog(tenant)"
+                    [attr.data-testid]="'decommission-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorXCircleThin" size="16" />
+                  </p-button>
+                }
+                @if (canDelete(tenant)) {
+                  <p-button
+                    size="small"
+                    severity="danger"
+                    [text]="true"
+                    [rounded]="true"
+                    ariaLabel="Delete tenant"
+                    (onClick)="openDeleteDialog(tenant)"
+                    [attr.data-testid]="'delete-btn-' + tenant.id"
+                  >
+                    <ng-icon name="phosphorTrashThin" size="16" />
+                  </p-button>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">
+              <div class="empty-state" data-testid="empty-table">
+                <ng-icon name="phosphorTrayThin" size="40" aria-hidden="true" />
+                <p>No tenants found matching your criteria.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+  @if (effectiveViewMode() === 'card' && tenants().length > 0) {
+    <div class="card-grid" data-testid="card-view">
+      @for (tenant of pagedTenants(); track tenant.id) {
+        <article class="tenant-card" [attr.data-testid]="'tenant-card-' + tenant.id">
+          <div class="card-header">
+            <a href="" class="tenant-link" (click)="openFactSheet(tenant); $event.preventDefault()">
+              <strong>{{ tenant.name }}</strong>
+              @if (tenant.fullName && tenant.fullName !== tenant.name) {
+                <small class="muted">{{ tenant.fullName }}</small>
+              }
+            </a>
+            <p-tag
+              [value]="tenant.status"
+              [severity]="statusSeverity(tenant.status)"
+              [rounded]="true"
+            />
+          </div>
+
+          <div class="card-meta">
+            <span>Tier: {{ tenant.tier ?? 'n/a' }}</span>
+            <span>Users: {{ tenant.usersCount ?? 0 }}</span>
+          </div>
+
+          @if (tenant.description) {
+            <p class="card-desc muted">{{ tenant.description }}</p>
+          }
+
+          <div class="card-actions">
+            @if (canEdit(tenant)) {
+              <p-button
+                label="Edit"
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="openEditModal(tenant)"
+              />
+            }
+            @if (canActivate(tenant)) {
+              <p-button
+                label="Activate"
+                size="small"
+                severity="success"
+                [outlined]="true"
+                (onClick)="openActivateDialog(tenant)"
+              />
+            }
+            @if (canSuspend(tenant)) {
+              <p-button
+                label="Suspend"
+                size="small"
+                severity="warn"
+                [outlined]="true"
+                (onClick)="openSuspendDialog(tenant)"
+              />
+            }
+            @if (canReactivate(tenant)) {
+              <p-button
+                label="Reactivate"
+                size="small"
+                severity="info"
+                [outlined]="true"
+                (onClick)="openReactivateDialog(tenant)"
+              />
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state empty-cards" data-testid="empty-cards">
+          <ng-icon name="phosphorTrayThin" size="40" aria-hidden="true" />
+          <p>No tenants found matching your criteria.</p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (totalFiltered() > 0) {
+    <p-paginator
+      [first]="(page() - 1) * pageSize()"
+      [rows]="pageSize()"
+      [totalRecords]="totalFiltered()"
+      [rowsPerPageOptions]="paginatorRowsPerPageOptions()"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="
+        isMobileViewport()
+          ? 'Page {currentPage} of {totalPages}'
+          : 'Showing {first} to {last} of {totalRecords}'
+      "
+      [showPageLinks]="!isMobileViewport()"
+      [showJumpToPageInput]="!isMobileViewport()"
+      [showFirstLastIcon]="!isMobileViewport()"
+      (onPageChange)="onPageChange($any($event))"
+      [pt]="tenantPaginatorPt"
+      data-testid="tenant-paginator"
+    />
+  }
+</section>
+
+@if (showFactSheet() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showFactSheet()"
+    (visibleChange)="onFactSheetVisibleChange($event)"
+    [modal]="true"
+    [position]="'right'"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [closable]="true"
+    [style]="factSheetDialogStyle"
+    [breakpoints]="factSheetDialogBreakpoints"
+    [pt]="factSheetDialogPt"
+    data-testid="factsheet-dialog"
+  >
+    <ng-template pTemplate="header">
+      <div class="factsheet-heading">
+        <h3 data-testid="factsheet-name">{{ tenant.name }}</h3>
+        <p class="muted">{{ tenant.uuid ?? tenant.id }}</p>
+      </div>
+    </ng-template>
+
+    <div class="factsheet-status-row">
+      <p-tag [value]="tenant.status" [severity]="statusSeverity(tenant.status)" [rounded]="true" />
+      @if (tenant.isProtected) {
+        <p-tag value="Protected" severity="info" [rounded]="true" />
+      }
+    </div>
+
+    <p-tabs
+      class="factsheet-tabs"
+      [value]="factSheetTab()"
+      (valueChange)="onFactSheetTabChange($event)"
+    >
+      <p-tablist>
+        <p-tab value="overview" data-testid="factsheet-tab-overview">Overview</p-tab>
+        <p-tab value="license" data-testid="factsheet-tab-license">License</p-tab>
+        <p-tab value="auth" data-testid="factsheet-tab-auth">Auth</p-tab>
+        <p-tab value="users" data-testid="factsheet-tab-users">Users</p-tab>
+        <p-tab value="branding" data-testid="factsheet-tab-branding">Branding</p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="overview">
+          <div class="factsheet-content" data-testid="factsheet-overview">
+            <div class="overview-grid">
+              <div>
+                <span class="label">Full Name</span>
+                <strong>{{ tenant.fullName ?? tenant.name }}</strong>
+              </div>
+              <div>
+                <span class="label">Short Name</span>
+                <strong>{{ tenant.shortName ?? 'n/a' }}</strong>
+              </div>
+              <div>
+                <span class="label">Type</span>
+                <strong>{{ tenant.type }}</strong>
+              </div>
+              <div>
+                <span class="label">Tier</span>
+                <strong>{{ tenant.tier ?? 'n/a' }}</strong>
+              </div>
+              <div>
+                <span class="label">Users</span>
+                <strong>{{ tenant.usersCount ?? 0 }}</strong>
+              </div>
+              <div>
+                <span class="label">Domains</span>
+                <strong>{{ tenant.domainsCount ?? 0 }}</strong>
+              </div>
+              <div>
+                <span class="label">Primary Domain</span>
+                <strong>{{ tenant.primaryDomain ?? 'n/a' }}</strong>
+              </div>
+              <div>
+                <span class="label">Created</span>
+                <strong>{{
+                  tenant.createdAt ? (tenant.createdAt | date: 'dd MMM y, HH:mm') : 'n/a'
+                }}</strong>
+              </div>
+            </div>
+
+            @if (tenant.description) {
+              <div class="factsheet-desc">
+                <span class="label">Description</span>
+                <p>{{ tenant.description }}</p>
+              </div>
+            }
+
+            @if (tenant.status.toLowerCase() === 'suspended') {
+              <div class="suspension-info">
+                <h5>Suspension Details</h5>
+                <div class="overview-grid">
+                  <div>
+                    <span class="label">Reason</span>
+                    <strong>{{ tenant.suspensionReason ?? 'n/a' }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Suspended At</span>
+                    <strong>{{
+                      tenant.suspendedAt ? (tenant.suspendedAt | date: 'dd MMM y, HH:mm') : 'n/a'
+                    }}</strong>
+                  </div>
+                  @if (tenant.estimatedReactivationDate) {
+                    <div>
+                      <span class="label">Est. Reactivation</span>
+                      <strong>{{
+                        tenant.estimatedReactivationDate | date: 'dd MMM y, HH:mm'
+                      }}</strong>
+                    </div>
+                  }
+                </div>
+                @if (tenant.suspensionNotes) {
+                  <p class="suspension-notes muted">{{ tenant.suspensionNotes }}</p>
+                }
+              </div>
+            }
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="license">
+          <div class="factsheet-content" data-testid="factsheet-license">
+            <div class="overview-grid">
+              <div>
+                <span class="label">Tier</span>
+                <strong>{{ tenant.tier ?? 'n/a' }}</strong>
+              </div>
+              <div>
+                <span class="label">Users</span>
+                <strong>{{ tenant.usersCount ?? 0 }}</strong>
+              </div>
+            </div>
+            <p class="muted factsheet-license-note">
+              Detailed license information is available in the License Manager section.
+            </p>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="auth">
+          <div class="factsheet-content factsheet-content-full" data-testid="factsheet-auth">
+            <app-provider-embedded
+              [tenantId]="tenant.uuid || tenant.id"
+              [tenantName]="tenant.fullName || tenant.shortName || tenant.name"
+            />
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="users">
+          <div class="factsheet-content" data-testid="factsheet-users">
+            <div class="overview-grid">
+              <div>
+                <span class="label">Total Users</span>
+                <strong>{{ tenant.usersCount ?? 0 }}</strong>
+              </div>
+            </div>
+            <p class="muted factsheet-license-note">
+              User management is available in the Users section of the administration panel.
+            </p>
+          </div>
+        </p-tabpanel>
+
+        <p-tabpanel value="branding">
+          <div class="factsheet-content" data-testid="factsheet-branding">
+            @if (factSheetBrandingLoading()) {
+              <div class="branding-skeleton" aria-busy="true">
+                <p-skeleton width="30%" height="1rem" />
+                <div class="branding-colors">
+                  @for (swatch of [1, 2, 3, 4]; track swatch) {
+                    <p-skeleton width="100%" height="4.5rem" />
+                  }
+                </div>
+              </div>
+            } @else if (factSheetBranding(); as brand) {
+              <div class="factsheet-branding-preview">
+                <h5>Colors</h5>
+                <div class="branding-colors">
+                  <div class="color-swatch" [style.background]="brand.primaryColor" title="Primary">
+                    <span>Primary</span>
+                  </div>
+                  <div
+                    class="color-swatch"
+                    [style.background]="brand.primaryColorDark"
+                    title="Primary Dark"
+                  >
+                    <span>Dark</span>
+                  </div>
+                  <div
+                    class="color-swatch"
+                    [style.background]="brand.secondaryColor"
+                    title="Secondary"
+                  >
+                    <span>Secondary</span>
+                  </div>
+                  @if (brand.surfaceColor) {
+                    <div
+                      class="color-swatch"
+                      [style.background]="brand.surfaceColor"
+                      title="Surface"
+                    >
+                      <span>Surface</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="overview-grid overview-grid-compact">
+                  <div>
+                    <span class="label">Font</span>
+                    <strong>{{ brandFontLabel }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Corner Radius</span>
+                    <strong>{{ brand.cornerRadius }}px</strong>
+                  </div>
+                  <div>
+                    <span class="label">Soft Shadows</span>
+                    <strong>{{ brand.softShadows ? 'Yes' : 'No' }}</strong>
+                  </div>
+                  <div>
+                    <span class="label">Compact Nav</span>
+                    <strong>{{ brand.compactNav ? 'Yes' : 'No' }}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <app-branding-studio
+                [tenantId]="tenant.uuid || tenant.id"
+                [initialBranding]="brand"
+                (brandingSaved)="handleBrandingSaved($event)"
+              />
+            } @else {
+              <p class="muted">No branding configured. Using default theme.</p>
+            }
+          </div>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+
+    <ng-template pTemplate="footer">
+      <div class="factsheet-footer">
+        @if (canEdit(tenant)) {
+          <p-button
+            label="Edit"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="openEditModal(tenant); closeFactSheet()"
+            data-testid="factsheet-edit-btn"
+          />
+        }
+        @if (canActivate(tenant)) {
+          <p-button
+            label="Activate"
+            size="small"
+            severity="success"
+            [outlined]="true"
+            (onClick)="openActivateDialog(tenant); closeFactSheet()"
+            data-testid="factsheet-activate-btn"
+          />
+        }
+        @if (canSuspend(tenant)) {
+          <p-button
+            label="Suspend"
+            size="small"
+            severity="warn"
+            [outlined]="true"
+            (onClick)="openSuspendDialog(tenant); closeFactSheet()"
+            data-testid="factsheet-suspend-btn"
+          />
+        }
+        @if (canReactivate(tenant)) {
+          <p-button
+            label="Reactivate"
+            size="small"
+            severity="info"
+            [outlined]="true"
+            (onClick)="openReactivateDialog(tenant); closeFactSheet()"
+            data-testid="factsheet-reactivate-btn"
+          />
+        }
+      </div>
+    </ng-template>
+  </p-dialog>
+}
+
+@if (showActivateDialog() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showActivateDialog()"
+    (visibleChange)="showActivateDialog.set($event)"
+    header="Activate Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="compactDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="activate-dialog"
+  >
+    <p>
+      Activate <strong>{{ tenant.name }}</strong
+      >? This will transition the tenant from pending to active status.
+    </p>
+
+    <div class="switch-field">
+      <div>
+        <span class="field-label">Send welcome notification</span>
+        <p class="muted">Notify the tenant administrator immediately after activation.</p>
+      </div>
+      <p-toggleSwitch
+        inputId="activate-welcome-check"
+        [ngModel]="activateSendWelcome()"
+        (ngModelChange)="activateSendWelcome.set($event)"
+        ariaLabel="Send welcome notification"
+        data-testid="activate-welcome-check"
+      />
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="showActivateDialog.set(false)"
+      />
+      <p-button
+        label="Activate"
+        severity="success"
+        [loading]="actionLoading()"
+        (onClick)="confirmActivate()"
+        data-testid="activate-confirm"
+      />
+    </ng-template>
+  </p-dialog>
+}
+
+@if (showSuspendDialog() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showSuspendDialog()"
+    (visibleChange)="showSuspendDialog.set($event)"
+    header="Suspend Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="mediumDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="suspend-dialog"
+  >
+    <p>
+      Suspend <strong>{{ tenant.name }}</strong
+      >? Users will not be able to sign in while the tenant is suspended.
+    </p>
+
+    <div class="field">
+      <label class="field-label" for="suspend-reason">Reason</label>
+      <p-select
+        inputId="suspend-reason"
+        [options]="suspensionReasonOptions"
+        [ngModel]="suspendReason()"
+        (ngModelChange)="suspendReason.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        data-testid="suspend-reason"
+      />
+    </div>
+
+    <label class="field">
+      <span class="field-label">Notes</span>
+      <textarea
+        pTextarea
+        [rows]="4"
+        [ngModel]="suspendNotes()"
+        (ngModelChange)="suspendNotes.set($event)"
+        placeholder="Additional notes"
+        data-testid="suspend-notes"
+      ></textarea>
+    </label>
+
+    <div class="field">
+      <label class="field-label" for="suspend-reactivation-date">Estimated Reactivation Date</label>
+      <p-datepicker
+        inputId="suspend-reactivation-date"
+        [ngModel]="suspendReactivationDate()"
+        (ngModelChange)="suspendReactivationDate.set($event)"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        appendTo="body"
+        data-testid="suspend-reactivation-date"
+      />
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="showSuspendDialog.set(false)"
+      />
+      <p-button
+        label="Suspend"
+        severity="warn"
+        [loading]="actionLoading()"
+        (onClick)="confirmSuspend()"
+        data-testid="suspend-confirm"
+      />
+    </ng-template>
+  </p-dialog>
+}
+
+@if (showReactivateDialog() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showReactivateDialog()"
+    (visibleChange)="showReactivateDialog.set($event)"
+    header="Reactivate Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="compactDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="reactivate-dialog"
+  >
+    <p>
+      Reactivate <strong>{{ tenant.name }}</strong
+      >? This restores access and clears suspension details.
+    </p>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="showReactivateDialog.set(false)"
+      />
+      <p-button
+        label="Reactivate"
+        severity="info"
+        [loading]="actionLoading()"
+        (onClick)="confirmReactivate()"
+        data-testid="reactivate-confirm"
+      />
+    </ng-template>
+  </p-dialog>
+}
+
+@if (showDecommissionDialog() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showDecommissionDialog()"
+    (visibleChange)="showDecommissionDialog.set($event)"
+    header="Decommission Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="mediumDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="decommission-dialog"
+  >
+    <p-message severity="error">
+      This action is permanent. The tenant will be retired and cannot be restored.
+    </p-message>
+
+    <p>
+      Decommission <strong>{{ tenant.name }}</strong
+      >?
+    </p>
+
+    <label class="field">
+      <span class="field-label">Reason</span>
+      <input
+        pInputText
+        [ngModel]="decommissionReason()"
+        (ngModelChange)="decommissionReason.set($event)"
+        placeholder="Decommission reason"
+        data-testid="decommission-reason"
+      />
+    </label>
+
+    <label class="field">
+      <span class="field-label">Notes</span>
+      <textarea
+        pTextarea
+        [rows]="4"
+        [ngModel]="decommissionNotes()"
+        (ngModelChange)="decommissionNotes.set($event)"
+        placeholder="Additional notes"
+        data-testid="decommission-notes"
+      ></textarea>
+    </label>
+
+    <div class="switch-field">
+      <div>
+        <span class="field-label">Delete tenant data</span>
+        <p class="muted">
+          Enable this only after retention and archival requirements are satisfied.
+        </p>
+      </div>
+      <p-toggleSwitch
+        inputId="decommission-confirm-check"
+        [ngModel]="decommissionConfirm()"
+        (ngModelChange)="decommissionConfirm.set($event)"
+        ariaLabel="Confirm permanent tenant data deletion"
+        data-testid="decommission-confirm-check"
+      />
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="showDecommissionDialog.set(false)"
+      />
+      <p-button
+        label="Decommission"
+        severity="danger"
+        [loading]="actionLoading()"
+        [disabled]="!decommissionConfirm() || !decommissionReason().trim()"
+        (onClick)="confirmDecommission()"
+        data-testid="decommission-confirm"
+      />
+    </ng-template>
+  </p-dialog>
+}
+
+@if (showEditModal() && selectedTenant(); as tenant) {
+  <p-dialog
+    [visible]="showEditModal()"
+    (visibleChange)="showEditModal.set($event)"
+    header="Edit Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="formDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="edit-modal"
+  >
+    <div class="provision-grid">
+      <label class="field">
+        <span class="field-label">Full Name</span>
+        <input
+          pInputText
+          [ngModel]="editForm().fullName"
+          (ngModelChange)="updateEditField('fullName', $event)"
+          data-testid="edit-fullname"
+        />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Short Name</span>
+        <input
+          pInputText
+          [ngModel]="editForm().shortName"
+          (ngModelChange)="updateEditField('shortName', $event)"
+          data-testid="edit-shortname"
+        />
+      </label>
+
+      <div class="field">
+        <label class="field-label" for="edit-tier">Tier</label>
+        <p-select
+          inputId="edit-tier"
+          [options]="tierSelectOptions"
+          [ngModel]="editForm().tier"
+          (ngModelChange)="updateEditField('tier', $event)"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          data-testid="edit-tier"
+        />
+      </div>
+    </div>
+
+    <label class="field">
+      <span class="field-label">Description</span>
+      <textarea
+        pTextarea
+        [rows]="4"
+        [ngModel]="editForm().description"
+        (ngModelChange)="updateEditField('description', $event)"
+        data-testid="edit-description"
+      ></textarea>
+    </label>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="closeEditModal()"
+      />
+      <p-button
+        label="Save Changes"
+        severity="primary"
+        [loading]="actionLoading()"
+        [disabled]="actionLoading()"
+        (onClick)="saveEdit()"
+        data-testid="edit-save"
+      />
+    </ng-template>
+  </p-dialog>
+}
+
+@if (deleteDialogTarget(); as tenant) {
+  <p-dialog
+    [visible]="true"
+    (visibleChange)="closeDeleteDialog()"
+    header="Delete Tenant"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [style]="mediumDialogStyle"
+    [breakpoints]="mobileDialogBreakpoints"
+    [pt]="standardDialogPt"
+    data-testid="delete-tenant-dialog"
+  >
+    <p-message severity="error">
+      This permanently removes <strong>{{ tenant.name }}</strong> and its tenant record.
+    </p-message>
+
+    <p class="delete-dialog-copy">
+      Confirm deletion of <strong>{{ tenant.name }}</strong
+      >? This action cannot be undone.
+    </p>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="actionLoading()"
+        (onClick)="closeDeleteDialog()"
+        data-testid="delete-tenant-cancel"
+      />
+      <p-button
+        label="Delete Tenant"
+        severity="danger"
+        [loading]="actionLoading()"
+        [disabled]="actionLoading()"
+        (onClick)="confirmDeleteTenant()"
+        data-testid="delete-tenant-confirm"
+      />
+    </ng-template>
+  </p-dialog>
+}

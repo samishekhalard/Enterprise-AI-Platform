@@ -1,0 +1,8 @@
+# ==============================================================================
+# EMSIST Legacy Monolithic Compose - DECOMMISSIONED
+#
+# PostgreSQL, Neo4j, and Keycloak are external systems and must never be
+# started, rebuilt, or managed from this repository.
+# ==============================================================================
+
+services: {}

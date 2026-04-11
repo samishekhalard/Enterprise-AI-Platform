@@ -1,0 +1,1284 @@
+@if (visible) {
+  <p-dialog
+    [visible]="true"
+    (visibleChange)="onDialogVisibleChange($event)"
+    [modal]="true"
+    [closable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="wizardDialogStyle"
+    [breakpoints]="wizardDialogBreakpoints"
+    [pt]="wizardDialogPt"
+    aria-label="Add authentication source"
+    data-testid="auth-source-dialog"
+  >
+    <ng-template pTemplate="header">
+      <div class="auth-source-header">
+        <div>
+          <h2 data-testid="wizard-title">Add Authentication Source</h2>
+          <p class="muted">
+            Configure connection, attribute mapping, sync behavior, and validation before saving.
+          </p>
+        </div>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          class="auth-source-close-btn"
+          aria-label="Close wizard"
+          data-testid="wizard-close-btn"
+          (click)="requestClose()"
+        >
+          <ng-icon name="phosphorXThin" />
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="auth-source-shell">
+      <div class="tp-banner tp-banner-info" data-testid="protocol-info-banner">
+        <ng-icon name="phosphorInfoThin" />
+        <span>
+          Multiple authentication sources can run side by side. Use this wizard to standardize the
+          connection details before assigning the source to tenants.
+        </span>
+      </div>
+
+      @if (showCancelConfirm()) {
+        <div class="tp-banner tp-banner-warn" data-testid="cancel-confirm-banner">
+          <ng-icon name="phosphorWarningThin" />
+          <div class="confirm-banner-copy">
+            <span>You have unsaved configuration in this wizard.</span>
+            <div class="confirm-actions">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                size="small"
+                (click)="dismissCancelConfirm()"
+                data-testid="btn-cancel-dismiss"
+              >
+                Continue Editing
+              </button>
+              <button
+                pButton
+                type="button"
+                severity="danger"
+                size="small"
+                (click)="confirmClose()"
+                data-testid="btn-cancel-confirm"
+              >
+                Discard &amp; Close
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <p-stepper
+        class="auth-source-step-shell"
+        [value]="stepperValue()"
+        (valueChange)="onStepperValueChange($any($event))"
+        [linear]="true"
+      >
+        <p-step-list>
+          <p-step [value]="1">Protocol</p-step>
+          <p-step [value]="2">Connection</p-step>
+          <p-step [value]="3">Mapping</p-step>
+          <p-step [value]="4">Sync &amp; Tenants</p-step>
+          <p-step [value]="5">Test &amp; Review</p-step>
+        </p-step-list>
+
+        <p-step-panels>
+          <p-step-panel [value]="1">
+            <ng-template #content>
+              <section class="step-content" data-testid="step-protocol">
+                <label class="field field-wide" data-testid="field-display-name">
+                  <span>Source Display Name <span class="required">*</span></span>
+                  <input
+                    pInputText
+                    type="text"
+                    [ngModel]="state().protocolStep.displayName"
+                    (ngModelChange)="updateDisplayName($event)"
+                    placeholder="e.g. Corporate Active Directory"
+                    data-testid="input-display-name"
+                  />
+                </label>
+
+                <div class="section-heading">
+                  <h4>Select Protocol</h4>
+                  <p class="muted">
+                    Choose the provider type that matches the upstream identity flow.
+                  </p>
+                </div>
+
+                <div class="protocol-card-grid" data-testid="protocol-cards">
+                  @for (card of protocolCards; track card.protocol) {
+                    <button
+                      pButton
+                      type="button"
+                      severity="secondary"
+                      [text]="true"
+                      class="protocol-card"
+                      [class.selected]="selectedProtocol() === card.protocol"
+                      [attr.data-testid]="'protocol-card-' + card.protocol"
+                      (click)="selectProtocol(card.protocol)"
+                    >
+                      <div class="protocol-card-icon">
+                        <ng-icon [name]="card.icon" size="32" />
+                      </div>
+                      <div class="protocol-card-body">
+                        <strong>{{ card.label }}</strong>
+                        <p>{{ card.description }}</p>
+                        <small>{{ card.useCases }}</small>
+                      </div>
+                    </button>
+                  }
+                </div>
+              </section>
+
+              <footer class="panel-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="requestClose()"
+                  data-testid="btn-wizard-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  [disabled]="!canGoNext()"
+                  (click)="goNext()"
+                  data-testid="btn-wizard-next"
+                >
+                  Next
+                  <ng-icon name="phosphorArrowRightThin" size="16" />
+                </button>
+              </footer>
+            </ng-template>
+          </p-step-panel>
+
+          <p-step-panel [value]="2">
+            <ng-template #content>
+              <section class="step-content" data-testid="step-connection">
+                @if (selectedProtocol() === 'LDAP') {
+                  <div class="section-heading">
+                    <h4>LDAP / Active Directory Connection</h4>
+                    <p class="muted">
+                      Define directory endpoints, security, and operational controls.
+                    </p>
+                  </div>
+
+                  <div class="form-grid" data-testid="ldap-connection-form">
+                    <label class="field field-wide">
+                      <span>Server URL(s) <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().ldapConnection.serverUrls"
+                        (ngModelChange)="updateLdap('serverUrls', $event)"
+                        placeholder="ldap://dc01.corp.local:389, ldap://dc02.corp.local:389"
+                        data-testid="input-ldap-server-urls"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Base DN <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().ldapConnection.baseDn"
+                        (ngModelChange)="updateLdap('baseDn', $event)"
+                        placeholder="dc=corp,dc=local"
+                        data-testid="input-ldap-base-dn"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Search Filter</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().ldapConnection.searchFilter"
+                        (ngModelChange)="updateLdap('searchFilter', $event)"
+                        data-testid="input-ldap-search-filter"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Bind DN <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().ldapConnection.bindDn"
+                        (ngModelChange)="updateLdap('bindDn', $event)"
+                        placeholder="cn=admin,dc=corp,dc=local"
+                        data-testid="input-ldap-bind-dn"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Bind Password</span>
+                      <div class="password-field">
+                        <input
+                          pInputText
+                          [type]="isPasswordVisible('ldapBind') ? 'text' : 'password'"
+                          [ngModel]="state().ldapConnection.bindPassword"
+                          (ngModelChange)="updateLdap('bindPassword', $event)"
+                          data-testid="input-ldap-bind-password"
+                        />
+                        <button
+                          pButton
+                          type="button"
+                          severity="secondary"
+                          [text]="true"
+                          [rounded]="true"
+                          class="password-toggle"
+                          [attr.aria-label]="
+                            isPasswordVisible('ldapBind')
+                              ? 'Hide bind password'
+                              : 'Show bind password'
+                          "
+                          (click)="togglePasswordVisibility('ldapBind')"
+                          data-testid="toggle-ldap-bind-password"
+                        >
+                          <ng-icon
+                            [name]="
+                              isPasswordVisible('ldapBind')
+                                ? 'phosphorEyeSlashThin'
+                                : 'phosphorEyeThin'
+                            "
+                            size="16"
+                          />
+                        </button>
+                      </div>
+                    </label>
+
+                    <div class="field">
+                      <label class="field-label" for="ldap-tls-mode">TLS/SSL Mode</label>
+                      <p-select
+                        inputId="ldap-tls-mode"
+                        [options]="ldapTlsModeOptions"
+                        [ngModel]="state().ldapConnection.tlsMode"
+                        (ngModelChange)="updateLdap('tlsMode', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-ldap-tls-mode"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="ldap-tls-version">TLS Min Version</label>
+                      <p-select
+                        inputId="ldap-tls-version"
+                        [options]="ldapTlsVersionOptions"
+                        [ngModel]="state().ldapConnection.tlsMinVersion"
+                        (ngModelChange)="updateLdap('tlsMinVersion', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-ldap-tls-version"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="ldap-pool-size">Connection Pool Size</label>
+                      <p-inputNumber
+                        inputId="ldap-pool-size"
+                        [ngModel]="state().ldapConnection.connectionPoolSize"
+                        (ngModelChange)="updateLdap('connectionPoolSize', $event ?? 1)"
+                        [min]="1"
+                        [max]="50"
+                        [useGrouping]="false"
+                        data-testid="input-ldap-pool-size"
+                      />
+                    </div>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="ldap-ssl-verify">
+                          SSL Certificate Verification
+                        </label>
+                        <p class="field-hint">
+                          Reject untrusted or invalid directory certificates.
+                        </p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="ldap-ssl-verify"
+                        [ngModel]="state().ldapConnection.sslCertVerification"
+                        (ngModelChange)="updateLdap('sslCertVerification', $event)"
+                        data-testid="check-ldap-ssl-verify"
+                      />
+                    </div>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="ldap-referral-following">
+                          Referral Following
+                        </label>
+                        <p class="field-hint">Allow LDAP referrals to be followed automatically.</p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="ldap-referral-following"
+                        [ngModel]="state().ldapConnection.referralFollowing"
+                        (ngModelChange)="updateLdap('referralFollowing', $event)"
+                        data-testid="check-ldap-referral"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @if (selectedProtocol() === 'SAML') {
+                  <div class="section-heading">
+                    <h4>SAML 2.0 Connection</h4>
+                    <p class="muted">
+                      Set metadata ingestion, assertion behavior, and signature policy.
+                    </p>
+                  </div>
+
+                  <div class="form-grid" data-testid="saml-connection-form">
+                    <div class="field field-wide">
+                      <label class="field-label" for="saml-metadata-source">Metadata Source</label>
+                      <p-select
+                        inputId="saml-metadata-source"
+                        [options]="samlMetadataSourceOptions"
+                        [ngModel]="state().samlConnection.metadataSource"
+                        (ngModelChange)="updateSaml('metadataSource', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-saml-metadata-source"
+                      />
+                    </div>
+
+                    @if (state().samlConnection.metadataSource === 'url') {
+                      <label class="field field-wide">
+                        <span>IdP Metadata URL <span class="required">*</span></span>
+                        <input
+                          pInputText
+                          type="url"
+                          [ngModel]="state().samlConnection.metadataUrl"
+                          (ngModelChange)="updateSaml('metadataUrl', $event)"
+                          placeholder="https://idp.example.com/metadata"
+                          data-testid="input-saml-metadata-url"
+                        />
+                      </label>
+                    } @else {
+                      <label class="field field-wide">
+                        <span>Metadata XML <span class="required">*</span></span>
+                        <textarea
+                          pTextarea
+                          class="code-area"
+                          rows="5"
+                          [ngModel]="state().samlConnection.metadataXml"
+                          (ngModelChange)="updateSaml('metadataXml', $event)"
+                          placeholder="Paste SAML metadata XML here..."
+                          data-testid="input-saml-metadata-xml"
+                        ></textarea>
+                      </label>
+                    }
+
+                    <label class="field">
+                      <span>Entity ID (SP)</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().samlConnection.entityId"
+                        (ngModelChange)="updateSaml('entityId', $event)"
+                        data-testid="input-saml-entity-id"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Assertion Consumer URL</span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().samlConnection.assertionConsumerUrl"
+                        (ngModelChange)="updateSaml('assertionConsumerUrl', $event)"
+                        data-testid="input-saml-acs-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>SSO URL</span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().samlConnection.ssoUrl"
+                        (ngModelChange)="updateSaml('ssoUrl', $event)"
+                        data-testid="input-saml-sso-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>SLO URL</span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().samlConnection.sloUrl"
+                        (ngModelChange)="updateSaml('sloUrl', $event)"
+                        data-testid="input-saml-slo-url"
+                      />
+                    </label>
+
+                    <div class="field">
+                      <label class="field-label" for="saml-nameid-format">NameID Format</label>
+                      <p-select
+                        inputId="saml-nameid-format"
+                        [options]="samlNameIdOptions"
+                        [ngModel]="state().samlConnection.nameIdFormat"
+                        (ngModelChange)="updateSaml('nameIdFormat', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-saml-nameid"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="saml-signature-algorithm">
+                        Signature Algorithm
+                      </label>
+                      <p-select
+                        inputId="saml-signature-algorithm"
+                        [options]="samlSignatureOptions"
+                        [ngModel]="state().samlConnection.signatureAlgorithm"
+                        (ngModelChange)="updateSaml('signatureAlgorithm', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-saml-signature"
+                      />
+                    </div>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="saml-sign-requests">Sign Requests</label>
+                        <p class="field-hint">
+                          Sign outbound authentication requests sent to the IdP.
+                        </p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="saml-sign-requests"
+                        [ngModel]="state().samlConnection.signRequests"
+                        (ngModelChange)="updateSaml('signRequests', $event)"
+                        data-testid="check-saml-sign-requests"
+                      />
+                    </div>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="saml-encrypt-assertions">
+                          Encrypt Assertions
+                        </label>
+                        <p class="field-hint">
+                          Require encrypted assertions from the identity provider.
+                        </p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="saml-encrypt-assertions"
+                        [ngModel]="state().samlConnection.encryptAssertions"
+                        (ngModelChange)="updateSaml('encryptAssertions', $event)"
+                        data-testid="check-saml-encrypt"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @if (selectedProtocol() === 'SCIM') {
+                  <div class="section-heading">
+                    <h4>SCIM 2.0 Connection</h4>
+                    <p class="muted">
+                      Configure provisioning transport, pagination, and realtime push.
+                    </p>
+                  </div>
+
+                  <div class="form-grid" data-testid="scim-connection-form">
+                    <label class="field field-wide">
+                      <span>SCIM Endpoint URL <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().scimConnection.endpointUrl"
+                        (ngModelChange)="updateScim('endpointUrl', $event)"
+                        placeholder="https://idp.example.com/scim/v2"
+                        data-testid="input-scim-endpoint"
+                      />
+                    </label>
+
+                    <div class="field">
+                      <label class="field-label" for="scim-auth-method">Auth Method</label>
+                      <p-select
+                        inputId="scim-auth-method"
+                        [options]="scimAuthMethodOptions"
+                        [ngModel]="state().scimConnection.authMethod"
+                        (ngModelChange)="updateScim('authMethod', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-scim-auth-method"
+                      />
+                    </div>
+
+                    @if (state().scimConnection.authMethod === 'BEARER') {
+                      <label class="field">
+                        <span>Bearer Token</span>
+                        <div class="password-field">
+                          <input
+                            pInputText
+                            [type]="isPasswordVisible('scimToken') ? 'text' : 'password'"
+                            [ngModel]="state().scimConnection.bearerToken"
+                            (ngModelChange)="updateScim('bearerToken', $event)"
+                            data-testid="input-scim-bearer-token"
+                          />
+                          <button
+                            pButton
+                            type="button"
+                            severity="secondary"
+                            [text]="true"
+                            [rounded]="true"
+                            class="password-toggle"
+                            [attr.aria-label]="
+                              isPasswordVisible('scimToken')
+                                ? 'Hide bearer token'
+                                : 'Show bearer token'
+                            "
+                            (click)="togglePasswordVisibility('scimToken')"
+                            data-testid="toggle-scim-token"
+                          >
+                            <ng-icon
+                              [name]="
+                                isPasswordVisible('scimToken')
+                                  ? 'phosphorEyeSlashThin'
+                                  : 'phosphorEyeThin'
+                              "
+                              size="16"
+                            />
+                          </button>
+                        </div>
+                      </label>
+                    }
+
+                    <label class="field">
+                      <span>User Resource Path</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().scimConnection.userResourcePath"
+                        (ngModelChange)="updateScim('userResourcePath', $event)"
+                        data-testid="input-scim-user-path"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Group Resource Path</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().scimConnection.groupResourcePath"
+                        (ngModelChange)="updateScim('groupResourcePath', $event)"
+                        data-testid="input-scim-group-path"
+                      />
+                    </label>
+
+                    <div class="field">
+                      <label class="field-label" for="scim-page-size">Page Size</label>
+                      <p-inputNumber
+                        inputId="scim-page-size"
+                        [ngModel]="state().scimConnection.pageSize"
+                        (ngModelChange)="updateScim('pageSize', $event ?? 10)"
+                        [min]="10"
+                        [max]="1000"
+                        [useGrouping]="false"
+                        data-testid="input-scim-page-size"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <label class="field-label" for="scim-pagination-type">Pagination Type</label>
+                      <p-select
+                        inputId="scim-pagination-type"
+                        [options]="scimPaginationOptions"
+                        [ngModel]="state().scimConnection.paginationType"
+                        (ngModelChange)="updateScim('paginationType', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-scim-pagination"
+                      />
+                    </div>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="scim-realtime-push">Realtime Push</label>
+                        <p class="field-hint">Enable webhook-based provisioning updates.</p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="scim-realtime-push"
+                        [ngModel]="state().scimConnection.realtimePush"
+                        (ngModelChange)="updateScim('realtimePush', $event)"
+                        data-testid="check-scim-realtime"
+                      />
+                    </div>
+
+                    @if (state().scimConnection.realtimePush) {
+                      <label class="field field-wide">
+                        <span>Webhook URL (auto-generated)</span>
+                        <input
+                          pInputText
+                          type="text"
+                          [ngModel]="
+                            state().scimConnection.webhookUrl ||
+                            'https://platform.example.com/api/v1/scim/webhook/' + tenantId
+                          "
+                          [disabled]="true"
+                          data-testid="input-scim-webhook-url"
+                        />
+                      </label>
+                    }
+                  </div>
+                }
+
+                @if (selectedProtocol() === 'OAUTH2') {
+                  <div class="section-heading">
+                    <h4>OAuth 2.0 Connection</h4>
+                    <p class="muted">
+                      Capture authorization, token, and client application settings.
+                    </p>
+                  </div>
+
+                  <div class="form-grid" data-testid="oauth-connection-form">
+                    <label class="field">
+                      <span>Authorization URL <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().oauthConnection.authorizationUrl"
+                        (ngModelChange)="updateOAuth('authorizationUrl', $event)"
+                        data-testid="input-oauth-auth-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Token URL</span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().oauthConnection.tokenUrl"
+                        (ngModelChange)="updateOAuth('tokenUrl', $event)"
+                        data-testid="input-oauth-token-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>User Info URL</span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().oauthConnection.userInfoUrl"
+                        (ngModelChange)="updateOAuth('userInfoUrl', $event)"
+                        data-testid="input-oauth-userinfo-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Client ID <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().oauthConnection.clientId"
+                        (ngModelChange)="updateOAuth('clientId', $event)"
+                        data-testid="input-oauth-client-id"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Client Secret</span>
+                      <div class="password-field">
+                        <input
+                          pInputText
+                          [type]="isPasswordVisible('oauthSecret') ? 'text' : 'password'"
+                          [ngModel]="state().oauthConnection.clientSecret"
+                          (ngModelChange)="updateOAuth('clientSecret', $event)"
+                          data-testid="input-oauth-client-secret"
+                        />
+                        <button
+                          pButton
+                          type="button"
+                          severity="secondary"
+                          [text]="true"
+                          [rounded]="true"
+                          class="password-toggle"
+                          [attr.aria-label]="
+                            isPasswordVisible('oauthSecret')
+                              ? 'Hide client secret'
+                              : 'Show client secret'
+                          "
+                          (click)="togglePasswordVisibility('oauthSecret')"
+                          data-testid="toggle-oauth-secret"
+                        >
+                          <ng-icon
+                            [name]="
+                              isPasswordVisible('oauthSecret')
+                                ? 'phosphorEyeSlashThin'
+                                : 'phosphorEyeThin'
+                            "
+                            size="16"
+                          />
+                        </button>
+                      </div>
+                    </label>
+
+                    <label class="field">
+                      <span>Scopes</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().oauthConnection.scopes"
+                        (ngModelChange)="updateOAuth('scopes', $event)"
+                        data-testid="input-oauth-scopes"
+                      />
+                    </label>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="oauth-pkce-enabled">PKCE Enabled</label>
+                        <p class="field-hint">
+                          Require PKCE for public clients using the authorization code flow.
+                        </p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="oauth-pkce-enabled"
+                        [ngModel]="state().oauthConnection.pkceEnabled"
+                        (ngModelChange)="updateOAuth('pkceEnabled', $event)"
+                        data-testid="check-oauth-pkce"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @if (selectedProtocol() === 'OIDC') {
+                  <div class="section-heading">
+                    <h4>OpenID Connect Connection</h4>
+                    <p class="muted">
+                      Use discovery, client credentials, and PKCE defaults for OIDC.
+                    </p>
+                  </div>
+
+                  <div class="form-grid" data-testid="oidc-connection-form">
+                    <label class="field field-wide">
+                      <span>Discovery URL <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="url"
+                        [ngModel]="state().oidcConnection.discoveryUrl"
+                        (ngModelChange)="updateOidc('discoveryUrl', $event)"
+                        placeholder="https://idp.example.com/.well-known/openid-configuration"
+                        data-testid="input-oidc-discovery-url"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Client ID <span class="required">*</span></span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().oidcConnection.clientId"
+                        (ngModelChange)="updateOidc('clientId', $event)"
+                        data-testid="input-oidc-client-id"
+                      />
+                    </label>
+
+                    <label class="field">
+                      <span>Client Secret</span>
+                      <div class="password-field">
+                        <input
+                          pInputText
+                          [type]="isPasswordVisible('oidcSecret') ? 'text' : 'password'"
+                          [ngModel]="state().oidcConnection.clientSecret"
+                          (ngModelChange)="updateOidc('clientSecret', $event)"
+                          data-testid="input-oidc-client-secret"
+                        />
+                        <button
+                          pButton
+                          type="button"
+                          severity="secondary"
+                          [text]="true"
+                          [rounded]="true"
+                          class="password-toggle"
+                          [attr.aria-label]="
+                            isPasswordVisible('oidcSecret')
+                              ? 'Hide client secret'
+                              : 'Show client secret'
+                          "
+                          (click)="togglePasswordVisibility('oidcSecret')"
+                          data-testid="toggle-oidc-secret"
+                        >
+                          <ng-icon
+                            [name]="
+                              isPasswordVisible('oidcSecret')
+                                ? 'phosphorEyeSlashThin'
+                                : 'phosphorEyeThin'
+                            "
+                            size="16"
+                          />
+                        </button>
+                      </div>
+                    </label>
+
+                    <label class="field">
+                      <span>Scopes</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().oidcConnection.scopes"
+                        (ngModelChange)="updateOidc('scopes', $event)"
+                        data-testid="input-oidc-scopes"
+                      />
+                    </label>
+
+                    <div class="toggle-field">
+                      <div>
+                        <label class="field-label" for="oidc-pkce-enabled">PKCE Enabled</label>
+                        <p class="field-hint">
+                          Use PKCE for authorization code exchanges where supported.
+                        </p>
+                      </div>
+                      <p-toggleSwitch
+                        inputId="oidc-pkce-enabled"
+                        [ngModel]="state().oidcConnection.pkceEnabled"
+                        (ngModelChange)="updateOidc('pkceEnabled', $event)"
+                        data-testid="check-oidc-pkce"
+                      />
+                    </div>
+                  </div>
+                }
+              </section>
+
+              <footer class="panel-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="goBack()"
+                  data-testid="btn-wizard-back"
+                >
+                  <ng-icon name="phosphorArrowLeftThin" size="16" />
+                  Back
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  [disabled]="!canGoNext()"
+                  (click)="goNext()"
+                  data-testid="btn-wizard-next"
+                >
+                  Next
+                  <ng-icon name="phosphorArrowRightThin" size="16" />
+                </button>
+              </footer>
+            </ng-template>
+          </p-step-panel>
+
+          <p-step-panel [value]="3">
+            <ng-template #content>
+              <section class="step-content" data-testid="step-mapping">
+                <div class="section-heading">
+                  <h4>Attribute Mapping</h4>
+                  <p class="muted">Map source identity attributes to platform user fields.</p>
+                </div>
+
+                <div class="mapping-grid" data-testid="attribute-mapping-table">
+                  <div class="mapping-header">
+                    <span>Source Attribute</span>
+                    <span>Target Attribute</span>
+                    <span>Transform</span>
+                    <span class="action-column">Action</span>
+                  </div>
+
+                  @for (
+                    mapping of state().mapping.attributeMappings;
+                    track $index;
+                    let i = $index
+                  ) {
+                    <div class="mapping-row" [attr.data-testid]="'attr-mapping-row-' + i">
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="mapping.sourceAttribute"
+                        (ngModelChange)="updateAttributeMapping(i, 'sourceAttribute', $event)"
+                        placeholder="e.g. mail"
+                        [attr.data-testid]="'input-attr-source-' + i"
+                      />
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="mapping.targetAttribute"
+                        (ngModelChange)="updateAttributeMapping(i, 'targetAttribute', $event)"
+                        placeholder="e.g. email"
+                        [attr.data-testid]="'input-attr-target-' + i"
+                      />
+                      <p-select
+                        [options]="mappingTransformOptions"
+                        [ngModel]="mapping.transform"
+                        (ngModelChange)="updateAttributeMapping(i, 'transform', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        [attr.data-testid]="'select-attr-transform-' + i"
+                      />
+                      <button
+                        pButton
+                        type="button"
+                        severity="danger"
+                        [text]="true"
+                        [rounded]="true"
+                        class="action-icon-button"
+                        [attr.aria-label]="'Remove attribute mapping ' + (i + 1)"
+                        (click)="removeAttributeMapping(i)"
+                        [attr.data-testid]="'btn-remove-attr-' + i"
+                      >
+                        <ng-icon name="phosphorTrashThin" size="16" />
+                      </button>
+                    </div>
+                  }
+                </div>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (click)="addAttributeMapping()"
+                  data-testid="btn-add-attr-mapping"
+                >
+                  <ng-icon name="phosphorPlusThin" size="16" />
+                  Add Attribute Mapping
+                </button>
+
+                <div class="section-heading section-divider">
+                  <h4>Group-Role Mapping</h4>
+                  <p class="muted">Map identity provider groups to platform roles.</p>
+                </div>
+
+                <div class="mapping-grid" data-testid="group-role-mapping-table">
+                  <div class="mapping-header mapping-header-compact">
+                    <span>Source Group</span>
+                    <span>Target Role</span>
+                    <span class="action-column">Action</span>
+                  </div>
+
+                  @for (
+                    mapping of state().mapping.groupRoleMappings;
+                    track $index;
+                    let i = $index
+                  ) {
+                    <div
+                      class="mapping-row mapping-row-compact"
+                      [attr.data-testid]="'group-mapping-row-' + i"
+                    >
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="mapping.sourceGroup"
+                        (ngModelChange)="updateGroupRoleMapping(i, 'sourceGroup', $event)"
+                        placeholder="e.g. CN=Admins,OU=Groups"
+                        [attr.data-testid]="'input-group-source-' + i"
+                      />
+                      <p-select
+                        [options]="roleOptions"
+                        [ngModel]="mapping.targetRole"
+                        (ngModelChange)="updateGroupRoleMapping(i, 'targetRole', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        placeholder="Select role"
+                        [attr.data-testid]="'select-group-role-' + i"
+                      />
+                      <button
+                        pButton
+                        type="button"
+                        severity="danger"
+                        [text]="true"
+                        [rounded]="true"
+                        class="action-icon-button"
+                        [attr.aria-label]="'Remove group mapping ' + (i + 1)"
+                        (click)="removeGroupRoleMapping(i)"
+                        [attr.data-testid]="'btn-remove-group-' + i"
+                      >
+                        <ng-icon name="phosphorTrashThin" size="16" />
+                      </button>
+                    </div>
+                  }
+
+                  @if (state().mapping.groupRoleMappings.length === 0) {
+                    <p class="muted empty-msg">No group-role mappings configured.</p>
+                  }
+                </div>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  size="small"
+                  (click)="addGroupRoleMapping()"
+                  data-testid="btn-add-group-mapping"
+                >
+                  <ng-icon name="phosphorPlusThin" size="16" />
+                  Add Group-Role Mapping
+                </button>
+              </section>
+
+              <footer class="panel-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="goBack()"
+                  data-testid="btn-wizard-back"
+                >
+                  <ng-icon name="phosphorArrowLeftThin" size="16" />
+                  Back
+                </button>
+                <button type="button" pButton (click)="goNext()" data-testid="btn-wizard-next">
+                  Next
+                  <ng-icon name="phosphorArrowRightThin" size="16" />
+                </button>
+              </footer>
+            </ng-template>
+          </p-step-panel>
+
+          <p-step-panel [value]="4">
+            <ng-template #content>
+              <section class="step-content" data-testid="step-sync">
+                <div class="section-heading">
+                  <h4>Sync Schedule</h4>
+                  <p class="muted">Define sync cadence and tenant availability for this source.</p>
+                </div>
+
+                <div class="form-grid" data-testid="sync-config-form">
+                  <div class="toggle-field field-wide">
+                    <div>
+                      <label class="field-label" for="sync-enabled">Enable Automatic Sync</label>
+                      <p class="field-hint">
+                        Provision and update identities on a recurring schedule.
+                      </p>
+                    </div>
+                    <p-toggleSwitch
+                      inputId="sync-enabled"
+                      [ngModel]="state().syncStep.sync.syncEnabled"
+                      (ngModelChange)="updateSyncField('syncEnabled', $event)"
+                      data-testid="check-sync-enabled"
+                    />
+                  </div>
+
+                  @if (state().syncStep.sync.syncEnabled) {
+                    <div class="field">
+                      <label class="field-label" for="sync-interval">Sync Interval (minutes)</label>
+                      <p-inputNumber
+                        inputId="sync-interval"
+                        [ngModel]="state().syncStep.sync.intervalMinutes"
+                        (ngModelChange)="updateSyncField('intervalMinutes', $event ?? 5)"
+                        [min]="5"
+                        [max]="1440"
+                        [useGrouping]="false"
+                        data-testid="input-sync-interval"
+                      />
+                    </div>
+
+                    <label class="field">
+                      <span>Full Sync Cron</span>
+                      <input
+                        pInputText
+                        type="text"
+                        [ngModel]="state().syncStep.sync.fullSyncCron"
+                        (ngModelChange)="updateSyncField('fullSyncCron', $event)"
+                        placeholder="0 2 * * *"
+                        data-testid="input-sync-cron"
+                      />
+                    </label>
+
+                    <div class="field">
+                      <label class="field-label" for="sync-conflict-resolution">
+                        Conflict Resolution
+                      </label>
+                      <p-select
+                        inputId="sync-conflict-resolution"
+                        [options]="conflictResolutionOptions"
+                        [ngModel]="state().syncStep.sync.conflictResolution"
+                        (ngModelChange)="updateSyncField('conflictResolution', $event)"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                        data-testid="select-conflict-resolution"
+                      />
+                    </div>
+                  }
+                </div>
+
+                <div class="section-heading section-divider">
+                  <h4>Tenant Assignments</h4>
+                  <p class="muted">Select which tenants should use this authentication source.</p>
+                </div>
+
+                @if (state().syncStep.tenantAssignments.length === 0) {
+                  <div class="tp-banner tp-banner-info" data-testid="tenant-assignment-info">
+                    <ng-icon name="phosphorInfoThin" />
+                    <span>
+                      Tenant assignments will be configured after creation. The source will be
+                      available to the current tenant by default.
+                    </span>
+                  </div>
+                } @else {
+                  <div class="tenant-list" data-testid="tenant-assignment-list">
+                    @for (
+                      ta of state().syncStep.tenantAssignments;
+                      track ta.tenantId;
+                      let i = $index
+                    ) {
+                      <div class="tenant-row" [attr.data-testid]="'tenant-row-' + i">
+                        <div>
+                          <strong>{{ ta.tenantName }}</strong>
+                          <p class="field-hint">Enable this provider for the selected tenant.</p>
+                        </div>
+                        <p-toggleSwitch
+                          [inputId]="'tenant-assignment-' + i"
+                          [ngModel]="ta.assigned"
+                          (ngModelChange)="toggleTenantAssignment(i)"
+                          [attr.aria-label]="'Toggle assignment for ' + ta.tenantName"
+                        />
+                      </div>
+                    }
+                  </div>
+                }
+              </section>
+
+              <footer class="panel-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="goBack()"
+                  data-testid="btn-wizard-back"
+                >
+                  <ng-icon name="phosphorArrowLeftThin" size="16" />
+                  Back
+                </button>
+                <button type="button" pButton (click)="goNext()" data-testid="btn-wizard-next">
+                  Next
+                  <ng-icon name="phosphorArrowRightThin" size="16" />
+                </button>
+              </footer>
+            </ng-template>
+          </p-step-panel>
+
+          <p-step-panel [value]="5">
+            <ng-template #content>
+              <section class="step-content" data-testid="step-review">
+                <div class="section-heading">
+                  <h4>Connection Test</h4>
+                  <p class="muted">Run a 4-point verification to validate the configuration.</p>
+                </div>
+
+                <div class="test-panel" data-testid="test-panel">
+                  @for (check of state().testResults; track check.name; let i = $index) {
+                    <div
+                      class="test-row"
+                      [class]="testStatusClass(check.status)"
+                      [attr.data-testid]="'test-check-' + i"
+                    >
+                      <ng-icon [name]="testStatusIcon(check.status)" />
+                      <div class="test-info">
+                        <strong>{{ check.name }}</strong>
+                        <small>{{ check.description }}</small>
+                        @if (check.message) {
+                          <small class="test-message">{{ check.message }}</small>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <div class="test-actions">
+                  <button
+                    pButton
+                    type="button"
+                    severity="info"
+                    [disabled]="anyTestRunning()"
+                    [loading]="anyTestRunning()"
+                    (click)="runTests()"
+                    data-testid="btn-run-tests"
+                  >
+                    <ng-icon name="phosphorPlayThin" size="16" />
+                    Run Connection Test
+                  </button>
+                </div>
+
+                <div class="section-heading section-divider">
+                  <h4>Configuration Summary</h4>
+                  <p class="muted">Review the final provider configuration before submission.</p>
+                </div>
+
+                <div class="summary-grid" data-testid="config-summary">
+                  @for (item of getConfigSummary(); track item.label) {
+                    <div class="summary-row">
+                      <span class="summary-label">{{ item.label }}</span>
+                      <span class="summary-value">{{ item.value || '(not set)' }}</span>
+                    </div>
+                  }
+                </div>
+
+                @if (submitError()) {
+                  <p-message severity="error" data-testid="submit-error">{{
+                    submitError()
+                  }}</p-message>
+                }
+              </section>
+
+              <footer class="panel-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  (click)="goBack()"
+                  data-testid="btn-wizard-back"
+                >
+                  <ng-icon name="phosphorArrowLeftThin" size="16" />
+                  Back
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  severity="success"
+                  [disabled]="submitting() || anyTestRunning()"
+                  [loading]="submitting()"
+                  (click)="submit()"
+                  data-testid="btn-wizard-submit"
+                >
+                  <ng-icon name="phosphorCheckThin" size="16" />
+                  Create Source
+                </button>
+              </footer>
+            </ng-template>
+          </p-step-panel>
+        </p-step-panels>
+      </p-stepper>
+    </div>
+  </p-dialog>
+}

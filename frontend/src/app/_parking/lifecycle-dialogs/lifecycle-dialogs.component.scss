@@ -1,0 +1,103 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  font-family: var(--tp-font-family);
+}
+
+// ─── Dialog Body Layout ─────────────────────────────────────────────────────
+
+.lifecycle-dialog-body {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+// ─── Header Row (Icon + Message) ────────────────────────────────────────────
+
+.dialog-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-3);
+}
+
+.dialog-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  inline-size: var(--tp-touch-target);
+  block-size: var(--tp-touch-target);
+  border-radius: var(--nm-radius-sm);
+  font-size: var(--tp-font-lg);
+
+  &.icon-warning {
+    background: var(--tp-toast-warn-bg);
+    color: var(--tp-warning-dark);
+  }
+
+  &.icon-danger {
+    background: var(--tp-toast-error-bg);
+    color: var(--tp-error);
+  }
+
+  &.icon-info {
+    background: var(--tp-toast-info-bg);
+    color: var(--tp-toast-info-text);
+  }
+}
+
+.dialog-message {
+  color: var(--tp-text-dark);
+  font-size: var(--tp-font-md);
+  font-weight: 600;
+  line-height: 1.5;
+  padding-block-start: var(--tp-space-2);
+}
+
+// ─── Impact Text ────────────────────────────────────────────────────────────
+
+.dialog-impact {
+  color: var(--tp-text-secondary);
+  font-size: var(--tp-font-sm);
+  line-height: 1.6;
+}
+
+// ─── Footer ─────────────────────────────────────────────────────────────────
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+  padding-block-start: var(--tp-space-2);
+}
+
+// ─── PrimeNG Message inline adjustments ─────────────────────────────────────
+
+:host ::ng-deep p-message {
+  .p-message {
+    padding: var(--tp-space-2) var(--tp-space-3);
+    font-size: var(--tp-font-sm);
+    border-radius: var(--nm-radius-sm);
+    line-height: 1.5;
+  }
+}
+
+// ─── Responsive ─────────────────────────────────────────────────────────────
+
+@media (max-width: bp.$bp-md) {
+  .dialog-footer {
+    flex-direction: column;
+    align-items: stretch;
+
+    p-button {
+      inline-size: 100%;
+    }
+  }
+
+  .dialog-header-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}

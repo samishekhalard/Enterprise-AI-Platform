@@ -1,0 +1,119 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://localhost:8180/realms/master/protocol/openid-connect/certs}
+
+  cloud:
+    gateway:
+      # CORS is handled by CorsConfig.java + SecurityConfig.java
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+
+      # Prevent duplicating X-Forwarded-* headers when clients already send them
+      x-forwarded:
+        host-append: false
+        for-append: false
+        proto-append: false
+
+      # Default filters for all routes
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+        - RemoveRequestHeader=Origin
+        - AddRequestHeader=X-Gateway-Request-Time, ${now:yyyy-MM-dd'T'HH:mm:ss.SSSZ}
+
+      # Route configuration is in RouteConfig.java
+      # Routes can also be defined here for simpler cases:
+      routes:
+        # Health check routes for services
+        - id: auth-health
+          uri: lb://AUTH-FACADE
+          predicates:
+            - Path=/services/auth/health
+          filters:
+            - RewritePath=/services/auth/health, /actuator/health
+
+        - id: tenant-health
+          uri: lb://TENANT-SERVICE
+          predicates:
+            - Path=/services/tenant/health
+          filters:
+            - RewritePath=/services/tenant/health, /actuator/health
+
+        - id: user-health
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/services/user/health
+          filters:
+            - RewritePath=/services/user/health, /actuator/health
+
+        - id: license-health
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/services/license/health
+          filters:
+            - RewritePath=/services/license/health, /actuator/health
+
+        - id: audit-health
+          uri: lb://AUDIT-SERVICE
+          predicates:
+            - Path=/services/audit/health
+          filters:
+            - RewritePath=/services/audit/health, /actuator/health
+
+        - id: ai-health
+          uri: lb://AI-SERVICE
+          predicates:
+            - Path=/services/ai/health
+          filters:
+            - RewritePath=/services/ai/health, /actuator/health
+
+        - id: definition-health
+          uri: lb://DEFINITION-SERVICE
+          predicates:
+            - Path=/services/definition/health
+          filters:
+            - RewritePath=/services/definition/health, /actuator/health
+
+  # Valkey for rate limiting (optional)
+  data:
+    redis:
+      host: ${VALKEY_HOST:localhost}
+      port: ${VALKEY_PORT:6379}
+
+# Token Blacklist
+token:
+  blacklist:
+    prefix: "auth:blacklist:"
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.ems.gateway: DEBUG

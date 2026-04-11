@@ -1,0 +1,29 @@
+# Docker profile - uses container hostnames
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://keycloak:8080/realms/master/protocol/openid-connect/certs}
+
+  data:
+    redis:
+      host: ${VALKEY_HOST:valkey}
+      port: 6379
+
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://keycloak:8080}
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka}
+
+spring.kafka:
+  bootstrap-servers: ${KAFKA_SERVERS:kafka:29092}
+
+logging:
+  level:
+    com.ems: INFO

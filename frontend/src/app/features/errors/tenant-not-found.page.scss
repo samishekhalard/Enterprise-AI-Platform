@@ -1,0 +1,12 @@
+.error-panel {
+  max-width: 560px;
+
+  p {
+    margin-bottom: var(--tp-space-4);
+    color: var(--tp-text);
+  }
+
+  a {
+    text-decoration: none;
+  }
+}

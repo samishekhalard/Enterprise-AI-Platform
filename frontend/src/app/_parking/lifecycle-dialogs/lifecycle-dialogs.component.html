@@ -1,0 +1,61 @@
+<p-dialog
+  [header]="config().title"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [style]="dialogStyle"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  [attr.data-testid]="'lifecycle-dialog-' + action()"
+>
+  <div class="lifecycle-dialog-body" data-testid="lifecycle-dialog-body">
+    <!-- Icon + Message -->
+    <div class="dialog-header-row">
+      <span
+        class="dialog-icon"
+        [class]="config().iconClass"
+        data-testid="lifecycle-dialog-icon"
+      >
+        <i [class]="config().icon"></i>
+      </span>
+      <p class="dialog-message" data-testid="lifecycle-dialog-message">
+        {{ config().message }}
+      </p>
+    </div>
+
+    <!-- Impact Text -->
+    <p class="dialog-impact" data-testid="lifecycle-dialog-impact">
+      {{ config().impactText }}
+    </p>
+
+    <!-- Warning Banner -->
+    @if (config().warningBanner) {
+      <p-message
+        [severity]="config().warningSeverity"
+        data-testid="lifecycle-dialog-warning"
+      >
+        {{ config().warningBanner }}
+      </p-message>
+    }
+
+  </div>
+
+  <!-- Footer Actions -->
+  <div class="dialog-footer" data-testid="lifecycle-dialog-footer">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      (onClick)="cancel()"
+      data-testid="lifecycle-cancel-button"
+    />
+    <p-button
+      [label]="config().confirmLabel"
+      [severity]="config().confirmSeverity"
+      [disabled]="confirmDisabled()"
+      (onClick)="confirm()"
+      [attr.data-testid]="'lifecycle-confirm-button-' + action()"
+    />
+  </div>
+</p-dialog>

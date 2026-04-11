@@ -1,0 +1,377 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  font-family: var(--tp-font-family);
+}
+
+// ─── Page Layout ────────────────────────────────────────────────────────────
+
+.tenant-list {
+  max-inline-size: calc(20 * var(--tp-space-16));
+  margin: 0 auto;
+  padding: var(--tp-space-6);
+}
+
+// ─── List-Page Card (showcase pattern) ──────────────────────────────────────
+// Everything lands on a single card: header → toolbar → table/grid → paginator
+
+.list-page-card {
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+  padding: var(--tp-space-5);
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.list-page-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tenant-list-title {
+  font-size: var(--tp-font-xl);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin: 0;
+}
+
+// ─── Toolbar (showcase .toolbar — single flex line) ─────────────────────────
+
+.toolbar {
+  display: flex;
+  gap: var(--tp-space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--tp-space-3) var(--tp-space-4);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  background: transparent;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+// ─── Search Bar (inline in toolbar) ─────────────────────────────────────────
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-inline-size: 320px;
+}
+
+.search-icon {
+  position: absolute;
+  inset-inline-start: var(--tp-space-4);
+  color: var(--tp-grey);
+  font-size: var(--tp-font-md);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  inline-size: 100%;
+  padding-inline-start: var(--tp-space-10);
+}
+
+// ─── Filter Row (collapsible below toolbar) ──────────────────────────────────
+
+.filter-row {
+  display: flex;
+  gap: var(--tp-space-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+// filter-select and filter-icon-active are styleClass values on PrimeNG
+// components — global selectors work without ::ng-deep.
+
+// ─── Tenant Grid ─────────────────────────────────────────────────────────────
+
+.tenant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--tp-space-4);
+}
+
+// ─── Tenant Card ─────────────────────────────────────────────────────────────
+
+.tenant-card {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-4);
+  background: var(--tp-surface);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--tp-primary);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--tp-primary);
+    outline-offset: 2px;
+    box-shadow: var(--tp-focus-ring);
+  }
+}
+
+// ─── Card Header ─────────────────────────────────────────────────────────────
+
+.tenant-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+}
+
+.tenant-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  inline-size: var(--tp-touch-target);
+  block-size: var(--tp-touch-target);
+  border-radius: 50%;
+  font-size: var(--tp-font-md);
+  font-weight: 700;
+  color: var(--tp-surface-light);
+  user-select: none;
+}
+
+.tenant-avatar-sm {
+  inline-size: var(--icon-size-lg);
+  block-size: var(--icon-size-lg);
+  font-size: var(--tp-font-xs);
+}
+
+.avatar-master {
+  background: var(--tp-primary);
+}
+
+.avatar-regular {
+  background: var(--tp-warning);
+}
+
+.avatar-dominant {
+  background: var(--tp-danger);
+}
+
+.tenant-info {
+  display: grid;
+  gap: var(--tp-space-1);
+  min-inline-size: 0;
+}
+
+.tenant-name {
+  font-size: var(--tp-font-md);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tenant-short-name {
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Badges Row ──────────────────────────────────────────────────────────────
+
+.tenant-card-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tp-space-2);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  font-size: var(--tp-font-xs);
+  font-weight: 600;
+  color: var(--tp-text-secondary);
+}
+
+.status-dot {
+  display: inline-block;
+  inline-size: var(--tp-space-2);
+  block-size: var(--tp-space-2);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-active {
+  background: var(--tp-primary);
+}
+
+.dot-suspended {
+  background: var(--tp-warning);
+}
+
+.dot-provisioning {
+  background: var(--tp-primary);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+.dot-failed {
+  background: var(--tp-danger);
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
+
+// ─── Health Badge ────────────────────────────────────────────────────────────
+
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--tp-font-sm);
+  margin-inline-start: auto;
+}
+
+.health-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+}
+
+.health-healthy {
+  color: var(--tp-primary);
+}
+
+.health-degraded {
+  color: var(--tp-warning);
+}
+
+.health-unhealthy {
+  color: var(--tp-danger);
+}
+
+// ─── Stats Row ───────────────────────────────────────────────────────────────
+
+.tenant-card-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  padding-block-start: var(--tp-space-2);
+  border-block-start: 1px solid var(--tp-border-light);
+}
+
+.stat {
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.stat-separator {
+  inline-size: var(--tp-space-1);
+  block-size: var(--tp-space-1);
+  border-radius: 50%;
+  background: var(--tp-grey-light);
+  flex-shrink: 0;
+}
+
+// ─── Table View ─────────────────────────────────────────────────────────────
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.table-tenant-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.table-tenant-info {
+  display: grid;
+  gap: var(--tp-space-1);
+  min-inline-size: 0;
+}
+
+.text-muted {
+  color: var(--tp-text-muted);
+}
+
+// ─── DataTable ──────────────────────────────────────────────────────────────
+// Border/radius handled globally in styles.scss (.tenant-data-table selector).
+
+// ─── Empty State ─────────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tp-space-3);
+  min-block-size: calc(4 * var(--tp-space-16));
+  padding: var(--tp-space-6) var(--tp-space-4);
+  text-align: center;
+}
+
+.empty-state-icon {
+  font-size: var(--icon-size-xl);
+  color: var(--tp-grey-light);
+}
+
+.empty-state-title {
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin: 0;
+}
+
+.empty-state-message {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text-muted);
+  max-inline-size: calc(6.25 * var(--tp-space-16));
+  line-height: 1.6;
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: bp.$bp-lg) {
+  .tenant-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: bp.$bp-sm) {
+  .tenant-list {
+    padding: var(--tp-space-4);
+  }
+
+  .tenant-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    gap: var(--tp-space-2);
+  }
+}

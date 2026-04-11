@@ -1,0 +1,974 @@
+@use './app/core/theme/default-preset';
+@use './app/core/theme/advanced-css-governance';
+@use './app/core/icons/icon-rtl';
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Book.otf') format('opentype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Medium.otf') format('opentype');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gotham Rounded';
+  src: url('/assets/fonts/GothamRounded-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --tp-primary: #428177;
+  --tp-primary-dark: #054239;
+
+  --tp-info: #054239;
+  --tp-success: #428177;
+  --tp-warning: #988561;
+  --tp-danger: #6b1f2a;
+  --tp-surface: #f2efe9;
+  --tp-bg: #f2efe9;
+  --tp-text: #3d3a3b;
+  --tp-text-secondary: #7a7672;
+  --tp-text-muted: #999590;
+  --tp-border: #e0ddda;
+  --tp-focus-ring: 0 0 0 2px color-mix(in srgb, var(--tp-primary) 25%, transparent);
+
+  --nm-bg: var(--tp-bg);
+  --nm-accent: var(--tp-primary);
+  --nm-radius: 16px;
+  --nm-depth: 12px;
+  --nm-black-rgb: 42, 36, 28;
+  --tp-primary-darkest: #002623;
+
+  /* --- Extended color tokens --- */
+  --tp-text-dark: #2a241c;
+  /* --tp-white and --tp-on-primary retired — use var(--tp-surface-light) instead */
+  --tp-danger-hover: #4a151e;
+  --tp-warning-dark: #5a4a2a;
+  --tp-danger-bg: color-mix(in srgb, var(--tp-danger) 6%, transparent);
+  --tp-danger-border: color-mix(in srgb, var(--tp-danger) 15%, transparent);
+  --tp-primary-bg: color-mix(in srgb, var(--tp-primary) 6%, transparent);
+  --tp-primary-bg-hover: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --tp-error: #ef4444;
+  --tp-error-bg: color-mix(in srgb, var(--tp-error) 10%, transparent);
+  --tp-error-border: color-mix(in srgb, var(--tp-error) 30%, transparent);
+  --tp-error-text: #b91c1c;
+
+  /* --- Surface hierarchy --- */
+  --tp-surface-raised: #faf8f4;
+  --tp-surface-light: #faf8f5;
+  --tp-surface-muted: #f0ede7;
+  --nm-surface: #e0ddda;
+
+  /* --- Border scale --- */
+  --nm-border-soft: var(--tp-border);
+  --tp-border-light: #e8e5e0;
+
+  /* --- Neutral greys --- */
+  --tp-grey: #999590;
+  --tp-grey-light: #d4d1cc;
+
+  /* --- Link color --- */
+  --tp-link: #428177;
+
+  /* --- Radius scale --- */
+  --nm-radius-xs: 4px;
+  --nm-radius-sm: 8px;
+  --nm-radius-md: 12px;
+  --nm-radius-lg: 16px;
+  --nm-radius-xl: 20px;
+  --nm-radius-pill: 999px;
+
+  /* --- Font family tokens --- */
+  --tp-font-family:
+    'Gotham Rounded', 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+
+
+  /* --- Type scale --- */
+  --tp-font-xs: 0.5rem;
+  --tp-font-sm: 0.625rem;
+  --tp-font-md: 0.75rem;
+  --tp-font-lg: 0.875rem;
+  --tp-font-xl: 1rem;
+
+  /* --- Z-index scale --- */
+  --tp-z-base: 0;
+  --tp-z-content: 1;
+  --tp-z-sidebar: 20;
+  --tp-z-header: 40;
+  --tp-z-overlay: 900;
+  --tp-z-modal: 1000;
+  --tp-z-toast: 2000;
+
+  /* --- Transition tokens --- */
+  --tp-transition-fast: 0.12s;
+  --tp-transition-normal: 0.2s;
+  --tp-transition-slow: 0.3s;
+
+  /* --- Easing tokens --- */
+  --tp-ease-default: ease;
+  --tp-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --tp-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- Icon sizing scale --- */
+  --icon-size-xs: 14px;
+  --icon-size-sm: 18px;
+  --icon-size-md: 24px;
+  --icon-size-lg: 32px;
+  --icon-size-xl: 48px;
+
+  /* --- Spacing scale (4px base) --- */
+  --tp-space-0: 0;
+  --tp-space-1: 0.25rem;
+  --tp-space-2: 0.5rem;
+  --tp-space-3: 0.75rem;
+  --tp-space-4: 1rem;
+  --tp-space-5: 1.25rem;
+  --tp-space-6: 1.5rem;
+  --tp-touch-target: 44px;
+  --tp-space-8: 2rem;
+  --tp-space-10: 2.5rem;
+  --tp-space-12: 3rem;
+  --tp-space-16: 4rem;
+
+  /* --- Toast / Banner severity tokens --- */
+  --tp-toast-success-bg: color-mix(in srgb, #428177 8%, transparent);
+  --tp-toast-success-border: color-mix(in srgb, #428177 12%, transparent);
+  --tp-toast-success-text: #054239;
+
+  --tp-toast-error-bg: color-mix(in srgb, #ef4444 8%, transparent);
+  --tp-toast-error-border: color-mix(in srgb, #ef4444 12%, transparent);
+  --tp-toast-error-text: #b91c1c;
+
+  --tp-toast-warn-bg: color-mix(in srgb, #988561 8%, transparent);
+  --tp-toast-warn-border: color-mix(in srgb, #988561 12%, transparent);
+  --tp-toast-warn-text: #5a4a2a;
+
+  --tp-toast-info-bg: color-mix(in srgb, #054239 8%, transparent);
+  --tp-toast-info-border: color-mix(in srgb, #054239 12%, transparent);
+  --tp-toast-info-text: #054239;
+
+  /* --- PrimeNG Form Component overrides (Grey Neutral) --- */
+
+  /* InputText */
+  --p-inputtext-background: transparent;
+  --p-inputtext-border-color: rgba(var(--nm-black-rgb), 0.08);
+  --p-inputtext-hover-border-color: rgba(var(--nm-black-rgb), 0.14);
+  --p-inputtext-focus-border-color: var(--tp-primary);
+  --p-inputtext-invalid-border-color: var(--tp-error);
+  --p-inputtext-color: var(--tp-text);
+  --p-inputtext-placeholder-color: var(--tp-grey);
+  --p-inputtext-border-radius: var(--nm-radius-pill);
+  --p-inputtext-shadow: none;
+  --p-inputtext-disabled-background: var(--nm-surface);
+  --p-inputtext-disabled-color: var(--tp-grey);
+  --p-inputtext-padding-x: var(--tp-space-3);
+  --p-inputtext-padding-y: var(--tp-space-2);
+
+  /* Textarea */
+  --p-textarea-background: transparent;
+  --p-textarea-border-color: rgba(var(--nm-black-rgb), 0.08);
+  --p-textarea-hover-border-color: rgba(var(--nm-black-rgb), 0.14);
+  --p-textarea-focus-border-color: var(--tp-primary);
+  --p-textarea-invalid-border-color: var(--tp-error);
+  --p-textarea-color: var(--tp-text);
+  --p-textarea-placeholder-color: var(--tp-grey);
+  --p-textarea-border-radius: var(--nm-radius-lg);
+  --p-textarea-shadow: none;
+  --p-textarea-disabled-background: var(--nm-surface);
+  --p-textarea-disabled-color: var(--tp-grey);
+  --p-textarea-padding-x: var(--tp-space-3);
+  --p-textarea-padding-y: var(--tp-space-2);
+
+  /* Select */
+  --p-select-background: transparent;
+  --p-select-border-color: rgba(var(--nm-black-rgb), 0.08);
+  --p-select-hover-border-color: rgba(var(--nm-black-rgb), 0.14);
+  --p-select-focus-border-color: var(--tp-primary);
+  --p-select-invalid-border-color: var(--tp-error);
+  --p-select-color: var(--tp-text);
+  --p-select-placeholder-color: var(--tp-grey);
+  --p-select-border-radius: var(--nm-radius-pill);
+  --p-select-shadow: none;
+  --p-select-disabled-background: var(--nm-surface);
+  --p-select-disabled-color: var(--tp-grey);
+  --p-select-overlay-background: var(--tp-surface-raised);
+  --p-select-overlay-border-color: var(--tp-border);
+  --p-select-overlay-border-radius: var(--nm-radius-md);
+  --p-select-overlay-color: var(--tp-text);
+  --p-select-overlay-shadow: var(--nm-shadow-dialog);
+  --p-select-option-focus-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-select-option-selected-background: color-mix(in srgb, var(--tp-primary) 14%, transparent);
+  --p-select-option-selected-focus-background: color-mix(
+    in srgb,
+    var(--tp-primary) 18%,
+    transparent
+  );
+  --p-select-option-color: var(--tp-text);
+  --p-select-option-focus-color: var(--tp-text-dark);
+  --p-select-option-selected-color: var(--tp-primary-dark);
+  --p-select-option-border-radius: var(--nm-radius-xs);
+
+  /* MultiSelect */
+  --p-multiselect-background: transparent;
+  --p-multiselect-border-color: rgba(var(--nm-black-rgb), 0.08);
+  --p-multiselect-hover-border-color: rgba(var(--nm-black-rgb), 0.14);
+  --p-multiselect-focus-border-color: var(--tp-primary);
+  --p-multiselect-invalid-border-color: var(--tp-error);
+  --p-multiselect-color: var(--tp-text);
+  --p-multiselect-placeholder-color: var(--tp-grey);
+  --p-multiselect-border-radius: var(--nm-radius-pill);
+  --p-multiselect-shadow: none;
+  --p-multiselect-disabled-background: var(--nm-surface);
+  --p-multiselect-disabled-color: var(--tp-grey);
+  --p-multiselect-overlay-background: var(--tp-surface-raised);
+  --p-multiselect-overlay-border-color: var(--tp-border);
+  --p-multiselect-overlay-border-radius: var(--nm-radius-md);
+  --p-multiselect-overlay-color: var(--tp-text);
+  --p-multiselect-overlay-shadow: var(--nm-shadow-dialog);
+  --p-multiselect-option-focus-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-multiselect-option-selected-background: color-mix(
+    in srgb,
+    var(--tp-primary) 14%,
+    transparent
+  );
+  --p-multiselect-option-selected-focus-background: color-mix(
+    in srgb,
+    var(--tp-primary) 18%,
+    transparent
+  );
+  --p-multiselect-option-color: var(--tp-text);
+  --p-multiselect-option-focus-color: var(--tp-text-dark);
+  --p-multiselect-option-selected-color: var(--tp-primary-dark);
+  --p-multiselect-option-border-radius: var(--nm-radius-xs);
+
+  /* Fieldset */
+  --p-fieldset-background: var(--tp-surface-raised);
+  --p-fieldset-border-color: var(--tp-border-light);
+  --p-fieldset-border-radius: var(--nm-radius-lg);
+  --p-fieldset-color: var(--tp-text);
+  --p-fieldset-legend-background: var(--tp-surface);
+  --p-fieldset-legend-hover-background: var(--nm-surface);
+  --p-fieldset-legend-color: var(--tp-text-dark);
+  --p-fieldset-legend-hover-color: var(--tp-text-dark);
+  --p-fieldset-legend-border-radius: var(--nm-radius-md);
+  --p-fieldset-legend-border-color: var(--tp-border-light);
+  --p-fieldset-legend-font-weight: 600;
+  --p-fieldset-toggle-icon-color: var(--tp-text);
+  --p-fieldset-toggle-icon-hover-color: var(--tp-primary);
+
+  /* DatePicker */
+  --p-datepicker-panel-background: var(--tp-surface-raised);
+  --p-datepicker-panel-border-color: var(--tp-border);
+  --p-datepicker-panel-color: var(--tp-text);
+  --p-datepicker-panel-border-radius: var(--nm-radius-md);
+  --p-datepicker-panel-shadow: var(--nm-shadow-dialog);
+  --p-datepicker-header-background: transparent;
+  --p-datepicker-header-border-color: var(--tp-border);
+  --p-datepicker-header-color: var(--tp-text-dark);
+  --p-datepicker-date-hover-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-datepicker-date-selected-background: var(--tp-primary);
+  --p-datepicker-date-selected-color: var(--tp-surface-light);
+  --p-datepicker-date-color: var(--tp-text);
+  --p-datepicker-date-hover-color: var(--tp-text-dark);
+  --p-datepicker-date-border-radius: var(--nm-radius-xs);
+  --p-datepicker-week-day-color: var(--tp-grey);
+  --p-datepicker-today-background: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --p-datepicker-today-color: var(--tp-primary-dark);
+  --p-datepicker-dropdown-background: var(--tp-surface-raised);
+  --p-datepicker-dropdown-hover-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-datepicker-dropdown-color: var(--tp-text);
+  --p-datepicker-dropdown-border-color: var(--tp-border);
+  --p-datepicker-dropdown-border-radius: var(--nm-radius-md);
+  --p-datepicker-buttonbar-border-color: var(--tp-border);
+
+  /* ToggleSwitch */
+  --p-toggleswitch-background: var(--nm-surface);
+  --p-toggleswitch-hover-background: var(--tp-grey-light);
+  --p-toggleswitch-checked-background: var(--tp-primary);
+  --p-toggleswitch-checked-hover-background: var(--tp-primary-dark);
+  --p-toggleswitch-border-color: var(--tp-border);
+  --p-toggleswitch-hover-border-color: var(--tp-grey);
+  --p-toggleswitch-checked-border-color: var(--tp-primary);
+  --p-toggleswitch-invalid-border-color: var(--tp-error);
+  --p-toggleswitch-handle-background: var(--tp-surface-raised);
+  --p-toggleswitch-handle-hover-background: var(--tp-surface-raised);
+  --p-toggleswitch-handle-checked-background: var(--tp-surface-light);
+  --p-toggleswitch-handle-checked-hover-background: var(--tp-surface-light);
+  --p-toggleswitch-border-radius: var(--nm-radius-pill);
+  --p-toggleswitch-shadow: none;
+
+  /* Message */
+  --p-message-border-radius: var(--nm-radius-sm);
+  --p-message-info-background: var(--tp-toast-info-bg);
+  --p-message-info-border-color: var(--tp-toast-info-border);
+  --p-message-info-color: var(--tp-toast-info-text);
+  --p-message-info-shadow: none;
+  --p-message-success-background: var(--tp-toast-success-bg);
+  --p-message-success-border-color: var(--tp-toast-success-border);
+  --p-message-success-color: var(--tp-toast-success-text);
+  --p-message-success-shadow: none;
+  --p-message-warn-background: var(--tp-toast-warn-bg);
+  --p-message-warn-border-color: var(--tp-toast-warn-border);
+  --p-message-warn-color: var(--tp-toast-warn-text);
+  --p-message-warn-shadow: none;
+  --p-message-error-background: var(--tp-toast-error-bg);
+  --p-message-error-border-color: var(--tp-toast-error-border);
+  --p-message-error-color: var(--tp-toast-error-text);
+  --p-message-error-shadow: none;
+  --p-message-secondary-background: color-mix(
+    in srgb,
+    var(--tp-surface) 80%,
+    var(--tp-surface-raised)
+  );
+  --p-message-secondary-border-color: var(--tp-border);
+  --p-message-secondary-color: var(--tp-text);
+  --p-message-secondary-shadow: none;
+
+  /* --- PrimeNG Toast overrides --- */
+  --p-toast-border-radius: var(--nm-radius-sm);
+  --p-toast-content-padding: 10px 14px;
+  --p-toast-content-gap: 10px;
+  --p-toast-summary-font-weight: 700;
+  --p-toast-summary-font-size: 1rem;
+  --p-toast-detail-font-size: 0.8rem;
+  --p-toast-icon-size: 1.25rem;
+  --p-toast-close-icon-size: 20px;
+  --p-toast-close-button-width: 28px;
+  --p-toast-close-button-height: 28px;
+
+  --p-toast-success-background: var(--tp-toast-success-bg);
+  --p-toast-success-border-color: var(--tp-toast-success-border);
+  --p-toast-success-color: var(--tp-toast-success-text);
+  --p-toast-success-detail-color: var(--tp-toast-success-text);
+  --p-toast-success-shadow: 0 16px 32px rgba(var(--nm-black-rgb), 0.04);
+
+  --p-toast-error-background: var(--tp-toast-error-bg);
+  --p-toast-error-border-color: var(--tp-toast-error-border);
+  --p-toast-error-color: var(--tp-toast-error-text);
+  --p-toast-error-detail-color: var(--tp-toast-error-text);
+  --p-toast-error-shadow: 0 16px 32px rgba(var(--nm-black-rgb), 0.04);
+
+  --p-toast-warn-background: var(--tp-toast-warn-bg);
+  --p-toast-warn-border-color: var(--tp-toast-warn-border);
+  --p-toast-warn-color: var(--tp-toast-warn-text);
+  --p-toast-warn-detail-color: var(--tp-toast-warn-text);
+  --p-toast-warn-shadow: 0 16px 32px rgba(var(--nm-black-rgb), 0.04);
+
+  --p-toast-info-background: var(--tp-toast-info-bg);
+  --p-toast-info-border-color: var(--tp-toast-info-border);
+  --p-toast-info-color: var(--tp-toast-info-text);
+  --p-toast-info-detail-color: var(--tp-toast-info-text);
+  --p-toast-info-shadow: 0 16px 32px rgba(var(--nm-black-rgb), 0.04);
+
+  /* --- PrimeNG Button overrides (Grey Neutral) --- */
+  --p-button-border-radius: var(--nm-radius-pill);
+  --p-button-padding-x: 1.25rem;
+  --p-button-padding-y: 0.5rem;
+  --p-button-label-font-weight: 600;
+  --p-button-gap: 0.5rem;
+  --p-button-sm-font-size: 0.8rem;
+  --p-button-sm-padding-x: 0.75rem;
+  --p-button-sm-padding-y: 0.35rem;
+  --p-button-primary-background: var(--tp-primary);
+  --p-button-primary-border-color: var(--tp-primary);
+  --p-button-primary-color: var(--tp-surface-light);
+  --p-button-primary-hover-background: var(--tp-primary-dark);
+  --p-button-primary-hover-border-color: var(--tp-primary-dark);
+  --p-button-primary-hover-color: var(--tp-surface-light);
+  --p-button-primary-active-background: var(--tp-primary-darkest);
+  --p-button-primary-active-border-color: var(--tp-primary-darkest);
+  --p-button-primary-active-color: var(--tp-surface-light);
+  --p-button-primary-focus-ring-color: var(--tp-primary);
+  --p-button-secondary-background: transparent;
+  --p-button-secondary-border-color: var(--tp-border);
+  --p-button-secondary-color: var(--tp-text);
+  --p-button-secondary-hover-background: color-mix(in srgb, var(--tp-border) 30%, transparent);
+  --p-button-secondary-hover-border-color: var(--tp-border);
+  --p-button-secondary-hover-color: var(--tp-text);
+  --p-button-secondary-active-background: color-mix(in srgb, var(--tp-border) 50%, transparent);
+  --p-button-secondary-active-border-color: var(--tp-border);
+  --p-button-secondary-active-color: var(--tp-text);
+  --p-button-danger-background: var(--tp-danger);
+  --p-button-danger-border-color: var(--tp-danger);
+  --p-button-danger-color: var(--tp-surface-light);
+  --p-button-danger-hover-background: var(--tp-danger-hover);
+  --p-button-danger-hover-border-color: var(--tp-danger-hover);
+  --p-button-danger-hover-color: var(--tp-surface-light);
+  --p-button-danger-active-background: var(--tp-danger-hover);
+  --p-button-danger-active-border-color: var(--tp-danger-hover);
+  --p-button-danger-active-color: var(--tp-surface-light);
+  --p-button-text-primary-color: var(--tp-primary);
+  --p-button-text-primary-hover-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-button-text-primary-active-background: color-mix(in srgb, var(--tp-primary) 14%, transparent);
+  --p-button-text-secondary-color: var(--tp-text);
+  --p-button-text-secondary-hover-background: color-mix(in srgb, var(--tp-border) 30%, transparent);
+  --p-button-text-secondary-active-background: color-mix(
+    in srgb,
+    var(--tp-border) 50%,
+    transparent
+  );
+  --p-button-text-danger-color: var(--tp-danger);
+  --p-button-text-danger-hover-background: color-mix(in srgb, var(--tp-danger) 8%, transparent);
+  --p-button-text-danger-active-background: color-mix(in srgb, var(--tp-danger) 14%, transparent);
+  --p-button-outlined-primary-border-color: var(--tp-primary);
+  --p-button-outlined-primary-color: var(--tp-primary);
+  --p-button-outlined-primary-hover-background: color-mix(
+    in srgb,
+    var(--tp-primary) 8%,
+    transparent
+  );
+  --p-button-outlined-primary-active-background: color-mix(
+    in srgb,
+    var(--tp-primary) 14%,
+    transparent
+  );
+  --p-button-outlined-danger-border-color: var(--tp-danger);
+  --p-button-outlined-danger-color: var(--tp-danger);
+  --p-button-outlined-danger-hover-background: color-mix(in srgb, var(--tp-danger) 8%, transparent);
+  --p-button-outlined-danger-active-background: color-mix(
+    in srgb,
+    var(--tp-danger) 14%,
+    transparent
+  );
+
+  /* --- PrimeNG Card overrides (Grey Neutral — flat, no shadow) --- */
+  --p-card-background: var(--tp-surface-raised);
+  --p-card-border-radius: var(--nm-radius);
+  --p-card-color: var(--tp-text);
+  --p-card-shadow: none;
+  --p-card-body-padding: var(--tp-space-4);
+  --p-card-body-gap: var(--tp-space-3);
+  --p-card-title-font-size: 1rem;
+  --p-card-title-font-weight: 700;
+  --p-card-subtitle-color: var(--tp-text-muted);
+  --p-card-subtitle-font-size: var(--tp-font-sm);
+
+  /* --- PrimeNG Tabs overrides (Grey Neutral) --- */
+  --p-tabs-tablist-background: transparent;
+  --p-tabs-tablist-border-color: var(--tp-border);
+  --p-tabs-tablist-border-width: 0;
+  --p-tabs-tab-background: transparent;
+  --p-tabs-tab-hover-background: transparent;
+  --p-tabs-tab-active-background: transparent;
+  --p-tabs-tab-color: var(--tp-text-muted);
+  --p-tabs-tab-hover-color: var(--tp-text);
+  --p-tabs-tab-active-color: var(--tp-primary);
+  --p-tabs-tab-font-weight: 600;
+  --p-tabs-tab-font-size: 0.875rem;
+  --p-tabs-tab-padding: var(--tp-space-3) var(--tp-space-4);
+  --p-tabs-tab-active-border-color: var(--tp-primary);
+  --p-tabs-active-bar-height: 2px;
+  --p-tabs-active-bar-background: var(--tp-primary);
+  --p-tabs-tabpanel-background: transparent;
+  --p-tabs-tabpanel-color: var(--tp-text);
+  --p-tabs-tabpanel-padding: var(--tp-space-6);
+  --p-tabs-nav-button-background: var(--tp-surface-raised);
+  --p-tabs-nav-button-color: var(--tp-text);
+  --p-tabs-nav-button-hover-color: var(--tp-primary);
+
+  /* --- PrimeNG DataTable overrides (Grey Neutral) --- */
+  --p-datatable-border-color: var(--tp-border);
+  --p-datatable-border-radius: var(--nm-radius);
+  --p-datatable-row-background: transparent;
+  --p-datatable-row-color: var(--tp-text);
+  --p-datatable-row-hover-background: color-mix(in srgb, var(--tp-primary) 4%, transparent);
+  --p-datatable-row-hover-color: var(--tp-text);
+  --p-datatable-header-cell-background: var(--tp-surface);
+  --p-datatable-header-cell-color: var(--tp-text-dark);
+  --p-datatable-header-cell-border-color: var(--tp-border);
+  --p-datatable-body-cell-border-color: color-mix(in srgb, var(--tp-border) 50%, transparent);
+  --p-datatable-header-cell-padding: var(--tp-space-3) var(--tp-space-4);
+  --p-datatable-body-cell-padding: var(--tp-space-3) var(--tp-space-4);
+  --p-datatable-sort-icon-color: var(--tp-grey);
+  --p-datatable-sort-icon-hover-color: var(--tp-primary);
+
+  /* --- PrimeNG Paginator overrides (Grey Neutral) --- */
+  --p-paginator-background: transparent;
+  --p-paginator-color: var(--tp-text);
+  --p-paginator-border-radius: var(--nm-radius-sm);
+  --p-paginator-padding: var(--tp-space-3) var(--tp-space-4);
+  --p-paginator-gap: var(--tp-space-3);
+  --p-paginator-nav-button-background: transparent;
+  --p-paginator-nav-button-hover-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-paginator-nav-button-selected-background: var(--tp-primary);
+  --p-paginator-nav-button-color: var(--tp-text);
+  --p-paginator-nav-button-hover-color: var(--tp-text-dark);
+  --p-paginator-nav-button-selected-color: var(--tp-surface-light);
+  --p-paginator-nav-button-width: 34px;
+  --p-paginator-nav-button-height: 34px;
+  --p-paginator-nav-button-border-radius: 6px;
+  --p-paginator-nav-button-font-weight: 600;
+  --p-paginator-nav-button-font-size: 0.82rem;
+  --p-paginator-current-page-report-color: var(--tp-text-muted);
+  --p-paginator-current-page-report-font-size: var(--tp-font-sm);
+
+  /* --- PrimeNG Dialog overrides (Grey Neutral) --- */
+  --p-dialog-background: var(--tp-surface-raised);
+  --p-dialog-border-color: transparent;
+  --p-dialog-color: var(--tp-text);
+  --p-dialog-border-radius: var(--nm-radius);
+  --p-dialog-shadow: var(--nm-shadow-dialog);
+  --p-dialog-title-font-size: 1.05rem;
+  --p-dialog-title-font-weight: 700;
+  --p-dialog-header-padding: var(--tp-space-4);
+  --p-dialog-content-padding: var(--tp-space-6);
+  --p-dialog-footer-padding: var(--tp-space-3) var(--tp-space-4);
+  --p-dialog-footer-gap: var(--tp-space-3);
+
+  /* --- PrimeNG Menu overrides (Grey Neutral) --- */
+  --p-menu-background: var(--tp-surface-raised);
+  --p-menu-border-color: var(--tp-border);
+  --p-menu-color: var(--tp-text);
+  --p-menu-border-radius: var(--nm-radius-sm);
+  --p-menu-shadow: var(--nm-shadow-dialog);
+  --p-menu-list-padding: var(--tp-space-1) 0;
+  --p-menu-item-focus-background: color-mix(in srgb, var(--tp-primary) 6%, transparent);
+  --p-menu-item-color: var(--tp-text);
+  --p-menu-item-focus-color: var(--tp-text-dark);
+  --p-menu-item-padding: var(--tp-space-2) var(--tp-space-4);
+  --p-menu-item-border-radius: 0;
+  --p-menu-item-gap: var(--tp-space-2);
+  --p-menu-item-icon-color: var(--tp-grey);
+  --p-menu-item-icon-focus-color: var(--tp-primary);
+  --p-menu-separator-border-color: var(--tp-border);
+
+  /* --- PrimeNG Chip overrides (Grey Neutral) --- */
+  --p-chip-border-radius: var(--nm-radius-pill);
+  --p-chip-padding-x: 0.6rem;
+  --p-chip-padding-y: 0.2rem;
+  --p-chip-gap: 0.25rem;
+  --p-chip-background: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --p-chip-color: var(--tp-primary-dark);
+  --p-chip-label-font-weight: 600;
+  --p-chip-label-font-size: 0.78rem;
+  --p-chip-remove-icon-color: var(--tp-primary);
+  --p-chip-icon-color: var(--tp-primary);
+
+  /* --- PrimeNG SelectButton overrides (Grey Neutral) --- */
+  --p-selectbutton-border-radius: var(--nm-radius-sm);
+  --p-selectbutton-padding: 0;
+  --p-selectbutton-background: var(--tp-surface-raised);
+  --p-selectbutton-border-color: var(--tp-border);
+  --p-selectbutton-option-background: transparent;
+  --p-selectbutton-option-color: var(--tp-text-muted);
+  --p-selectbutton-option-hover-background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  --p-selectbutton-option-hover-color: var(--tp-primary);
+  --p-selectbutton-option-selected-background: var(--tp-primary);
+  --p-selectbutton-option-selected-color: var(--tp-surface-light);
+  --p-selectbutton-option-selected-hover-background: var(--tp-primary-dark);
+  --p-selectbutton-option-selected-hover-color: var(--tp-surface-light);
+  --p-selectbutton-option-padding: var(--tp-space-2) var(--tp-space-3);
+
+  /* --- PrimeNG ToggleButton overrides (Grey Neutral) --- */
+  /* Cream pill: --tp-surface bg, borderless look, green icons, pill radius. */
+  --p-togglebutton-padding: 0;
+  --p-togglebutton-border-radius: var(--nm-radius-pill);
+  --p-togglebutton-gap: var(--tp-space-2);
+  --p-togglebutton-font-size: var(--tp-font-sm);
+  --p-togglebutton-font-weight: 600;
+  --p-togglebutton-background: var(--tp-surface);
+  --p-togglebutton-border-color: var(--tp-border);
+  --p-togglebutton-color: var(--tp-text-dark);
+  --p-togglebutton-hover-background: var(--tp-surface);
+  --p-togglebutton-hover-border-color: var(--tp-border);
+  --p-togglebutton-hover-color: var(--tp-text-dark);
+  --p-togglebutton-checked-background: var(--tp-surface);
+  --p-togglebutton-checked-border-color: var(--tp-primary);
+  --p-togglebutton-checked-color: var(--tp-text-dark);
+  --p-togglebutton-icon-color: var(--tp-primary);
+  --p-togglebutton-icon-hover-color: var(--tp-primary-dark);
+  --p-togglebutton-icon-checked-color: var(--tp-primary);
+  /* Content (inner pill) — transparent, no shadow */
+  --p-togglebutton-content-padding: 0.5rem 1.25rem;
+  --p-togglebutton-content-border-radius: var(--nm-radius-pill);
+  --p-togglebutton-content-checked-background: transparent;
+  --p-togglebutton-content-checked-shadow: none;
+
+  /* --- Slider --- */
+  --tp-slider-track-bg: var(--nm-surface);
+  --tp-slider-track-height: 6px;
+  --tp-slider-track-border-radius: var(--nm-radius-pill);
+  --tp-slider-range-bg: var(--tp-primary);
+  --tp-slider-handle-bg: var(--tp-surface-raised);
+  --tp-slider-handle-border: 2px solid var(--tp-primary);
+  --tp-slider-handle-size: 20px;
+  --tp-slider-handle-border-radius: 50%;
+  --tp-slider-handle-hover-bg: var(--tp-surface-light);
+  --tp-slider-handle-focus-ring: var(--tp-focus-ring);
+
+  /* --- Checkbox --- */
+  --tp-checkbox-size: 20px;
+  --tp-checkbox-border: 2px solid var(--tp-border);
+  --tp-checkbox-border-radius: var(--nm-radius-xs);
+  --tp-checkbox-bg: var(--tp-surface-raised);
+  --tp-checkbox-checked-bg: var(--tp-primary);
+  --tp-checkbox-checked-border-color: var(--tp-primary);
+  --tp-checkbox-checked-icon-color: var(--tp-surface-light);
+  --tp-checkbox-hover-border-color: var(--tp-primary);
+  --tp-checkbox-focus-ring: var(--tp-focus-ring);
+  --tp-checkbox-disabled-bg: var(--nm-surface);
+
+  /* --- RadioButton --- */
+  --tp-radio-size: 20px;
+  --tp-radio-border: 2px solid var(--tp-border);
+  --tp-radio-bg: var(--tp-surface-raised);
+  --tp-radio-checked-bg: var(--tp-surface-raised);
+  --tp-radio-checked-border-color: var(--tp-primary);
+  --tp-radio-checked-icon-color: var(--tp-primary);
+  --tp-radio-hover-border-color: var(--tp-primary);
+  --tp-radio-focus-ring: var(--tp-focus-ring);
+  --tp-radio-disabled-bg: var(--nm-surface);
+
+  /* --- Tag --- */
+  --tp-tag-border-radius: var(--nm-radius-pill);
+  --tp-tag-font-size: 0.72rem;
+  --tp-tag-font-weight: 600;
+  --tp-tag-padding: 0.15rem 0.5rem;
+
+  /* --- Badge --- */
+  --tp-badge-min-width: 1.25rem;
+  --tp-badge-height: 1.25rem;
+  --tp-badge-font-size: 0.72rem;
+  --tp-badge-font-weight: 700;
+  --tp-badge-bg: var(--tp-primary);
+  --tp-badge-color: var(--tp-surface-light);
+  --tp-badge-border-radius: var(--nm-radius-pill);
+
+  /* --- ProgressBar --- */
+  --tp-progressbar-height: 8px;
+  --tp-progressbar-bg: var(--nm-surface);
+  --tp-progressbar-value-bg: var(--tp-primary);
+  --tp-progressbar-border-radius: var(--nm-radius-pill);
+  --tp-progressbar-label-color: var(--tp-surface-light);
+
+  /* --- Toolbar --- */
+  --tp-toolbar-bg: transparent;
+  --tp-toolbar-border-color: var(--tp-border);
+  --tp-toolbar-border-radius: var(--nm-radius);
+  --tp-toolbar-padding: var(--tp-space-3) var(--tp-space-4);
+  --tp-toolbar-gap: var(--tp-space-3);
+
+  /* --- Breadcrumb --- */
+  --tp-breadcrumb-bg: transparent;
+  --tp-breadcrumb-color: var(--tp-text-muted);
+  --tp-breadcrumb-active-color: var(--tp-text-dark);
+  --tp-breadcrumb-separator-color: var(--tp-grey-light);
+  --tp-breadcrumb-font-size: var(--tp-font-sm);
+
+  /* --- PrimeNG Slider overrides (Grey Neutral) --- */
+  --p-slider-track-background: var(--tp-slider-track-bg);
+  --p-slider-track-border-radius: var(--tp-slider-track-border-radius);
+  --p-slider-track-size: var(--tp-slider-track-height);
+  --p-slider-range-background: var(--tp-slider-range-bg);
+  --p-slider-handle-background: var(--tp-slider-handle-bg);
+  --p-slider-handle-border-color: var(--tp-primary);
+  --p-slider-handle-width: var(--tp-slider-handle-size);
+  --p-slider-handle-height: var(--tp-slider-handle-size);
+  --p-slider-handle-border-radius: var(--tp-slider-handle-border-radius);
+  --p-slider-handle-hover-background: var(--tp-slider-handle-hover-bg);
+  --p-slider-handle-hover-border-color: var(--tp-primary-dark);
+  --p-slider-handle-content-border-radius: var(--tp-slider-handle-border-radius);
+
+  /* --- PrimeNG Checkbox overrides (Grey Neutral) --- */
+  --p-checkbox-width: var(--tp-checkbox-size);
+  --p-checkbox-height: var(--tp-checkbox-size);
+  --p-checkbox-border-color: var(--tp-border);
+  --p-checkbox-border-radius: var(--tp-checkbox-border-radius);
+  --p-checkbox-background: var(--tp-checkbox-bg);
+  --p-checkbox-hover-border-color: var(--tp-checkbox-hover-border-color);
+  --p-checkbox-checked-background: var(--tp-checkbox-checked-bg);
+  --p-checkbox-checked-border-color: var(--tp-checkbox-checked-border-color);
+  --p-checkbox-checked-hover-background: var(--tp-primary-dark);
+  --p-checkbox-checked-hover-border-color: var(--tp-primary-dark);
+  --p-checkbox-icon-checked-color: var(--tp-checkbox-checked-icon-color);
+  --p-checkbox-disabled-background: var(--tp-checkbox-disabled-bg);
+  --p-checkbox-shadow: none;
+
+  /* --- PrimeNG RadioButton overrides (Grey Neutral) --- */
+  --p-radiobutton-width: var(--tp-radio-size);
+  --p-radiobutton-height: var(--tp-radio-size);
+  --p-radiobutton-border-color: var(--tp-border);
+  --p-radiobutton-background: var(--tp-radio-bg);
+  --p-radiobutton-hover-border-color: var(--tp-radio-hover-border-color);
+  --p-radiobutton-checked-background: var(--tp-radio-checked-bg);
+  --p-radiobutton-checked-border-color: var(--tp-radio-checked-border-color);
+  --p-radiobutton-checked-hover-background: var(--tp-radio-checked-bg);
+  --p-radiobutton-checked-hover-border-color: var(--tp-primary-dark);
+  --p-radiobutton-icon-checked-color: var(--tp-radio-checked-icon-color);
+  --p-radiobutton-disabled-background: var(--tp-radio-disabled-bg);
+  --p-radiobutton-shadow: none;
+
+  /* --- PrimeNG Tag overrides (Grey Neutral) --- */
+  --p-tag-border-radius: var(--tp-tag-border-radius);
+  --p-tag-font-size: var(--tp-tag-font-size);
+  --p-tag-font-weight: var(--tp-tag-font-weight);
+  --p-tag-padding: var(--tp-tag-padding);
+  --p-tag-primary-background: var(--tp-primary);
+  --p-tag-primary-color: var(--tp-surface-light);
+  --p-tag-success-background: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+  --p-tag-success-color: var(--tp-primary-dark);
+  --p-tag-info-background: color-mix(in srgb, var(--tp-info) 12%, transparent);
+  --p-tag-info-color: var(--tp-info);
+  --p-tag-warn-background: color-mix(in srgb, var(--tp-warning) 12%, transparent);
+  --p-tag-warn-color: var(--tp-warning-dark);
+  --p-tag-danger-background: color-mix(in srgb, var(--tp-danger) 12%, transparent);
+  --p-tag-danger-color: var(--tp-danger);
+  --p-tag-secondary-background: color-mix(in srgb, var(--tp-border) 40%, transparent);
+  --p-tag-secondary-color: var(--tp-text);
+
+  /* --- PrimeNG Badge overrides (Grey Neutral) --- */
+  --p-badge-min-width: var(--tp-badge-min-width);
+  --p-badge-height: var(--tp-badge-height);
+  --p-badge-font-size: var(--tp-badge-font-size);
+  --p-badge-font-weight: var(--tp-badge-font-weight);
+  --p-badge-primary-background: var(--tp-badge-bg);
+  --p-badge-primary-color: var(--tp-badge-color);
+  --p-badge-border-radius: var(--tp-badge-border-radius);
+
+  /* --- PrimeNG ProgressBar overrides (Grey Neutral) --- */
+  --p-progressbar-background: var(--tp-progressbar-bg);
+  --p-progressbar-height: var(--tp-progressbar-height);
+  --p-progressbar-border-radius: var(--tp-progressbar-border-radius);
+  --p-progressbar-value-background: var(--tp-progressbar-value-bg);
+  --p-progressbar-label-color: var(--tp-progressbar-label-color);
+
+  /* --- PrimeNG Toolbar overrides (Grey Neutral) --- */
+  --p-toolbar-background: var(--tp-toolbar-bg);
+  --p-toolbar-border-color: var(--tp-toolbar-border-color);
+  --p-toolbar-border-radius: var(--tp-toolbar-border-radius);
+  --p-toolbar-padding: var(--tp-toolbar-padding);
+  --p-toolbar-gap: var(--tp-toolbar-gap);
+  --p-toolbar-color: var(--tp-text);
+
+  /* --- PrimeNG Breadcrumb overrides (Grey Neutral) --- */
+  --p-breadcrumb-background: var(--tp-breadcrumb-bg);
+  --p-breadcrumb-item-color: var(--tp-breadcrumb-color);
+  --p-breadcrumb-item-hover-color: var(--tp-primary);
+  --p-breadcrumb-separator-color: var(--tp-breadcrumb-separator-color);
+  --p-breadcrumb-border-radius: 0;
+  --p-breadcrumb-padding: var(--tp-space-2) 0;
+}
+
+/* --- PrimeNG Tabs structural fix ─────────────────────────────────────────
+   PrimeNG applies border to all 4 sides of .p-tablist-tab-list via the
+   --p-tabs-tablist-border-width token (no per-side token exists).
+   We set that token to 0 and apply bottom-only border here to match
+   the showcase .tab-list spec: border-bottom: 2px solid --tp-border. */
+.p-tablist-tab-list {
+  border-bottom: 2px solid var(--tp-border);
+}
+
+/* --- ToggleButton structural fix — match standard button height --- */
+.p-togglebutton {
+  min-height: var(--tp-touch-target);
+}
+
+/* --- Paginator structural fix — border (no PrimeNG token exists) --- */
+.p-paginator {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+}
+
+/* --- Select structural fix — keep label and dropdown aligned on one row --- */
+.p-select {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* --- DataTable structural rules (showcase pattern) --- */
+/* PrimeNG has no CSS variable tokens for border-radius or font-size on cells */
+.factsheet-table,
+.tenant-data-table {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+}
+
+.p-datatable-thead > tr > th {
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+}
+
+.p-datatable-tbody > tr > td {
+  font-size: var(--tp-font-md);
+}
+
+/* --- Filter toolbar utilities (PrimeNG styleClass selectors) --- */
+.filter-select {
+  min-inline-size: 10rem;
+}
+
+.filter-icon-active {
+  border-color: var(--tp-primary) !important;
+  color: var(--tp-primary) !important;
+}
+
+/* --- Shared toast/banner severity classes --- */
+.tp-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-2) var(--tp-space-3);
+  border-radius: var(--nm-radius-sm);
+  font-size: var(--tp-font-sm);
+  font-weight: 700;
+  border-width: 1px;
+  border-style: solid;
+
+  &-success {
+    background: var(--tp-toast-success-bg);
+    border-color: var(--tp-toast-success-border);
+    color: var(--tp-toast-success-text);
+  }
+  &-error {
+    background: var(--tp-toast-error-bg);
+    border-color: var(--tp-toast-error-border);
+    color: var(--tp-toast-error-text);
+  }
+  &-warning {
+    background: var(--tp-toast-warn-bg);
+    border-color: var(--tp-toast-warn-border);
+    color: var(--tp-toast-warn-text);
+  }
+  &-info {
+    background: var(--tp-toast-info-bg);
+    border-color: var(--tp-toast-info-border);
+    color: var(--tp-toast-info-text);
+  }
+}
+
+.tp-banner-dismiss {
+  margin-inline-start: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--tp-font-family);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tp-text);
+  background: var(--tp-bg);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--tp-text-dark);
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select,
+optgroup,
+option {
+  font: inherit;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--tp-font-family);
+}
+
+.app-panel {
+  border: 1px solid var(--nm-border-soft);
+  border-radius: var(--nm-radius-lg);
+  background: var(--tp-surface-raised);
+  padding: 1rem;
+}
+
+.app-alert {
+  margin-bottom: 1rem;
+  border-radius: var(--nm-radius-sm);
+  padding: 0.75rem 1rem;
+  border: 1px solid transparent;
+}
+
+.app-alert-error {
+  background: var(--tp-error-bg);
+  border-color: var(--tp-error-border);
+  color: var(--tp-error-text);
+}
+
+.app-btn {
+  border: 1px solid var(--nm-border-soft);
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface-raised);
+  color: var(--tp-text);
+  font-weight: 600;
+  padding: var(--tp-space-2) var(--tp-space-3);
+  cursor: pointer;
+  transition:
+    background-color var(--tp-transition-normal) var(--tp-ease-default),
+    border-color var(--tp-transition-normal) var(--tp-ease-default),
+    box-shadow var(--tp-transition-normal) var(--tp-ease-default);
+}
+
+.app-btn:hover,
+.app-btn:focus-visible {
+  border-color: var(--tp-border);
+  background: color-mix(in srgb, var(--tp-border) 20%, transparent);
+}
+
+.app-btn:focus-visible {
+  outline: 3px solid var(--tp-primary);
+  outline-offset: 2px;
+  box-shadow: var(--tp-focus-ring);
+}
+
+.app-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app-btn-primary {
+  background: var(--tp-primary);
+  border: 1px solid var(--tp-primary);
+  color: var(--tp-surface-light);
+}
+
+.app-btn-primary:hover,
+.app-btn-primary:focus-visible {
+  background: var(--tp-primary-dark);
+  border-color: var(--tp-primary-dark);
+}

@@ -1,0 +1,406 @@
+@if (visible && provider) {
+  <p-dialog
+    [visible]="true"
+    (visibleChange)="onDialogVisibleChange($event)"
+    [modal]="true"
+    [position]="'right'"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [closable]="false"
+    [style]="detailDialogStyle"
+    [breakpoints]="detailDialogBreakpoints"
+    [pt]="detailDialogPt"
+    aria-label="Authentication source detail"
+    data-testid="auth-source-detail-panel"
+  >
+    <ng-template pTemplate="header">
+      <div class="panel-header" data-testid="detail-panel-header">
+        <div class="header-left">
+          <span class="protocol-icon" data-testid="detail-protocol-icon">
+            @switch (provider.protocol.toUpperCase()) {
+              @case ('LDAP') {
+                <ng-icon name="phosphorDesktopThin" />
+              }
+              @case ('SAML') {
+                <ng-icon name="phosphorShieldThin" />
+              }
+              @case ('OIDC') {
+                <ng-icon name="phosphorIdentificationCardThin" />
+              }
+              @case ('OAUTH2') {
+                <ng-icon name="phosphorKeyThin" />
+              }
+              @case ('SCIM') {
+                <ng-icon name="phosphorArrowsClockwiseThin" />
+              }
+              @default {
+                <ng-icon name="phosphorGearThin" />
+              }
+            }
+          </span>
+          <div class="header-info">
+            <h3 data-testid="detail-source-name">{{ provider.displayName }}</h3>
+            <div class="header-badges">
+              <span class="badge badge-protocol" data-testid="detail-protocol-badge">
+                {{ provider.protocol }}
+              </span>
+              <p-tag
+                [severity]="statusSeverity()"
+                [value]="provider.status === 'active' ? 'Active' : 'Inactive'"
+                data-testid="detail-status-badge"
+              />
+            </div>
+          </div>
+        </div>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          class="panel-close"
+          aria-label="Close detail panel"
+          data-testid="detail-close-btn"
+          (click)="onClose()"
+        >
+          <ng-icon name="phosphorXThin" />
+        </button>
+      </div>
+    </ng-template>
+
+    @if (provider.testResult === 'failure') {
+      <div class="tp-banner tp-banner-error" data-testid="detail-error-banner">
+        <ng-icon name="phosphorWarningThin" />
+        <span>Connection test failed. Check configuration and retry.</span>
+      </div>
+    }
+
+    <div class="panel-tabs">
+      <p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+        <p-tablist>
+          <p-tab value="config" data-testid="detail-tab-config">Config</p-tab>
+          <p-tab value="mapping" data-testid="detail-tab-mapping">Mapping</p-tab>
+          <p-tab value="sync" data-testid="detail-tab-sync">Sync</p-tab>
+          <p-tab value="tenants" data-testid="detail-tab-tenants">Tenants</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+          <p-tabpanel value="config">
+            <div class="tab-content" data-testid="detail-config-tab">
+              <div class="detail-grid" data-testid="detail-config-details">
+                <div class="detail-row">
+                  <span class="detail-label">URL</span>
+                  <span class="detail-value" data-testid="detail-url">
+                    {{
+                      provider.discoveryUrl || provider.serverUrl || provider.metadataUrl || 'N/A'
+                    }}
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Schedule</span>
+                  <span class="detail-value">Every 4 hours</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Last Sync</span>
+                  <span class="detail-value">2 hours ago</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Uptime (7d)</span>
+                  <span class="detail-value">
+                    <span class="uptime-bar" [style.--uptime-color]="uptimeColor()">
+                      <span class="uptime-fill" [style.width.%]="uptimeValue()"></span>
+                    </span>
+                    {{ uptimeValue() }}%
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Cert Expiry</span>
+                  <span class="detail-value">
+                    <p-tag
+                      [severity]="certExpiryColor()"
+                      [value]="certExpiryDays() + ' days'"
+                      data-testid="detail-cert-expiry"
+                    />
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Users</span>
+                  <span class="detail-value" data-testid="detail-user-count">142</span>
+                </div>
+              </div>
+
+              <div class="credentials-section" data-testid="detail-credentials">
+                <h4>Stored Credentials</h4>
+                <div class="credential-row">
+                  <span>Client Secret</span>
+                  <span class="credential-masked"
+                    >&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span
+                  >
+                </div>
+                <p class="credential-note">
+                  Encrypted (AES-256). Cannot be displayed, only replaced.
+                </p>
+              </div>
+
+              <div class="config-actions" data-testid="detail-config-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="success"
+                  size="small"
+                  data-testid="detail-btn-test"
+                  (click)="onTestConnection()"
+                >
+                  <ng-icon name="phosphorPlayThin" size="16" />
+                  Test Connection
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  severity="info"
+                  size="small"
+                  data-testid="detail-btn-sync"
+                  (click)="onSyncNow()"
+                >
+                  <ng-icon name="phosphorArrowsClockwiseThin" size="16" />
+                  Sync Now
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  severity="warn"
+                  size="small"
+                  [outlined]="true"
+                  data-testid="detail-btn-edit"
+                  (click)="onEditConfig()"
+                >
+                  <ng-icon name="phosphorPencilSimpleThin" size="16" />
+                  Edit Config
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  [severity]="provider.status === 'active' ? 'secondary' : 'success'"
+                  size="small"
+                  data-testid="detail-btn-toggle"
+                  (click)="onToggleActive()"
+                >
+                  <ng-icon
+                    [name]="provider.status === 'active' ? 'phosphorPauseThin' : 'phosphorPlayThin'"
+                    size="16"
+                  />
+                  {{ provider.status === 'active' ? 'Deactivate' : 'Activate' }}
+                </button>
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  size="small"
+                  data-testid="detail-btn-remove"
+                  (click)="onRemoveSource()"
+                >
+                  <ng-icon name="phosphorTrashThin" size="16" />
+                  Remove Source
+                </button>
+              </div>
+
+              <div class="deactivate-info" data-testid="detail-deactivate-info">
+                <ng-icon name="phosphorInfoThin" />
+                <span>
+                  Deactivating retains all users but prevents new logins and pauses sync.
+                </span>
+              </div>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="mapping">
+            <div class="tab-content" data-testid="detail-mapping-tab">
+              <h4>Attribute Mapping</h4>
+              <p-table
+                [value]="mappingRows()"
+                size="small"
+                [pt]="detailTablePt"
+                data-testid="detail-mapping-table"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>IdP Attribute</th>
+                    <th>Platform Field</th>
+                    <th>Status</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-row let-i="rowIndex">
+                  <tr [attr.data-testid]="'mapping-row-' + i">
+                    <td>
+                      <code>{{ row.idpAttribute }}</code>
+                    </td>
+                    <td>{{ row.platformField }}</td>
+                    <td>
+                      @if (row.mapped) {
+                        <span class="mapping-status mapping-status-mapped">
+                          <ng-icon name="phosphorCheckThin" size="16" />
+                          Mapped
+                        </span>
+                      } @else {
+                        <span class="mapping-status">Not mapped</span>
+                      }
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="3">
+                      <p class="empty-copy">
+                        No attribute mappings are configured for this source.
+                      </p>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="sync">
+            <div class="tab-content" data-testid="detail-sync-tab">
+              <div class="sync-summary-grid" data-testid="sync-summary-cards">
+                <div class="summary-card summary-syncs" data-testid="sync-summary-syncs">
+                  <span class="summary-value">{{ syncSummary().syncs }}</span>
+                  <span class="summary-label">Syncs</span>
+                </div>
+                <div class="summary-card summary-created" data-testid="sync-summary-created">
+                  <span class="summary-value">{{ syncSummary().created }}</span>
+                  <span class="summary-label">Created</span>
+                </div>
+                <div class="summary-card summary-updated" data-testid="sync-summary-updated">
+                  <span class="summary-value">{{ syncSummary().updated }}</span>
+                  <span class="summary-label">Updated</span>
+                </div>
+                <div
+                  class="summary-card summary-deactivated"
+                  data-testid="sync-summary-deactivated"
+                >
+                  <span class="summary-value">{{ syncSummary().deactivated }}</span>
+                  <span class="summary-label">Deactivated</span>
+                </div>
+              </div>
+
+              <div class="sync-log-header">
+                <span class="log-label" data-testid="sync-log-label">
+                  Showing last {{ showFullLog() ? syncLog().length : 6 }} operations
+                </span>
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  data-testid="sync-view-full-log"
+                  (click)="toggleFullLog()"
+                >
+                  {{ showFullLog() ? 'Show Less' : 'View Full Log' }}
+                </button>
+              </div>
+
+              <p-table
+                [value]="syncLogRows()"
+                size="small"
+                [pt]="detailTablePt"
+                data-testid="sync-log-table"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Duration</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                    <th>Deactivated</th>
+                    <th>Status</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-entry let-i="rowIndex">
+                  <tr
+                    [class.warning-row]="entry.status === 'warning'"
+                    [class.error-row]="entry.status === 'error'"
+                    [attr.data-testid]="'sync-log-row-' + i"
+                  >
+                    <td>{{ entry.timestamp | date: 'dd MMM y, HH:mm' }}</td>
+                    <td>{{ entry.duration }}</td>
+                    <td>
+                      <span
+                        [class.metric-positive]="entry.created > 0"
+                        [class.metric-zero]="entry.created === 0"
+                      >
+                        {{ entry.created > 0 ? '+' + entry.created : '\u2014' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        [class.metric-info]="entry.updated > 0"
+                        [class.metric-zero]="entry.updated === 0"
+                      >
+                        {{ entry.updated > 0 ? entry.updated.toString() : '\u2014' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        [class.metric-negative]="entry.deactivated > 0"
+                        [class.metric-zero]="entry.deactivated === 0"
+                      >
+                        {{ entry.deactivated > 0 ? '-' + entry.deactivated : '\u2014' }}
+                      </span>
+                    </td>
+                    <td>
+                      @if (entry.status === 'success') {
+                        <span class="status-pill status-success" data-testid="sync-status-success">
+                          Success
+                        </span>
+                      } @else if (entry.status === 'warning') {
+                        <span class="status-pill status-warning" data-testid="sync-status-warning">
+                          {{ entry.errors }} err
+                        </span>
+                      } @else {
+                        <span class="status-pill status-error" data-testid="sync-status-error"
+                          >Error</span
+                        >
+                      }
+                    </td>
+                  </tr>
+                  @if (entry.errorDetails) {
+                    <tr class="error-detail-row" [attr.data-testid]="'sync-error-detail-' + i">
+                      <td colspan="6">
+                        <div class="error-detail">
+                          <ng-icon name="phosphorWarningCircleThin" />
+                          {{ entry.errorDetails }}
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </ng-template>
+              </p-table>
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="tenants">
+            <div class="tab-content" data-testid="detail-tenants-tab">
+              <h4>Connected Tenants</h4>
+              <div class="tenant-chips">
+                <span class="tenant-chip" data-testid="detail-tenant-chip-master"
+                  >Master Tenant</span
+                >
+              </div>
+              <p class="tenant-note">
+                This authentication source is assigned to the tenants listed above. Users from this
+                source can authenticate into these tenants.
+              </p>
+            </div>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </div>
+  </p-dialog>
+}

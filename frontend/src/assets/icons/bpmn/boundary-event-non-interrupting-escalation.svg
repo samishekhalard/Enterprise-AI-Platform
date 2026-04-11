@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048" fill="none" stroke="#8B5CF6">
+  <circle cx="1024" cy="1024" r="875" stroke-width="70" stroke-dasharray="80 40" fill="#F5F5F5"/>
+  <circle cx="1024" cy="1024" r="750" stroke-width="70" stroke-dasharray="80 40" fill="#F5F5F5"/>
+  <!-- Escalation: Single upward-pointing triangle (BPMN 2.0 standard) -->
+  <path fill="none" stroke-width="70" stroke-linejoin="round" d="M1024 574L574 1474H1474Z"/>
+</svg>

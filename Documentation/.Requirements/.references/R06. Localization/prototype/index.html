@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EMSIST Localization Management — Prototype</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Skip Link (Design System Compliance Checklist §Accessibility) -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- ================================================================== -->
+<!-- TOAST CONTAINER                                                     -->
+<!-- ================================================================== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ================================================================== -->
+<!-- HEADER                                                              -->
+<!-- ================================================================== -->
+<header class="header-container">
+  <div class="header-inner">
+    <div class="header-island brand-island">
+      <a class="brand-logo" href="#" aria-label="ThinkPLUS Home">think+</a>
+      <div class="brand-block">
+        <h1>EMSIST</h1>
+        <p>Administration</p>
+      </div>
+    </div>
+
+    <nav class="header-island topnav" aria-label="Primary navigation">
+      <a href="#" class="active">Administration</a>
+      <a href="#">About</a>
+
+      <!-- ── Language Switcher ── -->
+      <div class="lang-switcher" id="lang-switcher">
+        <button
+          type="button"
+          class="lang-switcher-btn"
+          id="lang-switcher-btn"
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          aria-label="Change language"
+        >
+          <span class="flag" id="current-flag">🇺🇸</span>
+          <span class="code" id="current-code">EN</span>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </button>
+
+        <div class="lang-dropdown" id="lang-dropdown" role="listbox" aria-label="Select language">
+          <button class="lang-dropdown-item active" role="option" aria-selected="true" data-locale="en-US" data-flag="🇺🇸" data-name="English" data-dir="ltr">
+            <span class="check">✓</span>
+            <span class="flag">🇺🇸</span>
+            <span class="name">English</span>
+          </button>
+          <button class="lang-dropdown-item" role="option" aria-selected="false" data-locale="ar-AE" data-flag="🇦🇪" data-name="العربية" data-dir="rtl" dir="rtl">
+            <span class="check"></span>
+            <span class="flag">🇦🇪</span>
+            <span class="name">العربية</span>
+          </button>
+          <button class="lang-dropdown-item" role="option" aria-selected="false" data-locale="fr-FR" data-flag="🇫🇷" data-name="Français" data-dir="ltr">
+            <span class="check"></span>
+            <span class="flag">🇫🇷</span>
+            <span class="name">Français</span>
+          </button>
+          <button class="lang-dropdown-item" role="option" aria-selected="false" data-locale="de-DE" data-flag="🇩🇪" data-name="Deutsch" data-dir="ltr">
+            <span class="check"></span>
+            <span class="flag">🇩🇪</span>
+            <span class="name">Deutsch</span>
+          </button>
+          <button class="lang-dropdown-item" role="option" aria-selected="false" data-locale="hi-IN" data-flag="🇮🇳" data-name="हिन्दी" data-dir="ltr">
+            <span class="check"></span>
+            <span class="flag">🇮🇳</span>
+            <span class="name">हिन्दी</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="button">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================================================================== -->
+<!-- MAIN CONTENT                                                        -->
+<!-- ================================================================== -->
+<main class="content-container" id="main-content">
+  <div class="content-inner">
+    <div class="locale-section">
+
+      <!-- ── Tab Bar ── -->
+      <div class="tab-bar" role="tablist" aria-label="Localization Management">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-languages" id="btn-languages" data-tab="languages">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span class="tab-label">Languages</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-dictionary" id="btn-dictionary" data-tab="dictionary">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span class="tab-label">Dictionary</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-import-export" id="btn-import-export" data-tab="import-export">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span class="tab-label">Import / Export</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-rollback" id="btn-rollback" data-tab="rollback">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span class="tab-label">Rollback</span>
+        </button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-ai-translate" id="btn-ai-translate" data-tab="ai-translate">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>
+          <span class="tab-label">AI Translate</span>
+        </button>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 1: LANGUAGES                                                -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-languages" role="tabpanel" aria-labelledby="btn-languages">
+        <div class="toolbar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search-input" type="search" placeholder="Search locales…" aria-label="Search locales" id="locale-search">
+          </div>
+        </div>
+
+        <table class="nm-table" id="locale-table">
+          <thead>
+            <tr>
+              <th>Flag</th>
+              <th>Name</th>
+              <th>Code</th>
+              <th>LCID</th>
+              <th>Direction</th>
+              <th>Coverage</th>
+              <th>Alternative</th>
+              <th>Active</th>
+            </tr>
+          </thead>
+          <tbody id="locale-tbody"></tbody>
+        </table>
+
+        <div class="pagination" id="locale-pagination"></div>
+
+        <!-- Empty State (Design System Block: empty-state.md) -->
+        <div class="empty-state" id="locale-empty" style="display:none">
+          <div class="empty-state-icon" aria-hidden="true">&#x1F50D;</div>
+          <div class="empty-state-heading">No locales found</div>
+          <div class="empty-state-description">Try adjusting your search term or clear the filter to see all system locales.</div>
+          <button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="document.getElementById('locale-search').value=''; renderLocaleTable();">Clear Search</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 2: DICTIONARY                                               -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-dictionary" role="tabpanel" aria-labelledby="btn-dictionary" hidden>
+        <div class="toolbar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input class="search-input" type="search" placeholder="Search keys…" aria-label="Search dictionary" id="dict-search">
+          </div>
+          <span style="font-size:0.8rem;color:var(--tp-text-secondary)">Showing <strong>12</strong> of <strong>500</strong> entries</span>
+        </div>
+
+        <table class="nm-table" id="dict-table">
+          <thead>
+            <tr>
+              <th>Technical Name</th>
+              <th>Module</th>
+              <th>en-US</th>
+              <th>ar-AE</th>
+              <th>fr-FR</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dict-tbody"></tbody>
+        </table>
+
+        <div class="pagination">
+          <button>&laquo;</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>…</button>
+          <button>42</button>
+          <button>&raquo;</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 3: IMPORT / EXPORT                                          -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-import-export" role="tabpanel" aria-labelledby="btn-import-export" hidden>
+        <div class="section-card">
+          <h3>Export Dictionary</h3>
+          <p>Download all dictionary keys and translations as a UTF-8 BOM CSV file.</p>
+          <button class="nm-btn nm-btn-primary" onclick="showToast('success', 'Export started — dictionary-2026-03-11.csv')">
+            <svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+
+        <div class="section-card">
+          <h3>Import Dictionary</h3>
+          <p>Upload a CSV file (matching export format). A preview will be shown before committing changes.</p>
+          <button class="nm-btn nm-btn-secondary" id="choose-csv-btn" onclick="showImportPreview()">
+            <svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose CSV
+          </button>
+
+          <div class="import-preview-card" id="import-preview" style="display:none">
+            <div class="preview-timer" id="preview-timer">Preview expires in <strong>29:42</strong></div>
+            <div class="preview-stats">
+              <div class="preview-stat">
+                <div class="preview-stat-value">500</div>
+                <div class="preview-stat-label">Total Rows</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-value" style="color: var(--tp-primary)">12</div>
+                <div class="preview-stat-label">To Update</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-value" style="color: var(--tp-warning)">3</div>
+                <div class="preview-stat-label">New Keys</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-value" style="color: var(--tp-danger)">0</div>
+                <div class="preview-stat-label">Errors</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end">
+              <button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="hideImportPreview()">Cancel</button>
+              <button class="nm-btn nm-btn-primary nm-btn-sm" onclick="showToast('success','Import committed — 15 entries updated, snapshot created'); hideImportPreview()">
+                Confirm Import
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 4: ROLLBACK                                                 -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-rollback" role="tabpanel" aria-labelledby="btn-rollback" hidden>
+        <table class="nm-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Type</th>
+              <th>Summary</th>
+              <th>Date</th>
+              <th>Created By</th>
+              <th>Current</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>48</strong></td>
+              <td><span class="badge badge-edit">EDIT</span></td>
+              <td>Updated 3 translations for ar-AE</td>
+              <td>2026-03-11 09:45</td>
+              <td>admin@thinkplus.ae</td>
+              <td><span class="badge badge-success">CURRENT</span></td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>47</strong></td>
+              <td><span class="badge badge-import">IMPORT</span></td>
+              <td>CSV import: 500 rows, 12 updates, 3 new</td>
+              <td>2026-03-11 09:30</td>
+              <td>admin@thinkplus.ae</td>
+              <td></td>
+              <td><button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="showRollbackDialog(47)">Rollback</button></td>
+            </tr>
+            <tr>
+              <td><strong>46</strong></td>
+              <td><span class="badge badge-edit">EDIT</span></td>
+              <td>Updated auth.login.welcome for fr-FR</td>
+              <td>2026-03-10 16:22</td>
+              <td>admin@thinkplus.ae</td>
+              <td></td>
+              <td><button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="showRollbackDialog(46)">Rollback</button></td>
+            </tr>
+            <tr>
+              <td><strong>45</strong></td>
+              <td><span class="badge badge-rollback">ROLLBACK</span></td>
+              <td>Rolled back to version #42</td>
+              <td>2026-03-10 14:10</td>
+              <td>admin@thinkplus.ae</td>
+              <td></td>
+              <td><button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="showRollbackDialog(45)">Rollback</button></td>
+            </tr>
+            <tr>
+              <td><strong>44</strong></td>
+              <td><span class="badge badge-import">IMPORT</span></td>
+              <td>Bulk import: 480 rows, 40 updates</td>
+              <td>2026-03-10 11:05</td>
+              <td>admin@thinkplus.ae</td>
+              <td></td>
+              <td><button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="showRollbackDialog(44)">Rollback</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <button>&laquo;</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>&raquo;</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- TAB 5: AI TRANSLATE                                             -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <div class="tab-content" id="tab-ai-translate" role="tabpanel" aria-labelledby="btn-ai-translate" hidden>
+        <div class="ai-header">
+          <div class="ai-header-left">
+            <label style="font-size:0.82rem;font-weight:600">Target Locale:</label>
+            <select class="ai-locale-select" id="ai-locale-select">
+              <option value="ar-AE">🇦🇪 Arabic (ar-AE)</option>
+              <option value="fr-FR">🇫🇷 French (fr-FR)</option>
+              <option value="de-DE">🇩🇪 German (de-DE)</option>
+              <option value="hi-IN">🇮🇳 Hindi (hi-IN)</option>
+            </select>
+            <div class="ai-summary">
+              Missing: <strong id="ai-missing-count">45</strong> / 500 keys
+            </div>
+          </div>
+          <button class="nm-btn nm-btn-primary" id="ai-translate-btn" onclick="requestAITranslation()">
+            <svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>
+            Translate Missing
+          </button>
+        </div>
+
+        <!-- Auto-applied summary -->
+        <div class="ai-auto-applied" id="ai-auto-applied" style="display:none; padding:1rem; background:rgba(66,129,119,0.08); border-radius:0.72rem; margin-bottom:1rem;">
+          <strong style="color:var(--tp-primary)">✓ Auto-applied:</strong>
+          <span id="ai-auto-count">38</span> unambiguous translations saved with ACTIVE status (live in bundle).
+        </div>
+
+        <!-- HITL review table (ambiguous terms only) -->
+        <h4 style="margin:0.5rem 0; font-size:0.85rem; color:var(--tp-text-muted)">HITL Review — Ambiguous Terms</h4>
+        <table class="nm-table" id="ai-table">
+          <thead>
+            <tr>
+              <th style="width:28px"><input type="checkbox" id="ai-select-all" aria-label="Select all"></th>
+              <th>Key</th>
+              <th>Source (en-US)</th>
+              <th>AI Translation</th>
+              <th>Ambiguity Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ai-tbody"></tbody>
+        </table>
+
+        <div class="ai-bulk-bar" id="ai-bulk-bar">
+          <button class="nm-btn nm-btn-primary nm-btn-sm" onclick="showToast('success','5 HITL translations approved — now ACTIVE')">Approve Selected (5)</button>
+          <button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="showToast('info','2 translations rejected — re-translate manually')">Reject Selected (2)</button>
+          <span style="margin-left:auto;font-size:0.75rem;color:var(--tp-text-muted)">Only ambiguous terms need review. Unambiguous terms are auto-applied.</span>
+          <button class="nm-btn nm-btn-secondary nm-btn-sm" onclick="showToast('success','All pending terms approved')">Approve All Pending</button>
+        </div>
+      </div>
+
+    </div><!-- .locale-section -->
+  </div>
+</main>
+
+<!-- ================================================================== -->
+<!-- FOOTER                                                              -->
+<!-- ================================================================== -->
+<footer class="footer-container">
+  <div class="footer-inner">
+    <div class="footer-island">
+      Localization Prototype — EMSIST Design System — March 2026
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================== -->
+<!-- EDIT DIALOG                                                         -->
+<!-- ================================================================== -->
+<div class="dialog-overlay" id="edit-dialog">
+  <div class="dialog">
+    <div class="dialog-header">
+      <h2>Edit Translations</h2>
+      <button class="dialog-close" onclick="closeDialog('edit-dialog')" aria-label="Close">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p style="font-size:0.82rem;color:var(--tp-text-secondary);margin-bottom:1rem">
+        Key: <code id="edit-key-name">auth.login.welcome</code>
+      </p>
+      <div class="field">
+        <label>en-US (Source)</label>
+        <input type="text" value="Welcome to EMSIST" readonly style="opacity:0.7">
+      </div>
+      <div class="field rtl-field">
+        <label>ar-AE</label>
+        <input type="text" value="مرحباً بكم في EMSIST" dir="rtl">
+        <span class="char-count">24 / 5000</span>
+      </div>
+      <div class="field">
+        <label>fr-FR</label>
+        <input type="text" value="Bienvenue à EMSIST">
+        <span class="char-count">19 / 5000</span>
+      </div>
+      <div class="field">
+        <label>de-DE</label>
+        <input type="text" value="" placeholder="Enter translation…">
+        <span class="char-count">0 / 5000</span>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="nm-btn nm-btn-ghost" onclick="closeDialog('edit-dialog')">Cancel</button>
+      <button class="nm-btn nm-btn-primary" onclick="closeDialog('edit-dialog'); showToast('success','Translations saved — snapshot created')">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- ROLLBACK CONFIRMATION DIALOG                                        -->
+<!-- ================================================================== -->
+<div class="dialog-overlay" id="rollback-dialog">
+  <div class="dialog" style="max-width:420px">
+    <div class="dialog-header">
+      <h2>Confirm Rollback</h2>
+      <button class="dialog-close" onclick="closeDialog('rollback-dialog')" aria-label="Close">&times;</button>
+    </div>
+    <div class="dialog-body">
+      <p style="font-size:0.85rem;line-height:1.6">
+        Rollback to version <strong id="rollback-version">#47</strong>?
+      </p>
+      <p style="font-size:0.82rem;color:var(--tp-text-secondary);margin-top:0.5rem">
+        This will create a pre-rollback snapshot of the current dictionary state, then restore all translations to the selected version.
+      </p>
+    </div>
+    <div class="dialog-footer">
+      <button class="nm-btn nm-btn-ghost" onclick="closeDialog('rollback-dialog')">Cancel</button>
+      <button class="nm-btn nm-btn-danger" onclick="closeDialog('rollback-dialog'); showToast('success','Dictionary rolled back — pre-rollback snapshot #49 created')">Rollback</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================== -->
+<!-- JAVASCRIPT                                                          -->
+<!-- ================================================================== -->
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+
+const LOCALES = [
+  { flag: '🇺🇸', name: 'English (United States)', code: 'en-US', lcid: 1033, dir: 'LTR', coverage: 100, alt: false, active: true },
+  { flag: '🇦🇪', name: 'Arabic (UAE)', code: 'ar-AE', lcid: 14337, dir: 'RTL', coverage: 72, alt: true, active: true },
+  { flag: '🇫🇷', name: 'French (France)', code: 'fr-FR', lcid: 1036, dir: 'LTR', coverage: 45, alt: false, active: true },
+  { flag: '🇩🇪', name: 'German (Germany)', code: 'de-DE', lcid: 1031, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇮🇳', name: 'Hindi (India)', code: 'hi-IN', lcid: 1081, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇪🇸', name: 'Spanish (Spain)', code: 'es-ES', lcid: 3082, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇮🇹', name: 'Italian (Italy)', code: 'it-IT', lcid: 1040, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇯🇵', name: 'Japanese (Japan)', code: 'ja-JP', lcid: 1041, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇨🇳', name: 'Chinese (Simplified)', code: 'zh-CN', lcid: 2052, dir: 'LTR', coverage: 0, alt: false, active: false },
+  { flag: '🇧🇷', name: 'Portuguese (Brazil)', code: 'pt-BR', lcid: 1046, dir: 'LTR', coverage: 0, alt: false, active: false },
+];
+
+const DICT_ENTRIES = [
+  { key: 'auth.login.welcome', module: 'auth', en: 'Welcome to EMSIST', ar: 'مرحباً بكم في EMSIST', fr: 'Bienvenue à EMSIST' },
+  { key: 'auth.login.sign_in', module: 'auth', en: 'Sign In', ar: 'تسجيل الدخول', fr: 'Se connecter' },
+  { key: 'auth.login.email_label', module: 'auth', en: 'Email or Username', ar: 'البريد أو اسم المستخدم', fr: "E-mail ou nom d'utilisateur" },
+  { key: 'auth.login.password_label', module: 'auth', en: 'Password', ar: 'كلمة المرور', fr: 'Mot de passe' },
+  { key: 'auth.login.remember_me', module: 'auth', en: 'Remember me', ar: 'تذكرني', fr: 'Se souvenir de moi' },
+  { key: 'auth.login.forgot_password', module: 'auth', en: 'Forgot password?', ar: 'نسيت كلمة المرور؟', fr: 'Mot de passe oublié ?' },
+  { key: 'admin.nav.administration', module: 'shell', en: 'Administration', ar: 'الإدارة', fr: 'Administration' },
+  { key: 'admin.nav.about', module: 'shell', en: 'About', ar: 'حول', fr: 'À propos' },
+  { key: 'admin.nav.sign_out', module: 'shell', en: 'Sign Out', ar: 'تسجيل الخروج', fr: 'Déconnexion' },
+  { key: 'admin.locale.tab.languages', module: 'locale', en: 'Languages', ar: 'اللغات', fr: 'Langues' },
+  { key: 'admin.locale.tab.dictionary', module: 'locale', en: 'Dictionary', ar: 'القاموس', fr: 'Dictionnaire' },
+  { key: 'admin.locale.search_placeholder', module: 'locale', en: 'Search locales…', ar: 'بحث…', fr: 'Rechercher…' },
+];
+
+// Only ambiguous terms shown in HITL review table (unambiguous are auto-applied)
+const AI_TRANSLATIONS = [
+  { key: 'admin.tenant.state_provisioned', source: 'Provisioned', translation: 'مُجهّز', confidence: 78, reason: 'Multiple meanings: provisioned (IT) vs. supplied (general)' },
+  { key: 'admin.tenant.state_suspended', source: 'Suspended', translation: 'معلّق', confidence: 82, reason: 'Multiple meanings: suspended (account) vs. hanging (physical)' },
+  { key: 'admin.definitions.field_type', source: 'Field Type', translation: 'نوع الحقل', confidence: 88, reason: 'Context-dependent: field (form field) vs. field (agricultural)' },
+  { key: 'admin.definitions.no_definitions', source: 'No definitions found', translation: 'لم يتم العثور على تعريفات', confidence: 85, reason: 'Multiple meanings: definitions (config objects) vs. definitions (dictionary)' },
+  { key: 'error.access_denied.message', source: 'You do not have permission to access this resource.', translation: 'ليس لديك صلاحية للوصول إلى هذا المورد.', confidence: 45, reason: 'Complex sentence: resource (IT) vs. resource (general), permission context' },
+  { key: 'admin.about.build_info', source: 'Build Information', translation: 'معلومات البناء', confidence: 72, reason: 'Multiple meanings: build (software) vs. build (construction)' },
+  { key: 'admin.nav.dashboard', source: 'Dashboard', translation: 'لوحة المعلومات', confidence: 68, reason: 'Multiple meanings: dashboard (UI) vs. dashboard (vehicle)' },
+];
+
+// ── Tab Switching ──────────────────────────────────────────────────────
+
+document.querySelectorAll('.tab-btn[role="tab"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn[role="tab"]').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+
+    document.querySelectorAll('.tab-content[role="tabpanel"]').forEach(p => p.hidden = true);
+    const panel = document.getElementById('tab-' + btn.dataset.tab);
+    if (panel) panel.hidden = false;
+  });
+});
+
+// ── Language Switcher ──────────────────────────────────────────────────
+
+const switcherBtn = document.getElementById('lang-switcher-btn');
+const dropdown = document.getElementById('lang-dropdown');
+
+switcherBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const open = dropdown.classList.toggle('open');
+  switcherBtn.setAttribute('aria-expanded', open);
+});
+
+document.addEventListener('click', () => {
+  dropdown.classList.remove('open');
+  switcherBtn.setAttribute('aria-expanded', 'false');
+});
+
+dropdown.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+document.querySelectorAll('.lang-dropdown-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const locale = item.dataset.locale;
+    const flag = item.dataset.flag;
+    const name = item.dataset.name;
+    const dir = item.dataset.dir;
+
+    document.getElementById('current-flag').textContent = flag;
+    document.getElementById('current-code').textContent = locale.split('-')[0].toUpperCase();
+
+    document.querySelectorAll('.lang-dropdown-item').forEach(i => {
+      i.classList.remove('active');
+      i.setAttribute('aria-selected', 'false');
+      i.querySelector('.check').textContent = '';
+    });
+    item.classList.add('active');
+    item.setAttribute('aria-selected', 'true');
+    item.querySelector('.check').textContent = '✓';
+
+    document.documentElement.dir = dir;
+    document.documentElement.lang = locale;
+
+    dropdown.classList.remove('open');
+    switcherBtn.setAttribute('aria-expanded', 'false');
+
+    showToast('success', `Language changed to ${name}`);
+  });
+});
+
+// ── Keyboard navigation for switcher ──
+switcherBtn.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    dropdown.classList.remove('open');
+    switcherBtn.setAttribute('aria-expanded', 'false');
+  }
+  if (e.key === 'ArrowDown' && dropdown.classList.contains('open')) {
+    e.preventDefault();
+    dropdown.querySelector('.lang-dropdown-item')?.focus();
+  }
+});
+
+dropdown.addEventListener('keydown', (e) => {
+  const items = [...dropdown.querySelectorAll('.lang-dropdown-item')];
+  const idx = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' && idx < items.length - 1) { e.preventDefault(); items[idx + 1].focus(); }
+  if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); items[idx - 1].focus(); }
+  if (e.key === 'Escape') { dropdown.classList.remove('open'); switcherBtn.focus(); }
+});
+
+// ── Locale Table ──────────────────────────────────────────────────────
+
+function renderLocaleTable(filter = '') {
+  const tbody = document.getElementById('locale-tbody');
+  const table = document.getElementById('locale-table');
+  const empty = document.getElementById('locale-empty');
+  const filtered = LOCALES.filter(l =>
+    l.name.toLowerCase().includes(filter) || l.code.toLowerCase().includes(filter)
+  );
+
+  // Show/hide empty state per Design System Block: empty-state.md
+  if (filtered.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+  } else {
+    table.style.display = '';
+    empty.style.display = 'none';
+  }
+
+  tbody.innerHTML = filtered.map(l => {
+    const covClass = l.coverage > 80 ? 'high' : l.coverage > 40 ? 'medium' : 'low';
+    const dirBadge = l.dir === 'RTL'
+      ? '<span class="badge badge-warn">RTL</span>'
+      : '<span class="badge badge-info">LTR</span>';
+
+    return `<tr>
+      <td style="font-size:1.5rem">${l.flag}</td>
+      <td><strong>${l.name}</strong></td>
+      <td><code>${l.code}</code></td>
+      <td>${l.lcid}</td>
+      <td>${dirBadge}</td>
+      <td>
+        <div class="coverage-bar">
+          <div class="coverage-bar-track">
+            <div class="coverage-bar-fill ${covClass}" style="width:${l.coverage}%"></div>
+          </div>
+          <span class="coverage-bar-label">${l.coverage}%</span>
+        </div>
+      </td>
+      <td>
+        <button class="radio-circle ${l.alt ? 'selected' : ''}" aria-label="Set ${l.code} as alternative"
+          onclick="setAlternative('${l.code}')"></button>
+      </td>
+      <td>
+        <button class="toggle-switch ${l.active ? 'active' : ''}" aria-label="Toggle ${l.code} active"
+          onclick="toggleLocale('${l.code}')"></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('locale-search').addEventListener('input', (e) => {
+  renderLocaleTable(e.target.value.toLowerCase());
+});
+
+function toggleLocale(code) {
+  const locale = LOCALES.find(l => l.code === code);
+  if (!locale) return;
+
+  if (locale.active && locale.alt) {
+    showToast('error', 'Cannot deactivate alternative locale. Change the alternative first.');
+    return;
+  }
+  if (locale.active && LOCALES.filter(l => l.active).length <= 1) {
+    showToast('error', 'Cannot deactivate the last active locale.');
+    return;
+  }
+
+  locale.active = !locale.active;
+  showToast('success', `${locale.name} ${locale.active ? 'activated' : 'deactivated'}`);
+  renderLocaleTable();
+}
+
+function setAlternative(code) {
+  const locale = LOCALES.find(l => l.code === code);
+  if (!locale || !locale.active) {
+    showToast('error', 'Locale must be active to be set as alternative.');
+    return;
+  }
+  LOCALES.forEach(l => l.alt = false);
+  locale.alt = true;
+  showToast('success', `${locale.name} set as alternative locale`);
+  renderLocaleTable();
+}
+
+// ── Dictionary Table ──────────────────────────────────────────────────
+
+function renderDictTable() {
+  const tbody = document.getElementById('dict-tbody');
+  tbody.innerHTML = DICT_ENTRIES.map(e => `<tr>
+    <td><code>${e.key}</code></td>
+    <td>${e.module}</td>
+    <td class="translation-cell" onclick="openEditDialog('${e.key}')">${e.en}</td>
+    <td class="translation-cell ${!e.ar ? 'empty' : ''}" onclick="openEditDialog('${e.key}')" ${e.ar ? 'dir="rtl"' : ''}>${e.ar || '—'}</td>
+    <td class="translation-cell ${!e.fr ? 'empty' : ''}" onclick="openEditDialog('${e.key}')">${e.fr || '—'}</td>
+    <td>
+      <button class="nm-btn nm-btn-ghost nm-btn-sm" onclick="openEditDialog('${e.key}')" aria-label="Edit ${e.key}">
+        <svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+    </td>
+  </tr>`).join('');
+}
+
+// ── AI Translation Table ──────────────────────────────────────────────
+
+function renderAITable() {
+  const tbody = document.getElementById('ai-tbody');
+  // Show HITL review table with ambiguity reasons
+  tbody.innerHTML = AI_TRANSLATIONS.map(t => {
+    let rowClass;
+    if (t.confidence >= 70) { rowClass = 'ai-row-medium'; }
+    else { rowClass = 'ai-row-low'; }
+
+    return `<tr class="${rowClass}">
+      <td><input type="checkbox" aria-label="Select ${t.key}"></td>
+      <td><code>${t.key}</code></td>
+      <td>${t.source}</td>
+      <td dir="rtl" style="font-family:'Noto Sans Arabic',Tahoma,sans-serif">${t.translation}</td>
+      <td style="font-size:0.75rem;max-width:200px;color:var(--tp-text-muted)">${t.reason}</td>
+      <td>
+        <div class="ai-actions">
+          <button class="ai-action-btn accept" title="Approve" aria-label="Approve translation" onclick="showToast('success','Translation approved — status: ACTIVE')">✓</button>
+          <button class="ai-action-btn reject" title="Reject" aria-label="Reject translation" onclick="showToast('info','Translation rejected — re-translate manually')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Dialogs ───────────────────────────────────────────────────────────
+
+function openEditDialog(key) {
+  document.getElementById('edit-key-name').textContent = key;
+  document.getElementById('edit-dialog').classList.add('open');
+}
+
+function showRollbackDialog(version) {
+  document.getElementById('rollback-version').textContent = `#${version}`;
+  document.getElementById('rollback-dialog').classList.add('open');
+}
+
+function closeDialog(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close dialogs on overlay click
+document.querySelectorAll('.dialog-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.dialog-overlay.open').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// ── Import Preview ────────────────────────────────────────────────────
+
+function showImportPreview() {
+  document.getElementById('import-preview').style.display = 'block';
+}
+
+function hideImportPreview() {
+  document.getElementById('import-preview').style.display = 'none';
+}
+
+// ── AI Translate Request ──────────────────────────────────────────────
+
+function requestAITranslation() {
+  const btn = document.getElementById('ai-translate-btn');
+  btn.innerHTML = '<svg class="nm-btn-icon" style="animation:spin 1s linear infinite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Translating…';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.innerHTML = '<svg class="nm-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg> Translate Missing';
+    btn.disabled = false;
+    // Show auto-applied summary
+    document.getElementById('ai-auto-applied').style.display = 'block';
+    document.getElementById('ai-auto-count').textContent = '38';
+    showToast('success', '38 auto-applied + 7 flagged for HITL review');
+  }, 2000);
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────
+
+// Toast durations per Design System (components/toast.md): success 4s, info 5s, error 6s
+const TOAST_DURATIONS = { success: 4000, info: 5000, error: 6000 };
+
+function showToast(type, message) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.setAttribute('role', 'alert');
+  toast.setAttribute('aria-live', 'polite');
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  toast.innerHTML = `<span aria-hidden="true">${icons[type] || 'ℹ'}</span> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(40px)';
+    toast.style.transition = 'all 0.2s ease-in';
+    setTimeout(() => toast.remove(), 200);
+  }, TOAST_DURATIONS[type] || 4000);
+}
+
+// ── Spinner animation ─────────────────────────────────────────────────
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(style);
+
+// ── Init ──────────────────────────────────────────────────────────────
+renderLocaleTable();
+renderDictTable();
+renderAITable();
+</script>
+
+</body>
+</html>

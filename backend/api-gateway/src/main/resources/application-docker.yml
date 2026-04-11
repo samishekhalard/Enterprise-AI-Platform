@@ -1,0 +1,219 @@
+# ==============================================================================
+# Docker profile - registry-first routing via Eureka + Spring Cloud LoadBalancer
+# ==============================================================================
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://keycloak:8080/realms/master/protocol/openid-connect/certs}
+
+  cloud:
+    gateway:
+      routes:
+        # ==================================================================
+        # API Routes (Service Discovery)
+        # ==================================================================
+
+        # Auth Facade (8081)
+        - id: docker-auth-service
+          uri: lb://AUTH-FACADE
+          predicates:
+            - Path=/api/v1/auth/**
+          metadata:
+            order: -1
+
+        # License Service admin routes (must precede /api/v1/admin/** catch-all)
+        - id: docker-license-admin-service
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/api/v1/admin/licenses/**
+          metadata:
+            order: -2
+
+        - id: docker-license-seats-service
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/api/v1/tenants/*/seats/**
+          metadata:
+            order: -2
+
+        - id: docker-auth-admin-service
+          uri: lb://AUTH-FACADE
+          predicates:
+            - Path=/api/v1/admin/**
+          metadata:
+            order: -1
+
+        - id: docker-auth-events-service
+          uri: lb://AUTH-FACADE
+          predicates:
+            - Path=/api/v1/events/**
+          metadata:
+            order: -1
+
+        # Tenant Service (8082)
+        - id: docker-tenant-service
+          uri: lb://TENANT-SERVICE
+          predicates:
+            - Path=/api/tenants/**
+          metadata:
+            order: -1
+
+        # User Service (8083)
+        - id: docker-user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/users/**
+          metadata:
+            order: -1
+
+        # License Service (8085) - Feature gates (public)
+        - id: docker-license-features
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/api/v1/features/**
+          metadata:
+            order: -1
+
+        # License Service (8085)
+        - id: docker-license-products
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/api/v1/products/**
+          metadata:
+            order: -1
+
+        - id: docker-license-service
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/api/v1/licenses/**
+          metadata:
+            order: -1
+
+        # Notification Service (8086)
+        - id: docker-notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/v1/notifications/**
+          metadata:
+            order: -1
+
+        - id: docker-notification-templates
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/v1/notification-templates/**
+          metadata:
+            order: -1
+
+        # Audit Service (8087)
+        - id: docker-audit-service
+          uri: lb://AUDIT-SERVICE
+          predicates:
+            - Path=/api/v1/audit/**
+          metadata:
+            order: -1
+
+        # AI Service (8088)
+        - id: docker-ai-agents
+          uri: lb://AI-SERVICE
+          predicates:
+            - Path=/api/v1/agents/**
+          metadata:
+            order: -1
+
+        - id: docker-ai-conversations
+          uri: lb://AI-SERVICE
+          predicates:
+            - Path=/api/v1/conversations/**
+          metadata:
+            order: -1
+
+        - id: docker-ai-providers
+          uri: lb://AI-SERVICE
+          predicates:
+            - Path=/api/v1/providers/**
+          metadata:
+            order: -1
+
+        # Definition Service (8090)
+        - id: docker-definition-service
+          uri: lb://DEFINITION-SERVICE
+          predicates:
+            - Path=/api/v1/definitions/**
+          metadata:
+            order: -1
+
+        # ==================================================================
+        # Health Check Routes
+        # ==================================================================
+        - id: auth-health
+          uri: lb://AUTH-FACADE
+          predicates:
+            - Path=/services/auth/health
+          filters:
+            - RewritePath=/services/auth/health, /actuator/health
+
+        - id: tenant-health
+          uri: lb://TENANT-SERVICE
+          predicates:
+            - Path=/services/tenant/health
+          filters:
+            - RewritePath=/services/tenant/health, /actuator/health
+
+        - id: user-health
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/services/user/health
+          filters:
+            - RewritePath=/services/user/health, /actuator/health
+
+        - id: license-health
+          uri: lb://LICENSE-SERVICE
+          predicates:
+            - Path=/services/license/health
+          filters:
+            - RewritePath=/services/license/health, /actuator/health
+
+        - id: audit-health
+          uri: lb://AUDIT-SERVICE
+          predicates:
+            - Path=/services/audit/health
+          filters:
+            - RewritePath=/services/audit/health, /actuator/health
+
+        - id: ai-health
+          uri: lb://AI-SERVICE
+          predicates:
+            - Path=/services/ai/health
+          filters:
+            - RewritePath=/services/ai/health, /actuator/health
+
+        - id: definition-health
+          uri: lb://DEFINITION-SERVICE
+          predicates:
+            - Path=/services/definition/health
+          filters:
+            - RewritePath=/services/definition/health, /actuator/health
+
+  data:
+    redis:
+      host: ${VALKEY_HOST:valkey}
+      port: 6379
+
+# Token Blacklist
+token:
+  blacklist:
+    prefix: "auth:blacklist:"
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    com.ems.gateway: INFO

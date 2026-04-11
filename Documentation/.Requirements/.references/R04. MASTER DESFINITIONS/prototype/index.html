@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Definition Management — Prototype</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!-- APP SHELL                                                          -->
+<!-- ================================================================== -->
+<div id="app-shell" class="administration-page">
+
+  <!-- ---- Header ---- -->
+  <header class="app-header">
+    <div class="header-island header-island-left">
+      <button class="island-btn" id="hamburger-btn" type="button" aria-label="Toggle navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="hamburger-open">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="hamburger-close" style="display:none">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+      <div class="island-logo" aria-label="ThinkPLUS">
+        <span class="island-logo-text">think+</span>
+      </div>
+      <span class="island-divider" aria-hidden="true"></span>
+      <span class="page-indicator">
+        <span class="page-indicator-icon">
+          <!-- i18n: NAV_DEFINITION_MANAGER -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <path d="M4 6h16M4 12h16M4 18h7"></path>
+            <circle cx="18" cy="18" r="3"></circle>
+            <path d="M20.5 20.5L22 22"></path>
+          </svg>
+        </span>
+        <span id="section-name">Definition Manager</span>
+      </span>
+    </div>
+
+    <div class="header-island header-island-right" style="position:relative">
+      <button class="island-btn" type="button" aria-label="Help">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </button>
+      <span class="island-divider" aria-hidden="true"></span>
+      <button class="persona-badge role-architect" id="persona-badge" type="button" aria-label="Switch persona" title="Architect (Nicole)">
+        <span id="persona-badge-label">NR</span>
+      </button>
+      <button class="sign-out-btn" id="signout-btn" type="button" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+        <span class="sign-out-label">Sign out</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ---- Drawer Backdrop ---- -->
+  <div class="drawer-backdrop" id="drawer-backdrop" role="presentation"></div>
+
+  <!-- ---- Dock Sidebar ---- -->
+  <aside class="admin-dock" id="admin-dock" aria-label="Administration sections">
+    <div class="dock-card">
+      <ul>
+        <li class="dock-item active" data-section="def-manager" data-roles="super-admin,architect,tenant-admin">
+          <button type="button" class="dock-link active" aria-label="Definition Manager">
+            <span class="dock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"></path><circle cx="18" cy="18" r="3"></circle><path d="M20.5 20.5L22 22"></path></svg>
+            </span>
+            <span class="dock-label">Definition Manager</span>
+          </button>
+        </li>
+        <li class="dock-item" data-section="release-dashboard" data-roles="super-admin,architect,tenant-admin">
+          <button type="button" class="dock-link" aria-label="Release Dashboard">
+            <span class="dock-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            </span>
+            <span class="dock-label">Release Dashboard</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="dock-footer">
+      <button class="sign-out-btn dock-signout" type="button" aria-label="Sign out" id="dock-signout-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+          <line x1="12" y1="2" x2="12" y2="12"></line>
+        </svg>
+        <span class="sign-out-label">Sign out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ---- Content Area ---- -->
+  <section class="admin-content" id="admin-content">
+    <nav class="admin-breadcrumb" aria-label="Breadcrumb">
+      <!-- i18n: BREADCRUMB_ADMIN -->
+      <span>Administration</span>
+      <span class="crumb-sep" aria-hidden="true">&gt;</span>
+      <span id="breadcrumb-section">Definition Manager</span>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!-- SCR-01: Object Type List                                     -->
+    <!-- ============================================================ -->
+    <div class="section-panel" id="section-def-manager" data-testid="section-def-manager">
+      <div class="section-header">
+        <!-- i18n: DEF_HEADING_OBJECT_TYPES -->
+        <h2>Object Types</h2>
+        <div class="state-tabs">
+          <button class="state-tab active" data-state="populated" aria-label="Show populated state">Populated</button>
+          <button class="state-tab" data-state="loading" aria-label="Show loading state">Loading</button>
+          <button class="state-tab" data-state="empty" aria-label="Show empty state">Empty</button>
+        </div>
+      </div>
+
+      <!-- Populated State -->
+      <div data-view-state="populated">
+        <!-- Stats row -->
+        <div class="stat-cards-row">
+          <div class="stat-mini-card"><div class="stat-value">6</div><div class="stat-label">Total Types</div></div>
+          <div class="stat-mini-card"><div class="stat-value">4</div><div class="stat-label">Published</div></div>
+          <div class="stat-mini-card"><div class="stat-value">2</div><div class="stat-label">Draft</div></div>
+          <div class="stat-mini-card"><div class="stat-value">42</div><div class="stat-label">Total Attributes</div></div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar-row">
+          <div class="search-bar">
+            <input type="search" id="search-input" placeholder="Search object types..." aria-label="Search object types">
+          </div>
+          <div class="filter-chips" role="group" aria-label="Filter by category">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="core">Core</button>
+            <button class="filter-chip" data-filter="supporting">Supporting</button>
+            <button class="filter-chip" data-filter="custom">Custom</button>
+          </div>
+          <select class="sort-select" id="sort-select" aria-label="Sort by">
+            <option value="name-asc">Name A-Z</option>
+            <option value="name-desc">Name Z-A</option>
+            <option value="modified">Last Modified</option>
+            <option value="attrs">Attribute Count</option>
+          </select>
+          <div class="view-toggle" role="group" aria-label="View mode">
+            <button class="view-toggle-btn active" data-view="table" aria-label="Table view">Table</button>
+            <button class="view-toggle-btn" data-view="card" aria-label="Card view">Cards</button>
+          </div>
+        </div>
+
+        <!-- TABLE VIEW -->
+        <div id="table-view" data-list-view="table">
+          <div class="demo-table-wrap">
+            <table class="demo-table" id="ot-table" aria-label="Object types list">
+              <thead>
+                <tr>
+                  <th data-sort="name">Name <span class="sort-arrow" aria-hidden="true">&#9650;</span></th>
+                  <th data-sort="category">Category</th>
+                  <th data-sort="status">Status</th>
+                  <th data-sort="attrs">Attributes</th>
+                  <th data-sort="conns">Connections</th>
+                  <th data-sort="modified">Last Modified</th>
+                </tr>
+              </thead>
+              <tbody id="ot-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CARD VIEW -->
+        <div id="card-view" data-list-view="card" style="display:none">
+          <div class="demo-card-grid" id="ot-card-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div data-view-state="loading" style="display:none">
+        <div class="skeleton-loader">
+          <div class="skeleton-line w-60"></div>
+          <div class="skeleton-line w-80"></div>
+          <div class="skeleton-line w-40"></div>
+          <div class="skeleton-line w-70"></div>
+          <div class="skeleton-line w-50"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div data-view-state="empty" style="display:none">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+              <path d="M4 6h16M4 12h16M4 18h7"></path>
+              <circle cx="18" cy="18" r="3"></circle>
+            </svg>
+          </div>
+          <!-- i18n: DEF_EMPTY_TITLE -->
+          <h3>No object types defined</h3>
+          <!-- i18n: DEF_EMPTY_DESC -->
+          <p>Create your first object type to start building your definition schema.</p>
+          <button class="nm-btn nm-btn-primary" id="empty-create-btn" aria-label="Create first object type">+ Create Object Type</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SCR-04: Release Dashboard                                    -->
+    <!-- ============================================================ -->
+    <div class="section-panel" id="section-release-dashboard" style="display:none" data-testid="section-release-dashboard">
+      <div class="section-header">
+        <!-- i18n: DEF_HEADING_RELEASES -->
+        <h2>Release Dashboard</h2>
+      </div>
+
+      <div class="split-layout" id="release-split">
+        <!-- Release List -->
+        <div class="split-list">
+          <div class="split-list-header">
+            <input type="search" placeholder="Search releases..." aria-label="Search releases">
+          </div>
+          <div class="demo-table-wrap" style="box-shadow:none">
+            <div id="release-list">
+              <div class="release-card selected" data-release="rel-1" tabindex="0" role="button" aria-label="Release v2.1.0">
+                <div class="release-card-header">
+                  <span class="release-card-title">v2.1.0 - Schema Update</span>
+                  <span class="demo-status-badge pending">Pending</span>
+                </div>
+                <div class="release-card-meta">2026-03-08 -- 3 object types affected</div>
+              </div>
+              <div class="release-card" data-release="rel-2" tabindex="0" role="button" aria-label="Release v2.0.0">
+                <div class="release-card-header">
+                  <span class="release-card-title">v2.0.0 - Major Restructure</span>
+                  <span class="demo-status-badge approved">Approved</span>
+                </div>
+                <div class="release-card-meta">2026-03-01 -- 5 object types affected</div>
+              </div>
+              <div class="release-card" data-release="rel-3" tabindex="0" role="button" aria-label="Release v1.5.0">
+                <div class="release-card-header">
+                  <span class="release-card-title">v1.5.0 - Initial Definitions</span>
+                  <span class="demo-status-badge published">Published</span>
+                </div>
+                <div class="release-card-meta">2026-02-15 -- 6 object types affected</div>
+              </div>
+              <div class="release-card" data-release="rel-4" tabindex="0" role="button" aria-label="Release v1.0.0">
+                <div class="release-card-header">
+                  <span class="release-card-title">v1.0.0 - Bootstrap</span>
+                  <span class="demo-status-badge published">Published</span>
+                </div>
+                <div class="release-card-meta">2026-01-10 -- 4 object types affected</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Release Detail -->
+        <div class="split-detail" id="release-detail">
+          <h3>v2.1.0 - Schema Update</h3>
+          <div class="info-rows" style="margin-bottom:1rem">
+            <div class="info-row"><span class="info-label">Status</span><span class="info-value"><span class="demo-status-badge pending">Pending Approval</span></span></div>
+            <div class="info-row"><span class="info-label">Author</span><span class="info-value">Nicole Roberts</span></div>
+            <div class="info-row"><span class="info-label">Created</span><span class="info-value">2026-03-08</span></div>
+            <div class="info-row"><span class="info-label">Target Date</span><span class="info-value">2026-03-15</span></div>
+          </div>
+
+          <h4 style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--tp-text);opacity:0.6;margin-bottom:0.5rem">Changelog</h4>
+          <div class="content-card" style="margin-bottom:1rem">
+            <ul style="list-style:disc;padding-inline-start:1.25rem;font-size:0.84rem;line-height:1.8;color:var(--tp-text)">
+              <li>Added "Contract" object type with 8 attributes</li>
+              <li>Added "Expiry Date" attribute to Asset type</li>
+              <li>Retired "Legacy ID" attribute from Employee type</li>
+            </ul>
+          </div>
+
+          <h4 style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--tp-text);opacity:0.6;margin-bottom:0.5rem">Impact Assessment</h4>
+          <div class="impact-grid">
+            <div class="impact-item"><div class="impact-value">3</div><div class="impact-label">Types Changed</div></div>
+            <div class="impact-item"><div class="impact-value">9</div><div class="impact-label">Attributes Added</div></div>
+            <div class="impact-item"><div class="impact-value">1</div><div class="impact-label">Retired</div></div>
+            <div class="impact-item"><div class="impact-value">2</div><div class="impact-label">Tenants Affected</div></div>
+          </div>
+
+          <div style="display:flex;gap:0.5rem;margin-top:1rem" data-role-gate="super-admin,architect">
+            <button class="nm-btn nm-btn-primary" id="btn-approve-release" aria-label="Approve release">Approve</button>
+            <button class="nm-btn nm-btn-danger" id="btn-reject-release" aria-label="Reject release">Reject</button>
+            <button class="nm-btn" id="btn-publish-release" aria-label="Publish release" disabled>Publish</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SCR-02: Object Type Detail Panel (overlay on mobile)         -->
+  <!-- ============================================================ -->
+  <div id="detail-overlay" style="display:none">
+    <div class="split-detail" id="ot-detail-panel" style="position:fixed;top:80px;right:24px;bottom:24px;width:calc(50% - 40px);z-index:30;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 id="detail-title" style="margin:0">Employee</h3>
+        <button class="nm-btn nm-btn-sm" id="detail-close-btn" aria-label="Close detail panel">Close</button>
+      </div>
+
+      <!-- 7 Tabs -->
+      <div class="section-tabs" id="detail-tabs" role="tablist" aria-label="Object type configuration tabs">
+        <button class="section-tab active" data-tab="tab-general" role="tab" aria-selected="true">General</button>
+        <button class="section-tab" data-tab="tab-attributes" role="tab" aria-selected="false">Attributes</button>
+        <button class="section-tab" data-tab="tab-connections" role="tab" aria-selected="false">Connections</button>
+        <button class="section-tab" data-tab="tab-governance" role="tab" aria-selected="false">Governance</button>
+        <button class="section-tab" data-tab="tab-maturity" role="tab" aria-selected="false">Maturity</button>
+        <button class="section-tab" data-tab="tab-localization" role="tab" aria-selected="false">Localization</button>
+        <button class="section-tab" data-tab="tab-measures" role="tab" aria-selected="false">Measures</button>
+      </div>
+
+      <!-- T1: General -->
+      <div class="tab-panel active" data-tab-panel="tab-general" role="tabpanel">
+        <div class="content-card">
+          <div class="info-rows" id="detail-general-info">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- T2: Attributes -->
+      <div class="tab-panel" data-tab-panel="tab-attributes" role="tabpanel" style="display:none">
+        <div class="bulk-toolbar" id="bulk-toolbar" style="display:none">
+          <span class="bulk-count"><span id="bulk-count-num">0</span> selected</span>
+          <button class="nm-btn nm-btn-sm" id="bulk-activate-btn">Activate</button>
+          <button class="nm-btn nm-btn-sm nm-btn-danger" id="bulk-retire-btn">Retire</button>
+        </div>
+        <div class="demo-table-wrap">
+          <table class="demo-table" id="attr-table" aria-label="Attributes list">
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox" id="attr-select-all" aria-label="Select all attributes"></th>
+                <th>Attribute Name</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Lifecycle</th>
+                <th>Default</th>
+                <th style="width:80px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attr-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- T3: Connections -->
+      <div class="tab-panel" data-tab-panel="tab-connections" role="tabpanel" style="display:none">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem">
+          <button class="nm-btn nm-btn-sm nm-btn-primary" id="add-connection-btn">+ Add Connection</button>
+        </div>
+        <div class="demo-table-wrap">
+          <table class="demo-table" id="conn-table" aria-label="Connections list">
+            <thead>
+              <tr>
+                <th>Relationship</th>
+                <th>Target Type</th>
+                <th>Cardinality</th>
+                <th>Lifecycle</th>
+                <th style="width:80px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="conn-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- T4: Governance -->
+      <div class="tab-panel" data-tab-panel="tab-governance" role="tabpanel" style="display:none">
+        <div class="content-card">
+          <h4>Master Mandate Flags</h4>
+          <div id="gov-flags">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="content-card" data-role-gate="super-admin">
+          <h4>Tenant Override Rules</h4>
+          <div class="info-rows">
+            <div class="info-row"><span class="info-label">Allow local attributes</span><span class="info-value"><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Allow local attributes" tabindex="0"></div></span></div>
+            <div class="info-row"><span class="info-label">Allow custom connections</span><span class="info-value"><div class="toggle-switch" role="switch" aria-checked="false" aria-label="Allow custom connections" tabindex="0"></div></span></div>
+            <div class="info-row"><span class="info-label">Require approval for changes</span><span class="info-value"><div class="toggle-switch on" role="switch" aria-checked="true" aria-label="Require approval" tabindex="0"></div></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- T5: Maturity -->
+      <div class="tab-panel" data-tab-panel="tab-maturity" role="tabpanel" style="display:none">
+        <div class="content-card">
+          <h4>Maturity Assessment</h4>
+          <div class="radar-wrap">
+            <div class="radar-chart">
+              <span class="radar-axis top">Documentation</span>
+              <span class="radar-axis right">Completeness</span>
+              <span class="radar-axis bottom">Freshness</span>
+              <span class="radar-axis left">Usage</span>
+              <span class="radar-score">3.2</span>
+            </div>
+          </div>
+        </div>
+        <div class="content-card">
+          <h4>Dimension Scores</h4>
+          <div class="info-rows">
+            <div class="info-row"><span class="info-label">Documentation</span><span class="info-value"><div class="maturity-bar" style="width:120px;display:inline-block;vertical-align:middle"><div class="maturity-fill" style="width:70%"></div></div> 3.5</span></div>
+            <div class="info-row"><span class="info-label">Completeness</span><span class="info-value"><div class="maturity-bar" style="width:120px;display:inline-block;vertical-align:middle"><div class="maturity-fill" style="width:80%"></div></div> 4.0</span></div>
+            <div class="info-row"><span class="info-label">Freshness</span><span class="info-value"><div class="maturity-bar" style="width:120px;display:inline-block;vertical-align:middle"><div class="maturity-fill" style="width:50%"></div></div> 2.5</span></div>
+            <div class="info-row"><span class="info-label">Usage</span><span class="info-value"><div class="maturity-bar" style="width:120px;display:inline-block;vertical-align:middle"><div class="maturity-fill" style="width:60%"></div></div> 3.0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- T6: Localization -->
+      <div class="tab-panel" data-tab-panel="tab-localization" role="tabpanel" style="display:none">
+        <div class="content-card">
+          <h4>Translation Progress</h4>
+          <div id="locale-list">
+            <div class="locale-row">
+              <span class="locale-flag" aria-hidden="true">EN</span>
+              <span class="locale-name">English</span>
+              <div class="locale-bar"><div class="locale-bar-fill" style="width:100%"></div></div>
+              <span class="locale-pct">100%</span>
+            </div>
+            <div class="locale-row">
+              <span class="locale-flag" aria-hidden="true">AR</span>
+              <span class="locale-name">Arabic</span>
+              <div class="locale-bar"><div class="locale-bar-fill" style="width:85%"></div></div>
+              <span class="locale-pct">85%</span>
+            </div>
+            <div class="locale-row">
+              <span class="locale-flag" aria-hidden="true">FR</span>
+              <span class="locale-name">French</span>
+              <div class="locale-bar"><div class="locale-bar-fill" style="width:60%"></div></div>
+              <span class="locale-pct">60%</span>
+            </div>
+            <div class="locale-row">
+              <span class="locale-flag" aria-hidden="true">DE</span>
+              <span class="locale-name">German</span>
+              <div class="locale-bar"><div class="locale-bar-fill" style="width:40%"></div></div>
+              <span class="locale-pct">40%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- T7: Measures -->
+      <div class="tab-panel" data-tab-panel="tab-measures" role="tabpanel" style="display:none">
+        <div id="measures-list">
+          <div class="accordion-item open">
+            <div class="accordion-header" tabindex="0" role="button" aria-expanded="true" aria-label="Toggle Quality Measures">
+              <span>Quality Measures</span>
+              <span class="accordion-chevron" aria-hidden="true">&#9660;</span>
+            </div>
+            <div class="accordion-body">
+              <div class="info-rows">
+                <div class="info-row"><span class="info-label">Completeness Score</span><span class="info-value">85%</span></div>
+                <div class="info-row"><span class="info-label">Accuracy Score</span><span class="info-value">92%</span></div>
+                <div class="info-row"><span class="info-label">Consistency Score</span><span class="info-value">78%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header" tabindex="0" role="button" aria-expanded="false" aria-label="Toggle Usage Measures">
+              <span>Usage Measures</span>
+              <span class="accordion-chevron" aria-hidden="true">&#9660;</span>
+            </div>
+            <div class="accordion-body">
+              <div class="info-rows">
+                <div class="info-row"><span class="info-label">Instance Count</span><span class="info-value">1,247</span></div>
+                <div class="info-row"><span class="info-label">Active References</span><span class="info-value">892</span></div>
+                <div class="info-row"><span class="info-label">Last Instance Created</span><span class="info-value">2026-03-09</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header" tabindex="0" role="button" aria-expanded="false" aria-label="Toggle Timeliness Measures">
+              <span>Timeliness Measures</span>
+              <span class="accordion-chevron" aria-hidden="true">&#9660;</span>
+            </div>
+            <div class="accordion-body">
+              <div class="info-rows">
+                <div class="info-row"><span class="info-label">Average Update Frequency</span><span class="info-value">Weekly</span></div>
+                <div class="info-row"><span class="info-label">Last Review Date</span><span class="info-value">2026-03-05</span></div>
+                <div class="info-row"><span class="info-label">Staleness Threshold</span><span class="info-value">30 days</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SCR-03: Create Object Type Wizard                            -->
+  <!-- ============================================================ -->
+  <div class="wizard-overlay" id="wizard-overlay" role="dialog" aria-modal="true" aria-label="Create Object Type">
+    <div class="wizard-card">
+      <div class="wizard-header">
+        <!-- i18n: DEF_WIZARD_TITLE -->
+        <h3>Create Object Type</h3>
+        <button class="wizard-close" id="wizard-close" aria-label="Close wizard">&times;</button>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="wizard-steps" role="group" aria-label="Wizard progress">
+        <div class="wizard-step active" data-wiz-step="1">
+          <span class="wizard-step-number">1</span>
+          <span class="wizard-step-label">Basic Info</span>
+          <span class="wizard-step-connector" aria-hidden="true"></span>
+        </div>
+        <div class="wizard-step" data-wiz-step="2">
+          <span class="wizard-step-number">2</span>
+          <span class="wizard-step-label">Attributes</span>
+          <span class="wizard-step-connector" aria-hidden="true"></span>
+        </div>
+        <div class="wizard-step" data-wiz-step="3">
+          <span class="wizard-step-number">3</span>
+          <span class="wizard-step-label">Connections</span>
+          <span class="wizard-step-connector" aria-hidden="true"></span>
+        </div>
+        <div class="wizard-step" data-wiz-step="4">
+          <span class="wizard-step-number">4</span>
+          <span class="wizard-step-label">Review</span>
+        </div>
+      </div>
+
+      <!-- Wizard Body -->
+      <div class="wizard-body">
+        <!-- Step 1: Basic Info -->
+        <div class="wizard-panel active" data-wiz-panel="1">
+          <div class="wiz-row">
+            <div class="wiz-field" id="field-name">
+              <!-- i18n: DEF_FIELD_NAME -->
+              <label for="wiz-name">Name *</label>
+              <input type="text" id="wiz-name" placeholder="e.g. Equipment" required>
+              <span class="field-error">Name is required</span>
+            </div>
+            <div class="wiz-field" id="field-typekey">
+              <!-- i18n: DEF_FIELD_TYPEKEY -->
+              <label for="wiz-typekey">Type Key *</label>
+              <input type="text" id="wiz-typekey" placeholder="e.g. equipment" required>
+              <span class="field-error">Type key is required</span>
+            </div>
+          </div>
+          <div class="wiz-field">
+            <!-- i18n: DEF_FIELD_DESCRIPTION -->
+            <label for="wiz-desc">Description</label>
+            <textarea id="wiz-desc" placeholder="Describe this object type..."></textarea>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <!-- i18n: DEF_FIELD_CATEGORY -->
+              <label for="wiz-category">Category *</label>
+              <select id="wiz-category" required>
+                <option value="">Select category</option>
+                <option value="core">Core</option>
+                <option value="supporting">Supporting</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div class="wiz-field">
+              <!-- i18n: DEF_FIELD_ICON -->
+              <label for="wiz-icon">Icon</label>
+              <select id="wiz-icon">
+                <option value="cube">Cube</option>
+                <option value="person">Person</option>
+                <option value="folder">Folder</option>
+                <option value="building">Building</option>
+                <option value="briefcase">Briefcase</option>
+                <option value="gear">Gear</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Attributes -->
+        <div class="wizard-panel" data-wiz-panel="2">
+          <p style="font-size:0.84rem;color:var(--tp-text);opacity:0.7;margin-bottom:1rem">
+            System default attributes (name, description, status, owner) are automatically attached. Add additional attributes below.
+          </p>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem">
+            <button class="nm-btn nm-btn-sm nm-btn-primary" id="wiz-add-attr-btn">+ Add Attribute</button>
+          </div>
+          <div class="demo-table-wrap">
+            <table class="demo-table" aria-label="Wizard attributes">
+              <thead>
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th><th style="width:60px"></th></tr>
+              </thead>
+              <tbody id="wiz-attr-tbody">
+                <tr class="wiz-default-attr"><td>name</td><td>String</td><td>Yes</td><td>System</td><td></td></tr>
+                <tr class="wiz-default-attr"><td>description</td><td>Text</td><td>No</td><td>System</td><td></td></tr>
+                <tr class="wiz-default-attr"><td>status</td><td>Enum</td><td>Yes</td><td>System</td><td></td></tr>
+                <tr class="wiz-default-attr"><td>owner</td><td>Reference</td><td>Yes</td><td>System</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 3: Connections -->
+        <div class="wizard-panel" data-wiz-panel="3">
+          <p style="font-size:0.84rem;color:var(--tp-text);opacity:0.7;margin-bottom:1rem">
+            Define how this object type relates to other types.
+          </p>
+          <div style="display:flex;justify-content:flex-end;margin-bottom:0.75rem">
+            <button class="nm-btn nm-btn-sm nm-btn-primary" id="wiz-add-conn-btn">+ Add Connection</button>
+          </div>
+          <div class="demo-table-wrap">
+            <table class="demo-table" aria-label="Wizard connections">
+              <thead>
+                <tr><th>Relationship</th><th>Target Type</th><th>Cardinality</th><th style="width:60px"></th></tr>
+              </thead>
+              <tbody id="wiz-conn-tbody">
+                <tr><td colspan="4" style="text-align:center;opacity:0.5;padding:2rem">No connections defined yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Step 4: Review -->
+        <div class="wizard-panel" data-wiz-panel="4">
+          <div class="review-section">
+            <h4>Basic Information</h4>
+            <div class="review-item"><span class="review-item-label">Name</span><span class="review-item-value" id="review-name">--</span></div>
+            <div class="review-item"><span class="review-item-label">Type Key</span><span class="review-item-value" id="review-typekey">--</span></div>
+            <div class="review-item"><span class="review-item-label">Category</span><span class="review-item-value" id="review-category">--</span></div>
+          </div>
+          <div class="review-section">
+            <h4>Attributes</h4>
+            <div class="review-item"><span class="review-item-label">System defaults</span><span class="review-item-value">4</span></div>
+            <div class="review-item"><span class="review-item-label">Custom attributes</span><span class="review-item-value" id="review-attr-count">0</span></div>
+          </div>
+          <div class="review-section">
+            <h4>Connections</h4>
+            <div class="review-item"><span class="review-item-label">Total connections</span><span class="review-item-value" id="review-conn-count">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Footer -->
+      <div class="wizard-footer">
+        <button class="nm-btn" id="wiz-back-btn" disabled aria-label="Previous step">Back</button>
+        <div style="display:flex;gap:0.5rem">
+          <button class="nm-btn" id="wiz-cancel-btn" aria-label="Cancel wizard">Cancel</button>
+          <button class="nm-btn nm-btn-primary" id="wiz-next-btn" aria-label="Next step">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- Confirm Dialogs                                              -->
+  <!-- ============================================================ -->
+
+  <!-- CD-04: Retire Attribute -->
+  <div class="confirm-overlay" id="confirm-retire" role="dialog" aria-modal="true" aria-label="Confirm retire">
+    <div class="confirm-card">
+      <!-- i18n: DEF_CONFIRM_RETIRE_TITLE -->
+      <h4>Retire Attribute?</h4>
+      <!-- i18n: DEF_CONFIRM_RETIRE_DESC -->
+      <p>This attribute will be marked as retired. Existing instance data will be preserved but the attribute will no longer appear in new forms. This action can be reversed.</p>
+      <div class="confirm-actions">
+        <button class="nm-btn" id="confirm-retire-cancel">Cancel</button>
+        <button class="nm-btn nm-btn-danger" id="confirm-retire-ok">Retire</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CD-05: Bulk Retire -->
+  <div class="confirm-overlay" id="confirm-bulk-retire" role="dialog" aria-modal="true" aria-label="Confirm bulk retire">
+    <div class="confirm-card">
+      <!-- i18n: DEF_CONFIRM_BULK_RETIRE_TITLE -->
+      <h4>Retire Selected Attributes?</h4>
+      <!-- i18n: DEF_CONFIRM_BULK_RETIRE_DESC -->
+      <p><span id="bulk-retire-count">0</span> attributes will be retired. Instance data will be preserved. Non-system attributes only.</p>
+      <div class="confirm-actions">
+        <button class="nm-btn" id="confirm-bulk-cancel">Cancel</button>
+        <button class="nm-btn nm-btn-danger" id="confirm-bulk-ok">Retire All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CD-01: Delete Object Type -->
+  <div class="confirm-overlay" id="confirm-delete" role="dialog" aria-modal="true" aria-label="Confirm delete">
+    <div class="confirm-card">
+      <!-- i18n: DEF_CONFIRM_DELETE_TITLE -->
+      <h4>Delete Object Type?</h4>
+      <!-- i18n: DEF_CONFIRM_DELETE_DESC -->
+      <p>This will permanently remove the object type and all its configuration. This action cannot be undone. Instances referencing this type will become orphaned.</p>
+      <div class="confirm-actions">
+        <button class="nm-btn" id="confirm-delete-cancel">Cancel</button>
+        <button class="nm-btn nm-btn-danger" id="confirm-delete-ok">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB: Create New -->
+  <button class="fab-create" id="fab-create" aria-label="Create new object type" title="Create new object type">+</button>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

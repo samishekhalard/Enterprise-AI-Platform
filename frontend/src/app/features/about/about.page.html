@@ -1,0 +1,119 @@
+<app-page-frame
+  class="about-page-frame"
+  [title]="'About the Platform'"
+  [subtitle]="'Capabilities, mission, and technology stack for the current workspace.'"
+  data-testid="about-page"
+>
+  <div page-content class="about-page">
+    <section class="hero-section" data-testid="about-hero">
+      <div class="hero-content">
+        <h1 class="hero-title" data-testid="about-platform-name">{{ platformName }}</h1>
+        <p class="hero-tagline" data-testid="about-tagline">{{ tagline }}</p>
+      </div>
+    </section>
+
+    <section class="features-section" data-testid="about-features">
+      <h2 class="section-title">Platform Capabilities</h2>
+      <div class="features-grid">
+        @for (feature of features; track feature.title) {
+          <div class="feature-card" [attr.data-testid]="'about-feature-' + feature.icon">
+            <div class="feature-icon" [style.--feature-color]="'var(' + feature.colorVar + ')'">
+              @switch (feature.icon) {
+                @case ('clipboard') {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                    />
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                    <line x1="8" y1="10" x2="16" y2="10" />
+                    <line x1="8" y1="14" x2="16" y2="14" />
+                    <line x1="8" y1="18" x2="12" y2="18" />
+                  </svg>
+                }
+                @case ('brain') {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 2 2.83V12a4 4 0 0 1-2.5 3.7V18a4 4 0 0 1-8 0v-2.3A4 4 0 0 1 5 12V9.83A3 3 0 0 1 7 7V6a4 4 0 0 1 5-3.87"
+                    />
+                    <circle cx="9" cy="10" r="1" fill="currentColor" />
+                    <circle cx="15" cy="10" r="1" fill="currentColor" />
+                  </svg>
+                }
+                @case ('shield') {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <polyline points="9 12 11 14 15 10" />
+                  </svg>
+                }
+                @case ('archive') {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                }
+              }
+            </div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="mission-section" data-testid="about-mission">
+      <h2 class="section-title">Our Mission</h2>
+      <p class="mission-text" data-testid="about-mission-text">{{ mission }}</p>
+    </section>
+
+    <section class="tech-section" data-testid="about-tech-stack">
+      <h2 class="section-title">Technology Stack</h2>
+      <div class="tech-badges">
+        @for (tech of techStack; track tech.name) {
+          <span
+            class="tech-badge"
+            [attr.data-testid]="'about-tech-' + tech.name.toLowerCase().replace(' ', '-')"
+          >
+            {{ tech.name }}
+          </span>
+        }
+      </div>
+    </section>
+  </div>
+
+  <footer page-footer class="about-footer" data-testid="about-footer">
+    <p class="footer-version" data-testid="about-version">Version {{ version }}</p>
+    <p class="footer-copyright" data-testid="about-copyright">
+      &copy; {{ year }} BitX Government Platform. All rights reserved.
+    </p>
+    <a routerLink="/administration" class="footer-link" data-testid="about-back-link"
+      >Back to Administration</a
+    >
+  </footer>
+</app-page-frame>

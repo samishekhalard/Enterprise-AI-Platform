@@ -1,0 +1,69 @@
+{
+  "id": "master",
+  "realm": "master",
+  "enabled": true,
+  "displayName": "EMSIST Master Realm Baseline",
+  "displayNameHtml": "<div>EMSIST Master Realm Baseline</div>",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "rememberMe": false,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "roles": {
+    "realm": [
+      {
+        "name": "VIEWER",
+        "description": "EMS viewer role"
+      },
+      {
+        "name": "USER",
+        "description": "EMS user role"
+      },
+      {
+        "name": "MANAGER",
+        "description": "EMS manager role"
+      },
+      {
+        "name": "ADMIN",
+        "description": "EMS admin role"
+      },
+      {
+        "name": "SUPER_ADMIN",
+        "description": "EMS super admin role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "ems-auth-facade",
+      "name": "EMS Auth Facade",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "secret": "ems-auth-facade-secret",
+      "redirectUris": [
+        "https://ems.example/*",
+        "https://gateway.ems.example/*"
+      ],
+      "webOrigins": [
+        "https://ems.example",
+        "https://gateway.ems.example"
+      ],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ]
+    }
+  ]
+}

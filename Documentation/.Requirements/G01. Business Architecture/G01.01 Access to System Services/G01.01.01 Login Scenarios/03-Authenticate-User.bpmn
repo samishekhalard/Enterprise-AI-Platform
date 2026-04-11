@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  id="Definitions_AuthenticateUser"
+  targetNamespace="http://bpmn.io/schema/bpmn"
+  exporter="Camunda Modeler"
+  exporterVersion="5.44.0">
+  <bpmn:collaboration id="Collaboration_AuthenticateUser">
+    <bpmn:participant id="Participant_AuthenticateUser" name="Authenticate user" processRef="Process_AuthenticateUser" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_AuthenticateUser" name="J01 Authenticate User" isExecutable="false">
+    <bpmn:documentation>Objective: authenticate user and authorize user to access the landing page. Success outcome: user authenticated and redirected to the system shell and landing page. Failure outcomes: tenant not found, tenant suspended, tenant license expired, tenant access blocked, no authentication methods, invalid credentials, authentication provider failure, invalid MFA code.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <camunda:properties>
+        <camunda:property name="journey_code" value="J01" />
+        <camunda:property name="journey_name" value="Authenticate User" />
+        <camunda:property name="primary_screen" value="SC01" />
+        <camunda:property name="mfa_screen" value="SC02" />
+        <camunda:property name="not_found_screen" value="SC03" />
+      </camunda:properties>
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="LaneSet_AuthenticateUser">
+      <bpmn:lane id="Lane_AuthenticateUser">
+        <bpmn:flowNodeRef>Event_Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_OpenLoginShell</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SelectTenant</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TenantSelected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ResolveTenantAuthMethods</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_TenantResolution</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TenantNotFound</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OpenTenantNotFoundShell</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TenantNotFound</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TenantSuspended</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowTenantSuspendedMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TenantSuspended</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TenantLicenseExpired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowTenantLicenseExpiredMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TenantLicenseExpired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_NoAuthMethods</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowNoAuthMethodsMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_NoAuthMethods</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_TenantAccessBlocked</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowTenantAccessBlockedMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_TenantAccessBlocked</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_AuthMethodsAvailable</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SelectAuthMethod</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_AuthMethodType</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_CredentialSignInRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EnterCredentials</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SubmitCredentials</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_RedirectSignInRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_HandleAuthProviderResponse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PrimaryAuthenticationOutcome</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_InvalidCredentials</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowBadCredentialsMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_InvalidCredentials</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_AuthenticationFailed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowAuthenticationFailedMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_AuthenticationFailed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_PrimaryAuthenticationSucceeded</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MfaRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_OpenMfaShell</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_EnterMfa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_MfaOutcome</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_InvalidMfaCode</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ShowInvalidMfaMessage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_InvalidMfa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_NoMfaRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_ValidMfaCode</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RedirectToLandingPage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Success</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="Event_Start" name="Start">
+      <bpmn:outgoing>Flow_Start_OpenLoginShell</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_OpenLoginShell" name="Open Login Screen">
+      <bpmn:documentation>Journey step J01.JS01. Activate SC01 Login Screen and expose the login baseline.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS01" />
+          <camunda:property name="screen_code" value="SC01" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_Start_OpenLoginShell</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenLoginShell_SelectTenant</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:userTask id="Task_SelectTenant" name="Select Tenant">
+      <bpmn:documentation>Journey step J01.JS02. User selects the tenant to resolve available authentication methods.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS02" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Tenant Selection Step Section" />
+          <camunda:property name="ui_element" value="Tenant Registry Searchable Dropdown" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_OpenLoginShell_SelectTenant</bpmn:incoming>
+      <bpmn:outgoing>Flow_SelectTenant_TenantSelected</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_LoginShell">
+        <bpmn:targetRef>DataObjectReference_LoginShell</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+
+    <bpmn:intermediateThrowEvent id="Event_TenantSelected" name="Tenant Selected">
+      <bpmn:incoming>Flow_SelectTenant_TenantSelected</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantSelected_ResolveMethods</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:serviceTask id="Task_ResolveTenantAuthMethods" name="Resolve Tenant Authentication Methods">
+      <bpmn:documentation>Journey step J01.JS03. Resolve tenant existence, tenant access-state facts, and available authentication methods from Tenant PG Database.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS03" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="data_source" value="Tenant PG Database" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_TenantSelected_ResolveMethods</bpmn:incoming>
+      <bpmn:outgoing>Flow_ResolveMethods_TenantResolution</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_TenantPgDatabase">
+        <bpmn:targetRef>DataStoreReference_TenantPgDatabase</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_TenantResolution" name="Tenant Resolution Outcome">
+      <bpmn:incoming>Flow_ResolveMethods_TenantResolution</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantNotFound</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TenantSuspended</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TenantLicenseExpired</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NoAuthMethods</bpmn:outgoing>
+      <bpmn:outgoing>Flow_TenantAccessBlocked</bpmn:outgoing>
+      <bpmn:outgoing>Flow_AuthMethodsAvailable</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:intermediateThrowEvent id="Event_TenantNotFound" name="Tenant Not Found">
+      <bpmn:incoming>Flow_TenantNotFound</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantNotFound_OpenShell</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_OpenTenantNotFoundShell" name="Open Tenant Not Found Screen">
+      <bpmn:documentation>Rule-driven outcome. Activate SC03 Tenant Not Found Screen and expose the return path back to login.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC03" />
+          <camunda:property name="container" value="Tenant Not Found Section" />
+          <camunda:property name="ui_element" value="Back to Login Action" />
+          <camunda:property name="rule_outcome" value="TENANT_NOT_FOUND" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_TenantNotFound_OpenShell</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenTenantNotFoundShell_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_TenantNotFound">
+      <bpmn:incoming>Flow_OpenTenantNotFoundShell_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_TenantSuspended" name="Tenant Suspended">
+      <bpmn:incoming>Flow_TenantSuspended</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantSuspended_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowTenantSuspendedMessage" name="Show Tenant Suspended Message">
+      <bpmn:documentation>Rule-driven outcome. Show suspended-tenant feedback in SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="TENANT_SUSPENDED" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_TenantSuspended_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowTenantSuspended_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_TenantSuspended">
+      <bpmn:incoming>Flow_ShowTenantSuspended_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_TenantLicenseExpired" name="Tenant License Expired">
+      <bpmn:incoming>Flow_TenantLicenseExpired</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantLicenseExpired_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowTenantLicenseExpiredMessage" name="Show Tenant License Expired Message">
+      <bpmn:documentation>Rule-driven outcome. Show tenant-license-expired feedback in SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="TENANT_LICENSE_EXPIRED" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_TenantLicenseExpired_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowTenantLicenseExpired_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_TenantLicenseExpired">
+      <bpmn:incoming>Flow_ShowTenantLicenseExpired_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_NoAuthMethods" name="No Authentication Methods">
+      <bpmn:incoming>Flow_NoAuthMethods</bpmn:incoming>
+      <bpmn:outgoing>Flow_NoAuthMethods_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowNoAuthMethodsMessage" name="Show No Auth Methods Message">
+      <bpmn:documentation>Rule-driven outcome. Show the no-auth message inside SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="No Auth Section" />
+          <camunda:property name="ui_element" value="No Auth Description" />
+          <camunda:property name="rule_outcome" value="NO_AUTH_METHODS" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_NoAuthMethods_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowNoAuthMethods_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_NoAuthMethods">
+      <bpmn:incoming>Flow_ShowNoAuthMethods_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_TenantAccessBlocked" name="Tenant Access Blocked">
+      <bpmn:incoming>Flow_TenantAccessBlocked</bpmn:incoming>
+      <bpmn:outgoing>Flow_TenantAccessBlocked_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowTenantAccessBlockedMessage" name="Show Tenant Access Blocked Message">
+      <bpmn:documentation>Rule-driven outcome. Show tenant-access-blocked feedback in SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="TENANT_ACCESS_BLOCKED" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_TenantAccessBlocked_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowTenantAccessBlocked_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_TenantAccessBlocked">
+      <bpmn:incoming>Flow_ShowTenantAccessBlocked_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_AuthMethodsAvailable" name="Authentication Methods Available">
+      <bpmn:incoming>Flow_AuthMethodsAvailable</bpmn:incoming>
+      <bpmn:outgoing>Flow_AuthMethodsAvailable_SelectMethod</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:userTask id="Task_SelectAuthMethod" name="Select Authentication Provider">
+      <bpmn:documentation>Journey step J01.JS04. User selects the required authentication provider.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS04" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Provider Selection Section" />
+          <camunda:property name="ui_element" value="Provider Header Section" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AuthMethodsAvailable_SelectMethod</bpmn:incoming>
+      <bpmn:outgoing>Flow_SelectMethod_ProviderType</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_AuthMethodType" name="Authentication Method Type">
+      <bpmn:incoming>Flow_SelectMethod_ProviderType</bpmn:incoming>
+      <bpmn:outgoing>Flow_CredentialRequired</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RedirectRequired</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:intermediateThrowEvent id="Event_CredentialSignInRequired" name="Credential Sign-In Required">
+      <bpmn:incoming>Flow_CredentialRequired</bpmn:incoming>
+      <bpmn:outgoing>Flow_CredentialRequired_EnterCredentials</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:userTask id="Task_EnterCredentials" name="Enter Credentials">
+      <bpmn:documentation>Journey step J01.JS05. User enters credential-based authentication data.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS05" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Provider Variant Section" />
+          <camunda:property name="ui_element" value="User Name Input" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CredentialRequired_EnterCredentials</bpmn:incoming>
+      <bpmn:outgoing>Flow_EnterCredentials_SubmitCredentials</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:serviceTask id="Task_SubmitCredentials" name="Submit Credentials">
+      <bpmn:documentation>Journey step J01.JS05. Submit credential sign-in request and resolve primary authentication facts.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS05" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="ui_element" value="Sign In Action" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_EnterCredentials_SubmitCredentials</bpmn:incoming>
+      <bpmn:outgoing>Flow_SubmitCredentials_PrimaryOutcome</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:intermediateThrowEvent id="Event_RedirectSignInRequired" name="Redirect Sign-In Required">
+      <bpmn:incoming>Flow_RedirectRequired</bpmn:incoming>
+      <bpmn:outgoing>Flow_RedirectRequired_HandleResponse</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:serviceTask id="Task_HandleAuthProviderResponse" name="Handle Authentication Provider Response">
+      <bpmn:documentation>Journey step J01.JS05. Receive provider callback/response and resolve primary authentication facts.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS05" />
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="ui_element" value="Sign In Action" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RedirectRequired_HandleResponse</bpmn:incoming>
+      <bpmn:outgoing>Flow_HandleResponse_PrimaryOutcome</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:exclusiveGateway id="Gateway_PrimaryAuthenticationOutcome" name="Primary Authentication Outcome">
+      <bpmn:incoming>Flow_SubmitCredentials_PrimaryOutcome</bpmn:incoming>
+      <bpmn:incoming>Flow_HandleResponse_PrimaryOutcome</bpmn:incoming>
+      <bpmn:outgoing>Flow_InvalidCredentials</bpmn:outgoing>
+      <bpmn:outgoing>Flow_AuthenticationFailed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_PrimaryAuthenticationSucceeded</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:intermediateThrowEvent id="Event_InvalidCredentials" name="Invalid Credentials">
+      <bpmn:incoming>Flow_InvalidCredentials</bpmn:incoming>
+      <bpmn:outgoing>Flow_InvalidCredentials_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowBadCredentialsMessage" name="Show Bad Credentials Message">
+      <bpmn:documentation>Rule-driven outcome. Show invalid-credentials feedback in SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="INVALID_CREDENTIALS" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InvalidCredentials_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowBadCredentials_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_InvalidCredentials">
+      <bpmn:incoming>Flow_ShowBadCredentials_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_AuthenticationFailed" name="Authentication Failed">
+      <bpmn:incoming>Flow_AuthenticationFailed</bpmn:incoming>
+      <bpmn:outgoing>Flow_AuthenticationFailed_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowAuthenticationFailedMessage" name="Show Authentication Failed Message">
+      <bpmn:documentation>Rule-driven outcome. Show generic authentication-failed feedback in SC01 Login Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC01" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="AUTH_PROVIDER_FAILURE" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_AuthenticationFailed_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowAuthenticationFailed_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_AuthenticationFailed">
+      <bpmn:incoming>Flow_ShowAuthenticationFailed_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_PrimaryAuthenticationSucceeded" name="Primary Authentication Succeeded">
+      <bpmn:incoming>Flow_PrimaryAuthenticationSucceeded</bpmn:incoming>
+      <bpmn:outgoing>Flow_PrimaryAuthenticationSucceeded_MfaRequired</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:exclusiveGateway id="Gateway_MfaRequired" name="MFA Required">
+      <bpmn:incoming>Flow_PrimaryAuthenticationSucceeded_MfaRequired</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenMfaShell</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NoMfaRequired</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:intermediateThrowEvent id="Event_OpenMfaShell" name="Open MFA Screen">
+      <bpmn:documentation>Journey step J01.JS06. Activate SC02 MFA Screen when MFA is required after primary authentication succeeds.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS06" />
+          <camunda:property name="screen_code" value="SC02" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_OpenMfaShell</bpmn:incoming>
+      <bpmn:outgoing>Flow_OpenMfaShell_EnterMfa</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:userTask id="Task_EnterMfa" name="Enter MFA">
+      <bpmn:documentation>Journey step J01.JS07. User enters the MFA challenge code.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS07" />
+          <camunda:property name="screen_code" value="SC02" />
+          <camunda:property name="container" value="Verification Code Section" />
+          <camunda:property name="ui_element" value="OTP Digit 1" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_OpenMfaShell_EnterMfa</bpmn:incoming>
+      <bpmn:outgoing>Flow_EnterMfa_MfaOutcome</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_MfaOutcome" name="MFA Verification Outcome">
+      <bpmn:incoming>Flow_EnterMfa_MfaOutcome</bpmn:incoming>
+      <bpmn:outgoing>Flow_InvalidMfaCode</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ValidMfaCode</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:intermediateThrowEvent id="Event_InvalidMfaCode" name="Invalid MFA Code">
+      <bpmn:incoming>Flow_InvalidMfaCode</bpmn:incoming>
+      <bpmn:outgoing>Flow_InvalidMfa_ShowMessage</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:sendTask id="Task_ShowInvalidMfaMessage" name="Show Invalid MFA Message">
+      <bpmn:documentation>Rule-driven outcome. Show invalid-MFA feedback in SC02 MFA Screen.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="screen_code" value="SC02" />
+          <camunda:property name="container" value="Status Message Section" />
+          <camunda:property name="ui_element" value="Status Banner" />
+          <camunda:property name="rule_outcome" value="INVALID_MFA_CODE" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InvalidMfa_ShowMessage</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShowInvalidMfa_End</bpmn:outgoing>
+    </bpmn:sendTask>
+
+    <bpmn:endEvent id="End_InvalidMfa">
+      <bpmn:incoming>Flow_ShowInvalidMfa_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_NoMfaRequired" name="No MFA Required">
+      <bpmn:incoming>Flow_NoMfaRequired</bpmn:incoming>
+      <bpmn:outgoing>Flow_NoMfaRequired_Redirect</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:intermediateThrowEvent id="Event_ValidMfaCode" name="Valid MFA Code">
+      <bpmn:incoming>Flow_ValidMfaCode</bpmn:incoming>
+      <bpmn:outgoing>Flow_ValidMfa_Redirect</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+
+    <bpmn:serviceTask id="Task_RedirectToLandingPage" name="Redirect To Landing Page">
+      <bpmn:documentation>Journey step J01.JS08. Redirect the authenticated user to the system shell and landing page.</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="journey_step_code" value="J01.JS08" />
+          <camunda:property name="target_shell" value="app-shell-layout" />
+          <camunda:property name="target_page" value="Landing Page" />
+        </camunda:properties>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_NoMfaRequired_Redirect</bpmn:incoming>
+      <bpmn:incoming>Flow_ValidMfa_Redirect</bpmn:incoming>
+      <bpmn:outgoing>Flow_RedirectToLandingPage_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+
+    <bpmn:endEvent id="End_Success">
+      <bpmn:incoming>Flow_RedirectToLandingPage_End</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:dataObjectReference id="DataObjectReference_LoginShell" name="login shell" dataObjectRef="DataObject_LoginShell" />
+    <bpmn:dataObject id="DataObject_LoginShell" />
+    <bpmn:dataStoreReference id="DataStoreReference_TenantPgDatabase" name="Tenant PG Database" />
+
+    <bpmn:sequenceFlow id="Flow_Start_OpenLoginShell" sourceRef="Event_Start" targetRef="Event_OpenLoginShell" />
+    <bpmn:sequenceFlow id="Flow_OpenLoginShell_SelectTenant" sourceRef="Event_OpenLoginShell" targetRef="Task_SelectTenant" />
+    <bpmn:sequenceFlow id="Flow_SelectTenant_TenantSelected" sourceRef="Task_SelectTenant" targetRef="Event_TenantSelected" />
+    <bpmn:sequenceFlow id="Flow_TenantSelected_ResolveMethods" sourceRef="Event_TenantSelected" targetRef="Task_ResolveTenantAuthMethods" />
+    <bpmn:sequenceFlow id="Flow_ResolveMethods_TenantResolution" sourceRef="Task_ResolveTenantAuthMethods" targetRef="Gateway_TenantResolution" />
+
+    <bpmn:sequenceFlow id="Flow_TenantNotFound" sourceRef="Gateway_TenantResolution" targetRef="Event_TenantNotFound">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_TenantSuspended" sourceRef="Gateway_TenantResolution" targetRef="Event_TenantSuspended">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == true &amp;&amp; tenantStatus == 'SUSPENDED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_TenantLicenseExpired" sourceRef="Gateway_TenantResolution" targetRef="Event_TenantLicenseExpired">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == true &amp;&amp; tenantLicenseStatus == 'EXPIRED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_NoAuthMethods" sourceRef="Gateway_TenantResolution" targetRef="Event_NoAuthMethods">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == true &amp;&amp; tenantStatus != 'SUSPENDED' &amp;&amp; tenantLicenseStatus != 'EXPIRED' &amp;&amp; !(tenantStatus == 'INACTIVE' || tenantAccessBlocked == true) &amp;&amp; authMethodsCount == 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_TenantAccessBlocked" sourceRef="Gateway_TenantResolution" targetRef="Event_TenantAccessBlocked">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == true &amp;&amp; (tenantStatus == 'INACTIVE' || tenantAccessBlocked == true) &amp;&amp; tenantStatus != 'SUSPENDED' &amp;&amp; tenantLicenseStatus != 'EXPIRED'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_AuthMethodsAvailable" sourceRef="Gateway_TenantResolution" targetRef="Event_AuthMethodsAvailable">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tenantFound == true &amp;&amp; tenantStatus != 'SUSPENDED' &amp;&amp; tenantLicenseStatus != 'EXPIRED' &amp;&amp; !(tenantStatus == 'INACTIVE' || tenantAccessBlocked == true) &amp;&amp; authMethodsCount &gt; 0}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_TenantNotFound_OpenShell" sourceRef="Event_TenantNotFound" targetRef="Task_OpenTenantNotFoundShell" />
+    <bpmn:sequenceFlow id="Flow_OpenTenantNotFoundShell_End" sourceRef="Task_OpenTenantNotFoundShell" targetRef="End_TenantNotFound" />
+    <bpmn:sequenceFlow id="Flow_TenantSuspended_ShowMessage" sourceRef="Event_TenantSuspended" targetRef="Task_ShowTenantSuspendedMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowTenantSuspended_End" sourceRef="Task_ShowTenantSuspendedMessage" targetRef="End_TenantSuspended" />
+    <bpmn:sequenceFlow id="Flow_TenantLicenseExpired_ShowMessage" sourceRef="Event_TenantLicenseExpired" targetRef="Task_ShowTenantLicenseExpiredMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowTenantLicenseExpired_End" sourceRef="Task_ShowTenantLicenseExpiredMessage" targetRef="End_TenantLicenseExpired" />
+    <bpmn:sequenceFlow id="Flow_NoAuthMethods_ShowMessage" sourceRef="Event_NoAuthMethods" targetRef="Task_ShowNoAuthMethodsMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowNoAuthMethods_End" sourceRef="Task_ShowNoAuthMethodsMessage" targetRef="End_NoAuthMethods" />
+    <bpmn:sequenceFlow id="Flow_TenantAccessBlocked_ShowMessage" sourceRef="Event_TenantAccessBlocked" targetRef="Task_ShowTenantAccessBlockedMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowTenantAccessBlocked_End" sourceRef="Task_ShowTenantAccessBlockedMessage" targetRef="End_TenantAccessBlocked" />
+    <bpmn:sequenceFlow id="Flow_AuthMethodsAvailable_SelectMethod" sourceRef="Event_AuthMethodsAvailable" targetRef="Task_SelectAuthMethod" />
+    <bpmn:sequenceFlow id="Flow_SelectMethod_ProviderType" sourceRef="Task_SelectAuthMethod" targetRef="Gateway_AuthMethodType" />
+
+    <bpmn:sequenceFlow id="Flow_CredentialRequired" sourceRef="Gateway_AuthMethodType" targetRef="Event_CredentialSignInRequired">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${selectedAuthMethodType == 'CREDENTIAL'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RedirectRequired" sourceRef="Gateway_AuthMethodType" targetRef="Event_RedirectSignInRequired">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${selectedAuthMethodType == 'REDIRECT'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_CredentialRequired_EnterCredentials" sourceRef="Event_CredentialSignInRequired" targetRef="Task_EnterCredentials" />
+    <bpmn:sequenceFlow id="Flow_EnterCredentials_SubmitCredentials" sourceRef="Task_EnterCredentials" targetRef="Task_SubmitCredentials" />
+    <bpmn:sequenceFlow id="Flow_SubmitCredentials_PrimaryOutcome" sourceRef="Task_SubmitCredentials" targetRef="Gateway_PrimaryAuthenticationOutcome" />
+    <bpmn:sequenceFlow id="Flow_RedirectRequired_HandleResponse" sourceRef="Event_RedirectSignInRequired" targetRef="Task_HandleAuthProviderResponse" />
+    <bpmn:sequenceFlow id="Flow_HandleResponse_PrimaryOutcome" sourceRef="Task_HandleAuthProviderResponse" targetRef="Gateway_PrimaryAuthenticationOutcome" />
+
+    <bpmn:sequenceFlow id="Flow_InvalidCredentials" sourceRef="Gateway_PrimaryAuthenticationOutcome" targetRef="Event_InvalidCredentials">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${failureReason == 'INVALID_CREDENTIALS'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_AuthenticationFailed" sourceRef="Gateway_PrimaryAuthenticationOutcome" targetRef="Event_AuthenticationFailed">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${loginSucceeded == false &amp;&amp; failureReason != 'INVALID_CREDENTIALS'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_PrimaryAuthenticationSucceeded" sourceRef="Gateway_PrimaryAuthenticationOutcome" targetRef="Event_PrimaryAuthenticationSucceeded">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${loginSucceeded == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_InvalidCredentials_ShowMessage" sourceRef="Event_InvalidCredentials" targetRef="Task_ShowBadCredentialsMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowBadCredentials_End" sourceRef="Task_ShowBadCredentialsMessage" targetRef="End_InvalidCredentials" />
+    <bpmn:sequenceFlow id="Flow_AuthenticationFailed_ShowMessage" sourceRef="Event_AuthenticationFailed" targetRef="Task_ShowAuthenticationFailedMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowAuthenticationFailed_End" sourceRef="Task_ShowAuthenticationFailedMessage" targetRef="End_AuthenticationFailed" />
+    <bpmn:sequenceFlow id="Flow_PrimaryAuthenticationSucceeded_MfaRequired" sourceRef="Event_PrimaryAuthenticationSucceeded" targetRef="Gateway_MfaRequired" />
+
+    <bpmn:sequenceFlow id="Flow_OpenMfaShell" sourceRef="Gateway_MfaRequired" targetRef="Event_OpenMfaShell">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mfaRequired == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_NoMfaRequired" sourceRef="Gateway_MfaRequired" targetRef="Event_NoMfaRequired">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mfaRequired == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_OpenMfaShell_EnterMfa" sourceRef="Event_OpenMfaShell" targetRef="Task_EnterMfa" />
+    <bpmn:sequenceFlow id="Flow_EnterMfa_MfaOutcome" sourceRef="Task_EnterMfa" targetRef="Gateway_MfaOutcome" />
+    <bpmn:sequenceFlow id="Flow_InvalidMfaCode" sourceRef="Gateway_MfaOutcome" targetRef="Event_InvalidMfaCode">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mfaCodeValid == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ValidMfaCode" sourceRef="Gateway_MfaOutcome" targetRef="Event_ValidMfaCode">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${mfaCodeValid == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+
+    <bpmn:sequenceFlow id="Flow_InvalidMfa_ShowMessage" sourceRef="Event_InvalidMfaCode" targetRef="Task_ShowInvalidMfaMessage" />
+    <bpmn:sequenceFlow id="Flow_ShowInvalidMfa_End" sourceRef="Task_ShowInvalidMfaMessage" targetRef="End_InvalidMfa" />
+    <bpmn:sequenceFlow id="Flow_NoMfaRequired_Redirect" sourceRef="Event_NoMfaRequired" targetRef="Task_RedirectToLandingPage" />
+    <bpmn:sequenceFlow id="Flow_ValidMfa_Redirect" sourceRef="Event_ValidMfaCode" targetRef="Task_RedirectToLandingPage" />
+    <bpmn:sequenceFlow id="Flow_RedirectToLandingPage_End" sourceRef="Task_RedirectToLandingPage" targetRef="End_Success" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AuthenticateUser">
+    <bpmndi:BPMNPlane id="BPMNPlane_AuthenticateUser" bpmnElement="Collaboration_AuthenticateUser">
+      <bpmndi:BPMNShape id="Participant_AuthenticateUser_di" bpmnElement="Participant_AuthenticateUser" isHorizontal="true">
+        <dc:Bounds x="120" y="80" width="2360" height="860" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_AuthenticateUser_di" bpmnElement="Lane_AuthenticateUser" isHorizontal="true">
+        <dc:Bounds x="150" y="80" width="2330" height="860" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_Start_di" bpmnElement="Event_Start">
+        <dc:Bounds x="180" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_OpenLoginShell_di" bpmnElement="Event_OpenLoginShell">
+        <dc:Bounds x="240" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectTenant_di" bpmnElement="Task_SelectTenant">
+        <dc:Bounds x="320" y="220" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_TenantSelected_di" bpmnElement="Event_TenantSelected">
+        <dc:Bounds x="470" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ResolveTenantAuthMethods_di" bpmnElement="Task_ResolveTenantAuthMethods">
+        <dc:Bounds x="550" y="220" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_TenantResolution_di" bpmnElement="Gateway_TenantResolution" isMarkerVisible="true">
+        <dc:Bounds x="740" y="235" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_TenantNotFound_di" bpmnElement="Event_TenantNotFound">
+        <dc:Bounds x="860" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OpenTenantNotFoundShell_di" bpmnElement="Task_OpenTenantNotFoundShell">
+        <dc:Bounds x="940" y="90" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_TenantNotFound_di" bpmnElement="End_TenantNotFound">
+        <dc:Bounds x="1130" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_TenantSuspended_di" bpmnElement="Event_TenantSuspended">
+        <dc:Bounds x="860" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowTenantSuspendedMessage_di" bpmnElement="Task_ShowTenantSuspendedMessage">
+        <dc:Bounds x="940" y="160" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_TenantSuspended_di" bpmnElement="End_TenantSuspended">
+        <dc:Bounds x="1160" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_TenantLicenseExpired_di" bpmnElement="Event_TenantLicenseExpired">
+        <dc:Bounds x="860" y="332" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowTenantLicenseExpiredMessage_di" bpmnElement="Task_ShowTenantLicenseExpiredMessage">
+        <dc:Bounds x="940" y="310" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_TenantLicenseExpired_di" bpmnElement="End_TenantLicenseExpired">
+        <dc:Bounds x="1180" y="332" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_NoAuthMethods_di" bpmnElement="Event_NoAuthMethods">
+        <dc:Bounds x="860" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowNoAuthMethodsMessage_di" bpmnElement="Task_ShowNoAuthMethodsMessage">
+        <dc:Bounds x="940" y="220" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NoAuthMethods_di" bpmnElement="End_NoAuthMethods">
+        <dc:Bounds x="1150" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_TenantAccessBlocked_di" bpmnElement="Event_TenantAccessBlocked">
+        <dc:Bounds x="860" y="502" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowTenantAccessBlockedMessage_di" bpmnElement="Task_ShowTenantAccessBlockedMessage">
+        <dc:Bounds x="940" y="480" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_TenantAccessBlocked_di" bpmnElement="End_TenantAccessBlocked">
+        <dc:Bounds x="1170" y="502" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_AuthMethodsAvailable_di" bpmnElement="Event_AuthMethodsAvailable">
+        <dc:Bounds x="860" y="392" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectAuthMethod_di" bpmnElement="Task_SelectAuthMethod">
+        <dc:Bounds x="940" y="370" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AuthMethodType_di" bpmnElement="Gateway_AuthMethodType" isMarkerVisible="true">
+        <dc:Bounds x="1140" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_CredentialSignInRequired_di" bpmnElement="Event_CredentialSignInRequired">
+        <dc:Bounds x="1260" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnterCredentials_di" bpmnElement="Task_EnterCredentials">
+        <dc:Bounds x="1340" y="280" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SubmitCredentials_di" bpmnElement="Task_SubmitCredentials">
+        <dc:Bounds x="1510" y="280" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_RedirectSignInRequired_di" bpmnElement="Event_RedirectSignInRequired">
+        <dc:Bounds x="1260" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_HandleAuthProviderResponse_di" bpmnElement="Task_HandleAuthProviderResponse">
+        <dc:Bounds x="1340" y="450" width="170" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_PrimaryAuthenticationOutcome_di" bpmnElement="Gateway_PrimaryAuthenticationOutcome" isMarkerVisible="true">
+        <dc:Bounds x="1680" y="385" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_InvalidCredentials_di" bpmnElement="Event_InvalidCredentials">
+        <dc:Bounds x="1800" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowBadCredentialsMessage_di" bpmnElement="Task_ShowBadCredentialsMessage">
+        <dc:Bounds x="1880" y="280" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_InvalidCredentials_di" bpmnElement="End_InvalidCredentials">
+        <dc:Bounds x="2090" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_AuthenticationFailed_di" bpmnElement="Event_AuthenticationFailed">
+        <dc:Bounds x="1800" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowAuthenticationFailedMessage_di" bpmnElement="Task_ShowAuthenticationFailedMessage">
+        <dc:Bounds x="1880" y="450" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_AuthenticationFailed_di" bpmnElement="End_AuthenticationFailed">
+        <dc:Bounds x="2110" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_PrimaryAuthenticationSucceeded_di" bpmnElement="Event_PrimaryAuthenticationSucceeded">
+        <dc:Bounds x="1800" y="612" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_MfaRequired_di" bpmnElement="Gateway_MfaRequired" isMarkerVisible="true">
+        <dc:Bounds x="1880" y="605" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_OpenMfaShell_di" bpmnElement="Event_OpenMfaShell">
+        <dc:Bounds x="2010" y="552" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EnterMfa_di" bpmnElement="Task_EnterMfa">
+        <dc:Bounds x="2090" y="530" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_MfaOutcome_di" bpmnElement="Gateway_MfaOutcome" isMarkerVisible="true">
+        <dc:Bounds x="2250" y="545" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_InvalidMfaCode_di" bpmnElement="Event_InvalidMfaCode">
+        <dc:Bounds x="2380" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ShowInvalidMfaMessage_di" bpmnElement="Task_ShowInvalidMfaMessage">
+        <dc:Bounds x="2460" y="450" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_InvalidMfa_di" bpmnElement="End_InvalidMfa">
+        <dc:Bounds x="2670" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Event_NoMfaRequired_di" bpmnElement="Event_NoMfaRequired">
+        <dc:Bounds x="2010" y="702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_ValidMfaCode_di" bpmnElement="Event_ValidMfaCode">
+        <dc:Bounds x="2380" y="612" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RedirectToLandingPage_di" bpmnElement="Task_RedirectToLandingPage">
+        <dc:Bounds x="2460" y="610" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Success_di" bpmnElement="End_Success">
+        <dc:Bounds x="2670" y="632" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="DataObjectReference_LoginShell_di" bpmnElement="DataObjectReference_LoginShell">
+        <dc:Bounds x="357" y="335" width="36" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_TenantPgDatabase_di" bpmnElement="DataStoreReference_TenantPgDatabase">
+        <dc:Bounds x="595" y="335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_Start_OpenLoginShell_di" bpmnElement="Flow_Start_OpenLoginShell">
+        <di:waypoint x="216" y="260" />
+        <di:waypoint x="240" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenLoginShell_SelectTenant_di" bpmnElement="Flow_OpenLoginShell_SelectTenant">
+        <di:waypoint x="276" y="260" />
+        <di:waypoint x="320" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SelectTenant_TenantSelected_di" bpmnElement="Flow_SelectTenant_TenantSelected">
+        <di:waypoint x="430" y="260" />
+        <di:waypoint x="470" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantSelected_ResolveMethods_di" bpmnElement="Flow_TenantSelected_ResolveMethods">
+        <di:waypoint x="506" y="260" />
+        <di:waypoint x="550" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ResolveMethods_TenantResolution_di" bpmnElement="Flow_ResolveMethods_TenantResolution">
+        <di:waypoint x="690" y="260" />
+        <di:waypoint x="740" y="260" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TenantNotFound_di" bpmnElement="Flow_TenantNotFound">
+        <di:waypoint x="765" y="235" />
+        <di:waypoint x="765" y="130" />
+        <di:waypoint x="860" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantSuspended_di" bpmnElement="Flow_TenantSuspended">
+        <di:waypoint x="790" y="260" />
+        <di:waypoint x="820" y="260" />
+        <di:waypoint x="820" y="200" />
+        <di:waypoint x="860" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantLicenseExpired_di" bpmnElement="Flow_TenantLicenseExpired">
+        <di:waypoint x="790" y="260" />
+        <di:waypoint x="820" y="260" />
+        <di:waypoint x="820" y="350" />
+        <di:waypoint x="860" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoAuthMethods_di" bpmnElement="Flow_NoAuthMethods">
+        <di:waypoint x="790" y="260" />
+        <di:waypoint x="860" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantAccessBlocked_di" bpmnElement="Flow_TenantAccessBlocked">
+        <di:waypoint x="790" y="260" />
+        <di:waypoint x="820" y="260" />
+        <di:waypoint x="820" y="520" />
+        <di:waypoint x="860" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AuthMethodsAvailable_di" bpmnElement="Flow_AuthMethodsAvailable">
+        <di:waypoint x="765" y="285" />
+        <di:waypoint x="765" y="410" />
+        <di:waypoint x="860" y="410" />
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_TenantNotFound_OpenShell_di" bpmnElement="Flow_TenantNotFound_OpenShell">
+        <di:waypoint x="896" y="130" />
+        <di:waypoint x="940" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenTenantNotFoundShell_End_di" bpmnElement="Flow_OpenTenantNotFoundShell_End">
+        <di:waypoint x="1080" y="130" />
+        <di:waypoint x="1130" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantSuspended_ShowMessage_di" bpmnElement="Flow_TenantSuspended_ShowMessage">
+        <di:waypoint x="896" y="200" />
+        <di:waypoint x="940" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowTenantSuspended_End_di" bpmnElement="Flow_ShowTenantSuspended_End">
+        <di:waypoint x="1110" y="200" />
+        <di:waypoint x="1160" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantLicenseExpired_ShowMessage_di" bpmnElement="Flow_TenantLicenseExpired_ShowMessage">
+        <di:waypoint x="896" y="350" />
+        <di:waypoint x="940" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowTenantLicenseExpired_End_di" bpmnElement="Flow_ShowTenantLicenseExpired_End">
+        <di:waypoint x="1130" y="350" />
+        <di:waypoint x="1180" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoAuthMethods_ShowMessage_di" bpmnElement="Flow_NoAuthMethods_ShowMessage">
+        <di:waypoint x="896" y="260" />
+        <di:waypoint x="940" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowNoAuthMethods_End_di" bpmnElement="Flow_ShowNoAuthMethods_End">
+        <di:waypoint x="1100" y="260" />
+        <di:waypoint x="1150" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TenantAccessBlocked_ShowMessage_di" bpmnElement="Flow_TenantAccessBlocked_ShowMessage">
+        <di:waypoint x="896" y="520" />
+        <di:waypoint x="940" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowTenantAccessBlocked_End_di" bpmnElement="Flow_ShowTenantAccessBlocked_End">
+        <di:waypoint x="1120" y="520" />
+        <di:waypoint x="1170" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AuthMethodsAvailable_SelectMethod_di" bpmnElement="Flow_AuthMethodsAvailable_SelectMethod">
+        <di:waypoint x="896" y="410" />
+        <di:waypoint x="940" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SelectMethod_ProviderType_di" bpmnElement="Flow_SelectMethod_ProviderType">
+        <di:waypoint x="1090" y="410" />
+        <di:waypoint x="1140" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CredentialRequired_di" bpmnElement="Flow_CredentialRequired">
+        <di:waypoint x="1165" y="385" />
+        <di:waypoint x="1165" y="320" />
+        <di:waypoint x="1260" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RedirectRequired_di" bpmnElement="Flow_RedirectRequired">
+        <di:waypoint x="1165" y="435" />
+        <di:waypoint x="1165" y="490" />
+        <di:waypoint x="1260" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CredentialRequired_EnterCredentials_di" bpmnElement="Flow_CredentialRequired_EnterCredentials">
+        <di:waypoint x="1296" y="320" />
+        <di:waypoint x="1340" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EnterCredentials_SubmitCredentials_di" bpmnElement="Flow_EnterCredentials_SubmitCredentials">
+        <di:waypoint x="1470" y="320" />
+        <di:waypoint x="1510" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SubmitCredentials_PrimaryOutcome_di" bpmnElement="Flow_SubmitCredentials_PrimaryOutcome">
+        <di:waypoint x="1640" y="320" />
+        <di:waypoint x="1705" y="320" />
+        <di:waypoint x="1705" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RedirectRequired_HandleResponse_di" bpmnElement="Flow_RedirectRequired_HandleResponse">
+        <di:waypoint x="1296" y="490" />
+        <di:waypoint x="1340" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HandleResponse_PrimaryOutcome_di" bpmnElement="Flow_HandleResponse_PrimaryOutcome">
+        <di:waypoint x="1510" y="490" />
+        <di:waypoint x="1705" y="490" />
+        <di:waypoint x="1705" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InvalidCredentials_di" bpmnElement="Flow_InvalidCredentials">
+        <di:waypoint x="1705" y="385" />
+        <di:waypoint x="1705" y="320" />
+        <di:waypoint x="1800" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AuthenticationFailed_di" bpmnElement="Flow_AuthenticationFailed">
+        <di:waypoint x="1705" y="435" />
+        <di:waypoint x="1705" y="490" />
+        <di:waypoint x="1800" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PrimaryAuthenticationSucceeded_di" bpmnElement="Flow_PrimaryAuthenticationSucceeded">
+        <di:waypoint x="1730" y="410" />
+        <di:waypoint x="1818" y="410" />
+        <di:waypoint x="1818" y="612" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InvalidCredentials_ShowMessage_di" bpmnElement="Flow_InvalidCredentials_ShowMessage">
+        <di:waypoint x="1836" y="320" />
+        <di:waypoint x="1880" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowBadCredentials_End_di" bpmnElement="Flow_ShowBadCredentials_End">
+        <di:waypoint x="2040" y="320" />
+        <di:waypoint x="2090" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AuthenticationFailed_ShowMessage_di" bpmnElement="Flow_AuthenticationFailed_ShowMessage">
+        <di:waypoint x="1836" y="490" />
+        <di:waypoint x="1880" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowAuthenticationFailed_End_di" bpmnElement="Flow_ShowAuthenticationFailed_End">
+        <di:waypoint x="2060" y="490" />
+        <di:waypoint x="2110" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PrimaryAuthenticationSucceeded_MfaRequired_di" bpmnElement="Flow_PrimaryAuthenticationSucceeded_MfaRequired">
+        <di:waypoint x="1836" y="630" />
+        <di:waypoint x="1880" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenMfaShell_di" bpmnElement="Flow_OpenMfaShell">
+        <di:waypoint x="1905" y="605" />
+        <di:waypoint x="1905" y="570" />
+        <di:waypoint x="2010" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoMfaRequired_di" bpmnElement="Flow_NoMfaRequired">
+        <di:waypoint x="1905" y="655" />
+        <di:waypoint x="1905" y="720" />
+        <di:waypoint x="2010" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OpenMfaShell_EnterMfa_di" bpmnElement="Flow_OpenMfaShell_EnterMfa">
+        <di:waypoint x="2046" y="570" />
+        <di:waypoint x="2090" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EnterMfa_MfaOutcome_di" bpmnElement="Flow_EnterMfa_MfaOutcome">
+        <di:waypoint x="2200" y="570" />
+        <di:waypoint x="2250" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InvalidMfaCode_di" bpmnElement="Flow_InvalidMfaCode">
+        <di:waypoint x="2275" y="545" />
+        <di:waypoint x="2275" y="490" />
+        <di:waypoint x="2380" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ValidMfaCode_di" bpmnElement="Flow_ValidMfaCode">
+        <di:waypoint x="2300" y="570" />
+        <di:waypoint x="2380" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InvalidMfa_ShowMessage_di" bpmnElement="Flow_InvalidMfa_ShowMessage">
+        <di:waypoint x="2416" y="490" />
+        <di:waypoint x="2460" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShowInvalidMfa_End_di" bpmnElement="Flow_ShowInvalidMfa_End">
+        <di:waypoint x="2620" y="490" />
+        <di:waypoint x="2670" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoMfaRequired_Redirect_di" bpmnElement="Flow_NoMfaRequired_Redirect">
+        <di:waypoint x="2046" y="720" />
+        <di:waypoint x="2230" y="720" />
+        <di:waypoint x="2230" y="650" />
+        <di:waypoint x="2460" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ValidMfa_Redirect_di" bpmnElement="Flow_ValidMfa_Redirect">
+        <di:waypoint x="2416" y="630" />
+        <di:waypoint x="2460" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RedirectToLandingPage_End_di" bpmnElement="Flow_RedirectToLandingPage_End">
+        <di:waypoint x="2610" y="650" />
+        <di:waypoint x="2670" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_LoginShell_di" bpmnElement="DataOutputAssociation_LoginShell">
+        <di:waypoint x="375" y="300" />
+        <di:waypoint x="375" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_TenantPgDatabase_di" bpmnElement="DataOutputAssociation_TenantPgDatabase">
+        <di:waypoint x="620" y="300" />
+        <di:waypoint x="620" y="335" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

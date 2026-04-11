@@ -1,0 +1,19 @@
+/**
+ * RTL mirroring for directional Phosphor icons.
+ * Directional icons (arrows, carets, etc.) must be mirrored in RTL layouts.
+ *
+ * Source: docs/lld/icon-migration-lld.md Section 9.3.
+ */
+[dir='rtl'] {
+  ng-icon[name='phosphorCaretLeftThin'],
+  ng-icon[name='phosphorCaretRightThin'],
+  ng-icon[name='phosphorArrowLeftThin'],
+  ng-icon[name='phosphorArrowRightThin'],
+  ng-icon[name='phosphorArrowClockwiseThin'],
+  ng-icon[name='phosphorPaperPlaneTiltThin'],
+  ng-icon[name='phosphorSignpostThin'],
+  ng-icon[name='phosphorSignInThin'],
+  ng-icon[name='phosphorSignOutThin'] {
+    transform: scaleX(-1);
+  }
+}

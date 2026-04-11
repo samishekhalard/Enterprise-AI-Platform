@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R02 Tenant Management - Journey Map</title>
+<style>
+:root {
+  --tp-primary: #428177;
+  --tp-primary-dark: #054239;
+  --tp-accent: #988561;
+  --tp-error: #6b1f2a;
+  --tp-surface-light: #f2efe9;
+  --tp-text: #3d3a3b;
+  --tp-text-dark: #161616;
+  --tp-text-secondary: #7a7672;
+  --tp-text-muted: #999590;
+  --tp-border: #e0ddda;
+  --tp-surface-hover: #e8e5e0;
+  --tp-surface-bg: #faf8f4;
+  --tp-white: #fff;
+  --tp-success: #428177;
+  --tp-warning: #988561;
+  --tp-danger: #6b1f2a;
+  --tp-info: #0369a1;
+  --tp-font-xs: 0.72rem;
+  --tp-font-sm: 0.82rem;
+  --tp-font-md: 0.92rem;
+  --tp-font-lg: 1.15rem;
+  --tp-font-xl: 1.35rem;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Gotham Rounded', 'Nunito', 'Segoe UI', -apple-system, sans-serif;
+  background: var(--tp-surface-bg);
+  color: var(--tp-text);
+  font-size: var(--tp-font-md);
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Layout */
+.app-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100vh;
+}
+
+.app-header {
+  grid-column: 1 / -1;
+  background: var(--tp-primary-dark);
+  color: var(--tp-white);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.app-header h1 {
+  font-size: var(--tp-font-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-header .subtitle {
+  font-size: var(--tp-font-sm);
+  opacity: 0.7;
+  margin-left: 12px;
+}
+
+.header-actions { display: flex; gap: 8px; }
+
+.header-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--tp-white);
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: var(--tp-font-sm);
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.header-btn:hover { background: rgba(255,255,255,0.22); }
+.header-btn.active { background: var(--tp-primary); }
+
+/* Sidebar */
+.sidebar {
+  background: var(--tp-white);
+  border-right: 1px solid var(--tp-border);
+  overflow-y: auto;
+  padding: 0;
+}
+
+.sidebar-section {
+  padding: 14px 16px 8px;
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tp-text-muted);
+}
+
+.journey-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  font-size: var(--tp-font-sm);
+}
+.journey-item:hover {
+  background: var(--tp-surface-light);
+}
+.journey-item.active {
+  background: var(--tp-surface-light);
+  border-left-color: var(--tp-primary);
+}
+
+.journey-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--tp-surface-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  color: var(--tp-primary-dark);
+}
+.journey-item.active .journey-num {
+  background: var(--tp-primary);
+  color: var(--tp-white);
+}
+
+.journey-label {
+  line-height: 1.35;
+}
+.journey-label strong { display: block; color: var(--tp-text-dark); font-size: var(--tp-font-sm); }
+.journey-label span { color: var(--tp-text-muted); font-size: var(--tp-font-xs); }
+
+/* Special sidebar items */
+.sidebar-special {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  font-size: var(--tp-font-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--tp-primary-dark);
+}
+.sidebar-special:hover { background: var(--tp-surface-light); }
+.sidebar-special.active { background: var(--tp-surface-light); border-left-color: var(--tp-accent); }
+.sidebar-special .icon { font-size: 16px; }
+
+.sidebar-divider { height: 1px; background: var(--tp-border); margin: 8px 16px; }
+
+/* Main area */
+.main-area {
+  overflow: auto;
+  position: relative;
+  background: var(--tp-surface-bg);
+}
+
+.flowchart-container {
+  padding: 32px;
+  min-height: 100%;
+}
+
+/* Flowchart */
+.flow-title {
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin-bottom: 4px;
+}
+.flow-desc {
+  color: var(--tp-text-secondary);
+  font-size: var(--tp-font-sm);
+  margin-bottom: 24px;
+}
+
+.flow-lane {
+  margin-bottom: 28px;
+}
+.lane-label {
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lane-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+.lane-main .lane-dot { background: var(--tp-primary); }
+.lane-alt .lane-dot { background: var(--tp-accent); }
+.lane-fail .lane-dot { background: var(--tp-error); }
+.lane-main .lane-label { color: var(--tp-primary-dark); }
+.lane-alt .lane-label { color: var(--tp-accent); }
+.lane-fail .lane-label { color: var(--tp-error); }
+
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+.flow-step {
+  position: relative;
+  background: var(--tp-white);
+  border: 2px solid var(--tp-border);
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+  max-width: 200px;
+  text-align: center;
+  font-size: var(--tp-font-sm);
+  user-select: none;
+}
+.flow-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.flow-step.selected {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.lane-main .flow-step { border-color: var(--tp-primary); }
+.lane-main .flow-step:hover, .lane-main .flow-step.selected { background: #eef6f4; }
+.lane-alt .flow-step { border-color: var(--tp-accent); }
+.lane-alt .flow-step:hover, .lane-alt .flow-step.selected { background: #f7f3ec; }
+.lane-fail .flow-step { border-color: var(--tp-error); }
+.lane-fail .flow-step:hover, .lane-fail .flow-step.selected { background: #f5eced; }
+
+.flow-step .step-id {
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  color: var(--tp-text-muted);
+  margin-bottom: 2px;
+}
+.flow-step .step-name {
+  font-weight: 600;
+  color: var(--tp-text-dark);
+  line-height: 1.3;
+}
+.flow-step .step-codes {
+  margin-top: 4px;
+  font-size: 0.66rem;
+  color: var(--tp-text-muted);
+}
+
+.flow-arrow {
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.flow-arrow svg { display: block; }
+.lane-main .flow-arrow svg line, .lane-main .flow-arrow svg polyline { stroke: var(--tp-primary); }
+.lane-alt .flow-arrow svg line, .lane-alt .flow-arrow svg polyline { stroke: var(--tp-accent); }
+.lane-fail .flow-arrow svg line, .lane-fail .flow-arrow svg polyline { stroke: var(--tp-error); }
+
+/* Sub-steps (used in provisioning) */
+.sub-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.sub-step {
+  background: var(--tp-surface-light);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.66rem;
+  color: var(--tp-text-secondary);
+}
+
+/* Detail panel */
+.detail-panel {
+  position: fixed;
+  bottom: 0; left: 280px; right: 0;
+  background: var(--tp-white);
+  border-top: 2px solid var(--tp-primary);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  max-height: 340px;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 90;
+  padding: 20px 28px;
+}
+.detail-panel.open { transform: translateY(0); }
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.detail-title { font-size: var(--tp-font-lg); font-weight: 700; color: var(--tp-text-dark); }
+.detail-close {
+  background: none; border: none; cursor: pointer; font-size: 20px;
+  color: var(--tp-text-muted); padding: 4px 8px; border-radius: 4px;
+}
+.detail-close:hover { background: var(--tp-surface-light); }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.detail-card {
+  background: var(--tp-surface-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.detail-card-label {
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tp-text-muted);
+  margin-bottom: 6px;
+}
+.detail-card-body {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text);
+  line-height: 1.6;
+}
+.detail-card-body code {
+  background: var(--tp-surface-light);
+  border: 1px solid var(--tp-border);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: var(--tp-font-xs);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  color: var(--tp-primary-dark);
+}
+
+.msg-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  margin: 2px 2px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.msg-tag.success { background: #e0f0ed; color: var(--tp-primary-dark); }
+.msg-tag.error { background: #f0e0e3; color: var(--tp-error); }
+.msg-tag.warning { background: #f0eade; color: #6b5a2e; }
+.msg-tag.info { background: #e0eef5; color: var(--tp-info); }
+.msg-tag.confirm { background: #ece0f0; color: #5b2e6b; }
+
+/* Overview grid */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 32px;
+}
+.overview-card {
+  background: var(--tp-white);
+  border: 1px solid var(--tp-border);
+  border-radius: 12px;
+  padding: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.overview-card:hover {
+  border-color: var(--tp-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+.overview-card .ov-num {
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  color: var(--tp-primary);
+  margin-bottom: 4px;
+}
+.overview-card .ov-title {
+  font-size: var(--tp-font-md);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin-bottom: 8px;
+}
+.overview-card .ov-miniflow {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.mini-node {
+  width: 10px; height: 10px; border-radius: 3px;
+}
+.mini-node.main { background: var(--tp-primary); }
+.mini-node.alt { background: var(--tp-accent); }
+.mini-node.fail { background: var(--tp-error); }
+
+.overview-card .ov-meta {
+  margin-top: 10px;
+  display: flex;
+  gap: 12px;
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-muted);
+}
+
+/* Lifecycle state diagram */
+.lifecycle-container { padding: 32px; }
+.lifecycle-title {
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin-bottom: 24px;
+}
+
+.lifecycle-svg-wrap {
+  background: var(--tp-white);
+  border: 1px solid var(--tp-border);
+  border-radius: 12px;
+  padding: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Legend */
+.legend-container { padding: 32px; }
+.legend-title {
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin-bottom: 20px;
+}
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.legend-card {
+  background: var(--tp-white);
+  border: 1px solid var(--tp-border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.legend-card h3 {
+  font-size: var(--tp-font-md);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin-bottom: 10px;
+}
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: var(--tp-font-sm);
+}
+.legend-swatch {
+  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+  border: 2px solid transparent;
+}
+
+/* Print */
+@media print {
+  .app-layout { display: block; height: auto; overflow: visible; }
+  .sidebar { display: none; }
+  .app-header .header-actions { display: none; }
+  .main-area { overflow: visible; }
+  .detail-panel { position: relative; transform: none; left: 0; }
+  .flow-step { break-inside: avoid; }
+  body { overflow: visible; height: auto; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app-layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; left: -300px; top: 0; bottom: 0; width: 280px;
+    z-index: 200; transition: left 0.3s;
+  }
+  .sidebar.mobile-open { left: 0; }
+  .mobile-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+    z-index: 199;
+  }
+  .sidebar.mobile-open ~ .mobile-overlay { display: block; }
+  .detail-panel { left: 0; }
+  .mobile-menu-btn { display: inline-flex !important; }
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none; border: none; color: var(--tp-white);
+  cursor: pointer; font-size: 22px; padding: 4px 8px;
+  margin-right: 8px;
+}
+
+/* Scroll */
+.sidebar::-webkit-scrollbar, .main-area::-webkit-scrollbar, .detail-panel::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb, .main-area::-webkit-scrollbar-thumb, .detail-panel::-webkit-scrollbar-thumb {
+  background: var(--tp-border);
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <header class="app-header">
+    <div style="display:flex;align-items:center;">
+      <button class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Menu">&#9776;</button>
+      <h1>R02 Tenant Management</h1>
+      <span class="subtitle">Journey Map &mdash; 13 Journeys</span>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="showView('overview')" id="btn-overview">Overview</button>
+      <button class="header-btn" onclick="showView('lifecycle')" id="btn-lifecycle">Lifecycle</button>
+      <button class="header-btn" onclick="showView('legend')" id="btn-legend">Legend</button>
+      <button class="header-btn" onclick="window.print()">Print</button>
+    </div>
+  </header>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">Journeys</div>
+    <div id="journey-list"></div>
+  </nav>
+
+  <div class="mobile-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <main class="main-area" id="main-area"></main>
+
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title"></div>
+      <button class="detail-close" onclick="closeDetail()" aria-label="Close">&times;</button>
+    </div>
+    <div class="detail-grid" id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+// ────────────────────────────────────────────────────────────
+// Journey Data
+// ────────────────────────────────────────────────────────────
+const JOURNEYS = [
+  {
+    id: "J01", title: "Create Tenant",
+    desc: "Wizard flow to provision a new tenant through identity, configuration, review, and provisioning stages.",
+    main: [
+      { id: "S1", name: "New Tenant", desc: "User clicks 'Create Tenant' button from tenant list.", api: "GET /api/v1/tenants/new", screen: "Tenant List", pre: "User has MASTER_ADMIN role", post: "Wizard opens at Step 1", messages: [] },
+      { id: "S2", name: "Step 1: Identity", desc: "Enter tenant name, slug, description, and select plan.", api: "POST /api/v1/tenants/validate-slug", screen: "Wizard - Identity Step", pre: "Wizard initialized", post: "Identity fields validated", messages: [] },
+      { id: "S3", name: "Step 2: Config", desc: "Configure authentication providers, default roles, and feature flags.", api: "GET /api/v1/config/defaults", screen: "Wizard - Config Step", pre: "Identity step complete", post: "Config captured", messages: [] },
+      { id: "S4", name: "Step 3: Review", desc: "Review all inputs before provisioning. User confirms creation.", api: null, screen: "Wizard - Review Step", pre: "All steps complete", post: "User confirms creation", messages: [] },
+      { id: "S5", name: "Provisioning", desc: "System provisions: graph DB, Keycloak realm, Valkey namespace, storage bucket, seed data, health check.", api: "POST /api/v1/tenants", screen: "Provisioning Progress", pre: "User confirmed", post: "Tenant in PROVISIONING state", messages: [{code:"TEN-S-001",text:"Tenant created successfully",type:"success"}], subs: ["Graph DB", "Keycloak Realm", "Valkey NS", "Storage Bucket", "Seed Data", "Health Check"] },
+      { id: "S6", name: "Active Fact Sheet", desc: "Tenant fully provisioned and active. Fact sheet displayed.", api: "GET /api/v1/tenants/{id}", screen: "Tenant Fact Sheet", pre: "Provisioning complete", post: "Tenant state = ACTIVE", messages: [] }
+    ],
+    alt: [
+      { id: "A1", name: "Slug Suggestion", desc: "If slug is taken, system suggests alternatives automatically.", api: "POST /api/v1/tenants/suggest-slug", screen: "Wizard - Identity Step", pre: "Slug already exists", post: "Alternative slugs displayed", messages: [{code:"TEN-I-001",text:"Suggested alternative slugs",type:"info"}] }
+    ],
+    fail: [
+      { id: "F1", name: "Slug Collision", desc: "Entered slug already exists and user did not accept suggestion.", api: "POST /api/v1/tenants/validate-slug", screen: "Wizard - Identity Step", pre: "Slug exists", post: "Validation error shown", messages: [{code:"TEN-E-001",text:"Slug already in use",type:"error"}] },
+      { id: "F2", name: "Validation Error", desc: "Required fields missing or invalid format.", api: null, screen: "Wizard - Identity/Config Step", pre: "Form submitted incomplete", post: "Inline errors shown", messages: [{code:"TEN-E-002",text:"Tenant name is required",type:"error"},{code:"TEN-E-003",text:"Slug format invalid",type:"error"}] },
+      { id: "F3", name: "Provisioning Failure", desc: "One or more provisioning sub-steps failed. Partial rollback triggered.", api: "DELETE /api/v1/tenants/{id}/rollback", screen: "Provisioning Error", pre: "Sub-step failed", post: "Tenant state = FAILED", messages: [{code:"TEN-E-004",text:"Provisioning failed, rollback initiated",type:"error"}] }
+    ]
+  },
+  {
+    id: "J02", title: "View Tenant List",
+    desc: "Browse, search, filter, and sort the list of all tenants.",
+    main: [
+      { id: "S1", name: "Admin Dock", desc: "User navigates to Administration from the main navigation.", api: null, screen: "Shell Layout", pre: "User authenticated", post: "Admin dock visible", messages: [] },
+      { id: "S2", name: "Tenant List", desc: "List of tenants loads with pagination.", api: "GET /api/v1/tenants?page=0&size=20", screen: "Tenant List", pre: "Admin dock opened", post: "Tenant list rendered", messages: [] },
+      { id: "S3", name: "Search / Filter / Sort", desc: "User applies search text, state filter, or column sort.", api: "GET /api/v1/tenants?q={search}&state={filter}&sort={col}", screen: "Tenant List", pre: "Tenant list loaded", post: "Filtered results shown", messages: [] },
+      { id: "S4", name: "Select Tenant", desc: "User clicks a tenant row to open its fact sheet.", api: null, screen: "Tenant List", pre: "Tenants displayed", post: "Navigate to fact sheet", messages: [] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Empty State", desc: "No tenants exist or no results match the filter.", api: "GET /api/v1/tenants", screen: "Tenant List (empty)", pre: "Query returned 0 results", post: "Empty state displayed", messages: [{code:"TEN-I-002",text:"No tenants found",type:"info"}] }
+    ]
+  },
+  {
+    id: "J03", title: "Open Tenant Fact Sheet",
+    desc: "Load and render the tenant fact sheet with banner and tabbed content.",
+    main: [
+      { id: "S1", name: "Entry Point", desc: "User clicks tenant from list or accesses via deep-link URL.", api: null, screen: "Tenant List / URL", pre: "Tenant ID known", post: "Navigation triggered", messages: [] },
+      { id: "S2", name: "Load Banner", desc: "Fetch tenant header data: name, slug, state, plan, logo.", api: "GET /api/v1/tenants/{id}", screen: "Fact Sheet (loading)", pre: "Navigation complete", post: "Banner rendered", messages: [] },
+      { id: "S3", name: "Load Default Tab", desc: "Users tab loads as default. Fetch user count and list.", api: "GET /api/v1/tenants/{id}/users?page=0", screen: "Fact Sheet - Users Tab", pre: "Banner loaded", post: "Tab content rendered", messages: [] },
+      { id: "S4", name: "Render Complete", desc: "Fact sheet fully loaded and interactive.", api: null, screen: "Tenant Fact Sheet", pre: "All data loaded", post: "User can interact", messages: [] }
+    ],
+    alt: [
+      { id: "A1", name: "Master Tenant", desc: "If tenant is master, show master indicator badge and restricted actions.", api: null, screen: "Fact Sheet - Banner", pre: "Tenant is master", post: "Master badge shown", messages: [{code:"TEN-I-004",text:"This is the master tenant",type:"info"}] },
+      { id: "A2", name: "Read-Only Mode", desc: "User has view-only permissions. Edit controls hidden.", api: null, screen: "Fact Sheet", pre: "User lacks edit permission", post: "Read-only mode active", messages: [{code:"TEN-I-005",text:"Read-only access",type:"info"}] }
+    ],
+    fail: [
+      { id: "F1", name: "Tenant Not Found", desc: "Tenant ID does not exist or has been deleted.", api: "GET /api/v1/tenants/{id}", screen: "Error Page", pre: "Invalid tenant ID", post: "404 error shown", messages: [{code:"TEN-E-006",text:"Tenant not found",type:"error"}] },
+      { id: "F2", name: "No Permission", desc: "User does not have access to view this tenant.", api: "GET /api/v1/tenants/{id}", screen: "Error Page", pre: "User lacks permission", post: "403 error shown", messages: [{code:"TEN-E-005",text:"Access denied",type:"error"}] }
+    ]
+  },
+  {
+    id: "J04", title: "Edit Tenant Details",
+    desc: "Modify tenant name, description, plan, or configuration from the fact sheet banner.",
+    main: [
+      { id: "S1", name: "Banner Actions", desc: "User clicks edit button on the tenant banner.", api: null, screen: "Fact Sheet - Banner", pre: "User has edit permission", post: "Edit mode activated", messages: [] },
+      { id: "S2", name: "Edit Mode", desc: "Inline editing enabled for name, description, plan fields.", api: null, screen: "Fact Sheet - Edit Mode", pre: "Edit mode active", post: "Fields editable", messages: [] },
+      { id: "S3", name: "Modify Fields", desc: "User changes one or more fields.", api: null, screen: "Fact Sheet - Edit Mode", pre: "Fields editable", post: "Changes pending", messages: [] },
+      { id: "S4", name: "Save Changes", desc: "User saves. Validation runs, then API call.", api: "PATCH /api/v1/tenants/{id}", screen: "Fact Sheet", pre: "Valid changes", post: "Tenant updated", messages: [{code:"TEN-S-002",text:"Tenant updated successfully",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Access Denied", desc: "User does not have permission to edit this tenant.", api: null, screen: "Fact Sheet", pre: "Insufficient permissions", post: "Error toast shown", messages: [{code:"TEN-E-005",text:"Access denied",type:"error"}] }
+    ]
+  },
+  {
+    id: "J05", title: "Activate Tenant",
+    desc: "Transition a suspended or provisioned tenant to active state.",
+    main: [
+      { id: "S1", name: "Banner Action", desc: "User clicks 'Activate' from the state action menu.", api: null, screen: "Fact Sheet - Banner", pre: "Tenant in SUSPENDED or PROVISIONED state", post: "Confirmation dialog shown", messages: [] },
+      { id: "S2", name: "Confirm Activation", desc: "Confirmation dialog: 'Activate this tenant?'", api: null, screen: "Confirmation Dialog", pre: "Action initiated", post: "User confirms", messages: [] },
+      { id: "S3", name: "API Call", desc: "State transition API call.", api: "POST /api/v1/tenants/{id}/activate", screen: "Fact Sheet (loading)", pre: "User confirmed", post: "Tenant state = ACTIVE", messages: [{code:"TEN-S-003",text:"Tenant activated",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Invalid Transition", desc: "Tenant is in a state that cannot be activated (e.g., ARCHIVED).", api: "POST /api/v1/tenants/{id}/activate", screen: "Fact Sheet", pre: "Invalid source state", post: "Error shown", messages: [{code:"TEN-E-007",text:"Invalid state transition",type:"error"}] }
+    ]
+  },
+  {
+    id: "J06", title: "Suspend Tenant",
+    desc: "Suspend a tenant, terminating all active sessions.",
+    main: [
+      { id: "S1", name: "Banner Action", desc: "User clicks 'Suspend' from the state action menu.", api: null, screen: "Fact Sheet - Banner", pre: "Tenant in ACTIVE state", post: "Confirmation dialog shown", messages: [] },
+      { id: "S2", name: "Confirm Suspend", desc: "Confirmation dialog shows active session count and impact warning.", api: "GET /api/v1/tenants/{id}/sessions/count", screen: "Confirmation Dialog", pre: "Action initiated", post: "User confirms", messages: [{code:"TEN-C-001",text:"Confirm suspension (N active sessions will be terminated)",type:"confirm"}] },
+      { id: "S3", name: "Terminate Sessions", desc: "All active sessions for this tenant are terminated.", api: "POST /api/v1/tenants/{id}/sessions/terminate", screen: "Fact Sheet (loading)", pre: "User confirmed", post: "Sessions terminated", messages: [] },
+      { id: "S4", name: "State Change", desc: "Tenant state changes to SUSPENDED.", api: "POST /api/v1/tenants/{id}/suspend", screen: "Fact Sheet", pre: "Sessions terminated", post: "Tenant state = SUSPENDED", messages: [{code:"TEN-S-004",text:"Tenant suspended",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Invalid Transition", desc: "Tenant is not in ACTIVE state.", api: null, screen: "Fact Sheet", pre: "Invalid source state", post: "Error shown", messages: [{code:"TEN-E-007",text:"Invalid state transition",type:"error"}] },
+      { id: "F2", name: "Protected Tenant", desc: "This is the master tenant and cannot be suspended.", api: null, screen: "Fact Sheet", pre: "Tenant is master", post: "Action blocked", messages: [{code:"TEN-E-008",text:"Master tenant is protected",type:"error"}] }
+    ]
+  },
+  {
+    id: "J07", title: "Archive Tenant",
+    desc: "Archive a suspended tenant with data retention warning.",
+    main: [
+      { id: "S1", name: "Banner Action", desc: "User clicks 'Archive' from the state action menu.", api: null, screen: "Fact Sheet - Banner", pre: "Tenant in SUSPENDED state", post: "Confirmation dialog shown", messages: [] },
+      { id: "S2", name: "Confirm Archive", desc: "Dialog warns about data retention period and reversibility.", api: null, screen: "Confirmation Dialog", pre: "Action initiated", post: "User confirms", messages: [{code:"TEN-C-002",text:"Confirm archive (data retained for 90 days)",type:"confirm"}] },
+      { id: "S3", name: "State Change", desc: "Tenant state changes to ARCHIVED.", api: "POST /api/v1/tenants/{id}/archive", screen: "Fact Sheet", pre: "User confirmed", post: "Tenant state = ARCHIVED", messages: [{code:"TEN-S-006",text:"Tenant archived",type:"success"}] }
+    ],
+    alt: [
+      { id: "A1", name: "Retention Warning", desc: "If tenant has large data volume, additional warning about storage impact.", api: null, screen: "Confirmation Dialog", pre: "Large data volume detected", post: "Warning acknowledged", messages: [{code:"TEN-W-004",text:"Large data volume - archive may take time",type:"warning"}] }
+    ],
+    fail: []
+  },
+  {
+    id: "J08", title: "Restore Tenant",
+    desc: "Restore an archived tenant back to suspended state.",
+    main: [
+      { id: "S1", name: "Archived Tenant", desc: "User views an archived tenant's fact sheet.", api: "GET /api/v1/tenants/{id}", screen: "Fact Sheet (Archived)", pre: "Tenant in ARCHIVED state", post: "Restore action visible", messages: [] },
+      { id: "S2", name: "Confirm Restore", desc: "Confirmation dialog: 'Restore this tenant to SUSPENDED state?'", api: null, screen: "Confirmation Dialog", pre: "Action initiated", post: "User confirms", messages: [{code:"TEN-C-007",text:"Confirm tenant restoration",type:"confirm"}] },
+      { id: "S3", name: "Restore to Suspended", desc: "Tenant restored to SUSPENDED state. User must activate separately.", api: "POST /api/v1/tenants/{id}/restore", screen: "Fact Sheet", pre: "User confirmed", post: "Tenant state = SUSPENDED", messages: [{code:"TEN-S-013",text:"Tenant restored to suspended state",type:"success"}] }
+    ],
+    alt: [],
+    fail: []
+  },
+  {
+    id: "J09", title: "Permanently Delete",
+    desc: "Hard-delete an archived tenant. Irreversible operation requiring slug confirmation.",
+    main: [
+      { id: "S1", name: "Archived Tenant", desc: "User views an archived tenant's fact sheet.", api: null, screen: "Fact Sheet (Archived)", pre: "Tenant in ARCHIVED state", post: "Delete action visible", messages: [] },
+      { id: "S2", name: "Confirm Delete", desc: "Destructive confirmation: user must type the tenant slug to proceed.", api: null, screen: "Destructive Confirmation Dialog", pre: "Action initiated", post: "User types slug", messages: [{code:"TEN-C-003",text:"Type tenant slug to confirm permanent deletion",type:"confirm"}] },
+      { id: "S3", name: "Validate Slug", desc: "System validates the typed slug matches the tenant.", api: null, screen: "Destructive Confirmation Dialog", pre: "Slug entered", post: "Slug validated", messages: [] },
+      { id: "S4", name: "Hard Delete", desc: "Tenant data, graph, realm, and all resources permanently deleted.", api: "DELETE /api/v1/tenants/{id}", screen: "Deleting (progress)", pre: "Slug confirmed", post: "Tenant fully deleted", messages: [] },
+      { id: "S5", name: "Redirect to List", desc: "User redirected to tenant list with success toast.", api: null, screen: "Tenant List", pre: "Deletion complete", post: "User on tenant list", messages: [{code:"TEN-S-014",text:"Tenant permanently deleted",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Protected Tenant", desc: "Master tenant cannot be permanently deleted.", api: null, screen: "Fact Sheet", pre: "Tenant is master", post: "Action blocked", messages: [{code:"TEN-E-008",text:"Master tenant is protected",type:"error"}] }
+    ]
+  },
+  {
+    id: "J10", title: "Manage Branding",
+    desc: "Configure tenant branding: logos, colors, fonts. Draft, preview, and publish workflow.",
+    main: [
+      { id: "S1", name: "Branding Tab", desc: "User navigates to the Branding tab on the fact sheet.", api: "GET /api/v1/tenants/{id}/branding", screen: "Fact Sheet - Branding Tab", pre: "Fact sheet loaded", post: "Branding tab active", messages: [] },
+      { id: "S2", name: "View Current", desc: "Current branding settings displayed: logos, colors, fonts.", api: null, screen: "Branding Tab - View", pre: "Branding data loaded", post: "Current branding shown", messages: [] },
+      { id: "S3", name: "Edit Branding", desc: "User modifies branding: upload logo, change primary color, etc.", api: null, screen: "Branding Tab - Edit", pre: "User has edit permission", post: "Changes pending", messages: [] },
+      { id: "S4", name: "Preview", desc: "Live preview of branding changes before saving.", api: null, screen: "Branding Preview", pre: "Changes made", post: "Preview rendered", messages: [] },
+      { id: "S5", name: "Save Draft", desc: "Save branding changes as a draft (not live).", api: "PUT /api/v1/tenants/{id}/branding/draft", screen: "Branding Tab", pre: "Changes previewed", post: "Draft saved", messages: [{code:"TEN-S-007",text:"Branding draft saved",type:"success"}] },
+      { id: "S6", name: "Publish", desc: "Publish branding changes. Confirmation required.", api: "POST /api/v1/tenants/{id}/branding/publish", screen: "Branding Tab", pre: "Draft saved", post: "Branding live", messages: [{code:"TEN-C-004",text:"Confirm branding publish",type:"confirm"},{code:"TEN-S-008",text:"Branding published",type:"success"}] }
+    ],
+    alt: [
+      { id: "A1", name: "Unsaved Changes Guard", desc: "User tries to navigate away with unsaved branding changes.", api: null, screen: "Unsaved Changes Dialog", pre: "Changes not saved", post: "User chooses to save or discard", messages: [{code:"TEN-W-005",text:"You have unsaved branding changes",type:"warning"}] }
+    ],
+    fail: []
+  },
+  {
+    id: "J11", title: "Manage Integrations",
+    desc: "Add, configure, test, and enable identity provider integrations (SAML, OIDC, LDAP).",
+    main: [
+      { id: "S1", name: "Integrations Tab", desc: "User navigates to the Integrations tab.", api: "GET /api/v1/tenants/{id}/integrations", screen: "Fact Sheet - Integrations Tab", pre: "Fact sheet loaded", post: "Integrations listed", messages: [] },
+      { id: "S2", name: "View Providers", desc: "List of configured identity providers with status.", api: null, screen: "Integrations Tab - List", pre: "Data loaded", post: "Providers displayed", messages: [] },
+      { id: "S3", name: "Add Provider", desc: "User selects provider type (SAML/OIDC/LDAP) and fills config form.", api: null, screen: "Add Integration Form", pre: "User clicks Add", post: "Form filled", messages: [] },
+      { id: "S4", name: "Test Connection", desc: "System tests the integration configuration.", api: "POST /api/v1/tenants/{id}/integrations/test", screen: "Add Integration Form", pre: "Config entered", post: "Connection tested", messages: [] },
+      { id: "S5", name: "Enable", desc: "Integration enabled and active for tenant authentication.", api: "POST /api/v1/tenants/{id}/integrations", screen: "Integrations Tab", pre: "Connection test passed", post: "Integration active", messages: [{code:"TEN-S-009",text:"Integration enabled",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Connection Failed", desc: "Integration test failed. Configuration is invalid.", api: "POST /api/v1/tenants/{id}/integrations/test", screen: "Add Integration Form", pre: "Config invalid", post: "Error displayed", messages: [{code:"TEN-E-013",text:"Connection test failed",type:"error"}] },
+      { id: "F2", name: "Config Invalid", desc: "Required integration fields missing or malformed.", api: null, screen: "Add Integration Form", pre: "Form invalid", post: "Validation errors shown", messages: [{code:"TEN-E-014",text:"Integration configuration invalid",type:"error"}] }
+    ]
+  },
+  {
+    id: "J12", title: "Manage Users",
+    desc: "View users, invite new users, assign roles, and remove users from a tenant.",
+    main: [
+      { id: "S1", name: "Users Tab", desc: "User navigates to the Users tab on the fact sheet.", api: "GET /api/v1/tenants/{id}/users?page=0", screen: "Fact Sheet - Users Tab", pre: "Fact sheet loaded", post: "User list loaded", messages: [] },
+      { id: "S2", name: "View User List", desc: "Paginated list of tenant users with search and filters.", api: null, screen: "Users Tab - List", pre: "Data loaded", post: "Users displayed", messages: [] },
+      { id: "S3", name: "Invite User", desc: "Enter email and select roles to invite a new user.", api: "POST /api/v1/tenants/{id}/users/invite", screen: "Invite User Dialog", pre: "User clicks Invite", post: "Invitation sent", messages: [{code:"TEN-S-010",text:"User invitation sent",type:"success"}] },
+      { id: "S4", name: "Assign Roles", desc: "Modify roles for an existing user.", api: "PATCH /api/v1/tenants/{id}/users/{userId}/roles", screen: "User Role Editor", pre: "User selected", post: "Roles updated", messages: [{code:"TEN-S-011",text:"User roles updated",type:"success"}] },
+      { id: "S5", name: "Remove User", desc: "Remove a user from the tenant after confirmation.", api: "DELETE /api/v1/tenants/{id}/users/{userId}", screen: "Users Tab", pre: "Confirm removal", post: "User removed", messages: [{code:"TEN-C-005",text:"Confirm user removal",type:"confirm"},{code:"TEN-S-012",text:"User removed",type:"success"}] }
+    ],
+    alt: [],
+    fail: [
+      { id: "F1", name: "Seat Limit Reached", desc: "Cannot invite more users - license seat limit reached.", api: "POST /api/v1/tenants/{id}/users/invite", screen: "Invite User Dialog", pre: "Seat limit reached", post: "Error shown", messages: [{code:"TEN-E-011",text:"License seat limit reached",type:"error"}] }
+    ]
+  },
+  {
+    id: "J13", title: "View Health Checks",
+    desc: "Monitor tenant infrastructure health with auto-refreshing dashboard.",
+    main: [
+      { id: "S1", name: "Health Tab", desc: "User navigates to the Health tab on the fact sheet.", api: "GET /api/v1/tenants/{id}/health", screen: "Fact Sheet - Health Tab", pre: "Fact sheet loaded", post: "Health tab active", messages: [] },
+      { id: "S2", name: "Load Dashboard", desc: "Fetch health status for all tenant services.", api: "GET /api/v1/tenants/{id}/health/services", screen: "Health Dashboard", pre: "Tab active", post: "Dashboard rendered", messages: [] },
+      { id: "S3", name: "Per-Service Status", desc: "Individual service status cards: Graph DB, Keycloak, Valkey, Storage.", api: null, screen: "Health Dashboard - Cards", pre: "Data loaded", post: "Status cards shown", messages: [] },
+      { id: "S4", name: "Auto-Refresh", desc: "Dashboard auto-refreshes every 30 seconds.", api: "GET /api/v1/tenants/{id}/health/services", screen: "Health Dashboard", pre: "Dashboard rendered", post: "Data refreshed", messages: [] }
+    ],
+    alt: [
+      { id: "A1", name: "Degraded Service", desc: "One or more services in degraded state.", api: null, screen: "Health Dashboard", pre: "Service degraded", post: "Warning indicator shown", messages: [{code:"TEN-W-006",text:"Service degraded",type:"warning"}] }
+    ],
+    fail: [
+      { id: "F1", name: "Health Check Failed", desc: "Cannot reach health endpoint.", api: "GET /api/v1/tenants/{id}/health", screen: "Health Dashboard", pre: "Endpoint unreachable", post: "Error state shown", messages: [{code:"TEN-E-015",text:"Health check unavailable",type:"error"}] }
+    ]
+  }
+];
+
+// ────────────────────────────────────────────────────────────
+// State
+// ────────────────────────────────────────────────────────────
+let currentView = 'journey'; // journey | overview | lifecycle | legend
+let currentJourney = 0;
+let selectedStep = null;
+
+// ────────────────────────────────────────────────────────────
+// Render sidebar
+// ────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('journey-list');
+  list.innerHTML = JOURNEYS.map((j, i) => `
+    <div class="journey-item${i === currentJourney && currentView === 'journey' ? ' active' : ''}" onclick="selectJourney(${i})" data-journey="${i}">
+      <div class="journey-num">${(i+1).toString().padStart(2,'0')}</div>
+      <div class="journey-label">
+        <strong>${j.id}: ${j.title}</strong>
+        <span>${j.main.length} steps &middot; ${j.alt.length} alt &middot; ${j.fail.length} fail</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ────────────────────────────────────────────────────────────
+// Arrow SVG helper
+// ────────────────────────────────────────────────────────────
+function arrowSvg(color) {
+  return `<svg width="32" height="20" viewBox="0 0 32 20"><line x1="0" y1="10" x2="24" y2="10" stroke="${color}" stroke-width="2"/><polyline points="20,5 27,10 20,15" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+}
+
+// ────────────────────────────────────────────────────────────
+// Render flowchart
+// ────────────────────────────────────────────────────────────
+function renderJourney(idx) {
+  const j = JOURNEYS[idx];
+  const main = document.getElementById('main-area');
+
+  function renderLane(label, steps, laneClass, color) {
+    if (!steps.length) return '';
+    return `
+      <div class="flow-lane ${laneClass}">
+        <div class="lane-label"><span class="lane-dot"></span>${label}</div>
+        <div class="flow-steps">
+          ${steps.map((s, si) => `
+            ${si > 0 ? `<div class="flow-arrow">${arrowSvg(color)}</div>` : ''}
+            <div class="flow-step${selectedStep && selectedStep.id === s.id && selectedStep.lane === laneClass ? ' selected' : ''}"
+                 onclick="showStepDetail('${laneClass}', ${idx}, '${s.id}')"
+                 data-step="${s.id}">
+              <div class="step-id">${s.id}</div>
+              <div class="step-name">${s.name}</div>
+              ${s.messages && s.messages.length ? `<div class="step-codes">${s.messages.map(m => m.code).join(', ')}</div>` : ''}
+              ${s.subs ? `<div class="sub-steps">${s.subs.map(sub => `<span class="sub-step">${sub}</span>`).join('')}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  main.innerHTML = `
+    <div class="flowchart-container">
+      <div class="flow-title">${j.id}: ${j.title}</div>
+      <div class="flow-desc">${j.desc}</div>
+      ${renderLane('Main Path (Happy Path)', j.main, 'lane-main', '#428177')}
+      ${renderLane('Alternate Path', j.alt, 'lane-alt', '#988561')}
+      ${renderLane('Failure Path', j.fail, 'lane-fail', '#6b1f2a')}
+    </div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────
+// Step detail
+// ────────────────────────────────────────────────────────────
+function showStepDetail(lane, journeyIdx, stepId) {
+  const j = JOURNEYS[journeyIdx];
+  let pool;
+  if (lane === 'lane-main') pool = j.main;
+  else if (lane === 'lane-alt') pool = j.alt;
+  else pool = j.fail;
+
+  const step = pool.find(s => s.id === stepId);
+  if (!step) return;
+
+  selectedStep = { id: stepId, lane };
+  renderJourney(journeyIdx);
+
+  document.getElementById('detail-title').textContent = `${step.id}: ${step.name}`;
+
+  const msgHtml = step.messages && step.messages.length
+    ? step.messages.map(m => `<span class="msg-tag ${m.type}">${m.code}</span> ${m.text}`).join('<br>')
+    : '<span style="color:var(--tp-text-muted)">None</span>';
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-card">
+      <div class="detail-card-label">Description</div>
+      <div class="detail-card-body">${step.desc}</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-card-label">API Endpoint</div>
+      <div class="detail-card-body">${step.api ? `<code>${step.api}</code>` : '<span style="color:var(--tp-text-muted)">None (client-side)</span>'}</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-card-label">Screen</div>
+      <div class="detail-card-body">${step.screen || 'N/A'}</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-card-label">Messages Triggered</div>
+      <div class="detail-card-body">${msgHtml}</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-card-label">Preconditions</div>
+      <div class="detail-card-body">${step.pre || 'None'}</div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-card-label">Postconditions</div>
+      <div class="detail-card-body">${step.post || 'None'}</div>
+    </div>
+  `;
+
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  selectedStep = null;
+  if (currentView === 'journey') renderJourney(currentJourney);
+}
+
+// ────────────────────────────────────────────────────────────
+// Select journey
+// ────────────────────────────────────────────────────────────
+function selectJourney(idx) {
+  currentJourney = idx;
+  currentView = 'journey';
+  selectedStep = null;
+  closeDetail();
+  renderSidebar();
+  renderJourney(idx);
+  updateHeaderBtns();
+  closeMobileSidebar();
+}
+
+// ────────────────────────────────────────────────────────────
+// Overview
+// ────────────────────────────────────────────────────────────
+function renderOverview() {
+  const main = document.getElementById('main-area');
+  main.innerHTML = `
+    <div class="overview-grid">
+      ${JOURNEYS.map((j, i) => {
+        const miniNodes = [
+          ...j.main.map(() => '<span class="mini-node main"></span>'),
+          ...j.alt.map(() => '<span class="mini-node alt"></span>'),
+          ...j.fail.map(() => '<span class="mini-node fail"></span>')
+        ].join('');
+        return `
+          <div class="overview-card" onclick="selectJourney(${i})">
+            <div class="ov-num">${j.id}</div>
+            <div class="ov-title">${j.title}</div>
+            <div class="ov-miniflow">${miniNodes}</div>
+            <div class="ov-meta">
+              <span>${j.main.length} main</span>
+              <span>${j.alt.length} alt</span>
+              <span>${j.fail.length} fail</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────
+// Lifecycle State Diagram
+// ────────────────────────────────────────────────────────────
+function renderLifecycle() {
+  const main = document.getElementById('main-area');
+  // States: PROVISIONING -> ACTIVE -> SUSPENDED -> ARCHIVED -> DELETED
+  //         PROVISIONING -> FAILED
+  //         ARCHIVED -> SUSPENDED (restore)
+  const states = [
+    { id: 'PROV', label: 'PROVISIONING', x: 80, y: 150, color: '#0369a1' },
+    { id: 'ACTIVE', label: 'ACTIVE', x: 300, y: 150, color: '#428177' },
+    { id: 'SUSP', label: 'SUSPENDED', x: 520, y: 150, color: '#988561' },
+    { id: 'ARCH', label: 'ARCHIVED', x: 740, y: 150, color: '#7a7672' },
+    { id: 'DEL', label: 'DELETED', x: 740, y: 300, color: '#6b1f2a' },
+    { id: 'FAIL', label: 'FAILED', x: 80, y: 300, color: '#6b1f2a' }
+  ];
+  const transitions = [
+    { from: 'PROV', to: 'ACTIVE', label: 'Provision OK', journey: 'J01' },
+    { from: 'PROV', to: 'FAIL', label: 'Provision Fail', journey: 'J01' },
+    { from: 'ACTIVE', to: 'SUSP', label: 'Suspend', journey: 'J06' },
+    { from: 'SUSP', to: 'ACTIVE', label: 'Activate', journey: 'J05' },
+    { from: 'SUSP', to: 'ARCH', label: 'Archive', journey: 'J07' },
+    { from: 'ARCH', to: 'SUSP', label: 'Restore', journey: 'J08' },
+    { from: 'ARCH', to: 'DEL', label: 'Delete', journey: 'J09' }
+  ];
+
+  const w = 900, h = 400;
+  let svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="max-width:100%;">`;
+
+  // Defs for arrowhead
+  svg += `<defs><marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#3d3a3b"/></marker></defs>`;
+
+  // Transitions
+  transitions.forEach(t => {
+    const from = states.find(s => s.id === t.from);
+    const to = states.find(s => s.id === t.to);
+    let x1 = from.x + 70, y1 = from.y + 22;
+    let x2 = to.x, y2 = to.y + 22;
+
+    // Adjust endpoints
+    if (from.x === to.x) { // vertical
+      x1 = from.x + 70; y1 = from.y + 44;
+      x2 = to.x + 70; y2 = to.y;
+    } else if (to.x < from.x) { // backwards
+      x1 = from.x; y1 = from.y + (from.y < to.y ? 44 : 0);
+      x2 = to.x + 140; y2 = to.y + (from.y < to.y ? 0 : 44);
+    } else {
+      x1 = from.x + 140; y1 = from.y + 22;
+      x2 = to.x; y2 = to.y + 22;
+    }
+
+    // Curved path for restore (backward)
+    if (t.label === 'Restore') {
+      svg += `<path d="M${x1},${y1 - 22} C${x1 + 40},${y1 - 80} ${x2 - 40},${y2 - 80} ${x2},${y2}" fill="none" stroke="#428177" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>`;
+      svg += `<text x="${(from.x + to.x) / 2 + 70}" y="${y1 - 62}" text-anchor="middle" font-size="11" fill="#428177" font-weight="600">${t.label} (${t.journey})</text>`;
+    } else if (t.label === 'Activate') {
+      svg += `<path d="M${from.x},${from.y} C${from.x - 40},${from.y - 60} ${to.x + 180},${to.y - 60} ${to.x + 140},${to.y}" fill="none" stroke="#428177" stroke-width="2" marker-end="url(#ah)" stroke-dasharray="6,3"/>`;
+      svg += `<text x="${(from.x + to.x) / 2 + 70}" y="${from.y - 42}" text-anchor="middle" font-size="11" fill="#428177" font-weight="600">${t.label} (${t.journey})</text>`;
+    } else {
+      svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3d3a3b" stroke-width="2" marker-end="url(#ah)"/>`;
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 - 10;
+      svg += `<text x="${mx}" y="${my}" text-anchor="middle" font-size="11" fill="var(--tp-text-secondary)" font-weight="600">${t.label} (${t.journey})</text>`;
+    }
+  });
+
+  // States
+  states.forEach(s => {
+    svg += `<rect x="${s.x}" y="${s.y}" width="140" height="44" rx="10" fill="${s.color}15" stroke="${s.color}" stroke-width="2"/>`;
+    svg += `<text x="${s.x + 70}" y="${s.y + 27}" text-anchor="middle" font-size="13" font-weight="700" fill="${s.color}">${s.label}</text>`;
+  });
+
+  svg += '</svg>';
+
+  main.innerHTML = `
+    <div class="lifecycle-container">
+      <div class="lifecycle-title">Tenant Lifecycle State Machine</div>
+      <div class="lifecycle-svg-wrap">${svg}</div>
+      <div style="margin-top:16px;font-size:var(--tp-font-sm);color:var(--tp-text-secondary);">
+        Solid arrows indicate forward transitions. Dashed arrows indicate reverse transitions (restore, activate).
+        Each transition label references the journey that triggers it.
+      </div>
+    </div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────
+// Legend
+// ────────────────────────────────────────────────────────────
+function renderLegend() {
+  const main = document.getElementById('main-area');
+  main.innerHTML = `
+    <div class="legend-container">
+      <div class="legend-title">Legend</div>
+      <div class="legend-grid">
+        <div class="legend-card">
+          <h3>Path Colors</h3>
+          <div class="legend-row"><span class="legend-swatch" style="background:var(--tp-primary);"></span> Main Path (Happy Path)</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:var(--tp-accent);"></span> Alternate Path (Variant)</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:var(--tp-error);"></span> Failure Path (Error)</div>
+        </div>
+        <div class="legend-card">
+          <h3>Message Code Types</h3>
+          <div class="legend-row"><span class="msg-tag success">TEN-S-*</span> Success messages</div>
+          <div class="legend-row"><span class="msg-tag error">TEN-E-*</span> Error messages</div>
+          <div class="legend-row"><span class="msg-tag warning">TEN-W-*</span> Warning messages</div>
+          <div class="legend-row"><span class="msg-tag info">TEN-I-*</span> Informational messages</div>
+          <div class="legend-row"><span class="msg-tag confirm">TEN-C-*</span> Confirmation dialogs</div>
+        </div>
+        <div class="legend-card">
+          <h3>Tenant States</h3>
+          <div class="legend-row"><span class="legend-swatch" style="background:#0369a1;"></span> PROVISIONING - Being set up</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#428177;"></span> ACTIVE - Fully operational</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#988561;"></span> SUSPENDED - Temporarily disabled</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#7a7672;"></span> ARCHIVED - Soft-deleted, recoverable</div>
+          <div class="legend-row"><span class="legend-swatch" style="background:#6b1f2a;"></span> DELETED / FAILED - Terminal</div>
+        </div>
+        <div class="legend-card">
+          <h3>Step Detail Panel</h3>
+          <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span>Click any step node to expand the bottom detail panel showing:</span>
+            <span style="padding-left:12px;">- Description of the step</span>
+            <span style="padding-left:12px;">- API endpoint called</span>
+            <span style="padding-left:12px;">- Screen shown to user</span>
+            <span style="padding-left:12px;">- Messages triggered (TEN-* codes)</span>
+            <span style="padding-left:12px;">- Preconditions and postconditions</span>
+          </div>
+        </div>
+        <div class="legend-card">
+          <h3>Interactions</h3>
+          <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span><strong>Click step node</strong> - Show detail panel</span>
+            <span><strong>Click sidebar journey</strong> - Load flowchart</span>
+            <span><strong>Overview button</strong> - Show all 13 journeys</span>
+            <span><strong>Lifecycle button</strong> - State machine diagram</span>
+            <span><strong>Print button</strong> - Print-friendly layout</span>
+          </div>
+        </div>
+        <div class="legend-card">
+          <h3>Journey Categories</h3>
+          <div class="legend-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span><strong>J01-J03:</strong> Creation and viewing</span>
+            <span><strong>J04:</strong> Editing details</span>
+            <span><strong>J05-J09:</strong> Lifecycle state transitions</span>
+            <span><strong>J10:</strong> Branding management</span>
+            <span><strong>J11:</strong> Integration management</span>
+            <span><strong>J12:</strong> User management</span>
+            <span><strong>J13:</strong> Health monitoring</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ────────────────────────────────────────────────────────────
+// View switching
+// ────────────────────────────────────────────────────────────
+function showView(view) {
+  currentView = view;
+  closeDetail();
+  renderSidebar();
+  updateHeaderBtns();
+  if (view === 'overview') renderOverview();
+  else if (view === 'lifecycle') renderLifecycle();
+  else if (view === 'legend') renderLegend();
+  else renderJourney(currentJourney);
+}
+
+function updateHeaderBtns() {
+  ['overview','lifecycle','legend'].forEach(v => {
+    const btn = document.getElementById('btn-' + v);
+    if (btn) btn.classList.toggle('active', currentView === v);
+  });
+}
+
+// ────────────────────────────────────────────────────────────
+// Mobile sidebar
+// ────────────────────────────────────────────────────────────
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+}
+
+// ────────────────────────────────────────────────────────────
+// Init
+// ────────────────────────────────────────────────────────────
+renderSidebar();
+renderJourney(0);
+</script>
+</body>
+</html>

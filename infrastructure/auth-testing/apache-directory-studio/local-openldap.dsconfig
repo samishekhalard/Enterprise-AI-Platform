@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Apache Directory Studio Connection Configuration
+  ================================================
+  Connection: EMS Local OpenLDAP (Docker)
+
+  Import: File > Import > LDAP > Connection(s) from file
+-->
+<connections>
+    <connection
+        id="ems-local-openldap"
+        name="EMS Local OpenLDAP (Docker)"
+        host="localhost"
+        port="1389"
+        encryptionMethod="0"
+        authMethod="1"
+        bindPrincipal="cn=admin,dc=ems,dc=test"
+        bindPassword="admin"
+        saslMechanism=""
+        saslRealm=""
+        saslQop="0"
+        saslSecurityStrength="0"
+        saslMutualAuthentication="false"
+        readOnly="false"
+        fetchBaseDNs="true"
+        fetchSubentries="false"
+        fetchOperationalAttributes="false"
+        aliasesDereferencingMethod="1"
+        referralsHandlingMethod="1"
+        timeLimit="0"
+        countLimit="0"
+    >
+        <extendedProperties>
+            <extendedProperty key="connection.parameter.modifyMode" value="0"/>
+            <extendedProperty key="connection.parameter.modifyModeNoEMR" value="0"/>
+            <extendedProperty key="connection.parameter.modifyOrder" value="0"/>
+        </extendedProperties>
+    </connection>
+</connections>

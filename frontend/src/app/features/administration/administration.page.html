@@ -1,0 +1,214 @@
+<app-shell-layout
+  [title]="'Administration'"
+  [titleIconSrc]="'assets/icons/cog.svg'"
+  [showDefaultHeaderActions]="false"
+  [hideHeaderRightOnMobile]="true"
+>
+  <button
+    shell-header-leading
+    type="button"
+    pButton
+    [text]="true"
+    class="shell-icon-button"
+    aria-label="Navigation menu"
+    [attr.aria-expanded]="menuOpen()"
+    (click)="toggleMenu()"
+    data-testid="menu-toggle-btn"
+  >
+    @if (menuOpen()) {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"></path>
+      </svg>
+    } @else {
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    }
+  </button>
+
+  @if (menuOpen()) {
+    <svg
+      shell-header-trailing
+      class="chevron-indicator"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      aria-hidden="true"
+    >
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  }
+
+  <button
+    shell-header-actions
+    type="button"
+    pButton
+    [text]="true"
+    class="shell-icon-button"
+    aria-label="Notifications"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+  </button>
+
+  <button
+    shell-header-actions
+    type="button"
+    pButton
+    [text]="true"
+    class="shell-icon-button"
+    aria-label="Help"
+    (click)="openHelpDialog()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+      <circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"></circle>
+    </svg>
+  </button>
+
+  <span shell-header-actions class="island-divider" aria-hidden="true"></span>
+
+  <button
+    shell-header-actions
+    type="button"
+    pButton
+    [text]="true"
+    class="shell-signout-button"
+    aria-label="Sign out"
+    (click)="onLogout()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+      <line x1="12" y1="2" x2="12" y2="12"></line>
+    </svg>
+    <span class="sign-out-label">Sign out</span>
+  </button>
+
+  <section shell-content class="administration-page">
+    @if (menuOpen()) {
+      <div
+        class="menu-backdrop"
+        (click)="toggleMenu()"
+        role="presentation"
+        data-testid="menu-backdrop"
+      ></div>
+    }
+
+    @if (menuOpen()) {
+      <aside class="admin-dock" aria-label="Administration sections" data-testid="floating-menu">
+        <ul>
+          @for (item of navItems; track item.section) {
+            <li
+              class="iso-pro"
+              [class.active]="activeSection() === item.section"
+              [style.--dock-item-color]="item.hue"
+              [style.--dock-icon-url]="item.iconMask"
+            >
+              <span class="layer"></span>
+              <span class="layer"></span>
+              <span class="layer"></span>
+              <button
+                type="button"
+                class="dock-link"
+                pButton
+                [text]="true"
+                [class.active]="activeSection() === item.section"
+                [attr.aria-label]="item.label"
+                (click)="setSection(item.section)"
+                data-testid="menu-item"
+              >
+                <span class="svg" aria-hidden="true">
+                  <span class="dock-glyph"></span>
+                </span>
+                <span class="dock-text">
+                  <span class="dock-label">{{ item.label }}</span>
+                  <span class="dock-desc">{{ item.description }}</span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </aside>
+    }
+
+    <div class="admin-layout">
+      <section class="admin-content" aria-label="Administration active section">
+        <app-page-frame
+          class="admin-page-frame"
+          [title]="activeSectionLabel()"
+          [subtitle]="activeSectionDescription()"
+        >
+          <div page-actions class="admin-frame-actions" aria-label="Administration location">
+            <span class="admin-section-chip">Administration</span>
+            <span class="crumb-sep" aria-hidden="true">/</span>
+            <span class="admin-section-current">{{ activeSectionLabel() }}</span>
+          </div>
+
+          <section page-content class="admin-frame-content">
+            @switch (activeSection()) {
+              @case ('tenant-manager') {
+                <app-tenant-manager-section />
+              }
+              @case ('license-manager') {
+                <app-license-manager-section />
+              }
+              @case ('master-locale') {
+                <app-master-locale-section />
+              }
+              @case ('master-definitions') {
+                <app-master-definitions-section />
+              }
+            }
+          </section>
+        </app-page-frame>
+      </section>
+    </div>
+
+    <p-dialog
+      [visible]="helpDialogOpen()"
+      (visibleChange)="onHelpDialogVisibleChange($event)"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [dismissableMask]="true"
+      [closable]="true"
+      appendTo="body"
+      header="Keyboard Shortcuts"
+      styleClass="help-dialog"
+      [style]="helpDialogStyle"
+      [pt]="helpDialogPt"
+    >
+      <div class="help-dialog-content">
+        <ul class="help-kbd-list">
+          @for (hint of keyboardHints; track hint.keys) {
+            <li>
+              <span class="help-kbd-chip">{{ hint.keys }}</span>
+              <span>{{ hint.description }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </p-dialog>
+  </section>
+</app-shell-layout>

@@ -1,0 +1,644 @@
+<!-- ─── Breadcrumb ──────────────────────────────────────────────────────────── -->
+
+<nav class="factsheet-breadcrumb" data-testid="factsheet-breadcrumb">
+  <p-breadcrumb [model]="breadcrumbItems()" [home]="breadcrumbHome" />
+</nav>
+
+<!-- ─── Banner Hero ────────────────────────────────────────────────────────────── -->
+
+<header class="banner" data-testid="factsheet-banner">
+  <div class="banner-left">
+    <!-- Logo / Initials -->
+    <div class="banner-logo" data-testid="factsheet-logo">
+      @if (tenant().logoUrl) {
+        <img [src]="tenant().logoUrl!" [alt]="tenant().name + ' logo'" class="banner-logo-img" />
+      } @else {
+        <span class="banner-logo-initials">{{ initials() }}</span>
+      }
+    </div>
+
+    <!-- Name + Slug + Badges -->
+    <div class="banner-info">
+      <div class="banner-title-row">
+        <h1 class="banner-name" data-testid="factsheet-name">{{ tenant().name }}</h1>
+
+        <div class="banner-badges">
+          <p-tag
+            [value]="tenant().type"
+            [severity]="typeSeverity(tenant().type)"
+            data-testid="factsheet-type-badge"
+          />
+
+          <span class="status-badge" data-testid="factsheet-status-badge">
+            <span class="status-dot" [style.background]="statusColor(tenant().status)"></span>
+            {{ tenant().status }}
+          </span>
+
+          <p-tag
+            [value]="tenant().health"
+            [severity]="healthSeverity(tenant().health)"
+            [icon]="'pi pi-heart-fill'"
+            data-testid="factsheet-health-badge"
+          />
+        </div>
+      </div>
+
+      <span class="banner-short-name" data-testid="factsheet-short-name">{{
+        tenant().shortName
+      }}</span>
+
+      <!-- KPI Chips -->
+      <div class="banner-kpis" data-testid="factsheet-kpis">
+        @for (kpi of tenant().kpis; track kpi.label) {
+          <span class="kpi-chip" data-testid="factsheet-kpi">
+            <i [class]="kpi.icon" class="kpi-icon"></i>
+            <strong>{{ kpi.value }}</strong>
+            {{ kpi.label }}
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="banner-actions" data-testid="factsheet-actions">
+    <p-button
+      label="Back"
+      icon="pi pi-arrow-left"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="onBack()"
+      data-testid="factsheet-back-btn"
+    />
+    <p-button
+      label="Edit"
+      icon="pi pi-pencil"
+      severity="secondary"
+      data-testid="factsheet-edit-btn"
+    />
+    @if (lifecycleActionDef(); as lca) {
+      <p-button
+        [label]="lca.label"
+        [icon]="lca.icon"
+        [severity]="lca.severity"
+        (onClick)="onLifecycleAction()"
+        data-testid="factsheet-lifecycle-btn"
+      />
+    }
+  </div>
+</header>
+
+<!-- ─── Tab Bar + Content ──────────────────────────────────────────────────────── -->
+
+<div class="tabs-card" data-testid="factsheet-tabs">
+  <p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
+    <p-tablist>
+      @for (tab of tabs; track tab.value) {
+        <p-tab [value]="tab.value" [attr.data-testid]="'tab-' + tab.value">
+          <span class="tab-trigger">
+            <span class="tab-label">{{ tab.label }}</span>
+            @if (tab.count !== null) {
+              <span class="tab-count">{{ tab.count }}</span>
+            }
+          </span>
+        </p-tab>
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- ── Users Tab ──────────────────────────────────────────────────────── -->
+      <p-tabpanel value="users">
+        <div class="tab-section-layout">
+          <!-- Toolbar: search + filter icon | spacer | invite -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search users..."
+                [value]="usersSearch()"
+                (input)="usersSearch.set($any($event.target).value)"
+                data-testid="input-search-users"
+              />
+            </div>
+            <p-button
+              icon="pi pi-filter"
+              severity="secondary"
+              [outlined]="true"
+              [rounded]="true"
+              ariaLabel="Toggle filters"
+              (onClick)="usersFiltersVisible.update(v => !v)"
+              [styleClass]="usersFiltersVisible() ? 'filter-icon-active' : ''"
+              data-testid="btn-toggle-user-filters"
+            />
+            <span class="toolbar-spacer"></span>
+            <p-button label="Invite User" icon="pi pi-user-plus" data-testid="invite-user-btn" />
+          </div>
+
+          <!-- DataTable -->
+          <p-table
+            [value]="[...users]"
+            [rowHover]="true"
+            [tableStyle]="{ 'min-width': '40rem' }"
+            styleClass="factsheet-table"
+            data-testid="users-table"
+          >
+            <ng-template #header>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Active</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-user>
+              <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                  <p-tag [value]="user.status" [severity]="userStatusSeverity(user.status)" />
+                </td>
+                <td class="text-muted">{{ user.lastActive }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+          <!-- Paginator -->
+          <p-paginator
+            [rows]="10"
+            [totalRecords]="users.length"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            data-testid="users-paginator"
+          />
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Branding Tab ───────────────────────────────────────────────────── -->
+      <p-tabpanel value="branding">
+        <div class="tab-header">
+          <h2 class="tab-title">Branding</h2>
+          <p class="tab-description">Customize the visual identity of this tenant.</p>
+        </div>
+        <div class="branding-content">
+          <div class="branding-section">
+            <h3 class="section-subtitle">Color Swatches</h3>
+            <div class="color-swatches" data-testid="branding-swatches">
+              <div class="swatch" style="background: var(--tp-primary)">
+                <span class="swatch-label">Primary</span>
+              </div>
+              <div class="swatch" style="background: var(--tp-primary-dark)">
+                <span class="swatch-label">Dark</span>
+              </div>
+              <div class="swatch" style="background: var(--tp-success)">
+                <span class="swatch-label">Success</span>
+              </div>
+              <div class="swatch" style="background: var(--tp-warning)">
+                <span class="swatch-label">Warning</span>
+              </div>
+              <div class="swatch" style="background: var(--tp-danger)">
+                <span class="swatch-label">Danger</span>
+              </div>
+            </div>
+          </div>
+          <div class="branding-section">
+            <h3 class="section-subtitle">Logo Upload</h3>
+            <div class="logo-upload-placeholder" data-testid="branding-logo-upload">
+              <i class="pi pi-cloud-upload"></i>
+              <span>Drop logo here or click to upload</span>
+            </div>
+          </div>
+          <div class="branding-actions">
+            <p-button
+              label="Preview"
+              icon="pi pi-eye"
+              severity="secondary"
+              data-testid="branding-preview-btn"
+            />
+            <p-button label="Publish" icon="pi pi-check" data-testid="branding-publish-btn" />
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Integrations Tab ───────────────────────────────────────────────── -->
+      <p-tabpanel value="integrations">
+        <div class="tab-section-layout">
+          <!-- Toolbar -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search integrations..."
+                [value]="integrationsSearch()"
+                (input)="integrationsSearch.set($any($event.target).value)"
+                data-testid="input-search-integrations"
+              />
+            </div>
+            <p-button
+              icon="pi pi-filter"
+              severity="secondary"
+              [outlined]="true"
+              [rounded]="true"
+              ariaLabel="Toggle filters"
+              (onClick)="integrationsFiltersVisible.update(v => !v)"
+              [styleClass]="integrationsFiltersVisible() ? 'filter-icon-active' : ''"
+            />
+            <span class="toolbar-spacer"></span>
+            <p-toggleButton
+              [ngModel]="integrationsViewMode() === 'table'"
+              (ngModelChange)="integrationsViewMode.set($event ? 'table' : 'grid')"
+              onLabel="Table"
+              offLabel="Grid"
+              onIcon="pi pi-list"
+              offIcon="pi pi-objects-column"
+              ariaLabel="Toggle view mode"
+              data-testid="integrations-view-toggle"
+            />
+          </div>
+
+          <!-- Cards Grid -->
+          <div class="cards-grid" data-testid="integrations-grid">
+            @for (integ of integrations; track integ.id) {
+              <div class="integration-card" [attr.data-testid]="'integration-' + integ.id">
+                <div class="integration-header">
+                  <i [class]="integ.icon" class="integration-icon"></i>
+                  <span class="integration-name">{{ integ.name }}</span>
+                </div>
+                <div class="integration-meta">
+                  <p-tag [value]="integ.protocol" severity="info" />
+                  <p-tag
+                    [value]="integ.enabled ? 'Enabled' : 'Disabled'"
+                    [severity]="integ.enabled ? 'success' : 'danger'"
+                  />
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Paginator -->
+          <p-paginator
+            [rows]="10"
+            [totalRecords]="integrations.length"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            data-testid="integrations-paginator"
+          />
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Dictionary Tab ─────────────────────────────────────────────────── -->
+      <p-tabpanel value="dictionary">
+        <div class="tab-section-layout">
+          <!-- Toolbar -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search dictionary..."
+                [value]="dictionarySearch()"
+                (input)="dictionarySearch.set($any($event.target).value)"
+                data-testid="input-search-dictionary"
+              />
+            </div>
+            <p-button
+              icon="pi pi-filter"
+              severity="secondary"
+              [outlined]="true"
+              [rounded]="true"
+              ariaLabel="Toggle filters"
+              (onClick)="dictionaryFiltersVisible.update(v => !v)"
+              [styleClass]="dictionaryFiltersVisible() ? 'filter-icon-active' : ''"
+            />
+            <span class="toolbar-spacer"></span>
+            <p-toggleButton
+              [ngModel]="dictionaryViewMode() === 'table'"
+              (ngModelChange)="dictionaryViewMode.set($event ? 'table' : 'grid')"
+              onLabel="Table"
+              offLabel="Grid"
+              onIcon="pi pi-list"
+              offIcon="pi pi-objects-column"
+              ariaLabel="Toggle view mode"
+              data-testid="dictionary-view-toggle"
+            />
+          </div>
+
+          <!-- DataTable -->
+          <p-table
+            [value]="[...dictionary]"
+            [rowHover]="true"
+            [tableStyle]="{ 'min-width': '30rem' }"
+            styleClass="factsheet-table"
+            data-testid="dictionary-table"
+          >
+            <ng-template #header>
+              <tr>
+                <th>Object Type</th>
+                <th>Attributes</th>
+                <th>Origin</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-entry>
+              <tr>
+                <td>{{ entry.objectType }}</td>
+                <td>{{ entry.attributeCount }}</td>
+                <td>
+                  <p-tag
+                    [value]="entry.origin"
+                    [severity]="entry.origin === 'Seeded' ? 'info' : 'warn'"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+          <!-- Paginator -->
+          <p-paginator
+            [rows]="10"
+            [totalRecords]="dictionary.length"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            data-testid="dictionary-paginator"
+          />
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Agents Tab ─────────────────────────────────────────────────────── -->
+      <p-tabpanel value="agents">
+        <div class="tab-header">
+          <h2 class="tab-title">Agents</h2>
+          <p class="tab-description">AI agents deployed or in development for this tenant.</p>
+        </div>
+        <div class="cards-grid" data-testid="agents-grid">
+          @for (agent of agents; track agent.id) {
+            <div class="agent-card" [attr.data-testid]="'agent-' + agent.id">
+              <div class="agent-header">
+                <i class="pi pi-android agent-icon"></i>
+                <span class="agent-name">{{ agent.name }}</span>
+              </div>
+              <div class="agent-meta">
+                <p-tag
+                  [value]="agent.status"
+                  [severity]="agent.status === 'Deployed' ? 'success' : 'secondary'"
+                />
+                <span class="agent-skills">{{ agent.skillCount }} skills</span>
+              </div>
+            </div>
+          }
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Studio Tab ─────────────────────────────────────────────────────── -->
+      <p-tabpanel value="studio">
+        <div class="tab-section-layout">
+          <!-- Toolbar -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search processes..."
+                data-testid="input-search-studio"
+              />
+            </div>
+            <span class="toolbar-spacer"></span>
+            <p-button
+              label="Open Studio"
+              icon="pi pi-external-link"
+              severity="secondary"
+              data-testid="open-studio-btn"
+            />
+          </div>
+
+          <!-- Placeholder -->
+          <div class="studio-placeholder" data-testid="studio-placeholder">
+            <i class="pi pi-sitemap studio-placeholder-icon"></i>
+            <p>5 process definitions configured</p>
+            <p class="text-muted">Open Studio to manage BPMN workflows</p>
+          </div>
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Audit Log Tab ──────────────────────────────────────────────────── -->
+      <p-tabpanel value="audit">
+        <div class="tab-section-layout">
+          <!-- Toolbar -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search audit log..."
+                [value]="auditSearch()"
+                (input)="auditSearch.set($any($event.target).value)"
+                data-testid="input-search-audit"
+              />
+            </div>
+            <p-button
+              icon="pi pi-filter"
+              severity="secondary"
+              [outlined]="true"
+              [rounded]="true"
+              ariaLabel="Toggle filters"
+              (onClick)="auditFiltersVisible.update(v => !v)"
+              [styleClass]="auditFiltersVisible() ? 'filter-icon-active' : ''"
+            />
+            <span class="toolbar-spacer"></span>
+            <p-toggleButton
+              [ngModel]="auditViewMode() === 'table'"
+              (ngModelChange)="auditViewMode.set($event ? 'table' : 'grid')"
+              onLabel="Table"
+              offLabel="Grid"
+              onIcon="pi pi-list"
+              offIcon="pi pi-objects-column"
+              ariaLabel="Toggle view mode"
+              data-testid="audit-view-toggle"
+            />
+          </div>
+
+          <!-- DataTable -->
+          <p-table
+            [value]="[...auditLog]"
+            [rowHover]="true"
+            [tableStyle]="{ 'min-width': '40rem' }"
+            styleClass="factsheet-table"
+            data-testid="audit-table"
+          >
+            <ng-template #header>
+              <tr>
+                <th>Timestamp</th>
+                <th>Actor</th>
+                <th>Action</th>
+                <th>Target</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-entry>
+              <tr>
+                <td class="text-muted">{{ entry.timestamp }}</td>
+                <td>{{ entry.actor }}</td>
+                <td>{{ entry.action }}</td>
+                <td>{{ entry.target }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+
+          <!-- Paginator -->
+          <p-paginator
+            [rows]="10"
+            [totalRecords]="auditLog.length"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            data-testid="audit-paginator"
+          />
+        </div>
+      </p-tabpanel>
+
+      <!-- ── Health Checks Tab ──────────────────────────────────────────────── -->
+      <p-tabpanel value="health">
+        <div class="tab-section-layout">
+          <!-- Toolbar -->
+          <div class="tab-section-toolbar">
+            <div class="search-bar">
+              <span class="search-icon pi pi-search"></span>
+              <input
+                pInputText
+                type="text"
+                class="search-input"
+                placeholder="Search health checks..."
+                [value]="healthSearch()"
+                (input)="healthSearch.set($any($event.target).value)"
+                data-testid="input-search-health"
+              />
+            </div>
+            <p-button
+              icon="pi pi-filter"
+              severity="secondary"
+              [outlined]="true"
+              [rounded]="true"
+              ariaLabel="Toggle filters"
+              (onClick)="healthFiltersVisible.update(v => !v)"
+              [styleClass]="healthFiltersVisible() ? 'filter-icon-active' : ''"
+            />
+            <span class="toolbar-spacer"></span>
+            <p-toggleButton
+              [ngModel]="healthViewMode() === 'table'"
+              (ngModelChange)="healthViewMode.set($event ? 'table' : 'grid')"
+              onLabel="Table"
+              offLabel="Grid"
+              onIcon="pi pi-list"
+              offIcon="pi pi-objects-column"
+              ariaLabel="Toggle view mode"
+              data-testid="health-view-toggle"
+            />
+          </div>
+
+          <!-- Cards Grid -->
+          <div class="cards-grid" data-testid="health-grid">
+            @for (check of healthChecks; track check.id) {
+              <div class="health-card" [attr.data-testid]="'health-' + check.id">
+                <div class="health-card-header">
+                  <i [class]="check.icon" class="health-icon"></i>
+                  <span class="health-service">{{ check.service }}</span>
+                </div>
+                <div class="health-card-body">
+                  <p-tag [value]="check.status" [severity]="healthSeverity(check.status)" />
+                  <span class="health-checked text-muted">{{ check.lastChecked }}</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Paginator -->
+          <p-paginator
+            [rows]="10"
+            [totalRecords]="healthChecks.length"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            data-testid="health-paginator"
+          />
+        </div>
+      </p-tabpanel>
+
+      <!-- ── License Tab ────────────────────────────────────────────────────── -->
+      <p-tabpanel value="license">
+        <div class="tab-section-layout">
+          <div class="tab-header">
+            <h2 class="tab-title">License</h2>
+            <p class="text-muted">
+              Tenant-scoped license summary and seat allocation shell baseline.
+            </p>
+          </div>
+
+          <section class="license-summary" data-testid="license-summary">
+            <div class="license-summary-header">
+              <div>
+                <h3 class="section-subtitle">Current Tenant License</h3>
+                <p class="text-muted">
+                  Valid from {{ license.validFrom }} until {{ license.validUntil }}
+                </p>
+              </div>
+              <p-tag
+                [value]="license.status"
+                [severity]="
+                  license.status === 'Active'
+                    ? 'success'
+                    : license.status === 'Expiring Soon'
+                      ? 'warn'
+                      : 'danger'
+                "
+              />
+            </div>
+
+            <div class="license-metrics">
+              <article class="license-metric" data-testid="license-metric-allocated">
+                <span class="license-metric-label">Allocated Seats</span>
+                <strong>{{ allocatedSeats() }}</strong>
+              </article>
+              <article class="license-metric" data-testid="license-metric-assigned">
+                <span class="license-metric-label">Assigned Seats</span>
+                <strong>{{ assignedSeats() }}</strong>
+              </article>
+              <article class="license-metric" data-testid="license-metric-available">
+                <span class="license-metric-label">Available Seats</span>
+                <strong>{{ availableSeats() }}</strong>
+              </article>
+            </div>
+          </section>
+
+          <p-table
+            [value]="[...license.allocations]"
+            [rowHover]="true"
+            [tableStyle]="{ 'min-width': '32rem' }"
+            styleClass="factsheet-table"
+            data-testid="license-table"
+          >
+            <ng-template #header>
+              <tr>
+                <th>License Type</th>
+                <th>Allocated</th>
+                <th>Assigned</th>
+                <th>Available</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-allocation>
+              <tr>
+                <td>{{ allocation.licenseType }}</td>
+                <td>{{ allocation.allocated }}</td>
+                <td>{{ allocation.assigned }}</td>
+                <td>{{ allocation.available }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

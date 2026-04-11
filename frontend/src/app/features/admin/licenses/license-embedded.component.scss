@@ -1,0 +1,278 @@
+:host {
+  --nm-bg: var(--tp-surface);
+  --nm-surface: var(--tp-surface);
+  --nm-surface-alt: var(--tp-surface-raised);
+  --nm-shadow-dark: color-mix(in srgb, var(--tp-warning) 38%, transparent);
+  --nm-shadow-light: color-mix(in srgb, var(--tp-surface-raised) 55%, transparent);
+  --nm-muted: var(--tp-text);
+  --nm-text: var(--tp-text);
+  --nm-accent: var(--tp-primary);
+}
+
+.embedded-block {
+  display: grid;
+  gap: var(--tp-space-3);
+
+  h3,
+  h4 {
+    margin: 0;
+    color: var(--nm-text);
+  }
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--nm-muted);
+}
+
+.loading-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  color: var(--nm-muted);
+}
+
+.allocation-sliders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tp-space-4);
+  padding: var(--tp-space-4);
+  border-radius: var(--nm-radius-xl);
+  background: linear-gradient(180deg, var(--tp-surface) 0%, var(--tp-surface) 100%);
+  border: 0;
+  box-shadow:
+    inset 6px 6px 12px var(--nm-shadow-dark),
+    inset -6px -6px 12px var(--nm-shadow-light);
+}
+
+.slider-stack {
+  width: 118px;
+  display: grid;
+  justify-items: center;
+  gap: var(--tp-space-2);
+}
+
+.slider-shell {
+  position: relative;
+  width: 92px;
+  height: 258px;
+  border-radius: var(--nm-radius-pill);
+  background: var(--tp-surface);
+  box-shadow:
+    12px 12px 22px var(--nm-shadow-dark),
+    -10px -10px 20px var(--nm-shadow-light);
+}
+
+.track-area {
+  position: absolute;
+  top: 24px;
+  bottom: 50px;
+  left: 50%;
+  width: 40px;
+  transform: translateX(-50%);
+}
+
+.track-bg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  border-radius: var(--nm-radius-pill);
+  background: var(--tp-surface);
+  transform: translateX(-50%);
+}
+
+.track-fill {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 4px;
+  border-radius: var(--nm-radius-pill);
+  background: linear-gradient(180deg, var(--tp-danger) 0%, var(--tp-danger) 100%);
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--tp-danger) 45%, transparent);
+}
+
+.track-thumb {
+  position: absolute;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--tp-danger) 0%, var(--tp-danger) 65%);
+  border: 4px solid var(--tp-surface);
+  transform: translate(-50%, 50%);
+  box-shadow:
+    0 6px 10px color-mix(in srgb, var(--tp-danger) 35%, transparent),
+    -2px -2px 6px var(--nm-shadow-light);
+}
+
+.tier-icon {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--tp-font-xl);
+  color: var(--tp-danger);
+}
+
+.slider-caption {
+  text-align: center;
+  display: grid;
+  gap: 0.1rem;
+
+  strong {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text);
+    line-height: 1.2;
+  }
+
+  span {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text-dark);
+  }
+
+  small {
+    font-size: var(--tp-font-xs);
+    color: var(--nm-muted);
+  }
+}
+
+.assign-card,
+.table-card {
+  border: 0;
+  border-radius: var(--nm-radius-lg);
+  background: var(--nm-surface);
+  box-shadow:
+    10px 10px 18px var(--nm-shadow-dark),
+    -8px -8px 14px var(--nm-shadow-light);
+}
+
+:host ::ng-deep .assign-card .p-card-body,
+:host ::ng-deep .table-card .p-card-body {
+  padding: var(--tp-space-4);
+}
+
+.tier-allocation-card {
+  h4 {
+    margin-block-end: var(--tp-space-2);
+  }
+}
+
+.tier-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    padding: var(--tp-space-2) var(--tp-space-2);
+    border-bottom: 1px solid var(--tp-surface);
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text);
+  }
+
+  th {
+    font-weight: 700;
+    background: var(--tp-surface);
+  }
+}
+
+.utilization-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  min-width: 140px;
+}
+
+.utilization-track {
+  width: 84px;
+  height: 8px;
+  border-radius: var(--nm-radius-pill);
+  background: var(--tp-surface);
+  overflow: hidden;
+}
+
+.utilization-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--tp-primary) 0%, var(--tp-primary) 100%);
+}
+
+.assign-head {
+  margin-block-end: var(--tp-space-2);
+}
+
+.assign-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 180px auto;
+  gap: var(--tp-space-2);
+  align-items: center;
+}
+
+:host ::ng-deep .assign-controls .p-inputtext {
+  border: 1px solid rgba(var(--nm-black-rgb), 0.08);
+  border-radius: var(--nm-radius-pill);
+  background: var(--tp-surface-raised);
+  box-shadow: none;
+}
+
+.native-select {
+  width: 100%;
+  border: 0;
+  border-radius: var(--nm-radius-md);
+  padding: var(--tp-space-2) var(--tp-space-3);
+  color: var(--tp-text-dark);
+  background: var(--nm-surface-alt);
+  box-shadow:
+    inset 4px 4px 8px var(--nm-shadow-dark),
+    inset -4px -4px 8px var(--nm-shadow-light);
+}
+
+:host ::ng-deep .assign-controls .p-button,
+:host ::ng-deep .header-row .p-button,
+:host ::ng-deep .table-card .p-button {
+  border: 0;
+  border-radius: var(--nm-radius-pill);
+  box-shadow:
+    6px 6px 12px var(--nm-shadow-dark),
+    -5px -5px 10px var(--nm-shadow-light);
+}
+
+:host ::ng-deep .p-datatable {
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+}
+
+:host ::ng-deep .p-datatable-table {
+  min-width: 48rem;
+}
+
+// DataTable header/body cell styles now come from global --p-datatable-* tokens in styles.scss.
+// No local overrides needed — transparent row bg, --tp-surface header bg, --tp-border borders.
+
+@media (max-width: 760px) {
+  .assign-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .allocation-sliders {
+    justify-content: center;
+  }
+
+  .tier-table {
+    th,
+    td {
+      padding: var(--tp-space-1) var(--tp-space-1);
+      font-size: var(--tp-font-xs);
+    }
+  }
+}

@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSIST Tenant Management - Screen Flow Prototype</title>
+<style>
+:root {
+  --tp-primary: #428177;
+  --tp-primary-dark: #054239;
+  --tp-accent: #988561;
+  --tp-error: #6b1f2a;
+  --tp-surface-light: #f2efe9;
+  --tp-text: #3d3a3b;
+  --tp-text-dark: #161616;
+  --tp-text-secondary: #7a7672;
+  --tp-text-muted: #999590;
+  --tp-border: #e0ddda;
+  --tp-surface-hover: #e8e5e0;
+  --tp-surface-bg: #faf8f4;
+  --tp-white: #fff;
+  --tp-error-bg: #4a151e;
+  --tp-warning: #78350f;
+  --tp-info: #0369a1;
+  --tp-font-xs: 0.72rem;
+  --tp-font-sm: 0.82rem;
+  --tp-font-md: 0.92rem;
+  --tp-font-lg: 1.15rem;
+  --tp-font-xl: 1.35rem;
+  --tp-space-1: 0.25rem;
+  --tp-space-2: 0.5rem;
+  --tp-space-3: 0.75rem;
+  --tp-space-4: 1rem;
+  --tp-space-5: 1.25rem;
+  --tp-space-6: 1.5rem;
+  --tp-space-8: 2rem;
+  --tp-radius-sm: 4px;
+  --tp-radius-md: 8px;
+  --tp-radius-lg: 12px;
+  font-family: 'Gotham Rounded', 'Nunito', 'Segoe UI', -apple-system, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--tp-surface-bg);
+  color: var(--tp-text);
+  font-size: var(--tp-font-md);
+  line-height: 1.5;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar Navigation ── */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--tp-primary-dark);
+  color: var(--tp-white);
+  padding: var(--tp-space-6) 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 0 var(--tp-space-6) var(--tp-space-6);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: var(--tp-space-4);
+}
+.sidebar-brand h2 { font-size: var(--tp-font-lg); font-weight: 700; letter-spacing: -0.01em; }
+.sidebar-brand span { font-size: var(--tp-font-xs); color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+.sidebar-section { padding: var(--tp-space-2) var(--tp-space-6); font-size: var(--tp-font-xs); text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); margin-top: var(--tp-space-4); }
+.sidebar-link {
+  display: flex; align-items: center; gap: var(--tp-space-3);
+  padding: var(--tp-space-3) var(--tp-space-6);
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: var(--tp-font-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.06); color: var(--tp-white); }
+.sidebar-link.active { background: rgba(255,255,255,0.1); color: var(--tp-white); border-left-color: var(--tp-accent); }
+.sidebar-link .icon { width: 18px; text-align: center; font-size: 14px; }
+
+/* ── Main Content ── */
+.main { margin-left: 240px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Top Bar ── */
+.topbar {
+  height: 52px;
+  background: var(--tp-white);
+  border-bottom: 1px solid var(--tp-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--tp-space-8);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.breadcrumbs { display: flex; align-items: center; gap: var(--tp-space-2); font-size: var(--tp-font-sm); color: var(--tp-text-muted); }
+.breadcrumbs a { color: var(--tp-text-secondary); text-decoration: none; }
+.breadcrumbs a:hover { color: var(--tp-primary); }
+.breadcrumbs .sep { color: var(--tp-text-muted); }
+.breadcrumbs .current { color: var(--tp-text-dark); font-weight: 600; }
+
+.topbar-right { display: flex; align-items: center; gap: var(--tp-space-6); }
+
+/* ── Role Toggle ── */
+.role-toggle {
+  display: flex; align-items: center; gap: var(--tp-space-3);
+  background: var(--tp-surface-light);
+  border-radius: var(--tp-radius-lg);
+  padding: var(--tp-space-1) var(--tp-space-1);
+  font-size: var(--tp-font-sm);
+}
+.role-btn {
+  padding: var(--tp-space-2) var(--tp-space-4);
+  border-radius: var(--tp-radius-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--tp-font-xs);
+  font-weight: 600;
+  color: var(--tp-text-secondary);
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.role-btn.active { background: var(--tp-white); color: var(--tp-primary-dark); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+/* ── Responsive Preview ── */
+.viewport-toggle {
+  display: flex; align-items: center; gap: var(--tp-space-1);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--tp-radius-md);
+  padding: var(--tp-space-1);
+}
+.vp-btn {
+  padding: var(--tp-space-1) var(--tp-space-3);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--tp-font-xs);
+  color: var(--tp-text-secondary);
+  border-radius: var(--tp-radius-sm);
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.vp-btn.active { background: var(--tp-primary); color: var(--tp-white); }
+.vp-btn:hover:not(.active) { background: var(--tp-surface-hover); }
+
+/* ── Content Area ── */
+.content { padding: var(--tp-space-8); flex: 1; transition: max-width 0.3s; }
+.content.vp-tablet { max-width: 768px; margin: 0 auto; }
+.content.vp-mobile { max-width: 375px; margin: 0 auto; }
+
+/* ── Screen containers ── */
+.screen { display: none; animation: fadeIn 0.25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--tp-space-2);
+  padding: var(--tp-space-3) var(--tp-space-5);
+  border: 1px solid transparent;
+  border-radius: var(--tp-radius-md);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--tp-primary); color: var(--tp-white); }
+.btn-primary:hover { background: var(--tp-primary-dark); }
+.btn-secondary { background: transparent; color: var(--tp-primary); border-color: var(--tp-primary); }
+.btn-secondary:hover { background: var(--tp-primary); color: var(--tp-white); }
+.btn-accent { background: var(--tp-accent); color: var(--tp-white); }
+.btn-accent:hover { filter: brightness(0.9); }
+.btn-danger { background: var(--tp-error); color: var(--tp-white); }
+.btn-danger:hover { filter: brightness(1.15); }
+.btn-ghost { background: transparent; color: var(--tp-text-secondary); }
+.btn-ghost:hover { background: var(--tp-surface-light); color: var(--tp-text); }
+.btn-sm { padding: var(--tp-space-2) var(--tp-space-3); font-size: var(--tp-font-xs); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--tp-space-1);
+  padding: var(--tp-space-1) var(--tp-space-3);
+  border-radius: 999px;
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-primary { background: rgba(66,129,119,0.12); color: var(--tp-primary-dark); }
+.badge-accent { background: rgba(152,133,97,0.15); color: var(--tp-accent); }
+.badge-warning { background: rgba(120,53,15,0.12); color: var(--tp-warning); }
+.badge-error { background: rgba(107,31,42,0.12); color: var(--tp-error); }
+.badge-info { background: rgba(3,105,161,0.12); color: var(--tp-info); }
+.badge-muted { background: var(--tp-surface-light); color: var(--tp-text-muted); }
+
+/* ── Status Dot ── */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: var(--tp-space-2); }
+.status-active { background: #3a9a5c; }
+.status-suspended { background: #d4950a; }
+.status-archived { background: #999590; }
+.status-provisioning { background: var(--tp-info); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ── Cards ── */
+.card {
+  background: var(--tp-white);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--tp-radius-lg);
+  padding: var(--tp-space-6);
+  transition: all 0.15s;
+}
+.card-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: var(--tp-primary); cursor: pointer; transform: translateY(-1px); }
+
+/* ── Input ── */
+.input-group { display: flex; flex-direction: column; gap: var(--tp-space-2); }
+.input-group label { font-size: var(--tp-font-sm); font-weight: 600; color: var(--tp-text-dark); }
+.input-group .helper { font-size: var(--tp-font-xs); color: var(--tp-text-muted); }
+input[type="text"], input[type="email"], input[type="search"], select, textarea {
+  padding: var(--tp-space-3) var(--tp-space-4);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--tp-radius-md);
+  font-size: var(--tp-font-md);
+  font-family: inherit;
+  color: var(--tp-text);
+  background: var(--tp-white);
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--tp-primary); box-shadow: 0 0 0 3px rgba(66,129,119,0.1); }
+
+/* ── Search ── */
+.search-bar {
+  position: relative;
+}
+.search-bar input {
+  padding-left: 2.5rem;
+}
+.search-bar::before {
+  content: "\1F50D";
+  position: absolute;
+  left: var(--tp-space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+
+/* ── Filter Chips ── */
+.chip-group { display: flex; flex-wrap: wrap; gap: var(--tp-space-2); }
+.chip {
+  padding: var(--tp-space-2) var(--tp-space-4);
+  border-radius: 999px;
+  border: 1px solid var(--tp-border);
+  background: var(--tp-white);
+  font-size: var(--tp-font-xs);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--tp-text-secondary);
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--tp-primary); color: var(--tp-primary); }
+.chip.active { background: var(--tp-primary); color: var(--tp-white); border-color: var(--tp-primary); }
+
+/* ── Grid ── */
+.tenant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--tp-space-6); }
+
+/* ── Tenant Card ── */
+.tenant-card { display: flex; flex-direction: column; gap: var(--tp-space-4); }
+.tenant-card-header { display: flex; align-items: center; gap: var(--tp-space-4); }
+.tenant-logo {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: var(--tp-font-lg); color: var(--tp-white);
+  flex-shrink: 0;
+}
+.tenant-card-meta { display: flex; flex-wrap: wrap; gap: var(--tp-space-3); align-items: center; }
+.tenant-card-stats { display: flex; gap: var(--tp-space-6); padding-top: var(--tp-space-3); border-top: 1px solid var(--tp-border); }
+.stat { display: flex; flex-direction: column; }
+.stat-value { font-size: var(--tp-font-lg); font-weight: 700; color: var(--tp-text-dark); }
+.stat-label { font-size: var(--tp-font-xs); color: var(--tp-text-muted); }
+
+/* ── Fact Sheet Banner ── */
+.fact-banner {
+  background: linear-gradient(135deg, var(--tp-primary-dark) 0%, var(--tp-primary) 100%);
+  border-radius: var(--tp-radius-lg);
+  padding: var(--tp-space-8);
+  color: var(--tp-white);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-8);
+  margin-bottom: var(--tp-space-6);
+  position: relative;
+  overflow: hidden;
+}
+.fact-banner::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -5%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.fact-logo {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: 700;
+  flex-shrink: 0;
+  border: 3px solid rgba(255,255,255,0.25);
+}
+.fact-info { flex: 1; }
+.fact-info h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: var(--tp-space-1); }
+.fact-info .slug { color: rgba(255,255,255,0.6); font-size: var(--tp-font-sm); }
+.fact-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--tp-space-3); margin-top: var(--tp-space-4); }
+.fact-kpis { display: flex; flex-wrap: wrap; gap: var(--tp-space-3); margin-top: var(--tp-space-4); }
+.kpi-chip {
+  background: rgba(255,255,255,0.12);
+  padding: var(--tp-space-2) var(--tp-space-4);
+  border-radius: 999px;
+  font-size: var(--tp-font-xs);
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+.fact-actions { display: flex; gap: var(--tp-space-3); margin-top: var(--tp-space-5); }
+.fact-actions .btn { border-color: rgba(255,255,255,0.3); color: var(--tp-white); }
+.fact-actions .btn:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Tab Bar ── */
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--tp-border);
+  margin-bottom: var(--tp-space-6);
+  overflow-x: auto;
+  gap: 0;
+}
+.tab-btn {
+  padding: var(--tp-space-4) var(--tp-space-6);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+  color: var(--tp-text-muted);
+  font-family: inherit;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+.tab-btn:hover { color: var(--tp-text); }
+.tab-btn.active { color: var(--tp-primary); border-bottom-color: var(--tp-primary); }
+.tab-badge {
+  background: var(--tp-surface-light);
+  color: var(--tp-text-secondary);
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+.tab-btn.active .tab-badge { background: rgba(66,129,119,0.12); color: var(--tp-primary); }
+
+/* ── Tab Content ── */
+.tab-panel { display: none; animation: fadeIn 0.2s ease; }
+.tab-panel.active { display: block; }
+
+/* ── Table ── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  padding: var(--tp-space-3) var(--tp-space-4);
+  font-size: var(--tp-font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tp-text-muted);
+  border-bottom: 2px solid var(--tp-border);
+  font-weight: 700;
+}
+.data-table td {
+  padding: var(--tp-space-4);
+  border-bottom: 1px solid var(--tp-border);
+  font-size: var(--tp-font-sm);
+}
+.data-table tr:hover td { background: var(--tp-surface-light); }
+
+/* ── Wizard ── */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tp-space-2);
+  margin-bottom: var(--tp-space-8);
+}
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+}
+.step-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: var(--tp-font-sm);
+  border: 2px solid var(--tp-border);
+  color: var(--tp-text-muted);
+  transition: all 0.2s;
+}
+.step-circle.active { background: var(--tp-primary); border-color: var(--tp-primary); color: var(--tp-white); }
+.step-circle.done { background: var(--tp-primary-dark); border-color: var(--tp-primary-dark); color: var(--tp-white); }
+.step-label { font-size: var(--tp-font-sm); font-weight: 600; color: var(--tp-text-muted); }
+.step-label.active { color: var(--tp-text-dark); }
+.step-connector { width: 60px; height: 2px; background: var(--tp-border); }
+.step-connector.done { background: var(--tp-primary); }
+
+.wizard-panel { display: none; animation: fadeIn 0.25s ease; }
+.wizard-panel.active { display: block; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--tp-space-6); }
+.form-grid .full-width { grid-column: 1 / -1; }
+
+.wizard-footer { display: flex; justify-content: space-between; margin-top: var(--tp-space-8); padding-top: var(--tp-space-6); border-top: 1px solid var(--tp-border); }
+
+/* ── Modal / Dialog ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--tp-white);
+  border-radius: var(--tp-radius-lg);
+  padding: var(--tp-space-8);
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.modal h3 { font-size: var(--tp-font-xl); margin-bottom: var(--tp-space-4); }
+.modal p { color: var(--tp-text-secondary); margin-bottom: var(--tp-space-6); line-height: 1.6; }
+.modal-actions { display: flex; justify-content: flex-end; gap: var(--tp-space-3); }
+
+/* ── Color Swatch ── */
+.swatch-row { display: flex; gap: var(--tp-space-4); flex-wrap: wrap; }
+.swatch {
+  display: flex; flex-direction: column; align-items: center; gap: var(--tp-space-2);
+}
+.swatch-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px solid var(--tp-border);
+}
+.swatch-label { font-size: var(--tp-font-xs); color: var(--tp-text-muted); }
+
+/* ── Health Card ── */
+.health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--tp-space-4); }
+.health-card { text-align: center; padding: var(--tp-space-6); }
+.health-icon { font-size: 2rem; margin-bottom: var(--tp-space-3); }
+.health-status { font-weight: 700; font-size: var(--tp-font-sm); }
+.health-status.green { color: #3a9a5c; }
+.health-status.amber { color: #d4950a; }
+.health-status.red { color: var(--tp-error); }
+
+/* ── Integration Card ── */
+.integration-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--tp-space-4); }
+.integration-card { display: flex; align-items: center; justify-content: space-between; }
+.integration-info { display: flex; align-items: center; gap: var(--tp-space-4); }
+.integration-icon {
+  width: 44px; height: 44px; border-radius: var(--tp-radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: var(--tp-font-sm);
+  background: var(--tp-surface-light);
+  color: var(--tp-text);
+}
+
+/* ── Toggle Switch ── */
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--tp-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--tp-white);
+  top: 3px; left: 3px;
+  transition: 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle input:checked + .toggle-slider { background: var(--tp-primary); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+/* ── Provisioning Animation ── */
+.provisioning-overlay {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tp-space-6);
+  padding: var(--tp-space-8) 0;
+}
+.provisioning-overlay.active { display: flex; }
+.spinner {
+  width: 56px; height: 56px;
+  border: 4px solid var(--tp-border);
+  border-top-color: var(--tp-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.prov-steps { text-align: left; display: flex; flex-direction: column; gap: var(--tp-space-3); }
+.prov-step { display: flex; align-items: center; gap: var(--tp-space-3); font-size: var(--tp-font-sm); color: var(--tp-text-muted); }
+.prov-step.done { color: var(--tp-primary); }
+.prov-step.active { color: var(--tp-text-dark); font-weight: 600; }
+
+/* ── Agent Card ── */
+.agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--tp-space-4); }
+
+/* ── Upload Area ── */
+.upload-area {
+  border: 2px dashed var(--tp-border);
+  border-radius: var(--tp-radius-lg);
+  padding: var(--tp-space-8);
+  text-align: center;
+  color: var(--tp-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.upload-area:hover { border-color: var(--tp-primary); color: var(--tp-primary); }
+
+/* ── Confirm Input ── */
+.confirm-input {
+  border-color: var(--tp-error) !important;
+}
+
+/* ── Section Headers ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--tp-space-6);
+}
+.section-header h2 { font-size: var(--tp-font-xl); font-weight: 700; color: var(--tp-text-dark); }
+
+/* ── Empty State ── */
+.empty-state {
+  text-align: center;
+  padding: var(--tp-space-8) 0;
+  color: var(--tp-text-muted);
+}
+.empty-state .empty-icon { font-size: 3rem; margin-bottom: var(--tp-space-4); opacity: 0.4; }
+.empty-state p { margin-bottom: var(--tp-space-4); }
+
+/* ── Review Summary ── */
+.review-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--tp-space-3) 0;
+  border-bottom: 1px solid var(--tp-border);
+}
+.review-label { color: var(--tp-text-muted); font-size: var(--tp-font-sm); }
+.review-value { font-weight: 600; font-size: var(--tp-font-sm); }
+</style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <h2>EMSIST</h2>
+    <span>Tenant Management Prototype</span>
+  </div>
+  <div class="sidebar-section">Screens</div>
+  <a class="sidebar-link active" onclick="showScreen('tenant-list')">
+    <span class="icon">&#9783;</span> Tenant List
+  </a>
+  <a class="sidebar-link" onclick="showScreen('fact-sheet')">
+    <span class="icon">&#9776;</span> Fact Sheet
+  </a>
+  <a class="sidebar-link" onclick="showScreen('create-wizard')">
+    <span class="icon">&#10010;</span> Create Wizard
+  </a>
+  <div class="sidebar-section">Lifecycle Dialogs</div>
+  <a class="sidebar-link" onclick="openDialog('suspend')">
+    <span class="icon">&#9888;</span> Suspend
+  </a>
+  <a class="sidebar-link" onclick="openDialog('archive')">
+    <span class="icon">&#128451;</span> Archive
+  </a>
+  <a class="sidebar-link" onclick="openDialog('delete')">
+    <span class="icon">&#128465;</span> Permanent Delete
+  </a>
+  <div class="sidebar-section">Reference</div>
+  <a class="sidebar-link" style="color:rgba(255,255,255,0.4); font-size:0.7rem; cursor:default;">
+    R02 Tenant Management
+  </a>
+</nav>
+
+<!-- ── Main ── -->
+<div class="main">
+
+  <!-- ── Top Bar ── -->
+  <header class="topbar">
+    <div class="breadcrumbs" id="breadcrumbs">
+      <a onclick="showScreen('tenant-list')">Tenants</a>
+    </div>
+    <div class="topbar-right">
+      <div class="viewport-toggle">
+        <button class="vp-btn active" onclick="setViewport('desktop', this)">Desktop</button>
+        <button class="vp-btn" onclick="setViewport('tablet', this)">Tablet</button>
+        <button class="vp-btn" onclick="setViewport('mobile', this)">Mobile</button>
+      </div>
+      <div class="role-toggle">
+        <button class="role-btn active" id="role-master" onclick="setRole('master')">ADMIN (MASTER)</button>
+        <button class="role-btn" id="role-regular" onclick="setRole('regular')">ADMIN (REGULAR)</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content" id="content-area">
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SCREEN 1: Tenant List                 -->
+    <!-- ══════════════════════════════════════ -->
+    <div class="screen active" id="screen-tenant-list">
+      <div class="section-header">
+        <h2>Tenant Manager</h2>
+        <button class="btn btn-primary master-only" onclick="showScreen('create-wizard')">&#10010; New Tenant</button>
+      </div>
+
+      <div style="display:flex; gap:var(--tp-space-4); margin-bottom:var(--tp-space-6); flex-wrap:wrap; align-items:center;">
+        <div class="search-bar" style="flex:1; min-width:220px;">
+          <input type="search" placeholder="Search tenants by name or slug..." />
+        </div>
+        <div class="chip-group">
+          <button class="chip active">All</button>
+          <button class="chip" onclick="this.classList.toggle('active')">MASTER</button>
+          <button class="chip" onclick="this.classList.toggle('active')">REGULAR</button>
+          <button class="chip" onclick="this.classList.toggle('active')">DOMINANT</button>
+          <span style="color:var(--tp-border);">|</span>
+          <button class="chip" onclick="this.classList.toggle('active')">Active</button>
+          <button class="chip" onclick="this.classList.toggle('active')">Suspended</button>
+          <button class="chip" onclick="this.classList.toggle('active')">Archived</button>
+        </div>
+      </div>
+
+      <div class="tenant-grid" id="tenant-grid">
+        <!-- Master -->
+        <div class="card card-hover tenant-card" onclick="openFactSheet('acme')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:var(--tp-primary-dark);">A</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Acme Corporation</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">acme-corp</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-primary">MASTER</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-active"></span>Active</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">24</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">3</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">12</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+
+        <!-- Regular 1 -->
+        <div class="card card-hover tenant-card" onclick="openFactSheet('northwind')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:var(--tp-accent);">N</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Northwind Traders</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">northwind</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-accent">REGULAR</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-active"></span>Active</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">18</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">2</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">8</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+
+        <!-- Regular 2 -->
+        <div class="card card-hover tenant-card" onclick="openFactSheet('meridian')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:#7a8b6e;">M</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Meridian Services</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">meridian-svc</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-accent">REGULAR</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-suspended"></span>Suspended</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">6</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">1</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">5</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+
+        <!-- Regular 3 -->
+        <div class="card card-hover tenant-card" onclick="openFactSheet('pinnacle')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:#8b6e7a;">P</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Pinnacle Logistics</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">pinnacle-log</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-accent">REGULAR</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-archived"></span>Archived</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">0</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">0</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">4</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+
+        <!-- Dominant -->
+        <div class="card card-hover tenant-card" onclick="openFactSheet('vanguard')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:var(--tp-warning);">V</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Vanguard Industries</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">vanguard</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-warning">DOMINANT</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-provisioning"></span>Provisioning</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">0</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">0</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">0</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single tenant view for REGULAR role -->
+      <div id="regular-single-tenant" style="display:none;">
+        <div class="card card-hover tenant-card" style="max-width:400px;" onclick="openFactSheet('northwind')">
+          <div class="tenant-card-header">
+            <div class="tenant-logo" style="background:var(--tp-accent);">N</div>
+            <div>
+              <div style="font-weight:700; color:var(--tp-text-dark);">Northwind Traders</div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">northwind</div>
+            </div>
+          </div>
+          <div class="tenant-card-meta">
+            <span class="badge badge-accent">REGULAR</span>
+            <span style="font-size:var(--tp-font-xs); color:var(--tp-text-secondary);"><span class="status-dot status-active"></span>Active</span>
+          </div>
+          <div class="tenant-card-stats">
+            <div class="stat"><span class="stat-value">18</span><span class="stat-label">Users</span></div>
+            <div class="stat"><span class="stat-value">2</span><span class="stat-label">Agents</span></div>
+            <div class="stat"><span class="stat-value">8</span><span class="stat-label">Object Types</span></div>
+          </div>
+        </div>
+        <p style="color:var(--tp-text-muted); font-size:var(--tp-font-sm); margin-top:var(--tp-space-4);">You are viewing your organization's tenant. Multi-tenant management is available to Master Admins.</p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SCREEN 2: Tenant Fact Sheet           -->
+    <!-- ══════════════════════════════════════ -->
+    <div class="screen" id="screen-fact-sheet">
+      <!-- Banner -->
+      <div class="fact-banner">
+        <div class="fact-logo" id="fact-logo">A</div>
+        <div class="fact-info">
+          <h1 id="fact-name">Acme Corporation</h1>
+          <div class="slug" id="fact-slug">acme-corp</div>
+          <div class="fact-meta">
+            <span class="badge badge-primary" id="fact-type-badge">MASTER</span>
+            <span style="font-size:var(--tp-font-sm);"><span class="status-dot status-active" id="fact-status-dot"></span><span id="fact-status-label">Active</span></span>
+          </div>
+          <div class="fact-kpis">
+            <span class="kpi-chip" id="kpi-users">24 Users</span>
+            <span class="kpi-chip" id="kpi-agents">3 Agents</span>
+            <span class="kpi-chip" id="kpi-objects">12 Object Types</span>
+            <span class="kpi-chip" id="kpi-license">67% License</span>
+          </div>
+          <div class="fact-actions">
+            <button class="btn btn-secondary" style="border-color:rgba(255,255,255,0.3);">&#9998; Edit</button>
+            <button class="btn btn-secondary master-only" style="border-color:rgba(255,255,255,0.3);" onclick="openDialog('suspend')">&#9888; Suspend</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar" id="fact-tabs">
+        <button class="tab-btn active" onclick="switchTab('users', this)">Users <span class="tab-badge">24</span></button>
+        <button class="tab-btn" onclick="switchTab('branding', this)">Branding</button>
+        <button class="tab-btn" onclick="switchTab('integrations', this)">Integrations <span class="tab-badge">3</span></button>
+        <button class="tab-btn" onclick="switchTab('dictionary', this)">Dictionary <span class="tab-badge">12</span></button>
+        <button class="tab-btn" onclick="switchTab('agents', this)">Agents <span class="tab-badge">3</span></button>
+        <button class="tab-btn" onclick="switchTab('studio', this)">Studio <span class="tab-badge">5</span></button>
+        <button class="tab-btn" onclick="switchTab('audit', this)">Audit Log <span class="tab-badge">148</span></button>
+        <button class="tab-btn master-only-tab" onclick="switchTab('health', this)">Health Checks <span class="tab-badge">4</span></button>
+      </div>
+
+      <!-- ── Users Tab ── -->
+      <div class="tab-panel active" id="tab-users">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Team Members</h2>
+          <button class="btn btn-primary btn-sm">&#10010; Invite User</button>
+        </div>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Sarah Mitchell</td>
+                <td>s.mitchell@acme.com</td>
+                <td><span class="badge badge-primary">Admin</span></td>
+                <td><span class="status-dot status-active"></span>Active</td>
+                <td style="color:var(--tp-text-muted);">2 hours ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">James Chen</td>
+                <td>j.chen@acme.com</td>
+                <td><span class="badge badge-accent">Editor</span></td>
+                <td><span class="status-dot status-active"></span>Active</td>
+                <td style="color:var(--tp-text-muted);">15 minutes ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Priya Sharma</td>
+                <td>p.sharma@acme.com</td>
+                <td><span class="badge badge-accent">Editor</span></td>
+                <td><span class="status-dot status-active"></span>Active</td>
+                <td style="color:var(--tp-text-muted);">1 day ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Thomas Wright</td>
+                <td>t.wright@acme.com</td>
+                <td><span class="badge badge-muted">Viewer</span></td>
+                <td><span class="status-dot status-suspended"></span>Suspended</td>
+                <td style="color:var(--tp-text-muted);">30 days ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Elena Vasquez</td>
+                <td>e.vasquez@acme.com</td>
+                <td><span class="badge badge-muted">Viewer</span></td>
+                <td><span class="status-dot status-active"></span>Active</td>
+                <td style="color:var(--tp-text-muted);">5 hours ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Branding Tab ── -->
+      <div class="tab-panel" id="tab-branding">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Brand Configuration</h2>
+          <div style="display:flex;gap:var(--tp-space-3);">
+            <button class="btn btn-secondary btn-sm">Preview</button>
+            <button class="btn btn-primary btn-sm">Publish</button>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--tp-space-6);">
+          <div class="card">
+            <h3 style="font-size:var(--tp-font-md); font-weight:700; margin-bottom:var(--tp-space-4);">Color Palette</h3>
+            <div class="swatch-row">
+              <div class="swatch"><div class="swatch-circle" style="background:#428177;"></div><span class="swatch-label">Primary</span></div>
+              <div class="swatch"><div class="swatch-circle" style="background:#054239;"></div><span class="swatch-label">Dark</span></div>
+              <div class="swatch"><div class="swatch-circle" style="background:#988561;"></div><span class="swatch-label">Accent</span></div>
+              <div class="swatch"><div class="swatch-circle" style="background:#f2efe9;"></div><span class="swatch-label">Surface</span></div>
+              <div class="swatch"><div class="swatch-circle" style="background:#6b1f2a;"></div><span class="swatch-label">Error</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:var(--tp-font-md); font-weight:700; margin-bottom:var(--tp-space-4);">Logo</h3>
+            <div class="upload-area">
+              <div style="font-size:2rem; margin-bottom:var(--tp-space-2);">&#128247;</div>
+              <div style="font-weight:600; margin-bottom:var(--tp-space-1);">Click to upload logo</div>
+              <div style="font-size:var(--tp-font-xs);">SVG, PNG, or JPG (max 2MB)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Integrations Tab ── -->
+      <div class="tab-panel" id="tab-integrations">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Identity Integrations</h2>
+          <button class="btn btn-primary btn-sm">&#10010; Add Integration</button>
+        </div>
+        <div class="integration-grid">
+          <div class="card integration-card">
+            <div class="integration-info">
+              <div class="integration-icon" style="background:rgba(66,129,119,0.1);color:var(--tp-primary);">S</div>
+              <div>
+                <div style="font-weight:700;">SAML 2.0</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Azure AD Federation</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="card integration-card">
+            <div class="integration-info">
+              <div class="integration-icon" style="background:rgba(3,105,161,0.1);color:var(--tp-info);">O</div>
+              <div>
+                <div style="font-weight:700;">OIDC</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Google Workspace SSO</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="card integration-card">
+            <div class="integration-info">
+              <div class="integration-icon" style="background:rgba(152,133,97,0.1);color:var(--tp-accent);">L</div>
+              <div>
+                <div style="font-weight:700;">LDAP</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Corporate Active Directory</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Dictionary Tab ── -->
+      <div class="tab-panel" id="tab-dictionary">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Object Type Dictionary</h2>
+          <button class="btn btn-primary btn-sm">&#10010; Create Type</button>
+        </div>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr><th>Object Type</th><th>Origin</th><th>Fields</th><th>Instances</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Employee</td>
+                <td><span class="badge badge-primary" style="font-size:0.6rem;">Seeded from Master</span></td>
+                <td>14</td>
+                <td>1,240</td>
+                <td><span class="status-dot status-active"></span>Active</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Department</td>
+                <td><span class="badge badge-primary" style="font-size:0.6rem;">Seeded from Master</span></td>
+                <td>8</td>
+                <td>42</td>
+                <td><span class="status-dot status-active"></span>Active</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Project</td>
+                <td><span class="badge badge-muted" style="font-size:0.6rem;">Custom</span></td>
+                <td>11</td>
+                <td>86</td>
+                <td><span class="status-dot status-active"></span>Active</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Location</td>
+                <td><span class="badge badge-primary" style="font-size:0.6rem;">Seeded from Master</span></td>
+                <td>9</td>
+                <td>18</td>
+                <td><span class="status-dot status-active"></span>Active</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Asset</td>
+                <td><span class="badge badge-muted" style="font-size:0.6rem;">Custom</span></td>
+                <td>16</td>
+                <td>320</td>
+                <td><span class="status-dot status-active"></span>Active</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Agents Tab ── -->
+      <div class="tab-panel" id="tab-agents">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Deployed Agents</h2>
+          <button class="btn btn-primary btn-sm">&#10010; Deploy Agent</button>
+        </div>
+        <div class="agent-grid">
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:var(--tp-space-4); margin-bottom:var(--tp-space-4);">
+              <div style="width:40px;height:40px;border-radius:var(--tp-radius-md);background:rgba(66,129,119,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">&#129302;</div>
+              <div>
+                <div style="font-weight:700;">Onboarding Assistant</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">HR Process Automation</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="badge badge-primary">Running</span>
+              <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">v2.1.4</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:var(--tp-space-4); margin-bottom:var(--tp-space-4);">
+              <div style="width:40px;height:40px;border-radius:var(--tp-radius-md);background:rgba(152,133,97,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">&#128202;</div>
+              <div>
+                <div style="font-weight:700;">Compliance Monitor</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Regulatory Compliance</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="badge badge-primary">Running</span>
+              <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">v1.8.0</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex; align-items:center; gap:var(--tp-space-4); margin-bottom:var(--tp-space-4);">
+              <div style="width:40px;height:40px;border-radius:var(--tp-radius-md);background:rgba(107,31,42,0.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">&#128276;</div>
+              <div>
+                <div style="font-weight:700;">Notification Dispatcher</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Event-driven Alerts</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span class="badge badge-warning">Idle</span>
+              <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">v3.0.1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Studio Tab ── -->
+      <div class="tab-panel" id="tab-studio">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Process Definitions</h2>
+          <button class="btn btn-primary btn-sm">&#10010; New Process</button>
+        </div>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr><th>Process Name</th><th>Version</th><th>Instances</th><th>Status</th><th>Last Modified</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Employee Onboarding</td>
+                <td>v3.2</td>
+                <td>156</td>
+                <td><span class="badge badge-primary">Published</span></td>
+                <td style="color:var(--tp-text-muted);">2 days ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Leave Approval</td>
+                <td>v2.0</td>
+                <td>2,340</td>
+                <td><span class="badge badge-primary">Published</span></td>
+                <td style="color:var(--tp-text-muted);">1 week ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Asset Procurement</td>
+                <td>v1.1</td>
+                <td>89</td>
+                <td><span class="badge badge-primary">Published</span></td>
+                <td style="color:var(--tp-text-muted);">3 weeks ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Exit Clearance</td>
+                <td>v0.9</td>
+                <td>0</td>
+                <td><span class="badge badge-warning">Draft</span></td>
+                <td style="color:var(--tp-text-muted);">1 day ago</td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Performance Review</td>
+                <td>v1.5</td>
+                <td>480</td>
+                <td><span class="badge badge-primary">Published</span></td>
+                <td style="color:var(--tp-text-muted);">2 months ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Audit Log Tab ── -->
+      <div class="tab-panel" id="tab-audit">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Audit Trail</h2>
+          <div style="display:flex;gap:var(--tp-space-3);">
+            <button class="btn btn-ghost btn-sm">Export CSV</button>
+            <button class="btn btn-secondary btn-sm">Filter</button>
+          </div>
+        </div>
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr><th>Timestamp</th><th>Actor</th><th>Action</th><th>Target</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-23 14:32:18</td>
+                <td style="font-weight:600;">Sarah Mitchell</td>
+                <td><span class="badge badge-info" style="font-size:0.6rem;">USER.INVITED</span></td>
+                <td>elena.vasquez@acme.com</td>
+              </tr>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-23 11:15:04</td>
+                <td style="font-weight:600;">James Chen</td>
+                <td><span class="badge badge-accent" style="font-size:0.6rem;">PROCESS.PUBLISHED</span></td>
+                <td>Employee Onboarding v3.2</td>
+              </tr>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-22 16:45:33</td>
+                <td style="font-weight:600;">System</td>
+                <td><span class="badge badge-primary" style="font-size:0.6rem;">AGENT.DEPLOYED</span></td>
+                <td>Compliance Monitor v1.8.0</td>
+              </tr>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-22 09:20:11</td>
+                <td style="font-weight:600;">Sarah Mitchell</td>
+                <td><span class="badge badge-error" style="font-size:0.6rem;">USER.SUSPENDED</span></td>
+                <td>Thomas Wright</td>
+              </tr>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-21 13:08:55</td>
+                <td style="font-weight:600;">Priya Sharma</td>
+                <td><span class="badge badge-accent" style="font-size:0.6rem;">DICTIONARY.UPDATED</span></td>
+                <td>Object Type: Asset (added 2 fields)</td>
+              </tr>
+              <tr>
+                <td style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); white-space:nowrap;">2026-03-20 10:30:00</td>
+                <td style="font-weight:600;">System</td>
+                <td><span class="badge badge-primary" style="font-size:0.6rem;">BRANDING.PUBLISHED</span></td>
+                <td>Theme configuration updated</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Health Checks Tab ── -->
+      <div class="tab-panel" id="tab-health">
+        <div class="section-header">
+          <h2 style="font-size:var(--tp-font-lg);">Infrastructure Health</h2>
+          <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Last checked: 30 seconds ago</span>
+        </div>
+        <div class="health-grid">
+          <div class="card health-card">
+            <div class="health-icon">&#128024;</div>
+            <div style="font-weight:700; margin-bottom:var(--tp-space-2);">PostgreSQL</div>
+            <div class="health-status green">Healthy</div>
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); margin-top:var(--tp-space-2);">Latency: 2ms | Connections: 12/100</div>
+          </div>
+          <div class="card health-card">
+            <div class="health-icon">&#127760;</div>
+            <div style="font-weight:700; margin-bottom:var(--tp-space-2);">Neo4j</div>
+            <div class="health-status green">Healthy</div>
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); margin-top:var(--tp-space-2);">Latency: 5ms | Nodes: 14,320</div>
+          </div>
+          <div class="card health-card">
+            <div class="health-icon">&#128273;</div>
+            <div style="font-weight:700; margin-bottom:var(--tp-space-2);">Keycloak</div>
+            <div class="health-status amber">Degraded</div>
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); margin-top:var(--tp-space-2);">Latency: 180ms | Sessions: 89</div>
+          </div>
+          <div class="card health-card">
+            <div class="health-icon">&#9881;</div>
+            <div style="font-weight:700; margin-bottom:var(--tp-space-2);">Services</div>
+            <div class="health-status green">All Running</div>
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); margin-top:var(--tp-space-2);">4/4 services operational</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SCREEN 3: Create Tenant Wizard        -->
+    <!-- ══════════════════════════════════════ -->
+    <div class="screen" id="screen-create-wizard">
+      <div class="section-header">
+        <h2>Create New Tenant</h2>
+      </div>
+
+      <!-- Wizard Steps -->
+      <div class="wizard-steps">
+        <div class="wizard-step">
+          <div class="step-circle active" id="step-1-circle">1</div>
+          <span class="step-label active" id="step-1-label">Identity</span>
+        </div>
+        <div class="step-connector" id="connector-1"></div>
+        <div class="wizard-step">
+          <div class="step-circle" id="step-2-circle">2</div>
+          <span class="step-label" id="step-2-label">Configuration</span>
+        </div>
+        <div class="step-connector" id="connector-2"></div>
+        <div class="wizard-step">
+          <div class="step-circle" id="step-3-circle">3</div>
+          <span class="step-label" id="step-3-label">Review &amp; Confirm</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Identity -->
+      <div class="wizard-panel active card" id="wizard-step-1">
+        <h3 style="font-size:var(--tp-font-lg); font-weight:700; margin-bottom:var(--tp-space-6);">Tenant Identity</h3>
+        <div class="form-grid">
+          <div class="input-group">
+            <label>Tenant Name *</label>
+            <input type="text" id="wiz-name" placeholder="Acme Corporation" oninput="autoSlug(this.value)">
+          </div>
+          <div class="input-group">
+            <label>Slug (auto-generated)</label>
+            <input type="text" id="wiz-slug" placeholder="acme-corporation" style="color:var(--tp-text-muted);" readonly>
+            <span class="helper">Used in URLs and API paths. Cannot be changed later.</span>
+          </div>
+          <div class="input-group">
+            <label>Tenant Type *</label>
+            <select id="wiz-type">
+              <option value="">Select type...</option>
+              <option value="REGULAR" selected>Regular</option>
+              <option value="DOMINANT">Dominant</option>
+            </select>
+            <span class="helper">Master tenant already exists. Choose Regular or Dominant.</span>
+          </div>
+          <div class="input-group">
+            <label>Primary Domain</label>
+            <input type="text" id="wiz-domain" placeholder="acme.example.com">
+            <span class="helper">Optional. Used for vanity URL routing.</span>
+          </div>
+        </div>
+        <div class="wizard-footer">
+          <button class="btn btn-ghost" onclick="showScreen('tenant-list')">Cancel</button>
+          <button class="btn btn-primary" onclick="wizardNext(2)">Next: Configuration &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Configuration -->
+      <div class="wizard-panel card" id="wizard-step-2">
+        <h3 style="font-size:var(--tp-font-lg); font-weight:700; margin-bottom:var(--tp-space-6);">Configuration</h3>
+        <div class="form-grid">
+          <div class="input-group">
+            <label>Default Locale</label>
+            <select id="wiz-locale">
+              <option value="en-US" selected>English (United States)</option>
+              <option value="en-GB">English (United Kingdom)</option>
+              <option value="de-DE">German (Germany)</option>
+              <option value="fr-FR">French (France)</option>
+              <option value="es-ES">Spanish (Spain)</option>
+              <option value="pt-BR">Portuguese (Brazil)</option>
+              <option value="ja-JP">Japanese (Japan)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Timezone</label>
+            <select id="wiz-tz">
+              <option value="UTC" selected>UTC</option>
+              <option value="America/New_York">America/New_York (EST)</option>
+              <option value="America/Chicago">America/Chicago (CST)</option>
+              <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+              <option value="Europe/London">Europe/London (GMT)</option>
+              <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+              <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+            </select>
+          </div>
+          <div class="input-group full-width">
+            <label>License Tier</label>
+            <div style="display:flex; gap:var(--tp-space-4); margin-top:var(--tp-space-2);">
+              <label class="card" style="flex:1; cursor:pointer; padding:var(--tp-space-4); text-align:center; border:2px solid var(--tp-border);" onclick="selectTier(this, 'starter')">
+                <input type="radio" name="tier" value="starter" style="display:none;">
+                <div style="font-weight:700; margin-bottom:var(--tp-space-1);">Starter</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">10 users, 3 agents</div>
+              </label>
+              <label class="card" style="flex:1; cursor:pointer; padding:var(--tp-space-4); text-align:center; border:2px solid var(--tp-primary);" onclick="selectTier(this, 'professional')">
+                <input type="radio" name="tier" value="professional" style="display:none;" checked>
+                <div style="font-weight:700; margin-bottom:var(--tp-space-1);">Professional</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">50 users, 10 agents</div>
+              </label>
+              <label class="card" style="flex:1; cursor:pointer; padding:var(--tp-space-4); text-align:center; border:2px solid var(--tp-border);" onclick="selectTier(this, 'enterprise')">
+                <input type="radio" name="tier" value="enterprise" style="display:none;">
+                <div style="font-weight:700; margin-bottom:var(--tp-space-1);">Enterprise</div>
+                <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Unlimited users &amp; agents</div>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="wizard-footer">
+          <button class="btn btn-ghost" onclick="wizardNext(1)">&#8592; Back</button>
+          <button class="btn btn-primary" onclick="wizardNext(3)">Next: Review &#8594;</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Review -->
+      <div class="wizard-panel card" id="wizard-step-3">
+        <h3 style="font-size:var(--tp-font-lg); font-weight:700; margin-bottom:var(--tp-space-6);">Review &amp; Confirm</h3>
+        <div style="max-width:500px;">
+          <div class="review-row"><span class="review-label">Tenant Name</span><span class="review-value" id="review-name">--</span></div>
+          <div class="review-row"><span class="review-label">Slug</span><span class="review-value" id="review-slug">--</span></div>
+          <div class="review-row"><span class="review-label">Type</span><span class="review-value" id="review-type">--</span></div>
+          <div class="review-row"><span class="review-label">Domain</span><span class="review-value" id="review-domain">--</span></div>
+          <div class="review-row"><span class="review-label">Locale</span><span class="review-value" id="review-locale">--</span></div>
+          <div class="review-row"><span class="review-label">Timezone</span><span class="review-value" id="review-tz">--</span></div>
+          <div class="review-row"><span class="review-label">License Tier</span><span class="review-value" id="review-tier">--</span></div>
+        </div>
+        <div class="wizard-footer">
+          <button class="btn btn-ghost" onclick="wizardNext(2)">&#8592; Back</button>
+          <button class="btn btn-primary" onclick="startProvisioning()">Create Tenant</button>
+        </div>
+      </div>
+
+      <!-- Provisioning Animation -->
+      <div class="provisioning-overlay" id="provisioning">
+        <div class="spinner"></div>
+        <h3 style="font-size:var(--tp-font-lg); font-weight:700;">Provisioning Tenant...</h3>
+        <div class="prov-steps" id="prov-steps">
+          <div class="prov-step active" id="prov-1">&#9679; Creating graph database...</div>
+          <div class="prov-step" id="prov-2">&#9675; Configuring Keycloak realm...</div>
+          <div class="prov-step" id="prov-3">&#9675; Seeding dictionary from Master...</div>
+          <div class="prov-step" id="prov-4">&#9675; Applying branding defaults...</div>
+          <div class="prov-step" id="prov-5">&#9675; Finalizing...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- DIALOGS                               -->
+<!-- ══════════════════════════════════════ -->
+
+<!-- Suspend Dialog -->
+<div class="modal-overlay" id="dialog-suspend">
+  <div class="modal">
+    <h3 style="color:var(--tp-warning);">&#9888; Suspend Tenant</h3>
+    <p>Are you sure you want to suspend <strong>Acme Corporation</strong>? This will immediately:</p>
+    <ul style="color:var(--tp-text-secondary); margin:-1rem 0 1.5rem 1.2rem; line-height:2; font-size:var(--tp-font-sm);">
+      <li>Terminate <strong>12 active sessions</strong></li>
+      <li>Disable all user logins</li>
+      <li>Pause all running agents</li>
+      <li>Data remains intact and accessible to Master Admins</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDialog('suspend')">Cancel</button>
+      <button class="btn btn-accent" onclick="closeDialog('suspend')">Confirm Suspend</button>
+    </div>
+  </div>
+</div>
+
+<!-- Archive Dialog -->
+<div class="modal-overlay" id="dialog-archive">
+  <div class="modal">
+    <h3 style="color:var(--tp-text-dark);">&#128451; Archive Tenant</h3>
+    <p>Archiving <strong>Acme Corporation</strong> will move the tenant to read-only state. Data will be retained for <strong>90 days</strong>, after which it can be permanently deleted.</p>
+    <ul style="color:var(--tp-text-secondary); margin:-1rem 0 1.5rem 1.2rem; line-height:2; font-size:var(--tp-font-sm);">
+      <li>All users will lose access immediately</li>
+      <li>All agents will be stopped and undeployed</li>
+      <li>Graph data becomes read-only</li>
+      <li>Reversible within the 90-day retention window</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDialog('archive')">Cancel</button>
+      <button class="btn btn-accent" onclick="closeDialog('archive')">Confirm Archive</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Dialog -->
+<div class="modal-overlay" id="dialog-delete">
+  <div class="modal">
+    <h3 style="color:var(--tp-error);">&#128465; Permanently Delete Tenant</h3>
+    <p>This action is <strong>irreversible</strong>. All data associated with <strong>Acme Corporation</strong> will be permanently destroyed, including:</p>
+    <ul style="color:var(--tp-text-secondary); margin:-1rem 0 1.5rem 1.2rem; line-height:2; font-size:var(--tp-font-sm);">
+      <li>Graph database and all nodes/relationships</li>
+      <li>Keycloak realm and all user accounts</li>
+      <li>All process definitions and instances</li>
+      <li>All audit history</li>
+    </ul>
+    <div class="input-group" style="margin-bottom:var(--tp-space-6);">
+      <label>Type <strong style="color:var(--tp-error);">acme-corp</strong> to confirm:</label>
+      <input type="text" id="delete-confirm-input" class="confirm-input" placeholder="acme-corp" oninput="checkDeleteConfirm()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDialog('delete')">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn" disabled onclick="closeDialog('delete')">Permanently Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let currentScreen = 'tenant-list';
+let currentRole = 'master';
+let currentTab = 'users';
+let wizardStep = 1;
+
+// ── Screen Navigation ──
+function showScreen(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  currentScreen = screen;
+
+  // Update sidebar
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelector('.sidebar-link[onclick*="' + screen + '"]')?.classList.add('active');
+
+  // Update breadcrumbs
+  updateBreadcrumbs(screen);
+
+  // Reset wizard if navigating away
+  if (screen === 'create-wizard') {
+    wizardStep = 1;
+    updateWizard();
+    document.getElementById('provisioning').classList.remove('active');
+    document.querySelectorAll('.wizard-panel').forEach(p => p.style.display = '');
+  }
+}
+
+function updateBreadcrumbs(screen) {
+  const bc = document.getElementById('breadcrumbs');
+  if (screen === 'tenant-list') {
+    bc.innerHTML = '<span class="current">Tenants</span>';
+  } else if (screen === 'fact-sheet') {
+    bc.innerHTML = '<a onclick="showScreen(\'tenant-list\')">Tenants</a><span class="sep">/</span><span class="current" id="bc-tenant-name">Acme Corporation</span>';
+  } else if (screen === 'create-wizard') {
+    bc.innerHTML = '<a onclick="showScreen(\'tenant-list\')">Tenants</a><span class="sep">/</span><span class="current">Create Tenant</span>';
+  }
+}
+
+// ── Fact Sheet ──
+const tenantData = {
+  acme:      { name: 'Acme Corporation',    slug: 'acme-corp',     type: 'MASTER',   typeBadge: 'badge-primary',  status: 'Active',       statusClass: 'status-active',       logo: 'A', color: 'var(--tp-primary-dark)', users: 24, agents: 3, objects: 12, license: 67 },
+  northwind: { name: 'Northwind Traders',   slug: 'northwind',     type: 'REGULAR',  typeBadge: 'badge-accent',   status: 'Active',       statusClass: 'status-active',       logo: 'N', color: 'var(--tp-accent)',        users: 18, agents: 2, objects: 8,  license: 45 },
+  meridian:  { name: 'Meridian Services',   slug: 'meridian-svc',  type: 'REGULAR',  typeBadge: 'badge-accent',   status: 'Suspended',    statusClass: 'status-suspended',    logo: 'M', color: '#7a8b6e',                users: 6,  agents: 1, objects: 5,  license: 20 },
+  pinnacle:  { name: 'Pinnacle Logistics',  slug: 'pinnacle-log',  type: 'REGULAR',  typeBadge: 'badge-accent',   status: 'Archived',     statusClass: 'status-archived',     logo: 'P', color: '#8b6e7a',                users: 0,  agents: 0, objects: 4,  license: 0  },
+  vanguard:  { name: 'Vanguard Industries', slug: 'vanguard',      type: 'DOMINANT', typeBadge: 'badge-warning',  status: 'Provisioning', statusClass: 'status-provisioning', logo: 'V', color: 'var(--tp-warning)',       users: 0,  agents: 0, objects: 0,  license: 0  },
+};
+
+function openFactSheet(id) {
+  const t = tenantData[id];
+  if (!t) return;
+  document.getElementById('fact-logo').textContent = t.logo;
+  document.getElementById('fact-logo').style.background = 'rgba(255,255,255,0.15)';
+  document.getElementById('fact-name').textContent = t.name;
+  document.getElementById('fact-slug').textContent = t.slug;
+  document.getElementById('fact-type-badge').textContent = t.type;
+  document.getElementById('fact-type-badge').className = 'badge ' + t.typeBadge;
+  document.getElementById('fact-status-dot').className = 'status-dot ' + t.statusClass;
+  document.getElementById('fact-status-label').textContent = t.status;
+  document.getElementById('kpi-users').textContent = t.users + ' Users';
+  document.getElementById('kpi-agents').textContent = t.agents + ' Agents';
+  document.getElementById('kpi-objects').textContent = t.objects + ' Object Types';
+  document.getElementById('kpi-license').textContent = t.license + '% License';
+  showScreen('fact-sheet');
+  switchTab('users', document.querySelector('.tab-btn'));
+}
+
+// ── Tabs ──
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+  currentTab = tab;
+}
+
+// ── Role Toggle ──
+function setRole(role) {
+  currentRole = role;
+  document.getElementById('role-master').classList.toggle('active', role === 'master');
+  document.getElementById('role-regular').classList.toggle('active', role === 'regular');
+
+  // Master-only elements
+  document.querySelectorAll('.master-only').forEach(el => {
+    el.style.display = role === 'master' ? '' : 'none';
+  });
+
+  // Health tab
+  document.querySelectorAll('.master-only-tab').forEach(el => {
+    el.style.display = role === 'master' ? '' : 'none';
+  });
+
+  // Tenant list vs single tenant
+  if (currentScreen === 'tenant-list') {
+    document.getElementById('tenant-grid').style.display = role === 'master' ? '' : 'none';
+    document.getElementById('regular-single-tenant').style.display = role === 'regular' ? '' : 'none';
+  }
+
+  // If on health tab and switched to regular, go to users
+  if (role === 'regular' && currentTab === 'health') {
+    switchTab('users', document.querySelector('.tab-btn'));
+  }
+}
+
+// ── Viewport Toggle ──
+function setViewport(vp, btn) {
+  const content = document.getElementById('content-area');
+  content.classList.remove('vp-tablet', 'vp-mobile');
+  if (vp === 'tablet') content.classList.add('vp-tablet');
+  if (vp === 'mobile') content.classList.add('vp-mobile');
+  document.querySelectorAll('.vp-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Wizard ──
+function wizardNext(step) {
+  wizardStep = step;
+  updateWizard();
+  if (step === 3) populateReview();
+}
+
+function updateWizard() {
+  // Panels
+  document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('wizard-step-' + wizardStep);
+  if (panel) panel.classList.add('active');
+
+  // Step indicators
+  for (let i = 1; i <= 3; i++) {
+    const circle = document.getElementById('step-' + i + '-circle');
+    const label = document.getElementById('step-' + i + '-label');
+    circle.classList.remove('active', 'done');
+    label.classList.remove('active');
+    if (i < wizardStep) { circle.classList.add('done'); circle.textContent = '\u2713'; }
+    else if (i === wizardStep) { circle.classList.add('active'); circle.textContent = i; label.classList.add('active'); }
+    else { circle.textContent = i; }
+  }
+  // Connectors
+  for (let i = 1; i <= 2; i++) {
+    const conn = document.getElementById('connector-' + i);
+    conn.classList.toggle('done', i < wizardStep);
+  }
+}
+
+function autoSlug(val) {
+  document.getElementById('wiz-slug').value = val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function selectTier(el, tier) {
+  el.closest('.input-group').querySelectorAll('.card').forEach(c => c.style.borderColor = 'var(--tp-border)');
+  el.style.borderColor = 'var(--tp-primary)';
+}
+
+function populateReview() {
+  document.getElementById('review-name').textContent = document.getElementById('wiz-name').value || '--';
+  document.getElementById('review-slug').textContent = document.getElementById('wiz-slug').value || '--';
+  document.getElementById('review-type').textContent = document.getElementById('wiz-type').value || '--';
+  document.getElementById('review-domain').textContent = document.getElementById('wiz-domain').value || 'Not specified';
+  document.getElementById('review-locale').textContent = document.getElementById('wiz-locale').options[document.getElementById('wiz-locale').selectedIndex].text;
+  document.getElementById('review-tz').textContent = document.getElementById('wiz-tz').value;
+  const tierChecked = document.querySelector('input[name="tier"]:checked');
+  document.getElementById('review-tier').textContent = tierChecked ? tierChecked.value.charAt(0).toUpperCase() + tierChecked.value.slice(1) : '--';
+}
+
+function startProvisioning() {
+  document.querySelectorAll('.wizard-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('provisioning').classList.add('active');
+
+  const steps = ['prov-1','prov-2','prov-3','prov-4','prov-5'];
+  let i = 0;
+
+  function advanceStep() {
+    if (i > 0) {
+      document.getElementById(steps[i-1]).classList.remove('active');
+      document.getElementById(steps[i-1]).classList.add('done');
+      document.getElementById(steps[i-1]).innerHTML = '\u2713 ' + document.getElementById(steps[i-1]).textContent.substring(2);
+    }
+    if (i < steps.length) {
+      document.getElementById(steps[i]).classList.add('active');
+      document.getElementById(steps[i]).innerHTML = '\u25CF ' + document.getElementById(steps[i]).textContent.substring(2);
+      i++;
+      setTimeout(advanceStep, 1200);
+    } else {
+      // Done
+      setTimeout(function() {
+        openFactSheet('vanguard');
+      }, 800);
+    }
+  }
+  advanceStep();
+}
+
+// ── Dialogs ──
+function openDialog(type) {
+  document.getElementById('dialog-' + type).classList.add('active');
+  if (type === 'delete') {
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('delete-confirm-btn').disabled = true;
+  }
+}
+
+function closeDialog(type) {
+  document.getElementById('dialog-' + type).classList.remove('active');
+}
+
+function checkDeleteConfirm() {
+  const val = document.getElementById('delete-confirm-input').value;
+  document.getElementById('delete-confirm-btn').disabled = val !== 'acme-corp';
+}
+
+// Close dialogs on overlay click
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('active');
+  }
+});
+</script>
+
+</body>
+</html>

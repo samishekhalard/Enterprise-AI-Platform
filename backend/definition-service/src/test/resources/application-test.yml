@@ -1,0 +1,23 @@
+# Test profile configuration
+# Uses embedded/mocked Neo4j and disables external dependencies
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://test-issuer.example.com
+          jwk-set-uri: https://test-issuer.example.com/.well-known/jwks.json
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: test
+
+eureka:
+  client:
+    enabled: false
+
+logging:
+  level:
+    com.ems: DEBUG

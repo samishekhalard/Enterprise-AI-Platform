@@ -1,0 +1,75 @@
+# ==============================================================================
+# Auth Protocol Integration Test Profile
+# ==============================================================================
+# Connects to the ALREADY RUNNING Docker auth-testing stack:
+#   - Keycloak at localhost:28180 (with LDAP federation configured)
+#   - OpenLDAP at localhost:1389
+#
+# Prerequisites:
+#   1. docker compose -f infrastructure/auth-testing/docker-compose.auth-testing.yml up -d
+#   2. ./infrastructure/auth-testing/scripts/configure-keycloak-ldap-federation.sh
+#
+# Override with environment variables:
+#   KC_URL=http://localhost:28180 (default)
+# ==============================================================================
+
+server:
+  port: 0
+
+spring:
+  application:
+    name: auth-facade-integration-test
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KC_URL:http://localhost:28180}/realms/master
+          jwk-set-uri: ${KC_URL:http://localhost:28180}/realms/master/protocol/openid-connect/certs
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    neo4j:
+      uri: bolt://localhost:7687
+      authentication:
+        username: neo4j
+        password: testpassword
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.neo4j.Neo4jDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+
+keycloak:
+  server-url: ${KC_URL:http://localhost:28180}
+  admin:
+    username: admin
+    password: dev_keycloak_admin
+  client:
+    client-id: ems-auth-facade
+    client-secret: ems-auth-facade-secret
+
+auth:
+  dynamic-broker:
+    enabled: true
+    storage: memory
+
+jasypt:
+  encryptor:
+    password: test-encryption-key
+    algorithm: PBEWithMD5AndDES
+
+eureka:
+  client:
+    enabled: false
+
+rate-limit:
+  requests-per-minute: 1000
+
+token:
+  mfa-signing-key: test-signing-key-for-unit-tests-only-32-chars
+
+logging:
+  level:
+    com.ems: DEBUG
+    org.springframework.web.client: DEBUG

@@ -1,0 +1,597 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  font-family: var(--tp-font-family);
+}
+
+// ─── Breadcrumb ──────────────────────────────────────────────────────────────
+
+.factsheet-breadcrumb {
+  margin-block-end: var(--tp-space-4);
+}
+
+// ─── Banner Hero ─────────────────────────────────────────────────────────────
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tp-space-5);
+  padding: var(--tp-space-5) var(--tp-space-6);
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  margin-block-end: var(--tp-space-5);
+}
+
+.banner-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tp-space-5);
+  flex: 1;
+  min-inline-size: 0;
+}
+
+// ─── Logo Placeholder ────────────────────────────────────────────────────────
+
+.banner-logo {
+  flex-shrink: 0;
+  inline-size: calc(2 * var(--tp-space-10));
+  block-size: calc(2 * var(--tp-space-10));
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  border: 2px solid var(--tp-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.banner-logo-img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.banner-logo-initials {
+  font-size: var(--tp-font-xl);
+  font-weight: 700;
+  color: var(--tp-primary-dark);
+  letter-spacing: 0.05em;
+}
+
+// ─── Banner Info ─────────────────────────────────────────────────────────────
+
+.banner-info {
+  display: grid;
+  gap: var(--tp-space-2);
+  min-inline-size: 0;
+}
+
+.banner-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+}
+
+.banner-name {
+  font-size: var(--tp-font-xl);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin: 0;
+}
+
+.banner-badges {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+  color: var(--tp-text);
+  padding: var(--tp-space-1) var(--tp-space-2);
+  background: var(--tp-surface);
+  border-radius: var(--nm-radius-pill);
+}
+
+.status-dot {
+  inline-size: var(--tp-space-2);
+  block-size: var(--tp-space-2);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.banner-short-name {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text-muted);
+}
+
+// ─── KPI Chips ───────────────────────────────────────────────────────────────
+
+.banner-kpis {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  flex-wrap: wrap;
+  padding-block-start: var(--tp-space-1);
+}
+
+.kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-1);
+  font-size: var(--tp-font-sm);
+  font-weight: 500;
+  color: var(--tp-primary-dark);
+  background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+  padding: var(--tp-space-1) var(--tp-space-2);
+  border-radius: var(--nm-radius-pill);
+}
+
+.kpi-icon {
+  font-size: var(--tp-font-xs);
+  color: var(--tp-primary);
+}
+
+// ─── Banner Actions ──────────────────────────────────────────────────────────
+
+.banner-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+// ─── Tabs Card ──────────────────────────────────────────────────────────────
+// Showcase .comp-visual: bg --tp-surface-raised, border 1px solid --tp-border,
+// radius --nm-radius, overflow hidden.
+// PrimeNG .p-tablist and .p-tabpanel have their own opaque backgrounds that
+// paint OVER the parent's rounded corners. We must inherit the radius on the
+// inner PrimeNG elements so their backgrounds clip to the same curve.
+
+.tabs-card {
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+}
+
+// PrimeNG tab backgrounds + tablist border are now handled globally in styles.scss:
+// --p-tabs-tablist-background: transparent, --p-tabs-tabpanel-background: transparent,
+// --p-tabs-tablist-border-width: 0, .p-tablist-tab-list { border-bottom: 2px solid }.
+
+.tab-label {
+  font-weight: 600;
+}
+
+.tab-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--tp-space-5);
+  padding: 0 var(--tp-space-2);
+  border-radius: var(--nm-radius-pill);
+  background: color-mix(in srgb, var(--tp-primary) 10%, transparent);
+  color: var(--tp-primary-dark);
+  font-size: var(--tp-font-xs);
+  font-weight: 700;
+}
+
+// ─── Tab Toolbar (showcase Section 6 pattern — single flex line) ─────────────
+
+.tab-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.tab-title {
+  font-size: var(--tp-font-lg);
+  font-weight: 700;
+  color: var(--tp-text-dark);
+  margin: 0;
+}
+
+.tab-subtitle {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text-muted);
+  margin: 0;
+  margin-block-end: var(--tp-space-4);
+}
+
+// ─── Section Layout (Section 6: toolbar → table → paginator) ─────────────────
+
+.tab-section-layout {
+  display: grid;
+  gap: var(--tp-space-4);
+}
+
+.tab-section-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+  padding: var(--tp-space-3) var(--tp-space-4);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  background: transparent;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-inline-size: 320px;
+}
+
+.search-icon {
+  position: absolute;
+  inset-inline-start: var(--tp-space-4);
+  color: var(--tp-grey);
+  font-size: var(--tp-font-md);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  inline-size: 100%;
+  padding-inline-start: var(--tp-space-10);
+}
+
+.text-muted {
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-sm);
+}
+
+.section-subtitle {
+  font-size: var(--tp-font-md);
+  font-weight: 600;
+  color: var(--tp-text-dark);
+  margin-block-end: var(--tp-space-3);
+}
+
+// ─── DataTable ──────────────────────────────────────────────────────────────
+// Border/radius handled globally in styles.scss (.factsheet-table selector).
+
+// ─── Cards Grid (Integrations, Agents, Health) ──────────────────────────────
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(4 * var(--tp-space-16)), 1fr));
+  gap: var(--tp-space-4);
+}
+
+// ─── Integration Card ────────────────────────────────────────────────────────
+
+.integration-card {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-4);
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--tp-primary);
+  }
+}
+
+.integration-header {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.integration-icon {
+  font-size: var(--tp-font-lg);
+  color: var(--tp-primary);
+}
+
+.integration-name {
+  font-weight: 600;
+  font-size: var(--tp-font-md);
+  color: var(--tp-text-dark);
+}
+
+.integration-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+// ─── Agent Card ──────────────────────────────────────────────────────────────
+
+.agent-card {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-4);
+  background: var(--tp-surface-raised);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--tp-primary);
+  }
+}
+
+.agent-header {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.agent-icon {
+  font-size: var(--tp-font-lg);
+  color: var(--tp-primary);
+}
+
+.agent-name {
+  font-weight: 600;
+  font-size: var(--tp-font-md);
+  color: var(--tp-text-dark);
+}
+
+.agent-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.agent-skills {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text-muted);
+}
+
+// ─── Branding Tab ────────────────────────────────────────────────────────────
+
+.branding-content {
+  display: grid;
+  gap: var(--tp-space-6);
+}
+
+.branding-section {
+  display: grid;
+  gap: var(--tp-space-2);
+}
+
+.color-swatches {
+  display: flex;
+  gap: var(--tp-space-3);
+  flex-wrap: wrap;
+}
+
+.swatch {
+  inline-size: var(--tp-space-16);
+  block-size: var(--tp-space-16);
+  border-radius: var(--nm-radius-sm);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-block-end: var(--tp-space-1);
+}
+
+.swatch-label {
+  font-size: var(--tp-font-xs);
+  color: var(--tp-surface-light);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.logo-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tp-space-2);
+  padding: var(--tp-space-8);
+  border: 2px dashed var(--tp-border);
+  border-radius: var(--nm-radius);
+  color: var(--tp-text-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: var(--tp-primary);
+    background: color-mix(in srgb, var(--tp-primary) 4%, transparent);
+  }
+
+  i {
+    font-size: var(--icon-size-lg);
+  }
+
+  span {
+    font-size: var(--tp-font-sm);
+    font-weight: 500;
+  }
+}
+
+.branding-actions {
+  display: flex;
+  gap: var(--tp-space-2);
+}
+
+// ─── License Tab ─────────────────────────────────────────────────────────────
+
+.license-summary {
+  display: grid;
+  gap: var(--tp-space-4);
+  padding: var(--tp-space-4);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  background: var(--tp-surface-raised);
+}
+
+.license-summary-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tp-space-3);
+
+  p {
+    margin: 0;
+  }
+}
+
+.license-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--tp-space-3);
+}
+
+.license-metric {
+  display: grid;
+  gap: var(--tp-space-1);
+  padding: var(--tp-space-3);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius-sm);
+  background: color-mix(in srgb, var(--tp-primary) 4%, var(--tp-surface-raised));
+
+  strong {
+    font-size: var(--tp-font-xl);
+    color: var(--tp-text-dark);
+  }
+}
+
+.license-metric-label {
+  font-size: var(--tp-font-sm);
+  color: var(--tp-text-muted);
+}
+
+// ─── Studio Placeholder ──────────────────────────────────────────────────────
+
+.studio-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-12);
+  text-align: center;
+  color: var(--tp-text);
+
+  p {
+    margin: 0;
+    font-size: var(--tp-font-md);
+  }
+}
+
+.studio-placeholder-icon {
+  font-size: var(--icon-size-lg);
+  color: var(--tp-primary);
+}
+
+// ─── Health Card ─────────────────────────────────────────────────────────────
+
+.health-card {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-4);
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius);
+  overflow: hidden;
+  background: var(--tp-surface-raised);
+  transition: border-color 0.15s ease;
+}
+
+.health-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-2);
+}
+
+.health-icon {
+  font-size: var(--tp-font-lg);
+  color: var(--tp-text-muted);
+}
+
+.health-service {
+  font-weight: 600;
+  font-size: var(--tp-font-md);
+  color: var(--tp-text-dark);
+}
+
+.health-card-body {
+  display: flex;
+  align-items: center;
+  gap: var(--tp-space-3);
+}
+
+.health-checked {
+  font-size: var(--tp-font-xs);
+}
+
+// ─── PrimeNG Breadcrumb tweaks ───────────────────────────────────────────────
+// Global tokens in styles.scss handle: --p-breadcrumb-*, --tp-breadcrumb-*
+// Only border reset is local (PrimeNG default adds border).
+
+:host ::ng-deep p-breadcrumb .p-breadcrumb {
+  border: none;
+  padding: 0;
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: bp.$bp-md) {
+  .banner {
+    flex-direction: column;
+    padding: var(--tp-space-4);
+  }
+
+  .banner-left {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .banner-title-row {
+    justify-content: center;
+  }
+
+  .banner-kpis {
+    justify-content: center;
+  }
+
+  .banner-actions {
+    justify-content: center;
+    inline-size: 100%;
+  }
+
+  .tab-toolbar {
+    gap: var(--tp-space-2);
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .color-swatches {
+    justify-content: center;
+  }
+}

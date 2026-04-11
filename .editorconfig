@@ -1,0 +1,62 @@
+# =============================================================================
+# .editorconfig — Enforce consistent formatting across all IDEs and OSes
+# =============================================================================
+# Supported by VS Code, IntelliJ, Eclipse, Vim, and most modern editors.
+# See: https://editorconfig.org
+# =============================================================================
+
+root = true
+
+# --- Default for all files ---
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# --- Java (4-space indent per Spring Boot convention) ---
+[*.java]
+indent_size = 4
+
+# --- XML / POM files ---
+[*.xml]
+indent_size = 4
+
+# --- TypeScript / JavaScript ---
+[*.{ts,js,mjs,cjs}]
+quote_type = single
+
+# --- HTML templates ---
+[*.html]
+indent_size = 2
+
+# --- SCSS / CSS ---
+[*.{scss,css}]
+indent_size = 2
+
+# --- JSON ---
+[*.json]
+indent_size = 2
+
+# --- YAML ---
+[*.{yml,yaml}]
+indent_size = 2
+
+# --- Markdown (trailing whitespace is significant) ---
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# --- Shell scripts ---
+[*.sh]
+end_of_line = lf
+
+# --- Makefiles (must use tabs) ---
+[Makefile]
+indent_style = tab
+
+# --- Dockerfiles ---
+[Dockerfile*]
+indent_size = 2

@@ -1,0 +1,72 @@
+@use 'breakpoints' as bp;
+
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.page-frame {
+  display: grid;
+  gap: var(--tp-space-4);
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--tp-space-4);
+  padding: var(--tp-space-3) var(--tp-space-4);
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface);
+  border: var(--nm-island-border);
+  box-shadow: var(--nm-shadow-island);
+  min-inline-size: 0;
+}
+
+.header-copy,
+.header-actions-container,
+.content-container {
+  min-inline-size: 0;
+}
+
+.header-copy {
+  overflow-wrap: anywhere;
+}
+
+.header-copy h2 {
+  margin: 0;
+  font-size: var(--tp-font-xl);
+  font-weight: 700;
+  color: var(--tp-text);
+}
+
+.header-copy p {
+  margin: var(--tp-space-1) 0 0;
+  color: var(--tp-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.header-actions-container:empty,
+.footer-container:empty {
+  display: none;
+}
+
+.footer-container {
+  border-top: 1px solid var(--tp-border);
+  padding-top: var(--tp-space-3);
+  color: var(--tp-text-muted);
+  font-size: var(--tp-font-sm);
+}
+
+@media (max-width: bp.$bp-md) {
+  .header-container {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions-container {
+    inline-size: 100%;
+  }
+}

@@ -1,0 +1,69 @@
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .assign-card .p-card-body,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .assign-controls .p-button,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .assign-controls .p-inputtext {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .header-row .p-button,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .p-datatable {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .p-datatable-table {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .p-datatable-tbody > tr > td {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .p-datatable-thead > tr > th {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .table-card .p-button {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/licenses/license-embedded.component.scss|:host ::ng-deep .table-card .p-card-body {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/admin/users/user-embedded.component.scss|:host ::ng-deep .p-datatable-table {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|.p-button.p-button-primary:not(.p-button-text):not(.p-button-outlined):not(.p-disabled):hover
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-danger:not(.p-button-text):not(.p-button-outlined)) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-outlined),
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-outlined.p-button-danger),
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-primary:not(.p-button-text):not(.p-button-outlined)) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-text) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-text.p-button-danger) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button.p-button-text.p-button-icon-only) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button:focus-visible) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button:not(.p-disabled):active) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/administration.page.scss|:where(.p-button:not(.p-disabled):hover) {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|&.p-tab-active {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-select {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-tab {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-tablist {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-tabpanel {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-tabpanels {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|.p-tabs {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .fact-sheet-tabs {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .p-dialog-mask {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .status-dropdown {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .wizard-dialog .p-dialog-content {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .wizard-dialog .p-dialog-header {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .wizard-dialog.p-dialog {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/master-definitions/master-definitions-section.component.scss|:host ::ng-deep .wizard-dropdown .p-select {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/branding-studio/global-branding-form.component.scss|:host ::ng-deep .p-inputtext {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .row-actions .p-button {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .card-actions .p-button {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .factsheet-footer .p-button,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .p-inputtext,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .p-message {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .tenant-modal-footer .p-button,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager .toolbar-right .p-button,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager select,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .tenant-manager textarea,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .wizard-modal .p-inputtext {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .wizard-modal select,
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/features/administration/sections/tenant-manager/tenant-manager-section.component.scss|:host ::ng-deep .wizard-modal textarea {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .chevron-indicator {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn::before {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:active::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:active::before {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:focus-visible {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:hover {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:hover::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .island-btn:hover::before {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn::before {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:active::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:active::before {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:focus-visible {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:hover {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:hover::after {
+/Users/mksulty/Claude/Projects/Emsist-app/frontend/src/app/layout/shell-layout/shell-layout.component.scss|:host ::ng-deep .sign-out-btn:hover::before {

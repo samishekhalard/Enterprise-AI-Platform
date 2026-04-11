@@ -1,0 +1,81 @@
+# =============================================================================
+# .gitattributes — Enforce consistent line endings and file handling
+# =============================================================================
+# Without this file, Git uses each dev's local core.autocrlf setting,
+# causing macOS (LF) vs Windows (CRLF) mismatches.
+#
+# Rule: Store everything as LF in the repo. Let Git convert on checkout.
+# =============================================================================
+
+# Default: auto-detect text files and normalize to LF in repo
+* text=auto eol=lf
+
+# --- Source code (force LF) ---
+*.java          text eol=lf
+*.ts            text eol=lf
+*.js            text eol=lf
+*.mjs           text eol=lf
+*.cjs           text eol=lf
+*.html          text eol=lf
+*.css           text eol=lf
+*.scss          text eol=lf
+*.json          text eol=lf
+*.xml           text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.properties    text eol=lf
+*.sql           text eol=lf
+*.graphql       text eol=lf
+
+# --- Config files ---
+*.conf          text eol=lf
+*.cfg           text eol=lf
+*.ini           text eol=lf
+*.toml          text eol=lf
+*.env           text eol=lf
+*.editorconfig  text eol=lf
+.gitignore      text eol=lf
+.gitattributes  text eol=lf
+Makefile        text eol=lf
+Dockerfile      text eol=lf
+docker-compose*.yml text eol=lf
+
+# --- Scripts (force LF — CRLF breaks bash/sh on Linux/macOS) ---
+*.sh            text eol=lf
+*.bash          text eol=lf
+*.zsh           text eol=lf
+
+# --- Documentation ---
+*.md            text eol=lf
+*.txt           text eol=lf
+*.csv           text eol=lf
+LICENSE         text eol=lf
+
+# --- Lock files (exact content matters — no conversion) ---
+package-lock.json  text eol=lf -diff
+pom.xml            text eol=lf
+
+# --- Binary files (never touch these) ---
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.svg           text eol=lf
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.eot           binary
+*.pdf           binary
+*.jar           binary
+*.war           binary
+*.zip           binary
+*.gz            binary
+*.tar           binary
+*.p12           binary
+*.jks           binary
+*.pem           binary
+*.key           binary
+
+# --- Preserve execute permission on scripts ---
+*.sh            text eol=lf diff=bash

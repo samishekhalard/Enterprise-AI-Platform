@@ -1,0 +1,136 @@
+@if (visible && provider) {
+  <p-dialog
+    [visible]="true"
+    (visibleChange)="onDialogVisibleChange($event)"
+    [modal]="true"
+    [closable]="false"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="dialogStyle"
+    [pt]="dialogPt"
+    aria-label="Remove authentication source"
+    data-testid="remove-source-dialog"
+  >
+    <ng-template pTemplate="header">
+      <div class="remove-header">
+        <div class="header-info">
+          <span class="protocol-badge" data-testid="remove-dialog-protocol">{{
+            provider.protocol
+          }}</span>
+          <div>
+            <h3 data-testid="remove-dialog-title">Remove {{ provider.displayName }}</h3>
+            <p class="muted">This action permanently removes the provider configuration.</p>
+          </div>
+        </div>
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          class="dialog-close"
+          aria-label="Close"
+          data-testid="remove-dialog-close"
+          (click)="onCancel()"
+        >
+          <ng-icon name="phosphorXThin" />
+        </button>
+      </div>
+    </ng-template>
+
+    <div class="remove-content" data-testid="remove-source-dialog-content">
+      <div class="warning-banner" data-testid="remove-warning-banner">
+        <ng-icon name="phosphorWarningThin" class="warning-icon" />
+        <div>
+          <p class="warning-text">
+            This will permanently remove the authentication source configuration.
+          </p>
+          <p class="impact-stats" data-testid="remove-impact-stats">
+            Impact: <strong>{{ userCount }}</strong> provisioned user{{
+              userCount !== 1 ? 's' : ''
+            }}
+            across <strong>{{ tenantCount }}</strong> tenant{{ tenantCount !== 1 ? 's' : '' }}
+          </p>
+        </div>
+      </div>
+
+      @if (isLastActive) {
+        <div class="tp-banner tp-banner-error" data-testid="remove-last-source-error">
+          <ng-icon name="phosphorWarningCircleThin" />
+          <p>Cannot remove the last active authentication source.</p>
+        </div>
+      } @else {
+        <div class="form-stack" data-testid="remove-user-disposition">
+          <div class="field">
+            <label class="field-label" for="remove-user-disposition">User Disposition</label>
+            <p-select
+              inputId="remove-user-disposition"
+              [options]="userDispositionOptions"
+              [ngModel]="userDisposition()"
+              (ngModelChange)="userDisposition.set($event)"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              data-testid="remove-disposition-select"
+            />
+          </div>
+
+          <div class="disposition-note">
+            @if (userDisposition() === 'retain') {
+              <span>
+                Users remain in the system but are flagged as orphaned until another source is
+                assigned.
+              </span>
+            } @else {
+              <span>
+                Users immediately lose access and must be re-provisioned from another source.
+              </span>
+            }
+          </div>
+        </div>
+
+        <div class="form-stack confirm-stack" data-testid="remove-confirm-section">
+          <label class="field-label" for="confirm-source-name">
+            Type <strong>{{ provider.displayName }}</strong> to confirm removal:
+          </label>
+          <input
+            id="confirm-source-name"
+            pInputText
+            type="text"
+            [ngModel]="confirmText()"
+            (ngModelChange)="updateConfirmText($event)"
+            placeholder="Enter source name"
+            data-testid="remove-confirm-input"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="dialog-actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            data-testid="remove-cancel-btn"
+            (click)="onCancel()"
+          >
+            Cancel
+          </button>
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            [disabled]="!canRemove"
+            [loading]="removing"
+            data-testid="remove-confirm-btn"
+            (click)="onConfirm()"
+          >
+            Remove Source
+          </button>
+        </div>
+      }
+    </div>
+  </p-dialog>
+}

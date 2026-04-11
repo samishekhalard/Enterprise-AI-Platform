@@ -1,0 +1,26 @@
+# Docker profile - uses container hostnames
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://keycloak:8080/realms/master/protocol/openid-connect/certs}
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/process_db?sslmode=verify-full}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+
+  flyway:
+    repair-on-mismatch: false
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka}
+
+logging:
+  level:
+    com.ems: INFO

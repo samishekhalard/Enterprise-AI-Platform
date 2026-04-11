@@ -1,0 +1,84 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tp-space-2);
+}
+
+.summary {
+  margin-bottom: var(--tp-space-3);
+  display: flex;
+  gap: var(--tp-space-4);
+  flex-wrap: wrap;
+  color: var(--tp-text);
+}
+
+.table-card {
+  border: 1px solid var(--tp-border);
+  border-radius: var(--nm-radius-lg);
+  background: var(--tp-surface-raised);
+  box-shadow: var(--nm-elevation-soft);
+  overflow: hidden;
+}
+
+.tenant-card-list {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-3);
+}
+
+.tenant-card {
+  display: grid;
+  gap: var(--tp-space-3);
+  padding: var(--tp-space-4);
+  border: 1px solid color-mix(in srgb, var(--tp-border) 60%, transparent);
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface);
+}
+
+.tenant-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--tp-space-3);
+}
+
+.tenant-card-copy {
+  display: grid;
+  gap: var(--tp-space-1);
+}
+
+.tenant-card-id {
+  color: var(--tp-text-secondary);
+  font-size: var(--tp-font-sm);
+}
+
+.tenant-card-meta {
+  display: grid;
+  gap: var(--tp-space-3);
+}
+
+.tenant-card-meta div {
+  display: grid;
+  gap: var(--tp-space-1);
+}
+
+.tenant-card-meta dt {
+  color: var(--tp-text-secondary);
+  font-size: var(--tp-font-sm);
+  font-weight: 600;
+}
+
+.tenant-card-meta dd {
+  margin: 0;
+  color: var(--tp-text);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tp-space-2);
+  padding: var(--tp-space-8);
+  color: var(--tp-text-muted);
+  text-align: center;
+}

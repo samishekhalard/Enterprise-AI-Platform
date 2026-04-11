@@ -1,0 +1,79 @@
+:host {
+  display: block;
+  min-inline-size: 0;
+}
+
+.master-locale-card {
+  display: block;
+  border: var(--nm-border-warning);
+  min-inline-size: 0;
+}
+
+.master-locale {
+  display: grid;
+  gap: var(--tp-space-4);
+  min-inline-size: 0;
+
+  h3 {
+    margin: 0;
+  }
+
+  .muted {
+    margin-block-start: var(--tp-space-1);
+    color: var(--tp-text);
+  }
+
+  p-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--tp-space-2);
+    min-inline-size: 0;
+  }
+
+  p-tab {
+    flex: 1 1 calc(50% - var(--tp-space-2));
+    min-inline-size: 0;
+  }
+
+  p-tabpanel,
+  p-tabs,
+  p-tabpanels,
+  p-select,
+  input[pInputText] {
+    min-inline-size: 0;
+  }
+
+  p-select,
+  input[pInputText] {
+    inline-size: 100%;
+  }
+}
+
+.content-card {
+  border: var(--nm-border-warning);
+  border-radius: var(--nm-radius-md);
+  background: var(--tp-surface-raised);
+  padding: var(--tp-space-3);
+  display: grid;
+  gap: var(--tp-space-2);
+  min-inline-size: 0;
+
+  label {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text);
+    font-weight: 600;
+  }
+
+  h4 {
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+    color: var(--tp-text);
+  }
+}
+
+.format-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}

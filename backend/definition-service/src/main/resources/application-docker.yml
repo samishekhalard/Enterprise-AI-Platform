@@ -1,0 +1,24 @@
+# Docker profile - uses container hostnames
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/master}
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://keycloak:8080/realms/master/protocol/openid-connect/certs}
+
+  neo4j:
+    uri: ${NEO4J_URI:bolt://neo4j:7687}
+    authentication:
+      username: ${NEO4J_USER:neo4j}
+      password: ${NEO4J_PASSWORD:password123}
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka:8761/eureka}
+
+logging:
+  level:
+    com.ems: INFO

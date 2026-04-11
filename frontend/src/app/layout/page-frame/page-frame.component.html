@@ -1,0 +1,22 @@
+<article class="page-frame">
+  <header class="header-container">
+    <div class="header-copy">
+      <h2>{{ title }}</h2>
+      @if (subtitle) {
+        <p>{{ subtitle }}</p>
+      }
+    </div>
+
+    <div class="header-actions-container">
+      <ng-content select="[page-actions]" />
+    </div>
+  </header>
+
+  <section class="content-container">
+    <ng-content select="[page-content]" />
+  </section>
+
+  <footer class="footer-container">
+    <ng-content select="[page-footer]" />
+  </footer>
+</article>

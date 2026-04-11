@@ -1,0 +1,271 @@
+<p-dialog
+  header="Create Tenant"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [style]="dialogStyle"
+  [breakpoints]="dialogBreakpoints"
+  [pt]="dialogPt"
+  data-testid="create-tenant-dialog"
+>
+  <!-- ─── Form Phase ──────────────────────────────────────────────────────── -->
+  @if (phase() === 'form') {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="create-tenant-form"
+      data-testid="create-tenant-form"
+    >
+      <!-- Tenant Name -->
+      <div class="field">
+        <label for="tenantName" class="field-label">
+          Tenant Name <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="tenantName"
+          formControlName="tenantName"
+          placeholder="e.g. Acme Corporation"
+          autocomplete="organization"
+          data-testid="tenant-name-input"
+          [class.ng-invalid]="hasError('tenantName', 'required') || hasError('tenantName', 'tenantNameLength') || hasError('tenantName', 'tenantNameChars') || hasError('tenantName', 'tenantNameTaken')"
+        />
+
+        <!-- Slug helper text -->
+        @if (slug()) {
+          <span class="slug-helper" data-testid="tenant-slug">
+            Slug: <code>{{ slug() }}</code>
+          </span>
+        }
+
+        <!-- Async validation spinner -->
+        @if (isValidating('tenantName')) {
+          <span class="validating-hint">Checking availability...</span>
+        }
+
+        <!-- TEN-E-002: Invalid tenant name -->
+        @if (hasError('tenantName', 'required')) {
+          <p-message severity="error" data-testid="tenant-name-required-error">
+            <!-- TEN-E-002 -->
+            Tenant name is required.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameLength')) {
+          <p-message severity="error" data-testid="tenant-name-length-error">
+            <!-- TEN-E-002 -->
+            Name must be between 2 and 100 characters.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameChars')) {
+          <p-message severity="error" data-testid="tenant-name-chars-error">
+            <!-- TEN-E-002 -->
+            Name may only contain letters, numbers, spaces, hyphens, underscores, and periods.
+          </p-message>
+        }
+        @if (hasError('tenantName', 'tenantNameTaken')) {
+          <p-message severity="error" data-testid="tenant-name-taken-error">
+            <!-- TEN-E-002 -->
+            This tenant name is already in use.
+          </p-message>
+        }
+      </div>
+
+      <!-- Tenant URL -->
+      <div class="field">
+        <label for="tenantUrl" class="field-label">
+          Tenant URL <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="tenantUrl"
+          formControlName="tenantUrl"
+          placeholder="e.g. ems.digitaldubai.ae"
+          autocomplete="off"
+          data-testid="tenant-url-input"
+          [class.ng-invalid]="hasError('tenantUrl', 'required') || hasError('tenantUrl', 'tenantUrlFormat') || hasError('tenantUrl', 'tenantUrlClaimed')"
+        />
+
+        @if (isValidating('tenantUrl')) {
+          <span class="validating-hint">Checking tenant URL availability...</span>
+        }
+
+        <!-- TEN-E-009: Invalid tenant URL format -->
+        @if (hasError('tenantUrl', 'required')) {
+          <p-message severity="error" data-testid="tenant-url-required-error">
+            Tenant URL is required.
+          </p-message>
+        }
+        @if (hasError('tenantUrl', 'tenantUrlFormat')) {
+          <p-message severity="error" data-testid="tenant-url-format-error">
+            <!-- TEN-E-009 -->
+            Enter a valid tenant URL (e.g. ems.digitaldubai.ae).
+          </p-message>
+        }
+        <!-- TEN-E-010: Tenant URL already claimed -->
+        @if (hasError('tenantUrl', 'tenantUrlClaimed')) {
+          <p-message severity="error" data-testid="tenant-url-claimed-error">
+            <!-- TEN-E-010 -->
+            This tenant URL is already associated with another tenant.
+          </p-message>
+        }
+      </div>
+
+      <!-- Tenant Admin Email -->
+      <div class="field">
+        <label for="adminEmail" class="field-label">
+          Tenant Admin Email <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input
+          pInputText
+          id="adminEmail"
+          formControlName="adminEmail"
+          type="email"
+          placeholder="admin@acme.example.com"
+          autocomplete="email"
+          data-testid="admin-email-input"
+          [class.ng-invalid]="hasError('adminEmail', 'required') || hasError('adminEmail', 'email')"
+        />
+
+        @if (hasError('adminEmail', 'required')) {
+          <p-message severity="error" data-testid="email-required-error">
+            Admin email is required.
+          </p-message>
+        }
+        <!-- TEN-E-016: Invalid admin email -->
+        @if (hasError('adminEmail', 'email')) {
+          <p-message severity="error" data-testid="email-format-error">
+            <!-- TEN-E-016 -->
+            Enter a valid email address.
+          </p-message>
+        }
+      </div>
+
+      <!-- License Allocation -->
+      <div class="field">
+        <label for="licenseTierId" class="field-label">
+          License Allocation <span class="required" aria-hidden="true">*</span>
+        </label>
+        <p-select
+          formControlName="licenseTierId"
+          [options]="licenseTierOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a license tier"
+          data-testid="license-tier-select"
+        />
+
+        @if (hasError('licenseTierId', 'required')) {
+          <p-message severity="error" data-testid="license-required-error">
+            License allocation is required.
+          </p-message>
+        }
+      </div>
+
+      <!-- Form Footer -->
+      <div class="form-footer">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (onClick)="close()"
+          data-testid="cancel-button"
+        />
+        <p-button
+          label="Create Tenant"
+          severity="primary"
+          type="submit"
+          [disabled]="!canSubmit()"
+          [loading]="form.pending"
+          data-testid="submit-button"
+        />
+      </div>
+    </form>
+  }
+
+  <!-- ─── Provisioning Phase ──────────────────────────────────────────────── -->
+  @if (phase() === 'provisioning') {
+    <div class="provisioning-phase" data-testid="provisioning-phase">
+      <div class="provisioning-summary">
+        <h4 class="provisioning-title">
+          @if (provisioningComplete()) {
+            Tenant Created Successfully
+          } @else if (provisioningError()) {
+            Provisioning Failed
+          } @else {
+            Provisioning Tenant...
+          }
+        </h4>
+
+        <p-progressbar
+          [value]="provisioningProgress()"
+          [showValue]="true"
+          [style]="{ height: '8px' }"
+          data-testid="provisioning-progress"
+        />
+      </div>
+
+      <!-- Vertical step list -->
+      <ol class="provisioning-steps" data-testid="provisioning-steps">
+        @for (step of provisioningSteps(); track step.id) {
+          <li
+            class="provisioning-step"
+            [class]="stepStatusClass(step.status)"
+            [attr.data-testid]="'provisioning-step-' + step.id"
+          >
+            <span class="step-icon">
+              <i [class]="stepStatusIcon(step.status)"></i>
+            </span>
+            <div class="step-content">
+              <span class="step-label">{{ step.label }}</span>
+              <span class="step-description">{{ step.description }}</span>
+            </div>
+          </li>
+        }
+      </ol>
+
+      <!-- TEN-E-004: Provisioning failure -->
+      @if (provisioningError()) {
+        <p-message severity="error" data-testid="provisioning-error">
+          <!-- TEN-E-004 -->
+          {{ provisioningError() }}
+        </p-message>
+      }
+
+      <!-- Provisioning footer actions -->
+      <div class="form-footer">
+        @if (provisioningError()) {
+          <p-button
+            label="Retry"
+            severity="warning"
+            icon="pi pi-refresh"
+            (onClick)="retry()"
+            data-testid="retry-button"
+          />
+          <p-button
+            label="Close"
+            severity="secondary"
+            (onClick)="close()"
+            data-testid="close-error-button"
+          />
+        } @else if (provisioningComplete()) {
+          <!-- TEN-S-001: Tenant created successfully -->
+          <p-button
+            label="Close"
+            severity="secondary"
+            (onClick)="close()"
+            data-testid="close-success-button"
+          />
+          <p-button
+            label="Go to Tenant"
+            severity="primary"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (onClick)="navigateToTenant()"
+            data-testid="go-to-tenant-button"
+          />
+        }
+      </div>
+    </div>
+  }
+</p-dialog>

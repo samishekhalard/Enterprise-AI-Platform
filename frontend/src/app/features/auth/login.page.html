@@ -1,0 +1,223 @@
+<div class="login-page">
+  <div
+    class="background-brand-image"
+    aria-hidden="true"
+    [style.background-image]="loginBackgroundImage()"
+  ></div>
+  <div class="background-pattern" aria-hidden="true"></div>
+
+  <main class="login-content">
+    <app-page-frame
+      class="login-shell"
+      [title]="welcomeTitle()"
+      [subtitle]="authUiText.text('AUTH-L-002')"
+    >
+      <section page-content class="login-stage">
+        <a
+          routerLink="/administration"
+          class="welcome-logo-link"
+          [attr.aria-label]="brandHomeLabel()"
+        >
+          @if (!logoLoadFailed()) {
+            <img
+              [src]="loginLogoUrl()"
+              [alt]="brandRuntime.appTitle()"
+              class="welcome-logo"
+              (error)="onLogoLoadError()"
+            />
+          } @else {
+            <span class="welcome-logo-fallback" [attr.aria-label]="brandRuntime.appTitle()">
+              {{ brandFallbackLabel() }}
+            </span>
+          }
+        </a>
+
+        @if (info()) {
+          <section class="tp-banner tp-banner-info" role="status">{{ info() }}</section>
+        }
+
+        @if (error()) {
+          <section class="tp-banner tp-banner-error" role="alert">{{ error() }}</section>
+        }
+
+        @if (!showLoginForm()) {
+          <div class="signin-section">
+            <button
+              type="button"
+              pButton
+              class="auth-button auth-button--primary"
+              (click)="openEmailSignIn()"
+            >
+              <svg
+                class="btn-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                <polyline points="3,7 12,13 21,7"></polyline>
+              </svg>
+              {{ authUiText.text('AUTH-L-003') }}
+            </button>
+          </div>
+        } @else {
+          <div class="signin-card-stage">
+            <form class="login-form" (ngSubmit)="onSubmit()" novalidate>
+              <div class="neo-field">
+                <label class="neo-field-label" for="identifier">{{
+                  authUiText.text('AUTH-L-006')
+                }}</label>
+                <div class="neo-input-wrap">
+                  <input
+                    id="identifier"
+                    pInputText
+                    class="neo-input"
+                    type="text"
+                    name="identifier"
+                    [(ngModel)]="identifier"
+                    autocomplete="username"
+                    required
+                    [placeholder]="authUiText.text('AUTH-L-007')"
+                  />
+                  <span class="neo-icon" aria-hidden="true">
+                    <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="neo-field">
+                <label class="neo-field-label" for="password">{{
+                  authUiText.text('AUTH-L-008')
+                }}</label>
+                <div class="neo-input-wrap">
+                  <input
+                    id="password"
+                    pInputText
+                    class="neo-input neo-input-password"
+                    [type]="showPassword() ? 'text' : 'password'"
+                    name="password"
+                    [(ngModel)]="password"
+                    autocomplete="current-password"
+                    required
+                    [placeholder]="authUiText.text('AUTH-L-009')"
+                  />
+                  <span class="neo-icon" aria-hidden="true">
+                    <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z"
+                      />
+                    </svg>
+                  </span>
+                  <button
+                    type="button"
+                    pButton
+                    [text]="true"
+                    class="password-toggle"
+                    [attr.aria-label]="
+                      showPassword() ? authUiText.text('AUTH-L-011') : authUiText.text('AUTH-L-010')
+                    "
+                    [attr.title]="
+                      showPassword() ? authUiText.text('AUTH-L-011') : authUiText.text('AUTH-L-010')
+                    "
+                    (click)="togglePasswordVisibility()"
+                  >
+                    @if (showPassword()) {
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 3l18 18"></path>
+                        <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path>
+                        <path
+                          d="M9.9 5.1A10.7 10.7 0 0 1 12 5c5 0 9 3.7 10 7-0.4 1.4-1.4 3-2.9 4.3"
+                        ></path>
+                        <path
+                          d="M6.3 6.3C4.6 7.5 3.4 9.2 2 12c1 3.3 5 7 10 7 1.7 0 3.2-0.4 4.6-1.1"
+                        ></path>
+                      </svg>
+                    } @else {
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        aria-hidden="true"
+                      >
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    }
+                  </button>
+                </div>
+              </div>
+
+              <div class="neo-field">
+                <label class="neo-field-label" for="tenant-id">{{
+                  authUiText.text('AUTH-L-012')
+                }}</label>
+                <div class="neo-input-wrap">
+                  <input
+                    id="tenant-id"
+                    pInputText
+                    class="neo-input"
+                    type="text"
+                    name="tenantId"
+                    [(ngModel)]="tenantId"
+                    required
+                    [placeholder]="authUiText.text('AUTH-L-013')"
+                  />
+                  <span class="neo-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                pButton
+                class="auth-button auth-button--submit"
+                [disabled]="loading()"
+              >
+                {{ loading() ? authUiText.text('AUTH-L-015') : authUiText.text('AUTH-L-014') }}
+              </button>
+
+              <button
+                type="button"
+                pButton
+                class="auth-button auth-button--back"
+                (click)="closeEmailSignIn()"
+              >
+                <svg
+                  class="btn-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+                {{ authUiText.text('AUTH-L-016') }}
+              </button>
+            </form>
+          </div>
+        }
+      </section>
+
+      <p page-footer class="help-text">
+        {{ authUiText.text('AUTH-L-004') }}
+        <a href="mailto:support@thinkplus.ae">{{ authUiText.text('AUTH-L-005') }}</a>
+      </p>
+    </app-page-frame>
+  </main>
+</div>

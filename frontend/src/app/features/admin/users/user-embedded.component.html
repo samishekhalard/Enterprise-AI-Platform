@@ -1,0 +1,341 @@
+<section class="embedded-block">
+  <div class="header-row">
+    <div>
+      <h3>Tenant Users</h3>
+      <p class="muted">Users and roles scoped to {{ tenantName }}.</p>
+    </div>
+
+    <div class="head-controls">
+      <input
+        type="search"
+        pInputText
+        class="user-search"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (input)="onSearchInput($event)"
+        placeholder="Search users"
+        aria-label="Search tenant users"
+      />
+      <p-select
+        class="user-filter"
+        [options]="roleOptions"
+        [ngModel]="roleFilter()"
+        (ngModelChange)="roleFilter.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        ariaLabel="Filter users by role"
+      />
+      <p-select
+        class="user-filter"
+        [options]="statusOptions"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        ariaLabel="Filter users by status"
+      />
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="contrast"
+        [disabled]="loading()"
+        (click)="applyFilters()"
+      >
+        <ng-icon name="phosphorFunnelThin" size="16" />
+        Apply
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        [disabled]="loading()"
+        (click)="resetFilters()"
+      >
+        <ng-icon name="phosphorXThin" size="16" />
+        Reset
+      </button>
+      <button
+        type="button"
+        pButton
+        size="small"
+        severity="secondary"
+        [loading]="loading()"
+        [disabled]="loading()"
+        (click)="loadUsers()"
+      >
+        <ng-icon name="phosphorArrowsClockwiseThin" size="16" />
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <p-message severity="error">{{ error() }}</p-message>
+  }
+
+  @if (loading()) {
+    <div class="loading-row">
+      <p-progressSpinner strokeWidth="6" [style]="{ width: '1.25rem', height: '1.25rem' }" />
+      <span>Loading users...</span>
+    </div>
+  }
+
+  <p-card styleClass="table-card">
+    <p-table
+      [value]="sortedUsers()"
+      [tableStyle]="{ 'min-width': '44rem' }"
+      size="small"
+      [pt]="userTablePt"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>
+            <button
+              pButton
+              type="button"
+              class="table-sort"
+              [text]="true"
+              (click)="toggleSort('displayName')"
+            >
+              Name <span class="sort-indicator">{{ sortIndicator('displayName') }}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              pButton
+              type="button"
+              class="table-sort"
+              [text]="true"
+              (click)="toggleSort('email')"
+            >
+              Email <span class="sort-indicator">{{ sortIndicator('email') }}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              pButton
+              type="button"
+              class="table-sort"
+              [text]="true"
+              (click)="toggleSort('role')"
+            >
+              Role <span class="sort-indicator">{{ sortIndicator('role') }}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              pButton
+              type="button"
+              class="table-sort"
+              [text]="true"
+              (click)="toggleSort('status')"
+            >
+              Status <span class="sort-indicator">{{ sortIndicator('status') }}</span>
+            </button>
+          </th>
+          <th>
+            <button
+              pButton
+              type="button"
+              class="table-sort"
+              [text]="true"
+              (click)="toggleSort('lastActive')"
+            >
+              Last Active <span class="sort-indicator">{{ sortIndicator('lastActive') }}</span>
+            </button>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.displayName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ displayRole(user) }}</td>
+          <td>
+            <p-tag [value]="statusLabel(user)" [severity]="statusSeverity(statusLabel(user))" />
+          </td>
+          <td>{{ user.lastLoginAt ? (user.lastLoginAt | date: 'dd MMM y, HH:mm') : 'Never' }}</td>
+          <td>
+            <button
+              type="button"
+              pButton
+              [text]="true"
+              size="small"
+              [attr.aria-label]="'View sessions for ' + user.displayName"
+              data-testid="user-sessions-btn"
+              (click)="openSessions(user); $event.stopPropagation()"
+            >
+              <ng-icon name="phosphorShieldThin" size="16" />
+              Sessions
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: var(--tp-space-8);
+                gap: var(--tp-space-3);
+                color: var(--tp-text-muted);
+              "
+            >
+              <ng-icon name="phosphorTrayThin" size="40" style="opacity: 0.5" aria-hidden="true" />
+              <p style="margin: 0; font-weight: 500">No users found</p>
+              <p style="margin: 0; font-size: 0.875rem; opacity: 0.7">
+                Try adjusting your filters or search criteria.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <p-paginator
+      [rows]="pageSize()"
+      [totalRecords]="totalElements()"
+      [rowsPerPageOptions]="[10, 20, 50, 100]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+      (onPageChange)="onPageChange($any($event))"
+      data-testid="user-paginator"
+    >
+    </p-paginator>
+  </p-card>
+</section>
+
+<p-dialog
+  [visible]="showSessions()"
+  (visibleChange)="showSessions.set($event)"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="sessions-dialog"
+  [style]="sessionDialogStyle"
+  [breakpoints]="sessionDialogBreakpoints"
+  [pt]="sessionDialogPt"
+  (onHide)="closeSessions()"
+  data-testid="sessions-dialog"
+>
+  <ng-template pTemplate="header">
+    <div class="sessions-dialog-header">
+      <span class="sessions-dialog-title">
+        <ng-icon name="phosphorShieldThin" aria-hidden="true" />
+        Sessions — {{ selectedUser()?.displayName }}
+      </span>
+      <span class="sessions-dialog-subtitle muted">{{ selectedUser()?.email }}</span>
+    </div>
+  </ng-template>
+
+  @if (sessionsLoading()) {
+    <div class="sessions-loading" aria-busy="true">
+      <p-progressSpinner strokeWidth="4" styleClass="sessions-spinner" />
+    </div>
+  }
+
+  @if (sessionsError()) {
+    <div class="tp-banner tp-banner-error" role="alert">
+      <ng-icon name="phosphorWarningThin" aria-hidden="true" />
+      {{ sessionsError() }}
+    </div>
+  }
+
+  @if (!sessionsLoading() && sessions().length > 0) {
+    <p-table
+      [value]="sessions()"
+      [tableStyle]="{ 'min-width': '48rem' }"
+      size="small"
+      [pt]="sessionTablePt"
+      ariaLabel="User sessions"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Status</th>
+          <th>Device / IP</th>
+          <th>Login Time</th>
+          <th>Last Activity</th>
+          <th>Expires</th>
+          <th>Flags</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-s>
+        <tr
+          [class.session-current]="s.isCurrent"
+          [attr.aria-label]="'Session ' + s.status + (s.isCurrent ? ', current session' : '')"
+        >
+          <td>
+            <p-tag [value]="s.status" [severity]="sessionSeverity(s.status)" [rounded]="true" />
+            @if (s.isCurrent) {
+              <span class="current-badge" title="This is the current session">This session</span>
+            }
+          </td>
+          <td>
+            <div class="device-name">{{ s.deviceName ?? 'Unknown device' }}</div>
+            <small class="muted">{{ s.ipAddress ?? '—' }}</small>
+          </td>
+          <td>{{ s.createdAt | date: 'dd MMM y, HH:mm' }}</td>
+          <td>{{ s.lastActivity ? (s.lastActivity | date: 'dd MMM y, HH:mm') : '—' }}</td>
+          <td>{{ s.expiresAt | date: 'dd MMM y, HH:mm' }}</td>
+          <td class="flags-cell">
+            @if (s.isRemembered) {
+              <p-tag value="Remember Me" severity="info" [rounded]="true" />
+            }
+            @if (s.mfaVerified) {
+              <p-tag value="MFA" severity="success" [rounded]="true" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p class="sessions-count muted">
+      {{ sessions().length }} session(s) — {{ activeSessionCount() }} active
+    </p>
+  }
+
+  @if (!sessionsLoading() && !sessionsError() && sessions().length === 0) {
+    <div class="empty-sessions" data-testid="sessions-empty">
+      <ng-icon name="phosphorTrayThin" size="40" aria-hidden="true" />
+      <p>No sessions found for this user.</p>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <button
+      type="button"
+      pButton
+      severity="secondary"
+      [text]="true"
+      aria-label="Close sessions dialog"
+      data-testid="sessions-close-btn"
+      (click)="closeSessions()"
+    >
+      Close
+    </button>
+    <button
+      type="button"
+      pButton
+      severity="danger"
+      [loading]="revokingAll()"
+      [disabled]="revokingAll() || !hasActiveSessions()"
+      aria-label="Revoke all active sessions for this user"
+      data-testid="revoke-all-btn"
+      (click)="revokeAll()"
+    >
+      <ng-icon name="phosphorProhibitThin" size="16" />
+      Revoke All Sessions
+    </button>
+  </ng-template>
+</p-dialog>

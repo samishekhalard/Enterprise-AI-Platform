@@ -1,0 +1,410 @@
+openapi: 3.1.0
+info:
+  title: User Service API
+  description: API for managing user profiles, sessions, and devices
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8083
+    description: Development server
+
+tags:
+  - name: Users
+    description: User profile management
+  - name: Sessions
+    description: Session management
+  - name: Devices
+    description: Device management
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/users/me:
+    get:
+      tags: [Users]
+      summary: Get current user profile
+      operationId: getCurrentUserProfile
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Not authenticated
+
+    patch:
+      tags: [Users]
+      summary: Update current user profile
+      operationId: updateCurrentUserProfile
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+  /api/v1/users/me/sessions:
+    get:
+      tags: [Sessions]
+      summary: List current user's active sessions
+      operationId: getUserSessions
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: List of active sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSession'
+
+  /api/v1/users/me/sessions/{sessionId}:
+    delete:
+      tags: [Sessions]
+      summary: Revoke a session
+      operationId: revokeSession
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Session revoked
+        '404':
+          description: Session not found
+
+  /api/v1/users/me/devices:
+    get:
+      tags: [Devices]
+      summary: List current user's registered devices
+      operationId: getUserDevices
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDevice'
+
+  /api/v1/users/me/devices/{deviceId}:
+    delete:
+      tags: [Devices]
+      summary: Remove a device
+      operationId: removeDevice
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Device removed
+        '404':
+          description: Device not found
+
+  /api/v1/users:
+    get:
+      tags: [Users]
+      summary: List users (admin)
+      operationId: listUsers
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+
+  /api/v1/users/{userId}:
+    get:
+      tags: [Users]
+      summary: Get user by ID (admin)
+      operationId: getUserById
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: User not found
+
+    patch:
+      tags: [Users]
+      summary: Update user (admin)
+      operationId: updateUser
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        keycloakId:
+          type: string
+        tenantId:
+          type: string
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+        phoneNumber:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        timezone:
+          type: string
+        locale:
+          type: string
+        mfaEnabled:
+          type: boolean
+        mfaMethods:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, LOCKED, PENDING]
+        createdAt:
+          type: string
+          format: date-time
+        lastLoginAt:
+          type: string
+          format: date-time
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        phoneNumber:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        timezone:
+          type: string
+        locale:
+          type: string
+        avatarUrl:
+          type: string
+
+    AdminUpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        displayName:
+          type: string
+        phoneNumber:
+          type: string
+        jobTitle:
+          type: string
+        department:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, LOCKED]
+        roles:
+          type: array
+          items:
+            type: string
+
+    UserSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        refreshTokenId:
+          type: string
+        deviceId:
+          type: string
+          format: uuid
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+        location:
+          type: string
+        isRemembered:
+          type: boolean
+        mfaVerified:
+          type: boolean
+        status:
+          type: string
+          enum: [ACTIVE, EXPIRED, REVOKED]
+        createdAt:
+          type: string
+          format: date-time
+        lastActivity:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    UserDevice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fingerprint:
+          type: string
+        deviceName:
+          type: string
+        deviceType:
+          type: string
+        browserName:
+          type: string
+        browserVersion:
+          type: string
+        osName:
+          type: string
+        osVersion:
+          type: string
+        lastLocation:
+          type: string
+        isApproved:
+          type: boolean
+        approvedAt:
+          type: string
+          format: date-time
+        approvedBy:
+          type: string
+        loginCount:
+          type: integer
+        firstSeenAt:
+          type: string
+          format: date-time
+        lastSeenAt:
+          type: string
+          format: date-time
+
+    UserListResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfile'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer

@@ -1,0 +1,29 @@
+# Okta Provider Configuration
+# Activate with: spring.profiles.active=okta
+# Or: AUTH_PROVIDER=okta
+
+auth:
+  facade:
+    provider: okta
+
+    # Okta specific role claim paths
+    role-claim-paths:
+      - groups                           # Okta Groups
+      - roles                            # Custom claim if configured
+      - scp                              # Okta scopes (if using as roles)
+
+    # Okta user claim mappings
+    user-claim-mappings:
+      user-id: sub                       # Okta User ID
+      email: email
+      first-name: given_name
+      last-name: family_name
+      tenant-id: tenant_id               # Custom claim (requires Okta configuration)
+      identity-provider: idp             # Identity Provider for federated login
+
+    # Provider-specific configuration
+    provider-config:
+      domain: ${OKTA_DOMAIN:your-org.okta.com}
+      client-id: ${OKTA_CLIENT_ID:}
+      client-secret: ${OKTA_CLIENT_SECRET:}
+      issuer: ${OKTA_ISSUER:https://your-org.okta.com/oauth2/default}

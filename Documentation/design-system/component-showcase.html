@@ -1,0 +1,2920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSIST Design System — Component Showcase</title>
+<style>
+  /* ── Font Loading ── */
+  @font-face {
+    font-family: 'Gotham Rounded';
+    src: url('../../frontend/src/assets/fonts/GothamRounded-Book.otf') format('opentype');
+    font-weight: 300 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Gotham Rounded';
+    src: url('../../frontend/src/assets/fonts/GothamRounded-Medium.otf') format('opentype');
+    font-weight: 500 600;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Gotham Rounded';
+    src: url('../../frontend/src/assets/fonts/GothamRounded-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-display: swap;
+  }
+
+  /* ── ThinkPLUS Design Tokens ── */
+  :root {
+    --tp-primary: #428177;
+    --tp-primary-dark: #054239;
+    --tp-surface: #f2efe9;
+    --tp-surface-raised: #faf8f4;
+    --tp-surface-light: #faf8f5;
+    --tp-bg: #f2efe9;
+    --tp-text: #3d3a3b;
+    --tp-text-dark: #2a241c;
+    --tp-text-muted: #999590;
+    --tp-text-secondary: #7a7672;
+    --tp-border: #e0ddda;
+    --tp-border-light: #e8e5e0;
+    --tp-grey: #999590;
+    --tp-grey-light: #d4d1cc;
+    --tp-danger: #6b1f2a;
+    --tp-error: #ef4444;
+    --tp-warning: #988561;
+    --nm-radius: 16px;
+    --nm-radius-sm: 8px;
+    --nm-radius-md: 12px;
+    --nm-radius-lg: 16px;
+    --nm-radius-pill: 999px;
+    --tp-space-1: 0.25rem;
+    --tp-space-2: 0.5rem;
+    --tp-space-3: 0.75rem;
+    --tp-space-4: 1rem;
+    --tp-space-5: 1.25rem;
+    --tp-space-6: 1.5rem;
+    --tp-font-sm: 0.82rem;
+    --tp-font-lg: 1.15rem;
+    --tp-font-xl: 1.35rem;
+    --tp-touch-target: 44px;
+    --tp-focus-ring: 0 0 0 2px color-mix(in srgb, var(--tp-primary) 25%, transparent);
+    --tp-toast-success-bg: color-mix(in srgb, #428177 8%, transparent);
+    --tp-toast-success-border: color-mix(in srgb, #428177 12%, transparent);
+    --tp-toast-success-text: #054239;
+    --tp-toast-error-bg: color-mix(in srgb, #ef4444 8%, transparent);
+    --tp-toast-error-border: color-mix(in srgb, #ef4444 12%, transparent);
+    --tp-toast-error-text: #b91c1c;
+    --tp-toast-warn-bg: color-mix(in srgb, #988561 8%, transparent);
+    --tp-toast-warn-border: color-mix(in srgb, #988561 12%, transparent);
+    --tp-toast-warn-text: #5a4a2a;
+    --tp-toast-info-bg: color-mix(in srgb, #054239 8%, transparent);
+    --tp-toast-info-border: color-mix(in srgb, #054239 12%, transparent);
+    --tp-toast-info-text: #054239;
+    --nm-shadow-dialog: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --nm-shadow-input-inset: inset 0 2px 4px rgba(0,0,0,0.04);
+    --nm-shadow-island: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
+    --nm-island-border: 1px solid color-mix(in srgb, var(--tp-border) 60%, transparent);
+    --nm-shadow-light: rgba(255,255,255,0.7);
+    --nm-shadow-dark: rgba(0,0,0,0.06);
+    --tp-pattern-opacity: 0.06;
+
+    /* --- Missing dependency tokens --- */
+    --nm-surface: #e0ddda;
+    --nm-radius-xs: 4px;
+    --tp-info: #054239;
+    --tp-success: #428177;
+    --tp-warning-dark: #5a4a2a;
+
+    /* --- Slider --- */
+    --tp-slider-track-bg: var(--nm-surface);
+    --tp-slider-track-height: 6px;
+    --tp-slider-track-border-radius: var(--nm-radius-pill);
+    --tp-slider-range-bg: var(--tp-primary);
+    --tp-slider-handle-bg: var(--tp-surface-raised);
+    --tp-slider-handle-border: 2px solid var(--tp-primary);
+    --tp-slider-handle-size: 20px;
+    --tp-slider-handle-border-radius: 50%;
+    --tp-slider-handle-hover-bg: var(--tp-surface-light);
+    --tp-slider-handle-focus-ring: var(--tp-focus-ring);
+
+    /* --- Checkbox --- */
+    --tp-checkbox-size: 20px;
+    --tp-checkbox-border: 2px solid var(--tp-border);
+    --tp-checkbox-border-radius: var(--nm-radius-xs);
+    --tp-checkbox-bg: var(--tp-surface-raised);
+    --tp-checkbox-checked-bg: var(--tp-primary);
+    --tp-checkbox-checked-border-color: var(--tp-primary);
+    --tp-checkbox-checked-icon-color: var(--tp-surface-light);
+    --tp-checkbox-hover-border-color: var(--tp-primary);
+    --tp-checkbox-focus-ring: var(--tp-focus-ring);
+    --tp-checkbox-disabled-bg: var(--nm-surface);
+
+    /* --- RadioButton --- */
+    --tp-radio-size: 20px;
+    --tp-radio-border: 2px solid var(--tp-border);
+    --tp-radio-bg: var(--tp-surface-raised);
+    --tp-radio-checked-bg: var(--tp-surface-raised);
+    --tp-radio-checked-border-color: var(--tp-primary);
+    --tp-radio-checked-icon-color: var(--tp-primary);
+    --tp-radio-hover-border-color: var(--tp-primary);
+    --tp-radio-focus-ring: var(--tp-focus-ring);
+    --tp-radio-disabled-bg: var(--nm-surface);
+
+    /* --- Tag --- */
+    --tp-tag-border-radius: var(--nm-radius-pill);
+    --tp-tag-font-size: 0.72rem;
+    --tp-tag-font-weight: 600;
+    --tp-tag-padding: 0.15rem 0.5rem;
+
+    /* --- Badge --- */
+    --tp-badge-min-width: 1.25rem;
+    --tp-badge-height: 1.25rem;
+    --tp-badge-font-size: 0.72rem;
+    --tp-badge-font-weight: 700;
+    --tp-badge-bg: var(--tp-primary);
+    --tp-badge-color: var(--tp-surface-light);
+    --tp-badge-border-radius: var(--nm-radius-pill);
+
+    /* --- ProgressBar --- */
+    --tp-progressbar-height: 8px;
+    --tp-progressbar-bg: var(--nm-surface);
+    --tp-progressbar-value-bg: var(--tp-primary);
+    --tp-progressbar-border-radius: var(--nm-radius-pill);
+    --tp-progressbar-label-color: var(--tp-surface-light);
+
+    /* --- Breadcrumb --- */
+    --tp-breadcrumb-bg: transparent;
+    --tp-breadcrumb-color: var(--tp-text-muted);
+    --tp-breadcrumb-active-color: var(--tp-text-dark);
+    --tp-breadcrumb-separator-color: var(--tp-grey-light);
+    --tp-breadcrumb-font-size: var(--tp-font-sm);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Login inputs: placeholder must be cream, not browser-default grey */
+  #login input::placeholder {
+    color: color-mix(in srgb, var(--tp-bg) 54%, transparent);
+    opacity: 1;
+  }
+
+  body {
+    font-family: 'Gotham Rounded', 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--tp-text);
+    line-height: 1.5;
+    background: var(--tp-bg);
+  }
+
+  /* ═══ PRODUCT SHELL ═══ */
+  .app-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    position: relative;
+  }
+  .app-shell::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--tp-pattern-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23428177' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 120px 120px;
+    background-repeat: repeat;
+  }
+
+  .shell-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding-top: var(--tp-space-4);
+  }
+  .shell-header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-inline: var(--tp-space-6);
+    padding-bottom: var(--tp-space-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--tp-space-3);
+    position: relative;
+    z-index: 1;
+  }
+  .header-island {
+    background: var(--tp-bg);
+    border-radius: var(--nm-radius-lg);
+    border: var(--nm-island-border);
+    box-shadow: var(--nm-shadow-island);
+  }
+  .brand-island {
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-3);
+    padding: var(--tp-space-2) var(--tp-space-3);
+  }
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--nm-radius-md);
+    background: linear-gradient(180deg, var(--tp-surface-raised), var(--tp-bg));
+    box-shadow: inset 1px 1px 1px var(--nm-shadow-light), inset -1px -1px 1px var(--nm-shadow-dark);
+    text-decoration: none;
+    font-size: 1.3rem;
+    color: var(--tp-primary-dark);
+    font-weight: 800;
+  }
+  .brand-block h1 {
+    font-size: var(--tp-font-lg);
+    letter-spacing: 0.01em;
+    color: var(--tp-text-dark);
+    font-weight: 700;
+  }
+  .brand-block p {
+    margin-top: 2px;
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-font-sm);
+  }
+  .topnav {
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-1);
+    padding: var(--tp-space-2);
+  }
+  .topnav a, .topnav button {
+    text-decoration: none;
+    color: var(--tp-text);
+    background: var(--tp-bg);
+    border: 1px solid var(--tp-border);
+    border-radius: 999px;
+    padding: var(--tp-space-2) var(--tp-space-3);
+    font-size: var(--tp-font-sm);
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.15s ease;
+  }
+  .topnav a:hover, .topnav button:hover {
+    color: var(--tp-surface-light);
+    background: var(--tp-primary);
+    border-color: var(--tp-primary);
+  }
+  .topnav a.active {
+    color: var(--tp-surface-light);
+    background: linear-gradient(135deg, var(--tp-primary), var(--tp-primary-dark));
+    border-color: var(--tp-primary-dark);
+  }
+
+  .shell-content {
+    position: relative;
+    z-index: 1;
+    padding-block: var(--tp-space-2) var(--tp-space-6);
+  }
+  .shell-content-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-inline: var(--tp-space-6);
+    position: relative;
+    z-index: 1;
+  }
+
+  .shell-footer {
+    position: relative;
+    z-index: 1;
+    padding-bottom: var(--tp-space-4);
+  }
+  .shell-footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-inline: var(--tp-space-6);
+  }
+  .footer-island {
+    width: fit-content;
+    max-width: 100%;
+    padding: var(--tp-space-2) var(--tp-space-3);
+    border-radius: var(--nm-radius-lg);
+    border: var(--nm-island-border);
+    background: var(--tp-bg);
+    box-shadow: var(--nm-shadow-island);
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-3);
+  }
+  .footer-text {
+    color: var(--tp-text-muted);
+    font-size: var(--tp-font-sm);
+  }
+
+  /* ═══ COMPONENT SECTION LAYOUT ═══ */
+  .comp-section {
+    margin-block-end: 3rem;
+  }
+  .comp-section-header {
+    margin-block-end: 1.25rem;
+  }
+  .comp-section-header h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--tp-text-dark);
+  }
+  .comp-section-header .comp-meta {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text-muted);
+    margin-top: 2px;
+  }
+
+  .comp-row {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .comp-row { grid-template-columns: 1fr; }
+  }
+
+  .comp-visual {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+    overflow: hidden;
+  }
+  .comp-visual-body {
+    padding: var(--tp-space-4) var(--tp-space-6);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* ── Spec Panel ── */
+  .spec-panel {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+    padding: var(--tp-space-4);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--tp-text);
+    max-height: 600px;
+    overflow-y: auto;
+  }
+  .spec-panel h4 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--tp-primary-dark);
+    margin: 0 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .spec-panel h4:not(:first-child) {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--tp-border-light);
+  }
+  .spec-panel table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.25rem;
+  }
+  .spec-panel th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--tp-text-dark);
+    padding: 3px 6px 3px 0;
+    white-space: nowrap;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .spec-panel td {
+    padding: 3px 6px 3px 0;
+    vertical-align: top;
+  }
+  .spec-panel tr {
+    border-bottom: 1px solid color-mix(in srgb, var(--tp-border) 40%, transparent);
+  }
+  .spec-panel code {
+    background: color-mix(in srgb, var(--tp-primary) 8%, transparent);
+    color: var(--tp-primary-dark);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.72rem;
+  }
+  .spec-panel .spec-do { color: var(--tp-primary-dark); }
+  .spec-panel .spec-dont { color: var(--tp-danger); }
+  .spec-panel ul {
+    padding-left: 1rem;
+    margin: 0;
+  }
+  .spec-panel li {
+    margin-bottom: 2px;
+  }
+
+  /* ═══ COMPONENT STYLES ═══ */
+  .variant-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .variant-label {
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text-muted);
+    min-width: 80px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--nm-radius-pill);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    min-height: 44px;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    line-height: 1;
+  }
+  .btn:focus-visible { outline: none; box-shadow: var(--tp-focus-ring); }
+  .btn-primary {
+    background: var(--tp-primary);
+    color: var(--tp-surface-light);
+    border: 1px solid var(--tp-primary);
+  }
+  .btn-primary:hover { background: var(--tp-primary-dark); border-color: var(--tp-primary-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--tp-text);
+    border: 1px solid var(--tp-border);
+  }
+  .btn-secondary:hover { background: color-mix(in srgb, var(--tp-border) 30%, transparent); }
+  .btn-danger {
+    background: var(--tp-danger);
+    color: var(--tp-surface-light);
+    border: 1px solid var(--tp-danger);
+  }
+  .btn-text {
+    background: transparent;
+    color: var(--tp-primary);
+    border: none;
+    padding: 0.5rem 0.75rem;
+  }
+  .btn-text:hover { background: color-mix(in srgb, var(--tp-primary) 8%, transparent); }
+  .btn-icon {
+    background: transparent;
+    color: var(--tp-primary);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  .btn-icon:hover { background: color-mix(in srgb, var(--tp-primary) 8%, transparent); }
+
+  /* ToggleButton — cream pill, green icons, borderless default */
+  .toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tp-space-2);
+    padding: 0.5rem 1.25rem;
+    min-height: 44px;
+    border-radius: var(--nm-radius-pill);
+    border: 1px solid var(--tp-border);
+    background: var(--tp-surface);
+    color: var(--tp-text-dark);
+    font-size: var(--tp-font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .toggle-btn span { color: var(--tp-primary); }
+  .toggle-btn:hover { border-color: var(--tp-border); }
+  .toggle-btn[aria-pressed="true"] {
+    border-color: var(--tp-primary);
+  }
+  .toggle-btn[aria-pressed="true"] span { color: var(--tp-primary); }
+
+  .btn-loading {
+    background: linear-gradient(135deg, var(--tp-primary), var(--tp-primary-dark));
+    color: var(--tp-surface-light);
+    border: 1px solid var(--tp-primary);
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .btn-sm { padding: 0.35rem 0.75rem; min-height: 32px; font-size: 0.8rem; }
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Card */
+  .card {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: var(--tp-space-4);
+    font-weight: 700;
+    color: var(--tp-text-dark);
+    border-bottom: 1px solid var(--tp-border);
+  }
+  .card-subtitle {
+    font-weight: 400;
+    font-size: var(--tp-font-sm);
+    color: var(--tp-text-muted);
+    margin-top: 2px;
+  }
+  .card-body { padding: var(--tp-space-4); }
+  .card-footer {
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-top: 1px solid var(--tp-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--tp-space-3);
+  }
+  .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--tp-primary);
+    line-height: 1;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  .stat-card {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+    padding: var(--tp-space-3);
+    text-align: center;
+  }
+  .stat-card .stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--tp-primary);
+  }
+  .stat-card .stat-label {
+    font-size: 0.68rem;
+    color: var(--tp-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.2rem;
+  }
+
+  /* Input */
+  .form-field { display: grid; gap: var(--tp-space-2); }
+  .form-field label { font-size: 0.875rem; font-weight: 700; color: var(--tp-text-dark); }
+  .input {
+    padding: 0.75rem 1.25rem;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: var(--nm-radius-pill);
+    background: var(--tp-surface-raised);
+    color: var(--tp-text);
+    font-size: 0.875rem;
+    font-family: inherit;
+    min-height: 48px;
+    box-shadow: none;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  .input::placeholder { color: var(--tp-grey); }
+  .input:hover { border-color: rgba(0,0,0,0.14); }
+  .input:focus { border-color: var(--tp-primary); box-shadow: var(--tp-focus-ring); }
+  .input-error { border-color: var(--tp-error) !important; box-shadow: none !important; }
+  .input-disabled { background: var(--tp-border); color: var(--tp-grey); cursor: not-allowed; opacity: 1; }
+  .error-text { color: var(--tp-error); font-size: var(--tp-font-sm); }
+  .char-count { font-size: var(--tp-font-sm); color: var(--tp-text-muted); text-align: right; }
+  .input-icon-wrapper { position: relative; }
+  .input-icon-wrapper .icon-left { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--tp-grey); font-size: 1rem; }
+  .input-icon-wrapper .input { padding-left: 2.5rem; }
+  textarea.input { resize: vertical; min-height: 80px; border-radius: var(--nm-radius-lg); }
+
+  /* Select */
+  .select-wrapper { position: relative; }
+  .select {
+    appearance: none;
+    padding: 0.75rem 2.5rem 0.75rem 1.25rem;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: var(--nm-radius-pill);
+    background: var(--tp-surface-raised);
+    color: var(--tp-text);
+    font-size: 0.875rem;
+    font-family: inherit;
+    min-height: 48px;
+    width: 100%;
+    cursor: pointer;
+    outline: none;
+    box-shadow: none;
+  }
+  .select:hover { border-color: rgba(0,0,0,0.14); }
+  .select:focus { border-color: var(--tp-primary); box-shadow: var(--tp-focus-ring); }
+  .select-chevron { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); color: var(--tp-grey); pointer-events: none; font-size: 0.7rem; }
+
+  /* MultiSelect Chips */
+  .multiselect {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: var(--nm-radius-pill);
+    background: var(--tp-surface-raised);
+    padding: 0.5rem 1.25rem;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    cursor: pointer;
+    box-shadow: none;
+  }
+  .multiselect:hover { border-color: rgba(0,0,0,0.14); }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, var(--tp-primary) 12%, transparent);
+    color: var(--tp-primary-dark);
+    border-radius: var(--nm-radius-pill);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .chip-x { background: none; border: none; color: var(--tp-primary); cursor: pointer; font-size: 0.65rem; opacity: 0.6; padding: 0; }
+  .multiselect-ph { color: var(--tp-grey); font-size: 0.875rem; }
+  .ms-chev { margin-left: auto; color: var(--tp-grey); font-size: 0.7rem; }
+
+  /* Tabs */
+  .tab-list {
+    display: flex;
+    gap: var(--tp-space-1);
+    border-bottom: 2px solid var(--tp-border);
+    padding-inline: var(--tp-space-4);
+    background: var(--tp-surface-raised);
+  }
+  .tab {
+    padding: var(--tp-space-3) var(--tp-space-4);
+    font-weight: 600;
+    color: var(--tp-text-muted);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.875rem;
+    position: relative;
+    min-height: 44px;
+  }
+  .tab:hover { color: var(--tp-text); }
+  .tab.active { color: var(--tp-primary); }
+  .tab.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: var(--tp-primary); }
+  .tab-panel { padding: var(--tp-space-6); background: var(--tp-surface-raised); }
+
+  /* DataTable */
+  .data-table {
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+    overflow: hidden;
+    background: transparent;
+  }
+  .data-table table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    background: var(--tp-surface);
+    color: var(--tp-text-dark);
+    font-weight: 600;
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-bottom: 1px solid var(--tp-border);
+    text-align: left;
+    font-size: var(--tp-font-sm);
+  }
+  .data-table td {
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-bottom: 1px solid color-mix(in srgb, var(--tp-border) 50%, transparent);
+    font-size: var(--tp-font-md);
+  }
+  .data-table tr:hover td { background: color-mix(in srgb, var(--tp-primary) 4%, transparent); }
+
+  /* Tag */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--nm-radius-pill);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tag-success { background: color-mix(in srgb, var(--tp-primary) 14%, transparent); color: var(--tp-primary-dark); }
+  .tag-danger { background: color-mix(in srgb, var(--tp-error) 12%, transparent); color: var(--tp-danger); }
+  .tag-warning { background: color-mix(in srgb, var(--tp-warning) 18%, transparent); color: #5a4a2a; }
+  .tag-info { background: color-mix(in srgb, var(--tp-primary-dark) 10%, transparent); color: var(--tp-primary-dark); }
+
+  /* Dialog */
+  .dialog-backdrop {
+    background: rgba(22,22,22,0.2);
+    border-radius: var(--nm-radius);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dialog {
+    background: var(--tp-surface-raised);
+    border-radius: var(--nm-radius);
+    box-shadow: var(--nm-shadow-dialog);
+    width: 100%;
+    max-width: 460px;
+    overflow: hidden;
+  }
+  .dialog-header {
+    padding: var(--tp-space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--tp-border);
+  }
+  .dialog-header h4 { font-weight: 700; color: var(--tp-text-dark); font-size: 1.05rem; }
+  .dialog-close {
+    background: none; border: none; color: var(--tp-grey); font-size: 1.25rem; cursor: pointer;
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  }
+  .dialog-close:hover { background: color-mix(in srgb, var(--tp-border) 50%, transparent); }
+  .dialog-content { padding: var(--tp-space-6); }
+  .dialog-footer {
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-top: 1px solid var(--tp-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--tp-space-3);
+  }
+
+  /* Toast */
+  .toast {
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid;
+    box-shadow: 0 16px 32px rgba(0,0,0,0.04);
+  }
+  .toast-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .toast-content { flex: 1; }
+  .toast-summary { font-weight: 700; font-size: 0.88rem; }
+  .toast-detail { font-size: 0.78rem; margin-top: 2px; }
+  .toast-close { background: none; border: none; cursor: pointer; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: inherit; opacity: 0.6; }
+  .toast-success { background: var(--tp-toast-success-bg); border-color: var(--tp-toast-success-border); color: var(--tp-toast-success-text); }
+  .toast-error { background: var(--tp-toast-error-bg); border-color: var(--tp-toast-error-border); color: var(--tp-toast-error-text); }
+  .toast-warn { background: var(--tp-toast-warn-bg); border-color: var(--tp-toast-warn-border); color: var(--tp-toast-warn-text); }
+  .toast-info { background: var(--tp-toast-info-bg); border-color: var(--tp-toast-info-border); color: var(--tp-toast-info-text); }
+
+  /* Paginator */
+  .paginator {
+    background: transparent;
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius-sm);
+    padding: var(--tp-space-3) var(--tp-space-4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--tp-space-3);
+  }
+  .paginator-pages { display: flex; gap: 4px; }
+  .pag-btn {
+    min-width: 34px; min-height: 34px;
+    border: none; background: none; border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-weight: 600; color: var(--tp-text); font-size: 0.82rem;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .pag-btn:hover { background: color-mix(in srgb, var(--tp-primary) 8%, transparent); }
+  .pag-btn.active { background: var(--tp-primary); color: var(--tp-surface-light); }
+  .pag-btn:disabled { color: var(--tp-grey-light); cursor: not-allowed; }
+  .pag-btn:disabled:hover { background: none; }
+  .pag-info { color: var(--tp-text-muted); font-size: var(--tp-font-sm); }
+
+  /* Menu */
+  .menu {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius-sm);
+    box-shadow: var(--nm-shadow-dialog);
+    min-width: 200px;
+    padding: var(--tp-space-1) 0;
+    display: inline-block;
+  }
+  .menu-item {
+    padding: var(--tp-space-2) var(--tp-space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--tp-space-2);
+    font-size: 0.875rem;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .menu-item:hover { background: color-mix(in srgb, var(--tp-primary) 6%, transparent); }
+  .menu-item-icon { color: var(--tp-grey); width: 18px; text-align: center; }
+  .menu-sep { border-top: 1px solid var(--tp-border); margin: var(--tp-space-1) 0; }
+  .menu-item-danger { color: var(--tp-danger); }
+  .menu-item-danger .menu-item-icon { color: var(--tp-danger); }
+
+  /* DatePicker calendar */
+  .calendar-panel {
+    background: var(--tp-surface-raised);
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius-md);
+    box-shadow: var(--nm-shadow-dialog);
+    padding: var(--tp-space-4);
+    display: inline-block;
+    min-width: 260px;
+  }
+  .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--tp-space-3); }
+  .cal-head span { font-weight: 700; color: var(--tp-text-dark); font-size: 0.9rem; }
+  .cal-nav { background: none; border: none; cursor: pointer; color: var(--tp-grey); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .cal-nav:hover { background: color-mix(in srgb, var(--tp-primary) 8%, transparent); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; text-align: center; }
+  .cal-wd { font-size: 0.68rem; font-weight: 600; color: var(--tp-grey); padding: 4px; text-transform: uppercase; }
+  .cal-d { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.78rem; cursor: pointer; color: var(--tp-text); border: none; background: none; font-family: inherit; }
+  .cal-d:hover { background: color-mix(in srgb, var(--tp-primary) 8%, transparent); }
+  .cal-d.today { background: color-mix(in srgb, var(--tp-primary) 12%, transparent); color: var(--tp-primary-dark); font-weight: 700; }
+  .cal-d.selected { background: var(--tp-primary); color: var(--tp-surface-light); font-weight: 700; }
+  .cal-d.dim { color: var(--tp-grey-light); }
+
+  /* Fieldset */
+  .fieldset {
+    border: 1px solid var(--tp-border-light);
+    border-radius: var(--nm-radius-lg);
+    background: var(--tp-surface-raised);
+    overflow: hidden;
+  }
+  .fieldset-legend {
+    background: var(--tp-surface);
+    color: var(--tp-text-dark);
+    font-weight: 600;
+    font-size: 0.88rem;
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-bottom: 1px solid var(--tp-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .fieldset-toggle { background: none; border: none; color: var(--tp-grey); cursor: pointer; font-size: 0.72rem; }
+  .fieldset-content { padding: var(--tp-space-4); }
+
+  /* Message */
+  .message {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--nm-radius-sm);
+    border: 1px solid;
+    font-size: 0.82rem;
+  }
+  .msg-icon { flex-shrink: 0; font-size: 1rem; }
+  .msg-success { background: var(--tp-toast-success-bg); border-color: var(--tp-toast-success-border); color: var(--tp-toast-success-text); }
+  .msg-error { background: var(--tp-toast-error-bg); border-color: var(--tp-toast-error-border); color: var(--tp-toast-error-text); }
+  .msg-warn { background: var(--tp-toast-warn-bg); border-color: var(--tp-toast-warn-border); color: var(--tp-toast-warn-text); }
+  .msg-info { background: var(--tp-toast-info-bg); border-color: var(--tp-toast-info-border); color: var(--tp-toast-info-text); }
+
+  /* ToggleSwitch */
+  .toggle { position: relative; width: 48px; height: 26px; flex-shrink: 0; }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--tp-border); border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius-pill); cursor: pointer; transition: all 0.2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; background: var(--tp-surface-raised);
+    border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .toggle input:checked + .toggle-track { background: var(--tp-primary); border-color: var(--tp-primary); }
+  .toggle input:checked + .toggle-track::after { transform: translateX(22px); background: var(--tp-surface-light); }
+
+  /* Checkbox */
+  .cb-wrap { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.88rem; color: var(--tp-text); }
+  .cb-wrap input[type="checkbox"] { display: none; }
+  .cb-box {
+    width: var(--tp-checkbox-size); height: var(--tp-checkbox-size); flex-shrink: 0;
+    border: var(--tp-checkbox-border); border-radius: var(--tp-checkbox-border-radius);
+    background: var(--tp-checkbox-bg); display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .cb-box svg { display: none; width: 12px; height: 12px; }
+  .cb-wrap input:checked + .cb-box {
+    background: var(--tp-checkbox-checked-bg); border-color: var(--tp-checkbox-checked-border-color);
+  }
+  .cb-wrap input:checked + .cb-box svg { display: block; stroke: var(--tp-checkbox-checked-icon-color); }
+  .cb-wrap.disabled .cb-box { background: var(--tp-checkbox-disabled-bg); opacity: 0.6; cursor: not-allowed; }
+  .cb-wrap.disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* RadioButton */
+  .rb-wrap { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.88rem; color: var(--tp-text); }
+  .rb-wrap input[type="radio"] { display: none; }
+  .rb-dot {
+    width: var(--tp-radio-size); height: var(--tp-radio-size); flex-shrink: 0;
+    border: var(--tp-radio-border); border-radius: 50%;
+    background: var(--tp-radio-bg); display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .rb-dot::after {
+    content: ''; width: 10px; height: 10px; border-radius: 50%;
+    background: transparent; transition: background 0.15s;
+  }
+  .rb-wrap input:checked + .rb-dot { border-color: var(--tp-radio-checked-border-color); }
+  .rb-wrap input:checked + .rb-dot::after { background: var(--tp-radio-checked-icon-color); }
+  .rb-wrap.disabled .rb-dot { background: var(--tp-radio-disabled-bg); opacity: 0.6; cursor: not-allowed; }
+  .rb-wrap.disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* Stepper */
+  .stepper { display: flex; align-items: center; padding: var(--tp-space-3) var(--tp-space-4); border-bottom: 1px solid var(--tp-border); }
+  .step { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 600; color: var(--tp-text-muted); }
+  .step.active { color: var(--tp-primary-dark); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.68rem; font-weight: 700; background: var(--tp-border); color: var(--tp-text-muted);
+  }
+  .step.active .step-num { background: var(--tp-primary); color: var(--tp-surface-light); }
+  .step-line { flex: 1; height: 2px; background: var(--tp-border); margin: 0 0.4rem; }
+
+  /* Page title header */
+  .page-title-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--tp-space-4);
+    padding: var(--tp-space-3) var(--tp-space-4);
+    border-radius: var(--nm-radius-md);
+    background: var(--tp-surface);
+    border: var(--nm-island-border);
+    box-shadow: var(--nm-shadow-island);
+    margin-bottom: var(--tp-space-4);
+  }
+  .page-title-bar h2 { font-size: var(--tp-font-xl); font-weight: 700; color: var(--tp-text); }
+  .page-title-bar p { margin-top: 2px; color: var(--tp-text-secondary); font-size: var(--tp-font-sm); }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex; gap: 0.5rem; align-items: center;
+    font-size: var(--tp-font-sm); color: var(--tp-text-muted);
+    padding: var(--tp-space-2) 0;
+  }
+  .breadcrumb a { color: var(--tp-text-muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--tp-primary); text-decoration: underline; }
+  .breadcrumb .sep { color: var(--tp-grey-light); }
+  .breadcrumb .current { color: var(--tp-text); font-weight: 600; }
+
+  /* Toolbar (PrimeNG p-toolbar pattern: start / end groups) */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tp-space-3);
+    flex-wrap: wrap;
+    padding: var(--tp-space-3) var(--tp-space-4);
+    background: transparent;
+    border: 1px solid var(--tp-border);
+    border-radius: var(--nm-radius);
+  }
+  .toolbar-start, .toolbar-end { display: flex; align-items: center; gap: var(--tp-space-3); flex-wrap: wrap; }
+
+  /* Divider */
+  .section-divider {
+    border: none;
+    border-top: 2px solid var(--tp-border);
+    margin: 2rem 0 2.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .shell-header-inner { flex-direction: column; align-items: stretch; padding-inline: var(--tp-space-4); }
+    .shell-content-inner, .shell-footer-inner { padding-inline: var(--tp-space-4); }
+    .comp-row { grid-template-columns: 1fr; }
+    .brand-island { min-width: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ═══ SHELL HEADER ═══ -->
+<header class="shell-header">
+  <div class="shell-header-inner">
+    <div class="header-island brand-island">
+      <span class="brand-logo">t+</span>
+      <div class="brand-block">
+        <h1>think+</h1>
+        <p>Design System Showcase</p>
+      </div>
+    </div>
+    <nav class="header-island topnav" aria-label="Primary navigation">
+      <a href="#components" class="active">Components</a>
+      <a href="#tokens">Tokens</a>
+      <a href="#patterns">Patterns</a>
+      <a href="#login">Login</a>
+      <a href="#typography">Typography</a>
+      <a href="#colors">Colors</a>
+      <button type="button">Sign Out</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ SHELL CONTENT ═══ -->
+<main class="shell-content">
+  <div class="shell-content-inner">
+
+    <!-- Page Frame -->
+    <div class="page-title-bar">
+      <div>
+        <h2>Component Showcase</h2>
+        <p>All 15 PrimeNG components with Grey Neutral tokens &mdash; visual + specs side by side</p>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <span class="tag tag-success" style="font-size:0.68rem;">PrimeNG 21</span>
+        <span class="tag tag-info" style="font-size:0.68rem;">Angular 21</span>
+      </div>
+    </div>
+
+    <div class="breadcrumb">
+      <a href="#">Documentation</a> <span class="sep">&rsaquo;</span>
+      <a href="#">Design System</a> <span class="sep">&rsaquo;</span>
+      <span class="current">Components</span>
+    </div>
+
+    <!-- ═══════════ 1. BUTTON ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="button">
+      <div class="comp-section-header">
+        <h2>1. Button</h2>
+        <div class="comp-meta">p-button &bull; ButtonModule &bull; <a href="https://primeng.org/button" style="color:var(--tp-primary);">Docs</a></div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="variant-row"><span class="variant-label">Primary</span><button class="btn btn-primary">+ Create Object Type</button></div>
+            <div class="variant-row"><span class="variant-label">Secondary</span><button class="btn btn-secondary">Cancel</button><button class="btn btn-secondary">Refresh</button></div>
+            <div class="variant-row"><span class="variant-label">Danger</span><button class="btn btn-danger">Delete</button></div>
+            <div class="variant-row"><span class="variant-label">Text</span><button class="btn btn-text">Cancel</button><button class="btn btn-text">Skip</button></div>
+            <div class="variant-row"><span class="variant-label">Icon-only</span><button class="btn btn-icon" title="Edit">&#9998;</button><button class="btn btn-icon" title="View">&#128065;</button><button class="btn btn-icon" title="Delete" style="color:var(--tp-danger);">&#128465;</button></div>
+            <div class="variant-row"><span class="variant-label">Loading</span><button class="btn btn-loading" disabled><span class="spinner"></span> Saving...</button></div>
+            <div class="variant-row"><span class="variant-label">Sizes</span><button class="btn btn-primary btn-sm">Small</button><button class="btn btn-primary">Default</button></div>
+            <div class="variant-row"><span class="variant-label">ToggleButton</span><button class="toggle-btn" aria-pressed="false"><span>&#9776;</span> Grid</button><button class="toggle-btn" aria-pressed="true"><span>&#9776;</span> Table</button></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Shared Sizing</h4>
+          <table>
+            <tr><td>Min height</td><td><code>--tp-touch-target</code> 44px</td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-pill</code></td></tr>
+            <tr><td>Padding</td><td><code>0.5rem 1.25rem</code></td></tr>
+            <tr><td>Small padding</td><td><code>0.35rem 0.75rem</code></td></tr>
+          </table>
+          <h4>Severity &rarr; Token Map</h4>
+          <table>
+            <tr><th>Severity</th><th>Background</th><th>Text</th></tr>
+            <tr><td>primary</td><td><code>--tp-primary</code> (solid)</td><td><code>--tp-surface-light</code></td></tr>
+            <tr><td>danger</td><td><code>--tp-danger</code></td><td><code>--tp-surface-light</code></td></tr>
+            <tr><td>secondary</td><td><code>transparent</code></td><td><code>--tp-text</code></td></tr>
+            <tr><td>text</td><td><code>transparent</code></td><td><code>--tp-primary</code></td></tr>
+          </table>
+          <h4>ToggleButton (p-toggleButton)</h4>
+          <table>
+            <tr><td>Min height</td><td><code>--tp-touch-target</code> 44px</td></tr>
+            <tr><td>Background</td><td><code>--tp-surface</code> (cream)</td></tr>
+            <tr><td>Border</td><td><code>1px solid --tp-border</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-pill</code></td></tr>
+            <tr><td>Icon color</td><td><code>--tp-primary</code> (green)</td></tr>
+            <tr><td>Text color</td><td><code>--tp-text-dark</code></td></tr>
+            <tr><td>Checked border</td><td><code>--tp-primary</code></td></tr>
+            <tr><td>Content padding</td><td><code>--tp-space-2</code> / <code>--tp-space-5</code></td></tr>
+          </table>
+          <h4>Key Props</h4>
+          <table>
+            <tr><td><code>label</code></td><td>Button text</td></tr>
+            <tr><td><code>icon</code></td><td>PrimeIcons class</td></tr>
+            <tr><td><code>severity</code></td><td>primary | secondary | danger</td></tr>
+            <tr><td><code>outlined</code></td><td>Outlined border style</td></tr>
+            <tr><td><code>text</code></td><td>Text-only (no bg/border)</td></tr>
+            <tr><td><code>loading</code></td><td>Spinner + disabled</td></tr>
+            <tr><td><code>size</code></td><td>small | large</td></tr>
+          </table>
+          <h4>Accessibility</h4>
+          <ul>
+            <li>Touch target min 44&times;44px</li>
+            <li><code>aria-label</code> required on icon-only</li>
+            <li>Color contrast 10.3:1 (AAA)</li>
+            <li>Focus ring: <code>--tp-focus-ring</code></li>
+          </ul>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Limit to 1 primary per section</li>
+            <li class="spec-do">Use danger for destructive actions</li>
+            <li class="spec-dont">Never use <code>.app-btn</code> class</li>
+            <li class="spec-dont">Never place 2 primaries side by side</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 2. CARD ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="card">
+      <div class="comp-section-header">
+        <h2>2. Card</h2>
+        <div class="comp-meta">p-card &bull; CardModule &bull; Flat surface, no shadow</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="card"><div class="card-header">Definitions<div class="card-subtitle">Last 30 days</div></div><div class="card-body"><span class="kpi-value">142</span></div></div>
+              <div class="card"><div class="card-header">Info</div><div class="card-body" style="display:grid;gap:0.5rem;"><div><strong>Name:</strong> Quality Check</div><div><strong>Status:</strong> <span class="tag tag-success">active</span></div></div><div class="card-footer"><button class="btn btn-primary btn-sm">Edit</button></div></div>
+            </div>
+            <div class="stat-grid">
+              <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Total</div></div>
+              <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">Active</div></div>
+              <div class="stat-card"><div class="stat-value" style="color:var(--tp-warning);">0</div><div class="stat-label">Pending</div></div>
+            </div>
+            <div class="card"><div class="card-body" style="text-align:center;padding:1.5rem;"><div style="font-size:1.5rem;color:var(--tp-grey-light);">&#128230;</div><div style="font-weight:600;margin-top:0.5rem;">No Licenses</div><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Add a .lic file to activate.</div><button class="btn btn-primary btn-sm" style="margin-top:0.75rem;">+ Add License</button></div></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code> #FAF8F4</td></tr>
+            <tr><td>Border</td><td><code>--tp-border</code> #E0DDDA</td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius</code> 16px</td></tr>
+            <tr><td>Header text</td><td><code>--tp-text-dark</code> 700</td></tr>
+            <tr><td>Body padding</td><td><code>--tp-space-4</code></td></tr>
+          </table>
+          <h4>Slots</h4>
+          <table>
+            <tr><td><code>header</code></td><td>Custom header template</td></tr>
+            <tr><td><code>content</code></td><td>Main body</td></tr>
+            <tr><td><code>footer</code></td><td>Action buttons</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>--tp-surface-raised</code> background</li>
+            <li class="spec-do">Use footer for action buttons</li>
+            <li class="spec-dont">Never add box-shadow / elevation</li>
+            <li class="spec-dont">Never nest cards &gt; 1 level deep</li>
+            <li class="spec-dont">Never omit padding</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 3. INPUT ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="input">
+      <div class="comp-section-header">
+        <h2>3. Input</h2>
+        <div class="comp-meta">p-inputText, p-textarea, p-inputNumber &bull; Pill radius, no shadow, subtle border</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1.5rem; padding:1.5rem 1.75rem;">
+            <div class="form-field"><label>Object Type Name</label><input class="input" type="text" value="Quality Check"><span class="char-count">13/100 characters</span></div>
+            <div class="form-field"><label>Search</label><div class="input-icon-wrapper"><span class="icon-left" style="font-size:0.9rem;">&#128269;</span><input class="input" type="text" placeholder="Search object types..."></div></div>
+            <div class="form-field"><label>Email (Error)</label><input class="input input-error" type="email" value="invalid-email"><span class="error-text">Please enter a valid email address</span></div>
+            <div class="form-field"><label>Code (Disabled)</label><input class="input input-disabled" type="text" value="OBJ_XXX" disabled></div>
+            <div class="form-field"><label>Description</label><textarea class="input" rows="3" placeholder="Describe this object type..."></textarea><span class="char-count">0/500 characters</span></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code> #FAF8F4</td></tr>
+            <tr><td>Border</td><td><code>rgba(0,0,0,0.08)</code> barely visible</td></tr>
+            <tr><td>Hover border</td><td><code>rgba(0,0,0,0.14)</code></td></tr>
+            <tr><td>Focus border</td><td><code>--tp-primary</code> teal</td></tr>
+            <tr><td>Error border</td><td><code>--tp-error</code> #ef4444</td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-pill</code> 999px</td></tr>
+            <tr><td>Shadow</td><td><code>none</code> (flat interior)</td></tr>
+            <tr><td>Disabled bg</td><td><code>--nm-surface</code> #E0DDDA</td></tr>
+            <tr><td>Placeholder</td><td><code>--tp-grey</code> #999590</td></tr>
+            <tr><td>Textarea radius</td><td><code>--nm-radius-lg</code> 16px</td></tr>
+          </table>
+          <h4>Variants</h4>
+          <table>
+            <tr><td><code>p-inputText</code></td><td>Names, codes, short text</td></tr>
+            <tr><td><code>p-textarea</code></td><td>Descriptions, long-form</td></tr>
+            <tr><td><code>p-inputNumber</code></td><td>Quantities, currency</td></tr>
+            <tr><td><code>p-iconField</code></td><td>Search with icon</td></tr>
+          </table>
+          <h4>Accessibility</h4>
+          <ul>
+            <li>Every input needs <code>&lt;label&gt;</code> with <code>for</code>/<code>id</code></li>
+            <li>Errors use <code>role="alert"</code></li>
+            <li>Min height 44px touch target</li>
+            <li>Never use placeholder as only label</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 4. SELECT + MULTISELECT ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="select">
+      <div class="comp-section-header">
+        <h2>4. Select &amp; MultiSelect</h2>
+        <div class="comp-meta">p-select, p-multiSelect &bull; Use p-select (not deprecated p-dropdown)</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="form-field"><label>Category</label><div class="select-wrapper"><select class="select"><option value="" disabled>Select a category</option><option>Compliance</option><option selected>Quality Management</option><option>Risk Assessment</option></select><span class="select-chevron">&#9660;</span></div></div>
+            <div class="form-field"><label>Status Filter</label><div class="select-wrapper"><select class="select"><option selected>All Statuses</option><option>Active</option><option>Pending</option></select><span class="select-chevron">&#9660;</span></div></div>
+            <div class="form-field"><label>Assigned Roles (Chips)</label><div class="multiselect"><span class="chip">Admin <button class="chip-x">&times;</button></span><span class="chip">Editor <button class="chip-x">&times;</button></span><span class="chip">Viewer <button class="chip-x">&times;</button></span><span class="ms-chev">&#9660;</span></div></div>
+            <div class="form-field"><label>Tags (Empty)</label><div class="multiselect"><span class="multiselect-ph">Add tags...</span><span class="ms-chev">&#9660;</span></div></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Select Tokens</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code> #FAF8F4</td></tr>
+            <tr><td>Border</td><td><code>rgba(0,0,0,0.08)</code> barely visible</td></tr>
+            <tr><td>Focus</td><td><code>--tp-primary</code> teal</td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-pill</code> 999px</td></tr>
+            <tr><td>Shadow</td><td><code>none</code> (flat)</td></tr>
+            <tr><td>Panel shadow</td><td><code>--nm-shadow-dialog</code></td></tr>
+            <tr><td>Selected bg</td><td><code>color-mix(primary 14%)</code></td></tr>
+          </table>
+          <h4>Key Props (Select)</h4>
+          <table>
+            <tr><td><code>options</code></td><td>Array of options</td></tr>
+            <tr><td><code>filter</code></td><td>Enable search (&gt;7 items)</td></tr>
+            <tr><td><code>showClear</code></td><td>Allow deselection</td></tr>
+            <tr><td><code>appendTo</code></td><td>"body" (prevent clipping)</td></tr>
+          </table>
+          <h4>MultiSelect Props</h4>
+          <table>
+            <tr><td><code>display</code></td><td>"comma" | "chip"</td></tr>
+            <tr><td><code>maxSelectedLabels</code></td><td>Default 3</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-dont">Never use <code>p-dropdown</code> (deprecated)</li>
+            <li class="spec-do">Use <code>appendTo="body"</code></li>
+            <li class="spec-do">Filter when &gt;7 options</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 5. TABS ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="tabs">
+      <div class="comp-section-header">
+        <h2>5. Tabs</h2>
+        <div class="comp-meta">p-tabs / p-tabList / p-tab &bull; NOT deprecated p-tabView</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="tab-list">
+            <button class="tab active">Overview</button>
+            <button class="tab">License</button>
+            <button class="tab">Auth</button>
+            <button class="tab">Users</button>
+            <button class="tab">Branding</button>
+          </div>
+          <div class="tab-panel">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="card" style="border:1px solid var(--tp-border-light);"><div class="card-body"><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Full Name</div><div style="font-weight:600;">Master Tenant</div></div></div>
+              <div class="card" style="border:1px solid var(--tp-border-light);"><div class="card-body"><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Tier</div><div style="font-weight:600;">Enterprise</div></div></div>
+              <div class="card" style="border:1px solid var(--tp-border-light);"><div class="card-body"><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Users</div><div style="font-weight:600;">24</div></div></div>
+              <div class="card" style="border:1px solid var(--tp-border-light);"><div class="card-body"><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Region</div><div style="font-weight:600;">UAE</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Border</td><td><code>2px solid --tp-border</code></td></tr>
+            <tr><td>Active bar</td><td><code>--tp-primary</code> teal</td></tr>
+            <tr><td>Tab font</td><td>600 weight</td></tr>
+            <tr><td>Tab padding</td><td><code>--tp-space-3</code> / <code>--tp-space-4</code></td></tr>
+          </table>
+          <h4>API (PrimeNG 21)</h4>
+          <table>
+            <tr><td><code>p-tabs</code></td><td>Container, <code>[value]</code></td></tr>
+            <tr><td><code>p-tabList</code></td><td>Header bar, <code>[scrollable]</code></td></tr>
+            <tr><td><code>p-tab</code></td><td>Tab item, <code>[value]</code></td></tr>
+            <tr><td><code>p-tabPanel</code></td><td>Content panel</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use p-tabs API (not p-tabView)</li>
+            <li class="spec-do">3-7 tabs per page</li>
+            <li class="spec-do">Use <code>[scrollable]</code> on mobile</li>
+            <li class="spec-dont">Never use tabs for wizard steps</li>
+            <li class="spec-dont">Never use more than 7 tabs</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 6. DATATABLE (List-Page Pattern) ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="datatable">
+      <div class="comp-section-header">
+        <h2>6. DataTable</h2>
+        <div class="comp-meta">p-table &bull; TableModule &bull; Canonical list-page pattern: toolbar &rarr; table &rarr; paginator</div>
+      </div>
+      <div class="comp-row">
+        <div style="flex:1;min-width:0;">
+          <!-- ── Toolbar (p-toolbar: start / end) ──────────── -->
+          <div class="toolbar" style="margin-block-end:var(--tp-space-4);">
+            <div class="toolbar-start">
+              <div class="input-icon-wrapper" style="min-width:180px;max-width:320px;">
+                <span class="icon-left">&#128269;</span>
+                <input class="input" placeholder="Search..." style="padding-left:2.5rem;width:100%;">
+              </div>
+              <button class="btn btn-icon" title="Toggle filters" aria-label="Toggle filters" style="width:44px;height:44px;border:1px solid var(--tp-border);border-radius:var(--nm-radius-pill);background:var(--tp-surface);color:var(--tp-primary);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></button>
+            </div>
+            <div class="toolbar-end">
+              <button class="toggle-btn" aria-pressed="false"><span>&#9776;</span> Table</button>
+              <button class="btn btn-primary" style="gap:var(--tp-space-2);">+ Add</button>
+            </div>
+          </div>
+          <!-- ── DataTable ────────────────────────────────────── -->
+          <div class="data-table">
+            <table>
+              <thead><tr><th>Name</th><th>Status</th><th>Tier</th><th>Created</th><th style="width:6rem;">Actions</th></tr></thead>
+              <tbody>
+                <tr><td><strong style="color:var(--tp-primary);">DDA</strong></td><td><span class="tag tag-success">active</span></td><td>Free</td><td>Mar 16, 2026</td><td><button class="btn btn-icon" style="width:28px;height:28px;">&#9998;</button><button class="btn btn-icon" style="width:28px;height:28px;color:var(--tp-danger);">&#128465;</button></td></tr>
+                <tr><td><strong style="color:var(--tp-primary);">master</strong><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Master Tenant</div></td><td><span class="tag tag-success">active</span></td><td>Enterprise</td><td>Mar 16, 2026</td><td><button class="btn btn-icon" style="width:28px;height:28px;">&#9998;</button></td></tr>
+                <tr><td><strong style="color:var(--tp-primary);">staging</strong></td><td><span class="tag tag-warning">pending</span></td><td>Standard</td><td>Mar 20, 2026</td><td><button class="btn btn-icon" style="width:28px;height:28px;">&#9998;</button><button class="btn btn-icon" style="width:28px;height:28px;color:var(--tp-danger);">&#128465;</button></td></tr>
+                <tr><td><strong style="color:var(--tp-primary);">acme-corp</strong><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Acme Corp</div></td><td><span class="tag tag-success">active</span></td><td>Enterprise</td><td>Mar 18, 2026</td><td><button class="btn btn-icon" style="width:28px;height:28px;">&#9998;</button><button class="btn btn-icon" style="width:28px;height:28px;color:var(--tp-danger);">&#128465;</button></td></tr>
+                <tr><td><strong style="color:var(--tp-primary);">dev-sandbox</strong></td><td><span class="tag tag-info">provisioning</span></td><td>Free</td><td>Mar 22, 2026</td><td><button class="btn btn-icon" style="width:28px;height:28px;">&#9998;</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- ── Paginator ────────────────────────────────────── -->
+          <div class="paginator" style="margin-block-start:var(--tp-space-4);">
+            <div style="display:flex;align-items:center;gap:0.5rem;"><span class="pag-info">Rows per page:</span><div class="select-wrapper" style="width:65px;"><select class="select" style="padding:0.3rem 1.5rem 0.3rem 0.5rem;min-height:30px;font-size:var(--tp-font-sm);"><option>10</option><option selected>20</option><option>50</option></select><span class="select-chevron" style="right:0.5rem;">&#9660;</span></div></div>
+            <div class="paginator-pages"><button class="pag-btn" disabled>&laquo;</button><button class="pag-btn" disabled>&lsaquo;</button><button class="pag-btn active">1</button><button class="pag-btn">2</button><button class="pag-btn">3</button><button class="pag-btn">&rsaquo;</button><button class="pag-btn">&raquo;</button></div>
+            <span class="pag-info">1&ndash;20 of 47</span>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Pattern: List Page</h4>
+          <table>
+            <tr><td>Layout</td><td>Toolbar &rarr; DataTable &rarr; Paginator</td></tr>
+            <tr><td>Toolbar &rarr; Table gap</td><td><code>--tp-space-4</code></td></tr>
+            <tr><td>Table &rarr; Paginator gap</td><td><code>--tp-space-4</code></td></tr>
+          </table>
+          <h4>Token Map (Toolbar &mdash; p-toolbar)</h4>
+          <table>
+            <tr><td>Background</td><td><code>transparent</code></td></tr>
+            <tr><td>Border</td><td><code>1px solid --tp-border</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius</code></td></tr>
+            <tr><td>Padding</td><td><code>--tp-space-3</code> / <code>--tp-space-4</code></td></tr>
+            <tr><td>Gap</td><td><code>--tp-space-3</code></td></tr>
+            <tr><td>Start</td><td>Search + Filter icon (show/hide)</td></tr>
+            <tr><td>End</td><td>View Toggle + Action</td></tr>
+          </table>
+          <h4>Token Map (Table)</h4>
+          <table>
+            <tr><td>Root border</td><td><code>1px solid --tp-border</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius</code> 16px</td></tr>
+            <tr><td>Background</td><td><code>transparent</code></td></tr>
+            <tr><td>Header bg</td><td><code>--tp-surface</code> #F2EFE9</td></tr>
+            <tr><td>Header border</td><td><code>1px solid --tp-border</code></td></tr>
+            <tr><td>Header font</td><td><code>--tp-font-sm</code> weight 600</td></tr>
+            <tr><td>Body font</td><td><code>--tp-font-md</code></td></tr>
+            <tr><td>Cell padding</td><td><code>--tp-space-3</code> / <code>--tp-space-4</code></td></tr>
+            <tr><td>Row border</td><td><code>--tp-border 50%</code></td></tr>
+            <tr><td>Hover bg</td><td><code>--tp-primary 4%</code></td></tr>
+            <tr><td>Row color</td><td><code>--tp-text</code></td></tr>
+            <tr><td>Sort icon</td><td><code>--tp-grey</code> &rarr; hover <code>--tp-primary</code></td></tr>
+          </table>
+          <h4>Key Props</h4>
+          <table>
+            <tr><td><code>lazy</code></td><td>Server-side loading</td></tr>
+            <tr><td><code>paginator</code></td><td>Built-in pagination</td></tr>
+            <tr><td><code>rows</code></td><td>Default 20</td></tr>
+            <tr><td><code>rowHover</code></td><td>Highlight on hover</td></tr>
+            <tr><td><code>selectionMode</code></td><td>single | multiple</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Always show toolbar with search + filters</li>
+            <li class="spec-do">Always provide <code>emptymessage</code> template</li>
+            <li class="spec-do">Use <code>lazy</code> for &gt;50 rows</li>
+            <li class="spec-do">Include view toggle (table/grid) on pages with card view</li>
+            <li class="spec-dont">Never show table on mobile &lt;768px</li>
+            <li class="spec-dont">Never exceed 6-7 visible columns</li>
+            <li class="spec-dont">Never omit paginator on list pages</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 7. PAGINATOR ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="paginator">
+      <div class="comp-section-header">
+        <h2>7. Paginator</h2>
+        <div class="comp-meta">p-paginator &bull; PaginatorModule &bull; Standard for all list pages</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="paginator">
+              <div style="display:flex;align-items:center;gap:0.5rem;"><span class="pag-info">Rows per page:</span><div class="select-wrapper" style="width:65px;"><select class="select" style="padding:0.3rem 1.5rem 0.3rem 0.5rem;min-height:30px;font-size:0.78rem;"><option>10</option><option selected>20</option><option>50</option></select><span class="select-chevron" style="right:0.5rem;">&#9660;</span></div></div>
+              <div class="paginator-pages"><button class="pag-btn" disabled>&laquo;</button><button class="pag-btn" disabled>&lsaquo;</button><button class="pag-btn active">1</button><button class="pag-btn">2</button><button class="pag-btn">3</button><button class="pag-btn">&rsaquo;</button><button class="pag-btn">&raquo;</button></div>
+              <span class="pag-info">1&ndash;20 of 47</span>
+            </div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Key Props</h4>
+          <table>
+            <tr><td><code>rows</code></td><td>Items per page (default 20)</td></tr>
+            <tr><td><code>totalRecords</code></td><td>Total count</td></tr>
+            <tr><td><code>rowsPerPageOptions</code></td><td>[10, 20, 50]</td></tr>
+            <tr><td><code>showCurrentPageReport</code></td><td>"Showing X to Y of Z"</td></tr>
+            <tr><td><code>pageLinkSize</code></td><td>Default 5</td></tr>
+          </table>
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>transparent</code></td></tr>
+            <tr><td>Touch target</td><td>Min 44&times;44px</td></tr>
+            <tr><td>Active page</td><td><code>--tp-primary</code></td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Always show page report</li>
+            <li class="spec-do">Offer [10, 20, 50] options</li>
+            <li class="spec-dont">Never build custom pagination</li>
+            <li class="spec-dont">Never use "Load More" pattern</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 8. DIALOG ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="dialog">
+      <div class="comp-section-header">
+        <h2>8. Dialog</h2>
+        <div class="comp-meta">p-dialog &bull; DialogModule &bull; Modal overlays with form/confirm content</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div style="display:grid;gap:1rem;">
+            <div class="dialog-backdrop">
+              <div class="dialog">
+                <div class="dialog-header"><h4>Create Object Type</h4><button class="dialog-close">&times;</button></div>
+                <div class="dialog-content" style="display:grid;gap:var(--tp-space-4);"><div class="form-field"><label>Name *</label><input class="input" placeholder="Enter name..."></div><div class="form-field"><label>Description</label><textarea class="input" rows="2" placeholder="Describe..."></textarea></div></div>
+                <div class="dialog-footer"><button class="btn btn-text">Cancel</button><button class="btn btn-primary">Create</button></div>
+              </div>
+            </div>
+            <div class="dialog-backdrop">
+              <div class="dialog" style="max-width:380px;">
+                <div class="dialog-header"><h4>Confirm Delete</h4><button class="dialog-close">&times;</button></div>
+                <div class="dialog-content"><div style="display:flex;gap:var(--tp-space-3);"><span style="color:var(--tp-danger);font-size:1.5rem;">&#9888;</span><p>Are you sure you want to delete <strong>DDA</strong>? This cannot be undone.</p></div></div>
+                <div class="dialog-footer"><button class="btn btn-text">Cancel</button><button class="btn btn-danger">Delete</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Radius</td><td><code>--nm-radius</code> 16px</td></tr>
+            <tr><td>Header bg</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Header border</td><td><code>1px --tp-border</code></td></tr>
+            <tr><td>Content padding</td><td><code>--tp-space-6</code></td></tr>
+            <tr><td>Mask</td><td><code>rgba(22,22,22,0.5)</code></td></tr>
+            <tr><td>Max width</td><td>600px desktop</td></tr>
+            <tr><td>Breakpoint</td><td>90vw at 768px</td></tr>
+          </table>
+          <h4>Key Props</h4>
+          <table>
+            <tr><td><code>modal</code></td><td>Focus trap + backdrop</td></tr>
+            <tr><td><code>closable</code></td><td>Show close button</td></tr>
+            <tr><td><code>closeOnEscape</code></td><td>Escape key closes</td></tr>
+            <tr><td><code>breakpoints</code></td><td>Responsive widths</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Always <code>[modal]="true"</code></li>
+            <li class="spec-do">Primary action right-aligned</li>
+            <li class="spec-do">Use danger severity for destructive</li>
+            <li class="spec-dont">Never nest dialogs</li>
+            <li class="spec-dont">Never use for notifications (use toast)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 9. TOAST ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="toast">
+      <div class="comp-section-header">
+        <h2>9. Toast</h2>
+        <div class="comp-meta">p-toast &bull; MessageService &bull; Soft tinted backgrounds, non-blocking</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="toast toast-success"><span class="toast-icon">&#10003;</span><div class="toast-content"><div class="toast-summary">Created</div><div class="toast-detail">Object type "Quality Check" created.</div></div><button class="toast-close">&times;</button></div>
+            <div class="toast toast-error"><span class="toast-icon">&#10007;</span><div class="toast-content"><div class="toast-summary">Error</div><div class="toast-detail">Failed to save changes.</div></div><button class="toast-close">&times;</button></div>
+            <div class="toast toast-warn"><span class="toast-icon">&#9888;</span><div class="toast-content"><div class="toast-summary">Warning</div><div class="toast-detail">Active references exist.</div></div><button class="toast-close">&times;</button></div>
+            <div class="toast toast-info"><span class="toast-icon">&#8505;</span><div class="toast-content"><div class="toast-summary">Info</div><div class="toast-detail">License expires in 30 days.</div></div><button class="toast-close">&times;</button></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Severity Tokens</h4>
+          <table>
+            <tr><th>Severity</th><th>Bg</th><th>Text</th></tr>
+            <tr><td>success</td><td><code>#428177 8%</code></td><td><code>#054239</code></td></tr>
+            <tr><td>error</td><td><code>#ef4444 8%</code></td><td><code>#b91c1c</code></td></tr>
+            <tr><td>warn</td><td><code>#988561 8%</code></td><td><code>#5a4a2a</code></td></tr>
+            <tr><td>info</td><td><code>#054239 8%</code></td><td><code>#054239</code></td></tr>
+          </table>
+          <h4>Key Props</h4>
+          <table>
+            <tr><td><code>position</code></td><td>top-right (default)</td></tr>
+            <tr><td><code>life</code></td><td>4000ms success, 6000ms error</td></tr>
+            <tr><td><code>sticky</code></td><td>No auto-dismiss</td></tr>
+          </table>
+          <h4>Styling</h4>
+          <table>
+            <tr><td>Radius</td><td>8px</td></tr>
+            <tr><td>Padding</td><td>10px 14px</td></tr>
+            <tr><td>Summary</td><td>700 weight, 1rem</td></tr>
+            <tr><td>Detail</td><td>0.8rem</td></tr>
+            <tr><td>Close btn</td><td>28&times;28px</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use CSS tokens only (no <code>[pt]</code>)</li>
+            <li class="spec-do">Sticky for critical errors</li>
+            <li class="spec-dont">Never &lt;3000ms life</li>
+            <li class="spec-dont">Never &gt;3 simultaneous</li>
+            <li class="spec-dont">Never use for form validation</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 10. MESSAGE ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="message">
+      <div class="comp-section-header">
+        <h2>10. Message</h2>
+        <div class="comp-meta">p-message &bull; MessageModule &bull; Inline validation &amp; contextual alerts</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="message msg-success"><span class="msg-icon">&#10003;</span> Tenant settings saved successfully.</div>
+            <div class="message msg-error"><span class="msg-icon">&#10007;</span> Please fix the errors below before saving.</div>
+            <div class="message msg-warn"><span class="msg-icon">&#9888;</span> This auth source has no assigned providers.</div>
+            <div class="message msg-info"><span class="msg-icon">&#8505;</span> Multiple auth sources can operate simultaneously.</div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Props</h4>
+          <table>
+            <tr><td><code>severity</code></td><td>success | info | warn | error | secondary</td></tr>
+            <tr><td><code>text</code></td><td>Message text</td></tr>
+            <tr><td><code>closable</code></td><td>Show dismiss button</td></tr>
+            <tr><td><code>size</code></td><td>small | large</td></tr>
+          </table>
+          <h4>Token Map</h4>
+          <p style="margin-bottom:0.25rem;">Reuses toast severity tokens:</p>
+          <table>
+            <tr><td>Background</td><td><code>--tp-toast-*-bg</code></td></tr>
+            <tr><td>Border</td><td><code>--tp-toast-*-border</code></td></tr>
+            <tr><td>Text</td><td><code>--tp-toast-*-text</code></td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>role="alert"</code> for errors</li>
+            <li class="spec-do"><code>[closable]</code> for success msgs</li>
+            <li class="spec-dont">Never use for transient notifications</li>
+            <li class="spec-dont">Never stack &gt;3 messages</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 11. MENU ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="menu">
+      <div class="comp-section-header">
+        <h2>11. Menu</h2>
+        <div class="comp-meta">p-menu, p-menubar, p-tieredMenu &bull; Popup action menus</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="flex-direction:row;align-items:flex-start;gap:2rem;">
+            <div class="menu">
+              <div class="menu-item"><span class="menu-item-icon">&#128065;</span> View</div>
+              <div class="menu-item"><span class="menu-item-icon">&#9998;</span> Edit</div>
+              <div class="menu-item"><span class="menu-item-icon">&#128203;</span> Duplicate</div>
+              <div class="menu-sep"></div>
+              <div class="menu-item menu-item-danger"><span class="menu-item-icon">&#128465;</span> Delete</div>
+            </div>
+            <div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Triggered by:<br><button class="btn btn-icon" style="border:1px solid var(--tp-border);border-radius:var(--nm-radius-sm);margin-top:0.5rem;" title="More">&#8942;</button></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Border</td><td><code>--tp-border</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-sm</code> 8px</td></tr>
+            <tr><td>Shadow</td><td><code>--nm-shadow-dialog</code></td></tr>
+            <tr><td>Item height</td><td>Min 44px</td></tr>
+            <tr><td>Hover</td><td><code>--tp-primary 6%</code></td></tr>
+          </table>
+          <h4>MenuItem Interface</h4>
+          <table>
+            <tr><td><code>label</code></td><td>Display text</td></tr>
+            <tr><td><code>icon</code></td><td>PrimeIcons class</td></tr>
+            <tr><td><code>command</code></td><td>Click handler</td></tr>
+            <tr><td><code>separator</code></td><td>Divider line</td></tr>
+            <tr><td><code>routerLink</code></td><td>Angular route</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>appendTo="body"</code></li>
+            <li class="spec-do">Destructive actions last, after separator</li>
+            <li class="spec-dont">Never &gt;8 items per level</li>
+            <li class="spec-dont">Never &gt;2 levels of nesting</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 12. DATEPICKER ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="datepicker">
+      <div class="comp-section-header">
+        <h2>12. DatePicker</h2>
+        <div class="comp-meta">p-datePicker &bull; DatePickerModule &bull; Calendar overlay with Grey Neutral panel</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="flex-direction:row;flex-wrap:wrap;align-items:start;gap:1.5rem;">
+            <div class="form-field" style="flex:1;min-width:200px;"><label>Start Date</label><div style="position:relative;"><input class="input" value="22/03/2026" style="padding-right:2.5rem;"><button style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--tp-grey);cursor:pointer;">&#128197;</button></div></div>
+            <div class="calendar-panel">
+              <div class="cal-head"><button class="cal-nav">&lsaquo;</button><span>March 2026</span><button class="cal-nav">&rsaquo;</button></div>
+              <div class="cal-grid">
+                <span class="cal-wd">Su</span><span class="cal-wd">Mo</span><span class="cal-wd">Tu</span><span class="cal-wd">We</span><span class="cal-wd">Th</span><span class="cal-wd">Fr</span><span class="cal-wd">Sa</span>
+                <button class="cal-d">1</button><button class="cal-d">2</button><button class="cal-d">3</button><button class="cal-d">4</button><button class="cal-d">5</button><button class="cal-d">6</button><button class="cal-d">7</button>
+                <button class="cal-d">8</button><button class="cal-d">9</button><button class="cal-d">10</button><button class="cal-d">11</button><button class="cal-d">12</button><button class="cal-d">13</button><button class="cal-d">14</button>
+                <button class="cal-d">15</button><button class="cal-d">16</button><button class="cal-d">17</button><button class="cal-d">18</button><button class="cal-d">19</button><button class="cal-d">20</button><button class="cal-d">21</button>
+                <button class="cal-d selected">22</button><button class="cal-d today">23</button><button class="cal-d">24</button><button class="cal-d">25</button><button class="cal-d">26</button><button class="cal-d">27</button><button class="cal-d">28</button>
+                <button class="cal-d">29</button><button class="cal-d">30</button><button class="cal-d">31</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Panel bg</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Panel border</td><td><code>--tp-border</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-md</code> 12px</td></tr>
+            <tr><td>Selected bg</td><td><code>--tp-primary</code></td></tr>
+            <tr><td>Today bg</td><td><code>--tp-primary 12%</code></td></tr>
+            <tr><td>Hover bg</td><td><code>--tp-primary 8%</code></td></tr>
+            <tr><td>Weekday color</td><td><code>--tp-grey</code></td></tr>
+          </table>
+          <h4>Variants</h4>
+          <table>
+            <tr><td>Basic</td><td>Single date</td></tr>
+            <tr><td><code>showTime</code></td><td>Date + time</td></tr>
+            <tr><td><code>selectionMode="range"</code></td><td>Start-to-end</td></tr>
+            <tr><td><code>inline</code></td><td>Always visible</td></tr>
+            <tr><td><code>showIcon</code></td><td>Calendar icon trigger</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>appendTo="body"</code></li>
+            <li class="spec-do">Set <code>minDate</code>/<code>maxDate</code></li>
+            <li class="spec-dont">Never use text input for dates</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 13. FIELDSET ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="fieldset">
+      <div class="comp-section-header">
+        <h2>13. Fieldset</h2>
+        <div class="comp-meta">p-fieldset &bull; FieldsetModule &bull; Collapsible form groups with legend</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body">
+            <div class="fieldset"><div class="fieldset-legend">Contact Information</div><div class="fieldset-content" style="display:grid;gap:var(--tp-space-4);"><div class="form-field"><label>Email</label><input class="input" placeholder="user@example.com"></div><div class="form-field"><label>Phone</label><input class="input" placeholder="+971 50 123 4567"></div></div></div>
+            <div class="fieldset"><div class="fieldset-legend">Advanced Settings <button class="fieldset-toggle">&#9660; Expand</button></div></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Border</td><td><code>--tp-border-light</code></td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-lg</code> 16px</td></tr>
+            <tr><td>Legend bg</td><td><code>--tp-surface</code> #F2EFE9</td></tr>
+            <tr><td>Legend text</td><td><code>--tp-text-dark</code> 600</td></tr>
+          </table>
+          <h4>Props</h4>
+          <table>
+            <tr><td><code>legend</code></td><td>Section header text</td></tr>
+            <tr><td><code>toggleable</code></td><td>Allow collapse/expand</td></tr>
+            <tr><td><code>collapsed</code></td><td>Initial state</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use for form field groups (3-6 fields)</li>
+            <li class="spec-do">Toggleable for optional/advanced</li>
+            <li class="spec-dont">Never nest fieldsets &gt;1 deep</li>
+            <li class="spec-dont">Never hide required fields collapsed</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 14. TOGGLESWITCH ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="toggleswitch">
+      <div class="comp-section-header">
+        <h2>14. ToggleSwitch</h2>
+        <div class="comp-meta">p-toggleSwitch &bull; ToggleSwitchModule &bull; Binary on/off with teal active</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1.25rem;max-width:340px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:600;">Active</div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;">Email Notifications</div><div style="color:var(--tp-text-muted);font-size:var(--tp-font-sm);">Receive alerts for events</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-weight:600;">Compact Navigation</div><div style="color:var(--tp-text-muted);font-size:var(--tp-font-sm);">Reduce sidebar width</div></div><label class="toggle"><input type="checkbox"><span class="toggle-track"></span></label></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:600;">Soft Shadows</div><label class="toggle"><input type="checkbox" checked><span class="toggle-track"></span></label></div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Unchecked track</td><td><code>--nm-surface</code> #E0DDDA</td></tr>
+            <tr><td>Checked track</td><td><code>--tp-primary</code> teal</td></tr>
+            <tr><td>Checked hover</td><td><code>--tp-primary-dark</code></td></tr>
+            <tr><td>Handle</td><td><code>--tp-surface-raised</code></td></tr>
+            <tr><td>Border radius</td><td><code>--nm-radius-pill</code></td></tr>
+          </table>
+          <h4>Props</h4>
+          <table>
+            <tr><td><code>disabled</code></td><td>Disable interaction</td></tr>
+            <tr><td><code>trueValue</code></td><td>Value when on</td></tr>
+            <tr><td><code>falseValue</code></td><td>Value when off</td></tr>
+          </table>
+          <h4>Accessibility</h4>
+          <ul>
+            <li><code>role="switch"</code>, <code>aria-checked</code> auto</li>
+            <li>Space key toggles (built-in)</li>
+            <li>Min 44px touch area</li>
+          </ul>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Always pair with visible label</li>
+            <li class="spec-do">Place toggle right of label</li>
+            <li class="spec-dont">Never use for named option pairs (use radio)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 15. STEPPER / WIZARD ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="stepper">
+      <div class="comp-section-header">
+        <h2>15. Stepper / Wizard Dialog</h2>
+        <div class="comp-meta">Multi-step dialog pattern &bull; Auth Source &amp; Object Type wizards</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="dialog-backdrop">
+            <div class="dialog" style="max-width:520px;">
+              <div class="dialog-header"><div><h4>Add Authentication Source</h4><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Define a new IdP for your tenants</div></div><button class="dialog-close">&times;</button></div>
+              <div class="stepper">
+                <div class="step active"><span class="step-num">1</span> Protocol</div><div class="step-line"></div>
+                <div class="step"><span class="step-num">2</span> Connection</div><div class="step-line"></div>
+                <div class="step"><span class="step-num">3</span> Mapping</div><div class="step-line"></div>
+                <div class="step"><span class="step-num">4</span> Review</div>
+              </div>
+              <div class="dialog-content">
+                <div class="form-field" style="margin-bottom:0.75rem;"><label>Source Display Name *</label><input class="input" placeholder="e.g. Corporate Active Directory"></div>
+                <div class="message msg-info" style="margin-bottom:1rem;"><span class="msg-icon">&#8505;</span> Multiple auth sources can operate simultaneously.</div>
+                <div style="font-weight:700;color:var(--tp-text-dark);margin-bottom:0.5rem;">Select Protocol</div>
+                <div style="display:grid;gap:0.5rem;">
+                  <div class="card" style="cursor:pointer;border-color:var(--tp-primary);background:color-mix(in srgb, var(--tp-primary) 4%, var(--tp-surface-raised));"><div class="card-body" style="padding:var(--tp-space-3);display:flex;gap:var(--tp-space-3);align-items:center;"><span style="font-size:1.25rem;color:var(--tp-primary);">&#128274;</span><div><div style="font-weight:600;">LDAP / Active Directory</div><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">On-premise directory services</div></div></div></div>
+                  <div class="card" style="cursor:pointer;"><div class="card-body" style="padding:var(--tp-space-3);display:flex;gap:var(--tp-space-3);align-items:center;"><span style="font-size:1.25rem;color:var(--tp-grey);">&#128279;</span><div><div style="font-weight:600;">SAML 2.0</div><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">ADFS, Shibboleth, Ping Identity</div></div></div></div>
+                  <div class="card" style="cursor:pointer;"><div class="card-body" style="padding:var(--tp-space-3);display:flex;gap:var(--tp-space-3);align-items:center;"><span style="font-size:1.25rem;color:var(--tp-grey);">&#128273;</span><div><div style="font-weight:600;">OpenID Connect</div><div style="font-size:var(--tp-font-sm);color:var(--tp-text-muted);">Keycloak, Auth0, Azure AD</div></div></div></div>
+                </div>
+              </div>
+              <div class="dialog-footer"><button class="btn btn-text">Cancel</button><button class="btn btn-primary">Next &rarr;</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Stepper Pattern</h4>
+          <table>
+            <tr><td>Active step</td><td><code>--tp-primary</code> bg, white text</td></tr>
+            <tr><td>Inactive step</td><td><code>--tp-border</code> bg, muted text</td></tr>
+            <tr><td>Connector line</td><td><code>--tp-border</code> 2px</td></tr>
+            <tr><td>Step number</td><td>24&times;24px circle</td></tr>
+          </table>
+          <h4>Selectable Card List</h4>
+          <table>
+            <tr><td>Selected border</td><td><code>--tp-primary</code></td></tr>
+            <tr><td>Selected bg</td><td><code>--tp-primary 4%</code></td></tr>
+            <tr><td>Icon size</td><td>1.25rem</td></tr>
+            <tr><td>Layout</td><td>Icon + title + subtitle</td></tr>
+          </table>
+          <h4>Info Banner</h4>
+          <table>
+            <tr><td>Class</td><td><code>.tp-banner .tp-banner-info</code></td></tr>
+            <tr><td>Background</td><td>Soft tinted 8%</td></tr>
+            <tr><td>Radius</td><td><code>--nm-radius-sm</code> 8px</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use p-stepper for sequential flows</li>
+            <li class="spec-do">Keep to 3-5 steps max</li>
+            <li class="spec-do">Next/Cancel in dialog footer</li>
+            <li class="spec-dont">Never use tabs for wizard steps</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 16. LOGIN PAGE ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="login">
+      <div class="comp-section-header">
+        <h2>16. Login Page</h2>
+        <div class="comp-meta">Full-page auth shell &bull; Teal neumorphic surface &bull; /auth/login</div>
+      </div>
+      <div class="comp-row">
+
+        <!-- ── Visual: Login Page ── -->
+        <div class="comp-visual" style="padding:0; overflow:hidden; border-radius:var(--nm-radius-lg); min-height:740px; background:var(--tp-primary);">
+          <div style="
+            min-height:740px; width:100%; position:relative; overflow:hidden;
+            background: var(--tp-primary); color: var(--tp-bg);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            text-align:center; padding: 2.5rem 1.5rem 3rem;
+          ">
+            <!-- Background pattern (exact copy from login.page.scss) -->
+            <div style="
+              position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0.13;
+              background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23FAF8F5' stroke-width='1.2'%3E%3Cpath d='M60 8L70 30L92 20L82 42L112 60L82 78L92 100L70 90L60 112L50 90L28 100L38 78L8 60L38 42L28 20L50 30Z'/%3E%3Cpath d='M50 30L70 30L82 42L82 78L70 90L50 90L38 78L38 42Z'/%3E%3Cpath d='M60 38L74 60L60 82L46 60Z'/%3E%3Crect x='50' y='50' width='20' height='20' transform='rotate(45 60 60)'/%3E%3Cpath d='M0 0L10 22L22 10Z M120 0L110 22L98 10Z M0 120L10 98L22 110Z M120 120L110 98L98 110Z'/%3E%3Cpath d='M60 0L70 10L60 20L50 10Z M60 100L70 110L60 120L50 110Z M0 60L10 50L20 60L10 70Z M100 60L110 50L120 60L110 70Z'/%3E%3Cpath d='M22 10L38 42 M98 10L82 42 M22 110L38 78 M98 110L82 78'/%3E%3Cpath d='M10 22L42 38 M10 98L42 78 M110 22L78 38 M110 98L78 78'/%3E%3C/g%3E%3C/svg%3E&quot;);
+              background-size: 120px 120px; background-repeat: repeat;
+            "></div>
+
+            <!-- Content -->
+            <div style="position:relative; z-index:1; width:100%; max-width:420px;">
+              <!-- Logo wordmark -->
+              <div style="
+                display:inline-flex; align-items:center; justify-content:center;
+                min-width:150px; min-height:44px; padding:0.25rem 0.75rem;
+                border-radius:999px; font-size:2rem; font-weight:700;
+                letter-spacing:0.01em; text-transform:lowercase;
+                border: 1px solid color-mix(in srgb, var(--tp-surface-light) 20%, transparent);
+                box-shadow: 6px 6px 16px color-mix(in srgb, var(--tp-primary-dark) 36%, transparent),
+                           -6px -6px 16px color-mix(in srgb, var(--tp-primary) 34%, transparent);
+                margin-bottom:1rem;
+              ">think+</div>
+
+              <!-- Title & subtitle -->
+              <h3 style="font-size:2.2rem; font-weight:600; letter-spacing:0.01em; color:var(--tp-bg); margin:0;">Welcome to master</h3>
+              <p style="margin:0.5rem 0 2rem; font-size:var(--tp-font-lg); color:color-mix(in srgb, var(--tp-bg) 82%, transparent);">Empower. Transform. Succeed.</p>
+
+              <!-- Form card (opaque teal panel with deep shadow — matches login.page.scss) -->
+              <div style="
+                width:100%; text-align:left;
+                padding: 2.5rem 2.25rem 2rem;
+                border-radius: 24px;
+                border: 1px solid transparent;
+                background-color: var(--tp-primary);
+                box-shadow: 14px 14px 28px color-mix(in srgb, var(--tp-primary-dark) 42%, transparent);
+                display:grid; gap:1.25rem;
+              ">
+                <!-- Email field -->
+                <div style="display:grid; gap:0.5rem;">
+                  <label style="color:color-mix(in srgb, var(--tp-bg) 96%, transparent); font-size:var(--tp-font-md); font-weight:700; letter-spacing:0.01em; margin-inline-start:0.5rem;">Email or Username</label>
+                  <div style="position:relative;">
+                    <input type="text" placeholder="Enter your username" style="
+                      height:56px; width:100%; padding-inline-start:3rem; padding-inline-end:1rem;
+                      border:1px solid color-mix(in srgb, var(--tp-surface-light) 10%, transparent);
+                      outline:none; font-size:var(--tp-font-lg); font-family:inherit;
+                      background:var(--tp-primary); color:var(--tp-bg); border-radius:28px;
+                      box-shadow: inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 20%, transparent),
+                                  inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 10%, transparent);
+                    ">
+                    <span style="position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%); width:50px; height:50px; display:inline-flex; align-items:center; justify-content:center; pointer-events:none; color:color-mix(in srgb, var(--tp-bg) 78%, transparent);">
+                      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:currentColor;">
+                        <path d="M256 0c-74.439 0-135 60.561-135 135s60.561 135 135 135 135-60.561 135-135S330.439 0 256 0zM423.966 358.195C387.006 320.667 338.009 300 286 300h-60c-52.008 0-101.006 20.667-137.966 58.195C51.255 395.539 31 444.833 31 497c0 8.284 6.716 15 15 15h420c8.284 0 15-6.716 15-15 0-52.167-20.255-101.461-57.034-138.805z" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Password field -->
+                <div style="display:grid; gap:0.5rem;">
+                  <label style="color:color-mix(in srgb, var(--tp-bg) 96%, transparent); font-size:var(--tp-font-md); font-weight:700; letter-spacing:0.01em; margin-inline-start:0.5rem;">Password</label>
+                  <div style="position:relative;">
+                    <input type="password" placeholder="Enter your password" style="
+                      height:56px; width:100%; padding-inline-start:3rem; padding-inline-end:3.5rem;
+                      border:1px solid color-mix(in srgb, var(--tp-surface-light) 10%, transparent);
+                      outline:none; font-size:var(--tp-font-lg); font-family:inherit;
+                      background:var(--tp-primary); color:var(--tp-bg); border-radius:28px;
+                      box-shadow: inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 20%, transparent),
+                                  inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 10%, transparent);
+                    ">
+                    <span style="position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%); width:50px; height:50px; display:inline-flex; align-items:center; justify-content:center; pointer-events:none; color:color-mix(in srgb, var(--tp-bg) 78%, transparent);">
+                      <svg viewBox="0 0 384 512" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:currentColor;">
+                        <path d="M336 192h-16v-64C320 57.406 262.594 0 192 0S64 57.406 64 128v64H48c-26.453 0-48 21.523-48 48v224c0 26.477 21.547 48 48 48h288c26.453 0 48-21.523 48-48V240c0-26.477-21.547-48-48-48zm-229.332-64c0-47.063 38.27-85.332 85.332-85.332s85.332 38.27 85.332 85.332v64H106.668z" />
+                      </svg>
+                    </span>
+                    <button type="button" style="position:absolute; top:50%; inset-inline-end:0.5rem; transform:translateY(-50%); width:44px; height:44px; border:none; border-radius:999px; background:transparent; cursor:pointer; color:color-mix(in srgb, var(--tp-bg) 78%, transparent); display:inline-flex; align-items:center; justify-content:center;">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Tenant ID field -->
+                <div style="display:grid; gap:0.5rem;">
+                  <label style="color:color-mix(in srgb, var(--tp-bg) 96%, transparent); font-size:var(--tp-font-md); font-weight:700; letter-spacing:0.01em; margin-inline-start:0.5rem;">Tenant ID</label>
+                  <div style="position:relative;">
+                    <input type="text" placeholder="Enter tenant identifier" style="
+                      height:56px; width:100%; padding-inline-start:3rem; padding-inline-end:1rem;
+                      border:1px solid color-mix(in srgb, var(--tp-surface-light) 10%, transparent);
+                      outline:none; font-size:var(--tp-font-lg); font-family:inherit;
+                      background:var(--tp-primary); color:var(--tp-bg); border-radius:28px;
+                      box-shadow: inset 1px 1px 2px color-mix(in srgb, var(--tp-primary-dark) 20%, transparent),
+                                  inset -1px -1px 2px color-mix(in srgb, var(--tp-primary) 10%, transparent);
+                    ">
+                    <span style="position:absolute; inset-inline-start:0; top:50%; transform:translateY(-50%); width:50px; height:50px; display:inline-flex; align-items:center; justify-content:center; pointer-events:none; color:color-mix(in srgb, var(--tp-bg) 78%, transparent);">
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:currentColor;">
+                        <path d="M12 3l8 6v10a2 2 0 0 1-2 2h-4v-6h-4v6H6a2 2 0 0 1-2-2V9l8-6z" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Submit button -->
+                <button type="button" style="
+                  width:100%; min-height:58px;
+                  border:1px solid color-mix(in srgb, var(--tp-surface-light) 14%, transparent);
+                  border-radius:28px; background:var(--tp-primary); color:var(--tp-bg);
+                  font-family:inherit; font-size:var(--tp-font-lg); font-weight:700; cursor:pointer;
+                  box-shadow: 7px 7px 14px color-mix(in srgb, var(--tp-primary-dark) 52%, transparent),
+                              -6px -6px 12px color-mix(in srgb, var(--tp-primary) 24%, transparent);
+                ">Sign In</button>
+
+                <!-- Back button -->
+                <button type="button" style="
+                  min-height:44px; padding:0.25rem 1rem;
+                  border:1px solid color-mix(in srgb, var(--tp-surface-light) 12%, transparent);
+                  border-radius:28px; background:var(--tp-primary); color:var(--tp-bg);
+                  font-family:inherit; font-size:var(--tp-font-md); font-weight:600; cursor:pointer;
+                  justify-self:start; display:inline-flex; align-items:center; gap:0.25rem;
+                  box-shadow: 5px 5px 12px color-mix(in srgb, var(--tp-primary-dark) 52%, transparent),
+                              -5px -5px 12px color-mix(in srgb, var(--tp-primary) 34%, transparent);
+                ">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;" aria-hidden="true">
+                    <path d="M15 18l-6-6 6-6"></path>
+                  </svg>
+                  Back
+                </button>
+              </div>
+
+              <!-- Help text -->
+              <p style="margin-top:1.25rem; font-size:var(--tp-font-md); color:color-mix(in srgb, var(--tp-bg) 64%, transparent);">
+                Having trouble signing in? <a href="#" style="color:var(--tp-bg); text-decoration:underline; text-underline-offset:2px;">Contact support</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Spec Panel ── -->
+        <div class="spec-panel">
+          <h4>Login Shell</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-primary</code> (#428177 teal)</td></tr>
+            <tr><td>Text color</td><td><code>--tp-bg</code> (#F2EFE9 cream)</td></tr>
+            <tr><td>Pattern overlay</td><td>SVG repeat, <code>opacity: 0.13</code></td></tr>
+            <tr><td>Min height</td><td><code>100vh</code></td></tr>
+            <tr><td>Content width</td><td><code>560px</code> max</td></tr>
+          </table>
+
+          <h4>Logo Wordmark</h4>
+          <table>
+            <tr><td>Radius</td><td><code>999px</code> (pill)</td></tr>
+            <tr><td>Font size</td><td><code>2rem</code></td></tr>
+            <tr><td>Shadow</td><td>Neumorphic raised (dark + light)</td></tr>
+            <tr><td>Border</td><td><code>--tp-surface-light 20%</code></td></tr>
+          </table>
+
+          <h4>Neumorphic Inputs</h4>
+          <table>
+            <tr><td>Height</td><td><code>56px</code> (desktop)</td></tr>
+            <tr><td>Radius</td><td><code>28px</code> (pill)</td></tr>
+            <tr><td>Background</td><td><code>--tp-primary</code> (same as shell)</td></tr>
+            <tr><td>Shadow</td><td>Inset neumorphic (dark inset + light inset)</td></tr>
+            <tr><td>Border</td><td><code>--tp-surface-light 10%</code></td></tr>
+            <tr><td>Icon size</td><td><code>18px</code> in 50px hit area</td></tr>
+            <tr><td>Placeholder</td><td><code>--tp-bg 54%</code></td></tr>
+          </table>
+
+          <h4>Form Card</h4>
+          <table>
+            <tr><td>Radius</td><td><code>--nm-radius-xl</code> (24px)</td></tr>
+            <tr><td>Shadow</td><td>One-directional deep: <code>14px 14px 28px</code></td></tr>
+            <tr><td>Padding</td><td><code>--tp-space-10</code> top, <code>--tp-space-8</code> sides</td></tr>
+            <tr><td>Field gap</td><td><code>--tp-space-5</code> (1.25rem)</td></tr>
+          </table>
+
+          <h4>Action Buttons</h4>
+          <table>
+            <tr><td>Min height</td><td>Submit <code>58px</code>, Back <code>44px</code></td></tr>
+            <tr><td>Radius</td><td><code>28px</code> (pill)</td></tr>
+            <tr><td>Shadow</td><td>Neumorphic raised (dual-tone)</td></tr>
+            <tr><td>Hover</td><td><code>translateY(-1px)</code> + stronger shadow</td></tr>
+            <tr><td>Active</td><td>Inset shadow (pressed feel)</td></tr>
+          </table>
+
+          <h4>Responsive</h4>
+          <table>
+            <tr><td>&le; 768px</td><td>Input <code>48px</code>, radius <code>--nm-radius-xl</code></td></tr>
+            <tr><td>&le; 480px</td><td>Input <code>46px</code>, tighter padding</td></tr>
+            <tr><td>&le; 375px</td><td>Input <code>44px</code>, smallest scale</td></tr>
+          </table>
+
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Teal neumorphic surface — inverted palette from admin</li>
+            <li class="spec-do">SVG geometric pattern at low opacity</li>
+            <li class="spec-do">All focus indicators use <code>--tp-bg</code> outline</li>
+            <li class="spec-do">44px minimum touch targets on all controls</li>
+            <li class="spec-do">Password toggle with eye icon in hit area</li>
+            <li class="spec-dont">Never use cream/raised surface on login shell</li>
+            <li class="spec-dont">Never remove the neumorphic inset on login inputs</li>
+            <li class="spec-dont">Never use admin flat-card tokens here</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════ 17. TYPOGRAPHY ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="typography">
+      <div class="comp-section-header">
+        <h2>17. Typography</h2>
+        <div class="comp-meta">Gotham Rounded &bull; 5-step type scale &bull; 3 weights</div>
+      </div>
+      <div class="comp-row">
+
+        <!-- ── Visual: Typography specimens ── -->
+        <div class="comp-visual">
+          <!-- Font stack -->
+          <div style="margin-bottom:1.5rem;">
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.5rem;">Font Family</div>
+            <div style="font-size:2rem; font-weight:700; color:var(--tp-text-dark); letter-spacing:0.01em;">Gotham Rounded</div>
+            <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-top:0.25rem;">Fallbacks: Nunito &rarr; Segoe UI &rarr; system</div>
+          </div>
+
+          <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:1.25rem 0;">
+
+          <!-- Weight specimens -->
+          <div style="margin-bottom:1.5rem;">
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Font Weights</div>
+            <div style="display:grid; gap:0.75rem;">
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <span style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); min-width:40px;">400</span>
+                <span style="font-size:var(--tp-font-lg); font-weight:400; color:var(--tp-text);">Book — Body text, labels, secondary content</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <span style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); min-width:40px;">600</span>
+                <span style="font-size:var(--tp-font-lg); font-weight:600; color:var(--tp-text);">Medium — Buttons, nav items, subheadings</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <span style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); min-width:40px;">700</span>
+                <span style="font-size:var(--tp-font-lg); font-weight:700; color:var(--tp-text-dark);">Bold — Headings, strong emphasis</span>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:1.25rem 0;">
+
+          <!-- Type scale -->
+          <div style="margin-bottom:1.5rem;">
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Type Scale</div>
+            <div style="display:grid; gap:1rem;">
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <code style="font-size:var(--tp-font-xs); color:var(--tp-primary); min-width:100px;">--tp-font-xl</code>
+                <span style="font-size:var(--tp-font-xl); font-weight:700; color:var(--tp-text-dark);">Section Heading</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">1.4rem &asymp; 22px</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <code style="font-size:var(--tp-font-xs); color:var(--tp-primary); min-width:100px;">--tp-font-lg</code>
+                <span style="font-size:var(--tp-font-lg); font-weight:600; color:var(--tp-text-dark);">Card Title</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">1.1rem &asymp; 18px</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <code style="font-size:var(--tp-font-xs); color:var(--tp-primary); min-width:100px;">--tp-font-md</code>
+                <span style="font-size:var(--tp-font-md); font-weight:400; color:var(--tp-text);">Default body text and form inputs</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">0.92rem &asymp; 15px</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <code style="font-size:var(--tp-font-xs); color:var(--tp-primary); min-width:100px;">--tp-font-sm</code>
+                <span style="font-size:var(--tp-font-sm); font-weight:400; color:var(--tp-text);">Table cells, labels, compact content</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">0.82rem &asymp; 13px</span>
+              </div>
+              <div style="display:flex; align-items:baseline; gap:1rem;">
+                <code style="font-size:var(--tp-font-xs); color:var(--tp-primary); min-width:100px;">--tp-font-xs</code>
+                <span style="font-size:var(--tp-font-xs); font-weight:400; color:var(--tp-text-muted);">Captions, helper text, timestamps</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">0.72rem &asymp; 12px</span>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:1.25rem 0;">
+
+          <!-- Heading hierarchy -->
+          <div style="margin-bottom:1.5rem;">
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Heading Hierarchy</div>
+            <div style="display:grid; gap:0.5rem; padding:1rem; background:var(--tp-surface); border-radius:var(--nm-radius-md); border:1px solid var(--tp-border-light);">
+              <div style="font-size:1.953rem; font-weight:700; line-height:1.2; color:var(--tp-text-dark);">H1 — Page Title</div>
+              <div style="font-size:1.563rem; font-weight:700; line-height:1.3; color:var(--tp-text-dark);">H2 — Section Heading</div>
+              <div style="font-size:1.25rem; font-weight:600; line-height:1.4; color:var(--tp-text-dark);">H3 — Card Title</div>
+              <div style="font-size:1rem; font-weight:600; line-height:1.4; color:var(--tp-text-dark);">H4 — Group Label</div>
+              <div style="font-size:var(--tp-font-md); font-weight:400; line-height:1.5; color:var(--tp-text);">Body — Default paragraph text with comfortable 1.5 line-height for readability across the admin surface.</div>
+              <div style="font-size:var(--tp-font-sm); font-weight:400; line-height:1.5; color:var(--tp-text);">Body Small — Compact content for tables, sidebars, and metadata.</div>
+              <div style="font-size:var(--tp-font-xs); font-weight:400; line-height:1.4; color:var(--tp-text-muted);">Caption — Helper text, timestamps, and fine print.</div>
+            </div>
+          </div>
+
+          <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:1.25rem 0;">
+
+          <!-- Text colors -->
+          <div>
+            <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Text Colors</div>
+            <div style="display:grid; gap:0.5rem;">
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <span style="width:24px; height:24px; border-radius:999px; background:var(--tp-text-dark); border:1px solid var(--tp-border-light);"></span>
+                <span style="font-size:var(--tp-font-md); font-weight:600; color:var(--tp-text-dark);">--tp-text-dark</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Headings, high-emphasis</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <span style="width:24px; height:24px; border-radius:999px; background:var(--tp-text); border:1px solid var(--tp-border-light);"></span>
+                <span style="font-size:var(--tp-font-md); font-weight:400; color:var(--tp-text);">--tp-text</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Body text, labels</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <span style="width:24px; height:24px; border-radius:999px; background:var(--tp-text-secondary); border:1px solid var(--tp-border-light);"></span>
+                <span style="font-size:var(--tp-font-md); font-weight:400; color:var(--tp-text-secondary);">--tp-text-secondary</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Secondary info</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <span style="width:24px; height:24px; border-radius:999px; background:var(--tp-text-muted); border:1px solid var(--tp-border-light);"></span>
+                <span style="font-size:var(--tp-font-md); font-weight:400; color:var(--tp-text-muted);">--tp-text-muted</span>
+                <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Tertiary, placeholders</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Spec Panel ── -->
+        <div class="spec-panel">
+          <h4>Font Stack</h4>
+          <table>
+            <tr><td>Primary</td><td>Gotham Rounded (OTF, local)</td></tr>
+            <tr><td>Fallback 1</td><td>Nunito (rounded sans-serif match)</td></tr>
+            <tr><td>Fallback 2</td><td>Segoe UI / -apple-system</td></tr>
+            <tr><td>Loading</td><td><code>font-display: swap</code></td></tr>
+          </table>
+
+          <h4>Type Scale Tokens</h4>
+          <table>
+            <tr><td><code>--tp-font-xs</code></td><td>0.72rem (~12px)</td></tr>
+            <tr><td><code>--tp-font-sm</code></td><td>0.82rem (~13px)</td></tr>
+            <tr><td><code>--tp-font-md</code></td><td>0.92rem (~15px)</td></tr>
+            <tr><td><code>--tp-font-lg</code></td><td>1.1rem (~18px)</td></tr>
+            <tr><td><code>--tp-font-xl</code></td><td>1.4rem (~22px)</td></tr>
+          </table>
+
+          <h4>Weights</h4>
+          <table>
+            <tr><td>Book (400)</td><td>Body, labels, secondary</td></tr>
+            <tr><td>Medium (600)</td><td>Buttons, nav, subheadings</td></tr>
+            <tr><td>Bold (700)</td><td>H1, H2, strong emphasis</td></tr>
+          </table>
+
+          <h4>Heading Scale</h4>
+          <table>
+            <tr><td>H1</td><td>1.953rem / 700 / 1.2 lh</td></tr>
+            <tr><td>H2</td><td>1.563rem / 700 / 1.3 lh</td></tr>
+            <tr><td>H3</td><td>1.25rem / 600 / 1.4 lh</td></tr>
+            <tr><td>H4</td><td>1rem / 600 / 1.4 lh</td></tr>
+          </table>
+
+          <h4>Text Colors</h4>
+          <table>
+            <tr><td><code>--tp-text-dark</code></td><td>Headings (#2A241C)</td></tr>
+            <tr><td><code>--tp-text</code></td><td>Body (#3D3A3B)</td></tr>
+            <tr><td><code>--tp-text-secondary</code></td><td>Secondary (#7A7672)</td></tr>
+            <tr><td><code>--tp-text-muted</code></td><td>Muted (#999590)</td></tr>
+          </table>
+
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>var(--tp-font-*)</code> tokens for all font sizes</li>
+            <li class="spec-do">Use numeric weights: 400, 600, 700</li>
+            <li class="spec-do">Use <code>rem</code> for font sizes (respects user settings)</li>
+            <li class="spec-do">Maintain heading hierarchy (h1 &gt; h2 &gt; h3)</li>
+            <li class="spec-do">Use <code>--tp-text-dark</code> for headings</li>
+            <li class="spec-dont">Never use <code>px</code> for font sizes</li>
+            <li class="spec-dont">Never use <code>font-weight: bold</code> — use <code>700</code></li>
+            <li class="spec-dont">Never skip heading levels</li>
+            <li class="spec-dont">Never set line-height below 1.2</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════ 18. COLOR PALETTE ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="colors">
+      <div class="comp-section-header">
+        <h2>18. Color Palette</h2>
+        <div class="comp-meta">Grey Neutral &bull; Three-tier surfaces &bull; Semantic severity</div>
+      </div>
+      <div class="comp-row">
+
+        <!-- ── Visual: Color swatches ── -->
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1.5rem;">
+
+            <!-- Core palette -->
+            <div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Core Palette</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:0.75rem;">
+                <div style="text-align:center;">
+                  <div style="height:64px; border-radius:var(--nm-radius-sm); background:#428177; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="font-size:var(--tp-font-xs); font-weight:600; margin-top:0.5rem; color:var(--tp-text-dark);">Primary</div>
+                  <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">#428177</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="height:64px; border-radius:var(--nm-radius-sm); background:#054239; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="font-size:var(--tp-font-xs); font-weight:600; margin-top:0.5rem; color:var(--tp-text-dark);">Primary Dark</div>
+                  <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">#054239</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="height:64px; border-radius:var(--nm-radius-sm); background:#988561; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="font-size:var(--tp-font-xs); font-weight:600; margin-top:0.5rem; color:var(--tp-text-dark);">Warning</div>
+                  <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">#988561</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="height:64px; border-radius:var(--nm-radius-sm); background:#6b1f2a; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="font-size:var(--tp-font-xs); font-weight:600; margin-top:0.5rem; color:var(--tp-text-dark);">Danger</div>
+                  <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">#6B1F2A</div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="height:64px; border-radius:var(--nm-radius-sm); background:#ef4444; border:1px solid rgba(0,0,0,0.06);"></div>
+                  <div style="font-size:var(--tp-font-xs); font-weight:600; margin-top:0.5rem; color:var(--tp-text-dark);">Error</div>
+                  <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">#EF4444</div>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:0.25rem 0;">
+
+            <!-- Three-tier surfaces -->
+            <div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Three-Tier Surfaces</div>
+              <div style="display:grid; gap:0.75rem;">
+                <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-radius:var(--nm-radius-sm); background:#FAF8F4; border:1px solid var(--tp-border-light);">
+                  <div style="width:48px; height:48px; border-radius:var(--nm-radius-sm); background:#FAF8F4; border:1px solid var(--tp-border); flex-shrink:0;"></div>
+                  <div>
+                    <div style="font-weight:600; font-size:var(--tp-font-md); color:var(--tp-text-dark);">Raised — #FAF8F4</div>
+                    <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Cards, panels, inputs — floating surfaces</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-radius:var(--nm-radius-sm); background:#F2EFE9; border:1px solid var(--tp-border-light);">
+                  <div style="width:48px; height:48px; border-radius:var(--nm-radius-sm); background:#F2EFE9; border:1px solid var(--tp-border); flex-shrink:0;"></div>
+                  <div>
+                    <div style="font-weight:600; font-size:var(--tp-font-md); color:var(--tp-text-dark);">Base — #F2EFE9</div>
+                    <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Page background, shell surface</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-radius:var(--nm-radius-sm); background:#E0DDDA; border:1px solid var(--tp-border-light);">
+                  <div style="width:48px; height:48px; border-radius:var(--nm-radius-sm); background:#E0DDDA; border:1px solid var(--tp-border); flex-shrink:0;"></div>
+                  <div>
+                    <div style="font-weight:600; font-size:var(--tp-font-md); color:var(--tp-text-dark);">Recessed — #E0DDDA</div>
+                    <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Tab wells, search containers, disabled inputs</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:0.25rem 0;">
+
+            <!-- Text colors -->
+            <div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Text Colors</div>
+              <div style="display:grid; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#2A241C; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:600; color:#2A241C; min-width:100px;">Text Dark</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#2A241C</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Headings</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#3d3a3b; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:400; color:#3d3a3b; min-width:100px;">Text</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#3D3A3B</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Body</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#999590; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:400; color:#999590; min-width:100px;">Grey</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#999590</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Muted, placeholders</span>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:0.25rem 0;">
+
+            <!-- Borders -->
+            <div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Borders</div>
+              <div style="display:grid; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#E0DDDA; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:600; color:var(--tp-text-dark); min-width:100px;">Border</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#E0DDDA</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Cards, panels</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#E8E5E0; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:600; color:var(--tp-text-dark); min-width:100px;">Border Light</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#E8E5E0</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Subtle dividers</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="width:32px; height:32px; border-radius:999px; background:#D4D1CC; border:1px solid var(--tp-border-light); flex-shrink:0;"></span>
+                  <span style="font-size:var(--tp-font-md); font-weight:600; color:var(--tp-text-dark); min-width:100px;">Grey Light</span>
+                  <code style="font-size:var(--tp-font-xs); color:var(--tp-primary);">#D4D1CC</code>
+                  <span style="font-size:var(--tp-font-xs); color:var(--tp-text-muted);">Light dividers</span>
+                </div>
+              </div>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--tp-border-light); margin:0.25rem 0;">
+
+            <!-- Severity banners -->
+            <div>
+              <div style="font-size:var(--tp-font-xs); color:var(--tp-text-muted); text-transform:uppercase; letter-spacing:0.06em; font-weight:600; margin-bottom:0.75rem;">Severity Tints (8% base)</div>
+              <div style="display:grid; gap:0.5rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem; padding:0.625rem 0.75rem; border-radius:var(--nm-radius-sm); background:color-mix(in srgb, #428177 8%, transparent); border:1px solid color-mix(in srgb, #428177 12%, transparent);">
+                  <span style="font-size:var(--tp-font-sm); font-weight:600; color:#054239;">Success — teal 8%</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem; padding:0.625rem 0.75rem; border-radius:var(--nm-radius-sm); background:color-mix(in srgb, #054239 8%, transparent); border:1px solid color-mix(in srgb, #054239 12%, transparent);">
+                  <span style="font-size:var(--tp-font-sm); font-weight:600; color:#054239;">Info — dark teal 8%</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem; padding:0.625rem 0.75rem; border-radius:var(--nm-radius-sm); background:color-mix(in srgb, #988561 8%, transparent); border:1px solid color-mix(in srgb, #988561 12%, transparent);">
+                  <span style="font-size:var(--tp-font-sm); font-weight:600; color:#5a4a2a;">Warning — amber 8%</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem; padding:0.625rem 0.75rem; border-radius:var(--nm-radius-sm); background:color-mix(in srgb, #ef4444 8%, transparent); border:1px solid color-mix(in srgb, #ef4444 12%, transparent);">
+                  <span style="font-size:var(--tp-font-sm); font-weight:600; color:#b91c1c;">Error — red 8%</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Spec Panel ── -->
+        <div class="spec-panel">
+          <h4>Core Palette</h4>
+          <table>
+            <tr><td><code>--tp-primary</code></td><td>#428177 teal</td></tr>
+            <tr><td><code>--tp-primary-dark</code></td><td>#054239 dark teal</td></tr>
+            <tr><td><code>--tp-warning</code></td><td>#988561 amber</td></tr>
+            <tr><td><code>--tp-danger</code></td><td>#6B1F2A maroon</td></tr>
+            <tr><td><code>--tp-error</code></td><td>#EF4444 red</td></tr>
+          </table>
+
+          <h4>Three-Tier Surfaces</h4>
+          <table>
+            <tr><td>Raised</td><td><code>--tp-surface-raised</code> #FAF8F4</td></tr>
+            <tr><td>Base</td><td><code>--tp-surface</code> #F2EFE9</td></tr>
+            <tr><td>Recessed</td><td><code>--nm-surface</code> #E0DDDA</td></tr>
+          </table>
+
+          <h4>Text Hierarchy</h4>
+          <table>
+            <tr><td><code>--tp-text-dark</code></td><td>#2A241C headings</td></tr>
+            <tr><td><code>--tp-text</code></td><td>#3D3A3B body</td></tr>
+            <tr><td><code>--tp-text-secondary</code></td><td>#7A7672 secondary</td></tr>
+            <tr><td><code>--tp-text-muted</code></td><td>#999590 muted</td></tr>
+          </table>
+
+          <h4>Borders</h4>
+          <table>
+            <tr><td><code>--tp-border</code></td><td>#E0DDDA structural</td></tr>
+            <tr><td><code>--tp-border-light</code></td><td>#E8E5E0 subtle</td></tr>
+            <tr><td><code>--tp-grey-light</code></td><td>#D4D1CC light</td></tr>
+          </table>
+
+          <h4>Severity Tint Pattern</h4>
+          <table>
+            <tr><td>Background</td><td>base color at 8%</td></tr>
+            <tr><td>Border</td><td>base color at 12%</td></tr>
+            <tr><td>Text</td><td>dark variant of base</td></tr>
+          </table>
+
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use <code>var(--tp-*)</code> tokens, never hardcoded hex</li>
+            <li class="spec-do">Use <code>color-mix()</code> for derived variants</li>
+            <li class="spec-do">Surface hierarchy: raised &gt; base &gt; recessed</li>
+            <li class="spec-do">Use <code>--tp-error</code> for form validation, <code>--tp-danger</code> for destructive actions</li>
+            <li class="spec-dont">Never use white (#FFF) as a background</li>
+            <li class="spec-dont">Never introduce colors outside the palette</li>
+            <li class="spec-dont">Never mix surface tiers (e.g. raised input on raised card)</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════ 19. CHECKBOX ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="checkbox">
+      <div class="comp-section-header">
+        <h2>19. Checkbox</h2>
+        <div class="comp-meta">p-checkbox &bull; CheckboxModule &bull; Binary or grouped selection control</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1rem;">
+
+            <!-- Checked -->
+            <label class="cb-wrap">
+              <input type="checkbox" checked>
+              <span class="cb-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3"/>
+                </svg>
+              </span>
+              <span>Checked option</span>
+            </label>
+
+            <!-- Unchecked -->
+            <label class="cb-wrap">
+              <input type="checkbox">
+              <span class="cb-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3"/>
+                </svg>
+              </span>
+              <span>Unchecked option</span>
+            </label>
+
+            <!-- Disabled -->
+            <label class="cb-wrap disabled">
+              <input type="checkbox" disabled>
+              <span class="cb-box">
+                <svg viewBox="0 0 12 12" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3"/>
+                </svg>
+              </span>
+              <span>Disabled option</span>
+            </label>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Size</td><td><code>--tp-checkbox-size</code> 20px</td></tr>
+            <tr><td>Border</td><td><code>--tp-checkbox-border</code> 2px solid --tp-border</td></tr>
+            <tr><td>Border radius</td><td><code>--tp-checkbox-border-radius</code> 4px</td></tr>
+            <tr><td>Background</td><td><code>--tp-checkbox-bg</code> --tp-surface-raised</td></tr>
+            <tr><td>Checked bg</td><td><code>--tp-checkbox-checked-bg</code> --tp-primary</td></tr>
+            <tr><td>Checked icon</td><td><code>--tp-checkbox-checked-icon-color</code> --tp-surface-light</td></tr>
+            <tr><td>Disabled bg</td><td><code>--tp-checkbox-disabled-bg</code> --nm-surface</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use rounded-square shape (4px radius) to distinguish from radio</li>
+            <li class="spec-do">Maintain 20px minimum touch target for the box</li>
+            <li class="spec-do">Show checkmark icon in surface-light on checked state</li>
+            <li class="spec-dont">Never use a circular shape for checkboxes</li>
+            <li class="spec-dont">Never omit the label — always pair with visible text</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 20. RADIOBUTTON ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="radiobutton">
+      <div class="comp-section-header">
+        <h2>20. RadioButton</h2>
+        <div class="comp-meta">p-radioButton &bull; RadioButtonModule &bull; Single selection from a group</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1rem;">
+
+            <fieldset style="border:none; display:flex; flex-direction:column; gap:0.75rem;">
+              <!-- Selected -->
+              <label class="rb-wrap">
+                <input type="radio" name="demo-radio" checked>
+                <span class="rb-dot"></span>
+                <span>Option A (selected)</span>
+              </label>
+
+              <!-- Unselected -->
+              <label class="rb-wrap">
+                <input type="radio" name="demo-radio">
+                <span class="rb-dot"></span>
+                <span>Option B</span>
+              </label>
+
+              <!-- Unselected -->
+              <label class="rb-wrap">
+                <input type="radio" name="demo-radio">
+                <span class="rb-dot"></span>
+                <span>Option C</span>
+              </label>
+            </fieldset>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Size</td><td><code>--tp-radio-size</code> 20px</td></tr>
+            <tr><td>Border</td><td><code>--tp-radio-border</code> 2px solid --tp-border</td></tr>
+            <tr><td>Background</td><td><code>--tp-radio-bg</code> --tp-surface-raised</td></tr>
+            <tr><td>Checked border</td><td><code>--tp-radio-checked-border-color</code> --tp-primary</td></tr>
+            <tr><td>Checked icon</td><td><code>--tp-radio-checked-icon-color</code> --tp-primary</td></tr>
+            <tr><td>Disabled bg</td><td><code>--tp-radio-disabled-bg</code> --nm-surface</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Always use circular shape (50% radius) to distinguish from checkbox</li>
+            <li class="spec-do">Show filled inner circle in --tp-primary on selection</li>
+            <li class="spec-do">Group radios in a fieldset with a legend</li>
+            <li class="spec-dont">Never use square shapes for radio buttons</li>
+            <li class="spec-dont">Never allow multiple selections in a radio group</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 21. SLIDER ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="slider">
+      <div class="comp-section-header">
+        <h2>21. Slider</h2>
+        <div class="comp-meta">p-slider &bull; SliderModule &bull; Value selection via draggable handle</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1.5rem; flex-direction:column; width:100%;">
+
+            <!-- Single value slider -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.5rem;">Single value</div>
+              <div style="position:relative; width:100%; height:var(--tp-slider-track-height); background:var(--tp-slider-track-bg); border-radius:var(--tp-slider-track-border-radius);">
+                <div style="position:absolute; top:0; left:0; width:60%; height:100%; background:var(--tp-slider-range-bg); border-radius:var(--tp-slider-track-border-radius);"></div>
+                <div style="position:absolute; top:50%; left:60%; transform:translate(-50%,-50%); width:var(--tp-slider-handle-size); height:var(--tp-slider-handle-size); background:var(--tp-slider-handle-bg); border:var(--tp-slider-handle-border); border-radius:var(--tp-slider-handle-border-radius); box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
+              </div>
+            </div>
+
+            <!-- Range slider -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.5rem;">Range</div>
+              <div style="position:relative; width:100%; height:var(--tp-slider-track-height); background:var(--tp-slider-track-bg); border-radius:var(--tp-slider-track-border-radius);">
+                <div style="position:absolute; top:0; left:25%; width:40%; height:100%; background:var(--tp-slider-range-bg); border-radius:var(--tp-slider-track-border-radius);"></div>
+                <div style="position:absolute; top:50%; left:25%; transform:translate(-50%,-50%); width:var(--tp-slider-handle-size); height:var(--tp-slider-handle-size); background:var(--tp-slider-handle-bg); border:var(--tp-slider-handle-border); border-radius:var(--tp-slider-handle-border-radius); box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
+                <div style="position:absolute; top:50%; left:65%; transform:translate(-50%,-50%); width:var(--tp-slider-handle-size); height:var(--tp-slider-handle-size); background:var(--tp-slider-handle-bg); border:var(--tp-slider-handle-border); border-radius:var(--tp-slider-handle-border-radius); box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
+              </div>
+            </div>
+
+            <!-- Discrete steps -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.5rem;">Discrete steps</div>
+              <div style="position:relative; width:100%; height:var(--tp-slider-track-height); background:var(--tp-slider-track-bg); border-radius:var(--tp-slider-track-border-radius);">
+                <div style="position:absolute; top:0; left:0; width:40%; height:100%; background:var(--tp-slider-range-bg); border-radius:var(--tp-slider-track-border-radius);"></div>
+                <!-- Step markers -->
+                <div style="position:absolute; top:50%; left:0; width:6px; height:6px; background:var(--tp-slider-range-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:20%; width:6px; height:6px; background:var(--tp-slider-range-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:40%; width:6px; height:6px; background:var(--tp-slider-range-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:60%; width:6px; height:6px; background:var(--tp-slider-track-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:80%; width:6px; height:6px; background:var(--tp-slider-track-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:100%; width:6px; height:6px; background:var(--tp-slider-track-bg); border-radius:50%; transform:translate(-50%,-50%);"></div>
+                <div style="position:absolute; top:50%; left:40%; transform:translate(-50%,-50%); width:var(--tp-slider-handle-size); height:var(--tp-slider-handle-size); background:var(--tp-slider-handle-bg); border:var(--tp-slider-handle-border); border-radius:var(--tp-slider-handle-border-radius); box-shadow:0 1px 3px rgba(0,0,0,0.1);"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Track bg</td><td><code>--tp-slider-track-bg</code> --nm-surface</td></tr>
+            <tr><td>Track height</td><td><code>--tp-slider-track-height</code> 6px</td></tr>
+            <tr><td>Range bg</td><td><code>--tp-slider-range-bg</code> --tp-primary</td></tr>
+            <tr><td>Handle bg</td><td><code>--tp-slider-handle-bg</code> --tp-surface-raised</td></tr>
+            <tr><td>Handle border</td><td><code>--tp-slider-handle-border</code> 2px solid --tp-primary</td></tr>
+            <tr><td>Handle size</td><td><code>--tp-slider-handle-size</code> 20px</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use primary color for the filled range and handle border</li>
+            <li class="spec-do">Ensure handle is at least 20px for touch targets</li>
+            <li class="spec-do">Show discrete step markers when step > 0</li>
+            <li class="spec-dont">Never use gradient fills on the track</li>
+            <li class="spec-dont">Never hide the handle — always show a visible thumb</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 22. TAG ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="tag">
+      <div class="comp-section-header">
+        <h2>22. Tag</h2>
+        <div class="comp-meta">p-tag &bull; TagModule &bull; Severity-colored label indicators</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:0.75rem; flex-wrap:wrap;">
+
+            <!-- Primary -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:var(--tp-primary); color:var(--tp-surface-light);">Primary</span>
+
+            <!-- Success -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:color-mix(in srgb, var(--tp-primary) 12%, transparent); color:var(--tp-primary-dark);">Success</span>
+
+            <!-- Info -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:color-mix(in srgb, var(--tp-info) 12%, transparent); color:var(--tp-info);">Info</span>
+
+            <!-- Warn -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:color-mix(in srgb, var(--tp-warning) 12%, transparent); color:var(--tp-warning-dark);">Warning</span>
+
+            <!-- Danger -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:color-mix(in srgb, var(--tp-danger) 12%, transparent); color:var(--tp-danger);">Danger</span>
+
+            <!-- Secondary -->
+            <span style="display:inline-flex; align-items:center; padding:var(--tp-tag-padding); border-radius:var(--tp-tag-border-radius); font-size:var(--tp-tag-font-size); font-weight:var(--tp-tag-font-weight); background:color-mix(in srgb, var(--tp-border) 40%, transparent); color:var(--tp-text);">Secondary</span>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Border radius</td><td><code>--tp-tag-border-radius</code> pill</td></tr>
+            <tr><td>Font size</td><td><code>--tp-tag-font-size</code> 0.72rem</td></tr>
+            <tr><td>Font weight</td><td><code>--tp-tag-font-weight</code> 600</td></tr>
+            <tr><td>Padding</td><td><code>--tp-tag-padding</code> 0.15rem 0.5rem</td></tr>
+            <tr><td>Primary bg</td><td>solid <code>--tp-primary</code></td></tr>
+            <tr><td>Severity bg</td><td>base color at 12% via <code>color-mix()</code></td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use pill shape for all tags</li>
+            <li class="spec-do">Use solid primary bg for primary severity, tinted bg for others</li>
+            <li class="spec-do">Keep font weight 600 for readability at small size</li>
+            <li class="spec-dont">Never use tags for interactive actions — use chips instead</li>
+            <li class="spec-dont">Never exceed single-line text in a tag</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 23. BADGE ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="badge">
+      <div class="comp-section-header">
+        <h2>23. Badge</h2>
+        <div class="comp-meta">p-badge &bull; BadgeModule &bull; Numeric indicator on icons and elements</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:2rem; align-items:center;">
+
+            <!-- Badge on icon placeholder -->
+            <div style="position:relative; display:inline-flex;">
+              <span style="font-size:1.5rem; color:var(--tp-text-muted);">&#x1F514;</span>
+              <span style="position:absolute; top:-4px; right:-8px; min-width:var(--tp-badge-min-width); height:var(--tp-badge-height); display:flex; align-items:center; justify-content:center; padding:0 0.3rem; border-radius:var(--tp-badge-border-radius); background:var(--tp-badge-bg); color:var(--tp-badge-color); font-size:var(--tp-badge-font-size); font-weight:var(--tp-badge-font-weight); line-height:1;">3</span>
+            </div>
+
+            <!-- Badge on icon placeholder -->
+            <div style="position:relative; display:inline-flex;">
+              <span style="font-size:1.5rem; color:var(--tp-text-muted);">&#x2709;</span>
+              <span style="position:absolute; top:-4px; right:-8px; min-width:var(--tp-badge-min-width); height:var(--tp-badge-height); display:flex; align-items:center; justify-content:center; padding:0 0.3rem; border-radius:var(--tp-badge-border-radius); background:var(--tp-badge-bg); color:var(--tp-badge-color); font-size:var(--tp-badge-font-size); font-weight:var(--tp-badge-font-weight); line-height:1;">12</span>
+            </div>
+
+            <!-- Standalone counters -->
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <span style="min-width:var(--tp-badge-min-width); height:var(--tp-badge-height); display:inline-flex; align-items:center; justify-content:center; padding:0 0.3rem; border-radius:var(--tp-badge-border-radius); background:var(--tp-badge-bg); color:var(--tp-badge-color); font-size:var(--tp-badge-font-size); font-weight:var(--tp-badge-font-weight); line-height:1;">1</span>
+              <span style="min-width:var(--tp-badge-min-width); height:var(--tp-badge-height); display:inline-flex; align-items:center; justify-content:center; padding:0 0.3rem; border-radius:var(--tp-badge-border-radius); background:var(--tp-danger); color:var(--tp-surface-light); font-size:var(--tp-badge-font-size); font-weight:var(--tp-badge-font-weight); line-height:1;">5</span>
+              <span style="min-width:var(--tp-badge-min-width); height:var(--tp-badge-height); display:inline-flex; align-items:center; justify-content:center; padding:0 0.3rem; border-radius:var(--tp-badge-border-radius); background:var(--tp-warning); color:var(--tp-surface-light); font-size:var(--tp-badge-font-size); font-weight:var(--tp-badge-font-weight); line-height:1;">99+</span>
+            </div>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Min width</td><td><code>--tp-badge-min-width</code> 1.25rem</td></tr>
+            <tr><td>Height</td><td><code>--tp-badge-height</code> 1.25rem</td></tr>
+            <tr><td>Font size</td><td><code>--tp-badge-font-size</code> 0.72rem</td></tr>
+            <tr><td>Font weight</td><td><code>--tp-badge-font-weight</code> 700</td></tr>
+            <tr><td>Background</td><td><code>--tp-badge-bg</code> --tp-primary</td></tr>
+            <tr><td>Color</td><td><code>--tp-badge-color</code> --tp-surface-light</td></tr>
+            <tr><td>Border radius</td><td><code>--tp-badge-border-radius</code> pill</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use pill shape to keep badges compact</li>
+            <li class="spec-do">Position overlapping badges at top-right of host element</li>
+            <li class="spec-do">Use "99+" for counts exceeding two digits</li>
+            <li class="spec-dont">Never place badges on disabled or hidden elements</li>
+            <li class="spec-dont">Never use badges for interactive actions</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 24. PROGRESSBAR ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="progressbar">
+      <div class="comp-section-header">
+        <h2>24. ProgressBar</h2>
+        <div class="comp-meta">p-progressbar &bull; ProgressBarModule &bull; Determinate and indeterminate progress</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1.5rem; flex-direction:column; width:100%;">
+
+            <!-- 40% -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.4rem;">40% complete</div>
+              <div style="width:100%; height:var(--tp-progressbar-height); background:var(--tp-progressbar-bg); border-radius:var(--tp-progressbar-border-radius); overflow:hidden;">
+                <div style="width:40%; height:100%; background:var(--tp-progressbar-value-bg); border-radius:var(--tp-progressbar-border-radius); transition:width 0.3s;"></div>
+              </div>
+            </div>
+
+            <!-- 80% -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.4rem;">80% complete</div>
+              <div style="width:100%; height:var(--tp-progressbar-height); background:var(--tp-progressbar-bg); border-radius:var(--tp-progressbar-border-radius); overflow:hidden;">
+                <div style="width:80%; height:100%; background:var(--tp-progressbar-value-bg); border-radius:var(--tp-progressbar-border-radius); transition:width 0.3s;"></div>
+              </div>
+            </div>
+
+            <!-- Indeterminate -->
+            <div>
+              <div style="font-size:var(--tp-font-sm); color:var(--tp-text-muted); margin-bottom:0.4rem;">Indeterminate</div>
+              <div style="width:100%; height:var(--tp-progressbar-height); background:var(--tp-progressbar-bg); border-radius:var(--tp-progressbar-border-radius); overflow:hidden; position:relative;">
+                <div style="position:absolute; top:0; left:0; width:30%; height:100%; background:var(--tp-progressbar-value-bg); border-radius:var(--tp-progressbar-border-radius); animation:indeterminate 1.5s infinite ease-in-out;"></div>
+              </div>
+              <style>
+                @keyframes indeterminate {
+                  0% { left: -30%; }
+                  100% { left: 100%; }
+                }
+              </style>
+            </div>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Height</td><td><code>--tp-progressbar-height</code> 8px</td></tr>
+            <tr><td>Track bg</td><td><code>--tp-progressbar-bg</code> --nm-surface</td></tr>
+            <tr><td>Value bg</td><td><code>--tp-progressbar-value-bg</code> --tp-primary</td></tr>
+            <tr><td>Border radius</td><td><code>--tp-progressbar-border-radius</code> pill</td></tr>
+            <tr><td>Label color</td><td><code>--tp-progressbar-label-color</code> --tp-surface-light</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use determinate mode when progress percentage is known</li>
+            <li class="spec-do">Use indeterminate mode for unknown-duration operations</li>
+            <li class="spec-do">Show a text label above or beside for context</li>
+            <li class="spec-dont">Never show a progress bar stuck at 0% for a long time</li>
+            <li class="spec-dont">Never use multiple progress bars for the same operation</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ 25. BREADCRUMB ═══════════ -->
+    <hr class="section-divider">
+    <section class="comp-section" id="breadcrumb">
+      <div class="comp-section-header">
+        <h2>25. Breadcrumb</h2>
+        <div class="comp-meta">p-breadcrumb &bull; BreadcrumbModule &bull; Hierarchical navigation trail</div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-visual">
+          <div class="comp-visual-body" style="gap:1rem; width:100%;">
+
+            <nav style="display:flex; align-items:center; gap:0.5rem; font-size:var(--tp-breadcrumb-font-size); background:var(--tp-breadcrumb-bg); padding:var(--tp-space-2) 0;">
+              <a href="#" style="color:var(--tp-breadcrumb-color); text-decoration:none;" onmouseover="this.style.color='var(--tp-primary)'" onmouseout="this.style.color='var(--tp-breadcrumb-color)'">Home</a>
+              <span style="color:var(--tp-breadcrumb-separator-color);">/</span>
+              <a href="#" style="color:var(--tp-breadcrumb-color); text-decoration:none;" onmouseover="this.style.color='var(--tp-primary)'" onmouseout="this.style.color='var(--tp-breadcrumb-color)'">Administration</a>
+              <span style="color:var(--tp-breadcrumb-separator-color);">/</span>
+              <span style="color:var(--tp-breadcrumb-active-color); font-weight:600;">Tenant Manager</span>
+            </nav>
+
+          </div>
+        </div>
+        <div class="spec-panel">
+          <h4>Token Map</h4>
+          <table>
+            <tr><td>Background</td><td><code>--tp-breadcrumb-bg</code> transparent</td></tr>
+            <tr><td>Link color</td><td><code>--tp-breadcrumb-color</code> --tp-text-muted</td></tr>
+            <tr><td>Active color</td><td><code>--tp-breadcrumb-active-color</code> --tp-text-dark</td></tr>
+            <tr><td>Separator color</td><td><code>--tp-breadcrumb-separator-color</code> --tp-grey-light</td></tr>
+            <tr><td>Font size</td><td><code>--tp-breadcrumb-font-size</code> --tp-font-sm</td></tr>
+          </table>
+          <h4>Rules</h4>
+          <ul>
+            <li class="spec-do">Use "/" as the separator character</li>
+            <li class="spec-do">Make all items except the last one clickable links</li>
+            <li class="spec-do">Bold the current (last) breadcrumb item</li>
+            <li class="spec-dont">Never show more than 5 levels — use ellipsis for deep nesting</li>
+            <li class="spec-dont">Never make the current page item a link</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ═══ SHELL FOOTER ═══ -->
+<footer class="shell-footer">
+  <div class="shell-footer-inner">
+    <div class="footer-island">
+      <p class="footer-text">EMSIST Design System &mdash; ThinkPLUS Grey Neutral &mdash; PrimeNG 21 + Angular 21 &bull; 25 Sections &bull; Generated 2026-03-22</p>
+    </div>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

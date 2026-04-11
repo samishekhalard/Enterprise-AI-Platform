@@ -1,0 +1,51 @@
+# =============================================================================
+# Design Token Allowlist
+# =============================================================================
+# Hex color values listed here are excluded from the design token lint script.
+# Each line is a lowercase hex value (e.g., #fff, #000000).
+#
+# Legitimate exceptions include:
+#   - Hex values used as var() fallbacks: var(--tp-white, #fff)
+#   - Values in SCSS variable declarations that map to tokens
+#   - Browser/platform defaults that cannot use CSS custom properties
+#
+# Format: one hex value per line, lowercase, including the # prefix.
+# Lines starting with # are comments.
+# =============================================================================
+
+# CSS keyword equivalents (used in resets or browser-compat)
+#000
+#000000
+#fff
+#ffffff
+
+# Transparent/invisible (sometimes used in gradient stops)
+#0000
+#00000000
+
+# Token definitions in styles.scss :root (these ARE the token source values)
+#428177
+#054239
+#988561
+#6b1f2a
+#f2efe9
+#3d3a3b
+#e0ddda
+#002623
+#2a241c
+#4a151e
+#5a4a2a
+#ef4444
+#b91c1c
+#faf8f4
+#faf8f5
+#f0ede7
+#e8e5e0
+#7a7672
+#999590
+#d4d1cc
+
+# Token definitions in default-preset.scss (severity/status palette)
+#0369a1
+#78350f
+#334155

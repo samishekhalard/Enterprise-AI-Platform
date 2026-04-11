@@ -1,0 +1,632 @@
+<div class="branding-studio" data-testid="branding-studio">
+  <section class="studio-hero" data-testid="brand-studio-hero">
+    <div class="studio-hero-copy">
+      <p class="studio-eyebrow">R14 Brand Studio</p>
+      <h2>Brand Studio</h2>
+      <p class="studio-summary">
+        Govern one tenant brand across typography, colour system, imagery, iconography, and the
+        login experience from a single workspace.
+      </p>
+    </div>
+
+    <div class="studio-hero-meta">
+      <div class="hero-meta-card">
+        <span class="hero-meta-label">Tenant</span>
+        <strong>{{ tenantId() }}</strong>
+      </div>
+      <div class="hero-meta-card">
+        <span class="hero-meta-label">Starter Kit</span>
+        <strong>{{ activeStarterKit()?.name || 'Unselected' }}</strong>
+      </div>
+      <div class="hero-meta-card">
+        <span class="hero-meta-label">Palette Pack</span>
+        <strong>{{ activePalettePack()?.name || 'Unselected' }}</strong>
+      </div>
+      <div class="hero-meta-card">
+        <span class="hero-meta-label">Typography Pack</span>
+        <strong>{{ activeTypographyPack()?.name || 'Unselected' }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <div class="studio-command-bar" data-testid="brand-studio-command-bar">
+    <button
+      type="button"
+      pButton
+      class="command-button"
+      [disabled]="isLoadingStudio() || isSaving()"
+      (click)="saveDraft()"
+      data-testid="brand-studio-save-draft"
+    >
+      Save Draft
+    </button>
+    <button
+      type="button"
+      pButton
+      class="command-button"
+      [disabled]="isLoadingStudio() || isSaving()"
+      (click)="validateDraft()"
+      data-testid="brand-studio-validate-draft"
+    >
+      Validate Draft
+    </button>
+    <button
+      type="button"
+      pButton
+      class="command-button command-button-primary"
+      [disabled]="isLoadingStudio() || isPublishing()"
+      (click)="publishBranding()"
+      data-testid="brand-studio-publish"
+    >
+      Publish Brand
+    </button>
+    <button
+      type="button"
+      pButton
+      class="command-button"
+      [disabled]="isLoadingStudio()"
+      (click)="resetToDefault()"
+      data-testid="brand-studio-reset"
+    >
+      Reset Draft
+    </button>
+    @if (savedMessage()) {
+      <span class="save-message" [class.error]="savedMessage().includes('failed')">
+        {{ savedMessage() }}
+      </span>
+    }
+  </div>
+
+  @if (isLoadingStudio()) {
+    <div class="studio-loading" data-testid="brand-studio-loading">
+      Loading Brand Studio workspace...
+    </div>
+  }
+
+  <section class="workspace-shell" data-testid="brand-studio-workspace">
+    <aside class="workspace-sidebar" aria-label="Brand Studio sections">
+      <div class="workspace-sidebar-head">
+        <p class="workspace-sidebar-eyebrow">Workspace</p>
+        <h3>Brand Studio</h3>
+      </div>
+
+      <nav class="workspace-nav">
+        @for (section of workspaceSections; track section.id) {
+          <button
+            type="button"
+            class="workspace-nav-item"
+            [class.active]="isSectionActive(section.id)"
+            (click)="selectSection(section.id)"
+            [attr.data-testid]="'brand-studio-section-' + section.id"
+          >
+            <span class="workspace-nav-label">{{ section.label }}</span>
+            <span class="workspace-nav-description">{{ section.description }}</span>
+          </button>
+        }
+      </nav>
+
+      <div class="workspace-sidecard">
+        <span class="workspace-sidecard-label">Policy</span>
+        <strong>Palette-locked theme controls</strong>
+        <p>Custom CSS stays disabled and every publish must pass validation.</p>
+      </div>
+
+      <div class="workspace-sidecard">
+        <span class="workspace-sidecard-label">Runtime sweep</span>
+        <strong>{{ brandRuntime.appTitle() }}</strong>
+        <p>Publish updates title, favicon, shell logo, and login surface together.</p>
+      </div>
+    </aside>
+
+    <div class="workspace-canvas">
+      <header class="workspace-header">
+        <div>
+          <p class="workspace-page-eyebrow">{{ activeSectionMeta().label }}</p>
+          <h3>{{ activeSectionMeta().label }}</h3>
+          <p>{{ activeSectionMeta().description }}</p>
+        </div>
+
+        <div class="workspace-status">
+          <span class="status-tag active">Draft {{ draft()?.updatedAt || 'Not saved yet' }}</span>
+          <span class="status-tag active"
+            >Validated {{ draft()?.lastValidatedAt || 'Never' }}</span
+          >
+          @if (validationErrors().length === 0 && validationWarnings().length === 0) {
+            <span class="status-tag ok">No Current Issues</span>
+          } @else {
+            @if (validationErrors().length > 0) {
+              <span class="status-tag error">{{ validationErrors().length }} violation(s)</span>
+            }
+            @if (validationWarnings().length > 0) {
+              <span class="status-tag warn">{{ validationWarnings().length }} warning(s)</span>
+            }
+          }
+        </div>
+      </header>
+
+      @if (activeSection() === 'typography') {
+        <section class="workspace-panel workspace-panel-typography">
+          <div class="section-card typography-table-card">
+            <div class="section-card-head">
+              <h4>Typography</h4>
+              <p>
+                Control font face and semantic text colour. Text sizing stays fixed to the active
+                system typography scale.
+              </p>
+            </div>
+
+            <p-table
+              [value]="typographyRows()"
+              [pt]="typographyTablePt"
+              styleClass="tenant-data-table typography-design-table"
+              data-testid="brand-studio-typography-table"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="typography-col-item">Item</th>
+                  <th class="typography-col-font">Font</th>
+                  <th class="typography-col-color">Font Color</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-row>
+                <tr>
+                  <td class="typography-col-item">
+                    <div
+                      class="typography-item-stack"
+                      tabindex="0"
+                      (mouseenter)="showTypographyRolePreview(row.id)"
+                      (mouseleave)="hideTypographyRolePreview(row.id)"
+                      (focusin)="showTypographyRolePreview(row.id)"
+                      (focusout)="hideTypographyRolePreview(row.id)"
+                    >
+                      <strong>{{ row.label }}</strong>
+                      <p
+                        class="typography-inline-preview"
+                        [class.is-visible]="hoveredTypographyRoleId() === row.id"
+                        [style.font-family]="resolveTypographyFontFamily(row.fontId)"
+                        [style.color]="row.color"
+                        [style.font-size]="resolveTypographyPreviewSize(row.id)"
+                        [style.font-weight]="resolveTypographyPreviewWeight(row.id)"
+                      >
+                        Visit the UAE's unified digital platform
+                      </p>
+                    </div>
+                  </td>
+                  <td class="typography-col-font">
+                    <p-select
+                      [options]="approvedTypographyFonts"
+                      optionLabel="label"
+                      optionValue="id"
+                      [filter]="true"
+                      filterBy="label"
+                      [showClear]="true"
+                      placeholder="Select font"
+                      [ngModel]="row.fontId"
+                      (ngModelChange)="updateTypographyRow(row.id, 'fontId', $event)"
+                      appendTo="body"
+                    />
+                  </td>
+                  <td class="typography-col-color">
+                    <p-select
+                      [options]="typographyColorOptions()"
+                      optionLabel="label"
+                      optionValue="value"
+                      [filter]="true"
+                      filterBy="label"
+                      [showClear]="true"
+                      placeholder="Select font color"
+                      [ngModel]="row.color"
+                      (ngModelChange)="updateTypographyRow(row.id, 'color', $event)"
+                      appendTo="body"
+                    />
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="3">
+                    <p class="typography-empty-state">No typography roles are available.</p>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'colour-system') {
+        <section class="workspace-panel workspace-panel-colour">
+          <div class="section-grid section-grid-dual">
+            <div class="section-card">
+              <div class="section-card-head">
+                <h4>Starter Kits</h4>
+                <p>Choose the available brand baseline for this tenant.</p>
+              </div>
+              <div class="selection-list">
+                @for (card of starterKitCards(); track card.id) {
+                  <button
+                    type="button"
+                    pButton
+                    class="selection-card"
+                    [class.selected]="isStarterKitSelected(card.id)"
+                    (click)="selectStarterKit(card.id)"
+                  >
+                    <span class="selection-card-title">
+                      {{ card.title }}
+                      @if (card.badge) {
+                        <span class="selection-card-badge">{{ card.badge }}</span>
+                      }
+                    </span>
+                    <span class="selection-card-subtitle">{{ card.subtitle }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-card-head">
+                <h4>Palette Packs</h4>
+                <p>Governed semantic color sets mapped to the design system.</p>
+              </div>
+              <div class="selection-list">
+                @for (card of paletteCards(); track card.id) {
+                  <button
+                    type="button"
+                    pButton
+                    class="selection-card"
+                    [class.selected]="isPalettePackSelected(card.id)"
+                    (click)="selectPalettePack(card.id)"
+                  >
+                    <span class="selection-card-title">
+                      {{ card.title }}
+                      @if (card.badge) {
+                        <span class="selection-card-badge">{{ card.badge }}</span>
+                      }
+                    </span>
+                    <span class="selection-card-subtitle">{{ card.subtitle }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <app-global-branding-form
+              [(brandingForm)]="globalBrandingForm"
+              (previewChange)="onPreviewChange()"
+            />
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'imagery') {
+        <section class="workspace-panel workspace-panel-imagery">
+          <div class="section-grid section-grid-dual">
+            <div class="section-card">
+              <div class="section-card-head">
+                <h4>Asset Library</h4>
+                <p>Logo, favicon, and login background live here when internal media is ready.</p>
+              </div>
+              <p class="panel-warning">
+                Upload and replacement stay blocked in this prototype until the internal media
+                pipeline is defined.
+              </p>
+              @if (assets().length > 0) {
+                <div class="asset-list">
+                  @for (asset of assets(); track asset.assetId) {
+                    <div class="asset-card">
+                      <strong>{{ asset.kind }}</strong>
+                      <span>{{ asset.displayName }}</span>
+                      <code>{{ asset.deliveryUrl }}</code>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-note">No tenant-specific assets yet. Platform defaults are active.</p>
+              }
+            </div>
+
+            <div class="section-card imagery-preview-card">
+              <div class="section-card-head">
+                <h4>Current Asset Preview</h4>
+                <p>Review how the currently selected assets appear before publish.</p>
+              </div>
+              <div class="imagery-preview">
+                <div class="asset-preview-block">
+                  <span class="asset-preview-label">Logo</span>
+                  <img [src]="currentLogoUrl()" alt="Current tenant logo" class="asset-preview-logo" />
+                </div>
+                <div class="asset-preview-block">
+                  <span class="asset-preview-label">Favicon</span>
+                  <img
+                    [src]="currentFaviconUrl()"
+                    alt="Current tenant favicon"
+                    class="asset-preview-favicon"
+                  />
+                </div>
+                <div class="asset-preview-block asset-preview-block-wide">
+                  <span class="asset-preview-label">Login Background</span>
+                  <div
+                    class="asset-preview-background"
+                    [style.background-image]="
+                      currentLoginBackgroundUrl()
+                        ? 'linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.2)), url(' +
+                          currentLoginBackgroundUrl() +
+                          ')'
+                        : 'linear-gradient(135deg, color-mix(in srgb, var(--tp-primary) 18%, transparent), var(--tp-surface))'
+                    "
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'iconography') {
+        <section class="workspace-panel workspace-panel-iconography">
+          <div class="section-grid section-grid-dual">
+            <div class="section-card">
+              <div class="section-card-head">
+                <h4>Icon Libraries</h4>
+                <p>These icons feed object-definition pickers, not general system chrome.</p>
+              </div>
+              @if (iconLibraries().length > 0) {
+                <div class="selection-list">
+                  @for (library of iconLibraries(); track library.iconLibraryId) {
+                    <button
+                      type="button"
+                      pButton
+                      class="selection-card"
+                      [class.selected]="isIconLibrarySelected(library.iconLibraryId)"
+                      (click)="selectIconLibrary(library.iconLibraryId)"
+                    >
+                      <span class="selection-card-title">{{ library.name }}</span>
+                      <span class="selection-card-subtitle">
+                        {{ library.sourceType }} · v{{ library.version }}
+                      </span>
+                    </button>
+                  }
+                </div>
+              } @else {
+                <p class="empty-note">
+                  No tenant icon library uploaded yet. The seeded platform library remains active.
+                </p>
+              }
+            </div>
+
+            <div class="section-card">
+              <div class="section-card-head">
+                <h4>Library Manifest</h4>
+                <p>Brand Studio controls the object-definition icon source for the tenant graph.</p>
+              </div>
+              <div class="manifest-card">
+                <strong>{{ activeIconLibrary()?.name || 'No library selected' }}</strong>
+                <p>{{ activeIconLibrary()?.description || 'Select a library to inspect it.' }}</p>
+                <code>{{ activeIconLibrary()?.sourceType || 'PLATFORM_SEEDED' }}</code>
+                <pre>{{ activeIconLibrary()?.manifest | json }}</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'login-page') {
+        <section class="workspace-panel workspace-panel-login">
+          <div class="section-card">
+            <div class="section-card-head">
+              <h4>Login Surface Preview</h4>
+              <p>See how the active brand applies to logo, background, title, and primary action.</p>
+            </div>
+            <div class="login-preview-shell">
+              <div
+                class="login-preview-visual"
+                [style.background-image]="
+                  currentLoginBackgroundUrl()
+                    ? 'linear-gradient(rgba(255,255,255,0.46), rgba(255,255,255,0.18)), url(' +
+                      currentLoginBackgroundUrl() +
+                      ')'
+                    : 'radial-gradient(circle at top right, color-mix(in srgb, var(--tp-primary) 22%, transparent), transparent 42%), linear-gradient(135deg, var(--tp-surface-raised), var(--tp-surface))'
+                "
+              >
+                <div class="login-preview-card">
+                  <img [src]="currentLogoUrl()" alt="Tenant logo" class="login-preview-logo" />
+                  <p class="login-preview-eyebrow">{{ brandRuntime.appTitle() }}</p>
+                  <h3>Sign in to your tenant workspace</h3>
+                  <div class="login-preview-fields">
+                    <div class="login-preview-field">Email address</div>
+                    <div class="login-preview-field">Password</div>
+                  </div>
+                  <button type="button" class="login-preview-button">Continue</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'components') {
+        <section class="workspace-panel workspace-panel-components">
+          <div class="section-card">
+            <div class="section-card-head">
+              <h4>Governed Component Catalog</h4>
+              <p>Inspect component states and preview the active overrides before publish.</p>
+            </div>
+
+            <div class="component-workspace">
+              <div class="component-catalog-column">
+                <div class="studio-search">
+                  <input
+                    pInputText
+                    class="studio-search-input"
+                    [ngModel]="searchQuery()"
+                    (ngModelChange)="searchQuery.set($event)"
+                    placeholder="Search components..."
+                    aria-label="Search component catalog"
+                    data-testid="studio-search"
+                  />
+                </div>
+
+                <nav class="studio-sidebar" aria-label="Component catalog">
+                  <button
+                    type="button"
+                    pButton
+                    class="catalog-item global-item"
+                    [class.active]="isGlobal()"
+                    (click)="selectEntry('global')"
+                    data-testid="catalog-global"
+                  >
+                    <ng-icon name="phosphorPaletteThin" />
+                    Foundation
+                  </button>
+
+                  @for (group of catalogByCategory(); track group.category) {
+                    <div class="catalog-group-header">{{ group.category }}</div>
+                    @for (entry of group.entries; track entry.id) {
+                      <button
+                        type="button"
+                        pButton
+                        class="catalog-item"
+                        [class.active]="isEntrySelected(entry)"
+                        [class.has-overrides]="hasOverrides(entry.id)"
+                        [class.disabled]="!entry.usedInEmsist"
+                        [attr.aria-disabled]="!entry.usedInEmsist"
+                        [disabled]="!entry.usedInEmsist"
+                        (click)="entry.usedInEmsist && selectEntry(entry)"
+                        [attr.data-testid]="'catalog-' + entry.id"
+                      >
+                        <ng-icon [name]="entry.icon" />
+                        {{ entry.name }}
+                        @if (hasOverrides(entry.id)) {
+                          <span class="override-dot" aria-label="Has overrides"></span>
+                        }
+                      </button>
+                    }
+                  }
+                </nav>
+              </div>
+
+              <div class="component-preview-column">
+                @if (isGlobal()) {
+                  <div class="foundation-note-card">
+                    <h4>Foundation tokens live in Colour System</h4>
+                    <p>
+                      Use the Colour System section for palette, shape, depth, and interaction
+                      controls. Use this Components section for individual component previews.
+                    </p>
+                  </div>
+                } @else if (selectedCatalogEntry(); as entry) {
+                  <div class="component-panel">
+                    <div class="component-header">
+                      <div class="component-panel-header">
+                        <ng-icon [name]="entry.icon" class="component-panel-icon" />
+                        <div>
+                          <h3>{{ entry.name }}</h3>
+                          <p class="component-desc">{{ entry.description }}</p>
+                        </div>
+                      </div>
+                      <div class="component-governance" data-testid="component-governance-meta">
+                        <span class="meta-chip">{{ getEntrySource(entry) }}</span>
+                        <span class="meta-chip">{{ getEntryControlMode(entry) }}</span>
+                        <span class="meta-chip">Owner: {{ getEntryOwner(entry) }}</span>
+                      </div>
+                    </div>
+
+                    <div
+                      class="preview-area"
+                      data-testid="preview-area"
+                      aria-label="Component preview"
+                    >
+                      @if (previewComponent()) {
+                        <ng-container *ngComponentOutlet="previewComponent()" />
+                      } @else {
+                        <div class="preview-placeholder">
+                          <ng-icon name="phosphorEyeSlashThin" />
+                          <p>Preview not available for this component.</p>
+                        </div>
+                      }
+                    </div>
+
+                    @if (entry.styleVariants.length > 0) {
+                      <div class="variant-section" data-testid="variant-section">
+                        <h4 class="section-label">Style Variants</h4>
+                        <app-style-variant-picker
+                          [variants]="entry.styleVariants"
+                          [selectedId]="getSelectedVariant(entry.id)"
+                          (selectedIdChange)="selectVariant(entry.id, $event)"
+                          [attr.data-testid]="'variant-picker-' + entry.id"
+                        />
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      @if (activeSection() === 'history') {
+        <section class="workspace-panel workspace-panel-history">
+          <div class="section-card">
+            <div class="section-card-head">
+              <h4>Publish History</h4>
+              <p>Review previous brand versions and rollback targets.</p>
+            </div>
+            @if (history().length > 0) {
+              <div class="history-list">
+                @for (item of history(); track item.brandProfileId) {
+                  <div class="history-card">
+                    <div class="history-copy">
+                      <strong>Version {{ item.profileVersion }}</strong>
+                      <span>{{ item.appTitle }}</span>
+                      <small>{{ item.publishedAt }}</small>
+                    </div>
+                    <button
+                      type="button"
+                      pButton
+                      class="history-action"
+                      [disabled]="isPublishing()"
+                      (click)="rollbackBrand(item.brandProfileId)"
+                    >
+                      Rollback
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="empty-note">No published history yet.</p>
+            }
+          </div>
+        </section>
+      }
+
+      @if (validationErrors().length > 0 || validationWarnings().length > 0) {
+        <div class="validation-feedback" data-testid="branding-validation-feedback">
+          @if (validationErrors().length > 0) {
+            <div class="validation-block errors" data-testid="branding-validation-errors">
+              <h4>Policy Violations</h4>
+              <ul>
+                @for (error of validationErrors(); track error) {
+                  <li>{{ error }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (validationWarnings().length > 0) {
+            <div class="validation-block warnings" data-testid="branding-validation-warnings">
+              <h4>Policy Warnings</h4>
+              <ul>
+                @for (warning of validationWarnings(); track warning) {
+                  <li>{{ warning }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+</div>

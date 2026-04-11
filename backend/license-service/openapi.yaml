@@ -1,0 +1,444 @@
+openapi: 3.1.0
+info:
+  title: License Service API
+  description: API for managing tenant licenses, user licenses, and feature gates
+  version: 1.0.0
+  contact:
+    name: EMS Team
+
+servers:
+  - url: http://localhost:8085
+    description: Development server
+
+tags:
+  - name: Tenant Licenses
+    description: Tenant-level license management
+  - name: User Licenses
+    description: User seat allocation
+  - name: License Products
+    description: License product catalog
+  - name: Feature Gates
+    description: Feature access validation
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/tenant-licenses:
+    get:
+      tags: [Tenant Licenses]
+      summary: List tenant licenses
+      operationId: getTenantLicenses
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      responses:
+        '200':
+          description: List of tenant licenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantLicense'
+
+    post:
+      tags: [Tenant Licenses]
+      summary: Create tenant license
+      operationId: createTenantLicense
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantLicenseRequest'
+      responses:
+        '201':
+          description: License created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantLicense'
+
+  /api/v1/tenant-licenses/{licenseId}:
+    get:
+      tags: [Tenant Licenses]
+      summary: Get tenant license by ID
+      operationId: getTenantLicense
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: licenseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tenant license
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantLicense'
+        '404':
+          description: License not found
+
+    patch:
+      tags: [Tenant Licenses]
+      summary: Update tenant license
+      operationId: updateTenantLicense
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: licenseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantLicenseRequest'
+      responses:
+        '200':
+          description: License updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantLicense'
+
+  /api/v1/user-licenses:
+    get:
+      tags: [User Licenses]
+      summary: List user licenses
+      operationId: getUserLicenses
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: userId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: productCode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of user licenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserLicense'
+
+    post:
+      tags: [User Licenses]
+      summary: Assign license to user
+      operationId: assignUserLicense
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignUserLicenseRequest'
+      responses:
+        '201':
+          description: License assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLicense'
+        '409':
+          description: License already assigned or no seats available
+
+  /api/v1/user-licenses/{licenseId}:
+    delete:
+      tags: [User Licenses]
+      summary: Revoke user license
+      operationId: revokeUserLicense
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: licenseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: License revoked
+        '404':
+          description: License not found
+
+  /api/v1/license-products:
+    get:
+      tags: [License Products]
+      summary: List license products
+      operationId: getLicenseProducts
+      responses:
+        '200':
+          description: List of license products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LicenseProduct'
+
+  /api/v1/license-products/{productCode}:
+    get:
+      tags: [License Products]
+      summary: Get license product by code
+      operationId: getLicenseProduct
+      parameters:
+        - name: productCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: License product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicenseProduct'
+        '404':
+          description: Product not found
+
+  /api/v1/feature-gates/check:
+    get:
+      tags: [Feature Gates]
+      summary: Check feature access
+      operationId: checkFeatureAccess
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+        - name: feature
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Feature code to check
+        - name: userId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: User ID (optional, uses current user if not provided)
+      responses:
+        '200':
+          description: Feature access result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureAccessResponse'
+
+  /api/v1/feature-gates/batch-check:
+    post:
+      tags: [Feature Gates]
+      summary: Check multiple features
+      operationId: batchCheckFeatures
+      parameters:
+        - $ref: '#/components/parameters/XTenantID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                features:
+                  type: array
+                  items:
+                    type: string
+                userId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Feature access results
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: boolean
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    XTenantID:
+      name: X-Tenant-ID
+      in: header
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    TenantLicense:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tenantId:
+          type: string
+        productCode:
+          type: string
+        productName:
+          type: string
+        maxSeats:
+          type: integer
+        usedSeats:
+          type: integer
+        availableSeats:
+          type: integer
+        features:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [ACTIVE, EXPIRED, SUSPENDED, TRIAL]
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        autoRenew:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateTenantLicenseRequest:
+      type: object
+      required: [productCode, maxSeats]
+      properties:
+        productCode:
+          type: string
+        maxSeats:
+          type: integer
+          minimum: 1
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        autoRenew:
+          type: boolean
+          default: false
+
+    UpdateTenantLicenseRequest:
+      type: object
+      properties:
+        maxSeats:
+          type: integer
+          minimum: 1
+        endDate:
+          type: string
+          format: date
+        autoRenew:
+          type: boolean
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED]
+
+    UserLicense:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        userEmail:
+          type: string
+          format: email
+        tenantLicenseId:
+          type: string
+          format: uuid
+        productCode:
+          type: string
+        productName:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [ACTIVE, REVOKED, EXPIRED]
+        assignedAt:
+          type: string
+          format: date-time
+        assignedBy:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    AssignUserLicenseRequest:
+      type: object
+      required: [userId, productCode]
+      properties:
+        userId:
+          type: string
+          format: uuid
+        productCode:
+          type: string
+
+    LicenseProduct:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        tier:
+          type: string
+          enum: [FREE, STANDARD, PROFESSIONAL, ENTERPRISE]
+        pricing:
+          type: object
+          properties:
+            monthly:
+              type: number
+            yearly:
+              type: number
+            currency:
+              type: string
+
+    FeatureAccessResponse:
+      type: object
+      properties:
+        feature:
+          type: string
+        allowed:
+          type: boolean
+        reason:
+          type: string
+          description: Reason if not allowed (e.g., "NO_TENANT_LICENSE", "NO_USER_LICENSE", "LICENSE_EXPIRED")
+        upgradeRequired:
+          type: string
+          description: Product code required for access

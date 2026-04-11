@@ -1,0 +1,110 @@
+<div class="app-shell" [class.hide-header-right-on-mobile]="hideHeaderRightOnMobile">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-island header-island-left">
+        <ng-content select="[shell-header-leading]" />
+
+        <a
+          class="island-logo"
+          routerLink="/administration"
+          [attr.aria-label]="brandRuntime.appTitle() + ' Home'"
+        >
+          <img [src]="brandRuntime.shellLogoUrl()" [alt]="brandRuntime.appTitle()" />
+        </a>
+
+        <span class="island-divider" aria-hidden="true"></span>
+
+        <div class="page-indicator">
+          @if (titleIconSrc) {
+            <img
+              class="page-indicator-icon"
+              [src]="titleIconSrc"
+              [alt]="titleIconAlt"
+              [attr.aria-hidden]="titleIconAlt ? null : 'true'"
+            />
+          }
+
+          <span class="page-indicator-copy">
+            <span class="page-indicator-title">{{ title }}</span>
+            @if (subtitle) {
+              <span class="page-indicator-subtitle">{{ subtitle }}</span>
+            }
+          </span>
+        </div>
+
+        <ng-content select="[shell-header-trailing]" />
+      </div>
+
+      <div class="header-island header-island-right topnav">
+        <ng-content select="[shell-header-actions]" />
+
+        @if (showDefaultHeaderActions) {
+          @for (item of navItems; track item.route) {
+            <a
+              class="nav-chip"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            >
+              {{ item.label }}
+            </a>
+          }
+
+          @if (authenticated) {
+            @if (navItems.length) {
+              <span class="island-divider" aria-hidden="true"></span>
+            }
+
+            <button
+              class="shell-signout-button"
+              type="button"
+              pButton
+              [text]="true"
+              aria-label="Sign out"
+              (click)="onLogout()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+              </svg>
+              <span class="sign-out-label">Sign out</span>
+            </button>
+          } @else {
+            @if (navItems.length) {
+              <span class="island-divider" aria-hidden="true"></span>
+            }
+
+            <a class="nav-chip auth-chip" routerLink="/auth/login">Sign In</a>
+          }
+        }
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="content-container" tabindex="-1">
+    <div class="content-inner">
+      <ng-content select="[shell-content]" />
+    </div>
+  </main>
+
+  <footer class="footer-container">
+    <div class="footer-inner">
+      <div class="footer-island">
+        <ng-content select="[shell-footer]" />
+        @if (footerText) {
+          <p class="footer-text">{{ footerText }}</p>
+        }
+      </div>
+    </div>
+  </footer>
+</div>
